@@ -1,5 +1,4 @@
 """Unit tests for the User model."""
-import email
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclub.models import User
@@ -111,7 +110,8 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_bio_need_not_be_unique(self):
-        second_user = User.objects.get(username='@janedoe')
+        self.create_second_user()
+        second_user = User.objects.get(username='janedoe')
         self.user.bio = second_user.bio
         self._assert_user_is_valid()
 
@@ -134,7 +134,7 @@ class UserModelTestCase(TestCase):
             self.user.full_clean()
 
     def create_second_user(self):
-        self.user = User.objects.create_user(
+        User.objects.create_user(
             username = 'janedoe',
             first_name = 'Jane',
             last_name = 'Doe',
