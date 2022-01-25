@@ -16,7 +16,7 @@
 }
 
 #cover-image {
-  background: url(#) no-repeat center center fixed;
+  background: url(images/welcome.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -40,8 +40,12 @@ h1.cover-heading {
   font-size: 4rem;
 }
 
+h2.cover-heading {
+  font-size: 2rem;
+}
+
 p.cover-text {
-  font-size: 1.7rem;
+  font-size: 1.3rem;
 }
 
 .cover-card {
@@ -54,7 +58,7 @@ p.cover-text {
   border-radius: 15%;
 }
 .cover-card-block {
-  opacity: 1
+  opacity: 10
 }
 
 
