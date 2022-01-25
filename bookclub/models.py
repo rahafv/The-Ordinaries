@@ -7,7 +7,8 @@ class User(AbstractUser):
 
     username = models.CharField(
         max_length=30,
-        unique=True
+        unique=True,
+        blank=False
     )
 
     first_name = models.CharField(
@@ -45,7 +46,7 @@ class User(AbstractUser):
     )
 
     bio = models.CharField(
-        max_length=520,
+        max_length=300,
         blank=True
     )
   
@@ -67,7 +68,4 @@ class User(AbstractUser):
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
-
-    def mini_gravatar(self):
-        """Return a URL to a miniature version of the user's gravatar."""
-        return self.gravatar(size=60)
+    

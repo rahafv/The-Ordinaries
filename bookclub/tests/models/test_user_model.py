@@ -105,6 +105,64 @@ class UserModelTestCase(TestCase):
         self.user.email = 'johndoe@@example.org'
         self._assert_user_is_invalid()
 
+    def test_birthdate_may_be_blank(self):
+        self.user.birthdate = ''
+        self._assert_user_is_valid()
+
+    def test_city_may_be_blank(self):
+        self.user.city = ''
+        self._assert_user_is_valid()
+
+    def test_city_need_not_be_unique(self):
+        self.create_second_user()
+        second_user = User.objects.get(username='janedoe')
+        self.user.city = second_user.city
+        self._assert_user_is_valid()
+
+    def test_city_may_contain_50_characters(self):
+        self.user.city = 'x' * 50
+        self._assert_user_is_valid()
+
+    def test_city_must_not_contain_more_than_50_characters(self):
+        self.user.city = 'x' * 51
+        self._assert_user_is_invalid()
+
+    def test_state_may_be_blank(self):
+        self.user.state = ''
+        self._assert_user_is_valid()
+
+    def test_state_need_not_be_unique(self):
+        self.create_second_user()
+        second_user = User.objects.get(username='janedoe')
+        self.user.state = second_user.state
+        self._assert_user_is_valid()
+
+    def test_state_may_contain_50_characters(self):
+        self.user.state = 'x' * 50
+        self._assert_user_is_valid()
+
+    def test_state_must_not_contain_more_than_50_characters(self):
+        self.user.state = 'x' * 51
+        self._assert_user_is_invalid()
+
+    def test_country_may_be_blank(self):
+        self.user.country = ''
+        self._assert_user_is_valid()
+
+    def test_country_need_not_be_unique(self):
+        self.create_second_user()
+        second_user = User.objects.get(username='janedoe')
+        self.user.country = second_user.country
+        self._assert_user_is_valid()
+
+    def test_country_may_contain_50_characters(self):
+        self.user.country = 'x' * 50
+        self._assert_user_is_valid()
+
+    def test_country_must_not_contain_more_than_50_characters(self):
+        self.user.country = 'x' * 51
+        self._assert_user_is_invalid()
+
     def test_bio_may_be_blank(self):
         self.user.bio = ''
         self._assert_user_is_valid()
@@ -115,12 +173,12 @@ class UserModelTestCase(TestCase):
         self.user.bio = second_user.bio
         self._assert_user_is_valid()
 
-    def test_bio_may_contain_520_characters(self):
-        self.user.bio = 'x' * 520
+    def test_bio_may_contain_300_characters(self):
+        self.user.bio = 'x' * 300
         self._assert_user_is_valid()
 
-    def test_bio_must_not_contain_more_than_520_characters(self):
-        self.user.bio = 'x' * 521
+    def test_bio_must_not_contain_more_than_300_characters(self):
+        self.user.bio = 'x' * 301
         self._assert_user_is_invalid()
 
     def _assert_user_is_valid(self):
