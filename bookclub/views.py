@@ -1,13 +1,30 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import LogInForm
+from .forms import SignUpForm, LogInForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
+from .models import User
 
 @login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
+  
+@login_required
+def home(request):
+     return render(request, 'home.html')
+     
+@login_prohibited
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'sign_up.html', {'form': form})
 
 @login_prohibited
 def log_in(request):
@@ -27,11 +44,6 @@ def log_in(request):
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
-
-@login_required
-def home(request):
-     return render(request, 'home.html')
-
 
 def log_out(request):
     logout(request)

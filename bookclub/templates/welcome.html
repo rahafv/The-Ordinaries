@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-<div id = "cover-image">
+<div id = "welcome-image">
   <div class="container vh-100 ">
     <div class="row h-100">
       <div class="col-12 my-auto">
@@ -9,7 +9,7 @@
           <h2 class="cover-heading">Welcome!</h2>
           <p class="cover-text"> Become part of the ordinaries' family</p>
           <p>
-            <a href='#' class="btn btn-lg btn-secondary">
+            <a href='{% url 'sign_up' %}' class="btn btn-lg btn-secondary">
               Sign up
             </a>
             <a href='log_in' class="btn btn-lg btn-secondary">
