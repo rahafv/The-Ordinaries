@@ -4,7 +4,7 @@ from django.test import TestCase
 from bookclub.forms import LogInForm
 
 class LogInFormTestCase(TestCase):
-    """Unit tests of the log in form."""
+    
     def setUp(self):
         self.form_input = {'username': '@janedoe', 'password': 'Password123'}
 

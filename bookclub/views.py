@@ -1,14 +1,15 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render
-from django.contrib.auth import authenticate, login
 from .forms import LogInForm
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from .helpers import login_prohibited
 
+@login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
 
+@login_prohibited
 def log_in(request):
     if request.method == 'POST':
         form = LogInForm(request.POST)
@@ -19,7 +20,7 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                redirect_url = next or 'welcome'
+                redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
@@ -27,6 +28,7 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
+@login_required
 def home(request):
      return render(request, 'home.html')
 

@@ -7,7 +7,6 @@ from bookclub.models import User
 from bookclub.tests.helpers import LogInTester, reverse_with_next
 
 class LogInViewTestCase(TestCase, LogInTester):
-    """Tests of the log in view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
@@ -31,7 +30,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(len(messages_list), 0)
 
     def test_get_log_in_with_redirect(self):
-        destination_url = reverse('welcome')
+        destination_url = reverse('home')
         self.url = reverse_with_next('log_in', destination_url)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -44,12 +43,12 @@ class LogInViewTestCase(TestCase, LogInTester):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
-    # def test_get_log_in_redirects_when_logged_in(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     response = self.client.get(self.url, follow=True)
-    #     redirect_url = reverse('welcome')
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'welcome.html')
+    def test_get_log_in_redirects_when_logged_in(self):
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.get(self.url, follow=True)
+        redirect_url = reverse('home')
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'home.html')
 
     def test_unsuccesful_log_in(self):
         form_input = { 'username': '@johndoe', 'password': 'WrongPassword123' }
@@ -94,32 +93,24 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = { 'username': '@johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
-        response_url = reverse('welcome')
+        response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'welcome.html')
+        self.assertTemplateUsed(response, 'home.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
-    # def test_succesful_log_in_with_redirect(self):
-    #     redirect_url = reverse('welcome')
-    #     form_input = { 'username': '@johndoe', 'password': 'Password123', 'next': redirect_url }
-    #     response = self.client.post(self.url, form_input, follow=True)
-    #     self.assertTrue(self._is_logged_in())
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'welcome.html')
-    #     messages_list = list(response.context['messages'])
-    #     self.assertEqual(len(messages_list), 0)
-
-    # def test_post_log_in_redirects_when_logged_in(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     form_input = { 'username': '@wronguser', 'password': 'WrongPassword123' }
-    #     response = self.client.post(self.url, form_input, follow=True)
-    #     redirect_url = reverse('welcome')
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'welcome.html')
+    def test_succesful_log_in_with_redirect(self):
+        redirect_url = reverse('home')
+        form_input = { 'username': '@johndoe', 'password': 'Password123', 'next': redirect_url }
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertTrue(self._is_logged_in())
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'home.html')
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 0)
 
     def test_post_log_in_with_incorrect_credentials_and_redirect(self):
-        redirect_url = reverse('welcome')
+        redirect_url = reverse('log_in')
         form_input = { 'username': '@johndoe', 'password': 'WrongPassword123', 'next': redirect_url }
         response = self.client.post(self.url, form_input)
         next = response.context['next']
