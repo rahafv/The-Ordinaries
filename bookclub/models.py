@@ -21,7 +21,8 @@ class User(AbstractUser):
         blank=False
     )
 
-    birthdate = models.DateField(
+    age = models.PositiveSmallIntegerField(
+        null=True,
         blank=True
     )
 
@@ -35,7 +36,7 @@ class User(AbstractUser):
         blank=True
     )
 
-    state = models.CharField(
+    region = models.CharField(
         max_length=50,
         blank=True
     )
@@ -55,10 +56,6 @@ class User(AbstractUser):
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
-
-    def age(self):
-        import datetime
-        return int( (datetime.date.today() - self.birthdate).days / 365.25 )
 
     def location(self):
         return f'{self.city}, {self.state},  {self.country}'

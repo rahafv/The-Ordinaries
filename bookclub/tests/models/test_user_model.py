@@ -10,10 +10,10 @@ class UserModelTestCase(TestCase):
             username = 'johndoe',
             first_name = 'John',
             last_name = 'Doe',
-            birthdate = '2006-10-25',
+            age = '19',
             email = 'johndoe@example.com',
             city = 'new york',
-            state = 'NY',
+            region = 'NY',
             country = 'United states',
             bio = 'This is john doe bio',
         )
@@ -105,8 +105,12 @@ class UserModelTestCase(TestCase):
         self.user.email = 'johndoe@@example.org'
         self._assert_user_is_invalid()
 
-    def test_birthdate_may_be_blank(self):
-        self.user.birthdate = ''
+    def test_age_may_be_null(self):
+        self.user.age = None
+        self._assert_user_is_valid()
+
+    def test_age_may_be_blank(self):
+        self.user.age = ''
         self._assert_user_is_valid()
 
     def test_city_may_be_blank(self):
@@ -127,22 +131,22 @@ class UserModelTestCase(TestCase):
         self.user.city = 'x' * 51
         self._assert_user_is_invalid()
 
-    def test_state_may_be_blank(self):
-        self.user.state = ''
+    def test_region_may_be_blank(self):
+        self.user.region = ''
         self._assert_user_is_valid()
 
-    def test_state_need_not_be_unique(self):
+    def test_region_need_not_be_unique(self):
         self.create_second_user()
         second_user = User.objects.get(username='janedoe')
-        self.user.state = second_user.state
+        self.user.region = second_user.region
         self._assert_user_is_valid()
 
-    def test_state_may_contain_50_characters(self):
-        self.user.state = 'x' * 50
+    def test_region_may_contain_50_characters(self):
+        self.user.region = 'x' * 50
         self._assert_user_is_valid()
 
-    def test_state_must_not_contain_more_than_50_characters(self):
-        self.user.state = 'x' * 51
+    def test_region_must_not_contain_more_than_50_characters(self):
+        self.user.region = 'x' * 51
         self._assert_user_is_invalid()
 
     def test_country_may_be_blank(self):
@@ -196,10 +200,10 @@ class UserModelTestCase(TestCase):
             username = 'janedoe',
             first_name = 'Jane',
             last_name = 'Doe',
-            birthdate = '2006-10-25',
+            age = None,
             email = 'janedoe@example.com',
             city = 'new york',
-            state = 'NY',
+            region = 'NY',
             country = 'United states',
             bio = 'This is jane doe bio',
         )
