@@ -132,3 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'bookclub.User'
 
+LOGIN_URL = 'log_in'
+
+REDIRECT_URL_WHEN_LOGGED_IN = 'home'

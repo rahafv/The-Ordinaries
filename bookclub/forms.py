@@ -5,6 +5,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .models import User
+
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
 
@@ -82,4 +83,6 @@ class SignUpForm(forms.ModelForm):
         )
         return user
 
-
+class LogInForm(forms.Form):
+    username = forms.CharField(label="Username")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
