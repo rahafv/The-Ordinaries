@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from .forms import LogInForm
 from django.contrib import messages
+from django.shortcuts import redirect
 
 def welcome(request):
     return render(request, 'welcome.html')
@@ -16,7 +17,7 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                redirect_url = next or 'feed'
+                redirect_url = next or 'welcome'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
