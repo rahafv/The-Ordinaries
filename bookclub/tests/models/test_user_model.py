@@ -185,6 +185,16 @@ class UserModelTestCase(TestCase):
         self.user.bio = 'x' * 301
         self._assert_user_is_invalid()
 
+    def test_full_name(self):
+        self.assertTrue(self.user.full_name(), 'John Doe')
+    
+    def test_location(self):
+        self.assertTrue(self.user.location(), 'new york, NY, United states')
+
+    def test_user_gravatar(self):
+        self.assertTrue(self.user.gravatar())
+        self.assertTrue("https://www.gravatar.com" in self.user.gravatar())
+
     def _assert_user_is_valid(self):
         try:
             self.user.full_clean()

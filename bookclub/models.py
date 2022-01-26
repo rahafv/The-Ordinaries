@@ -58,7 +58,7 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def location(self):
-        return f'{self.city}, {self.state},  {self.country}'
+        return f'{self.city}, {self.region},  {self.country}'
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
