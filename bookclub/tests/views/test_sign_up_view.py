@@ -10,7 +10,6 @@ from datetime import date
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
 
-
     def setUp(self):
         self.url = reverse('sign_up')
         self.form_input = {
@@ -38,8 +37,6 @@ class SignUpViewTestCase(TestCase, LogInTester):
             bio = 'This is john doe bio',
         )
 
-
-
     def test_sign_up_url(self):
         self.assertEqual(self.url,'/sign_up/')
 
@@ -50,13 +47,6 @@ class SignUpViewTestCase(TestCase, LogInTester):
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertFalse(form.is_bound)
-
-    # def test_get_sign_up_redirects_when_logged_in(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     response = self.client.get(self.url, follow=True)
-    #     redirect_url = reverse('home')
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'home.html')
 
     def test_unsuccesful_sign_up(self):
         self.form_input['email'] = 'bademail'
@@ -76,9 +66,9 @@ class SignUpViewTestCase(TestCase, LogInTester):
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count+1)
-        response_url = reverse('welcome')
+        response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'welcome.html')
+        self.assertTemplateUsed(response, 'home.html')
         user = User.objects.get(username='@janedoe')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
@@ -92,12 +82,12 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertTrue(is_password_correct)
         self.assertTrue(self._is_logged_in())
 
-    # def test_post_sign_up_redirects_when_logged_in(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     before_count = User.objects.count()
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     after_count = User.objects.count()
-    #     self.assertEqual(after_count, before_count)
-    #     redirect_url = reverse('home')
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'home.html')
+    def test_sign_up_log_in_prohibited(self):
+        self.client.post(self.url, self.form_input)
+        self.assertTrue(self._is_logged_in())
+        response = self.client.get(self.url, follow=True)
+        target_url = reverse("home")
+        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'home.html')
+
+    
