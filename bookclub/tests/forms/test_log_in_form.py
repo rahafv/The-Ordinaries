@@ -1,7 +1,7 @@
 """Unit tests of the log in form."""
 from django import forms
 from django.test import TestCase
-from microblogs.forms import LogInForm
+from bookclub.forms import LogInForm
 
 class LogInFormTestCase(TestCase):
     """Unit tests of the log in form."""
