@@ -1,3 +1,5 @@
+from django.shortcuts import render , redirect
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
 from .forms import LogInForm
@@ -24,3 +26,11 @@ def log_in(request):
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
+
+def home(request):
+     return render(request, 'home.html')
+
+
+def log_out(request):
+    logout(request)
+    return redirect('welcome')
