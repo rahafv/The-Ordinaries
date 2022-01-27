@@ -4,7 +4,7 @@ from pickle import FALSE
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Club
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -86,3 +86,13 @@ class SignUpForm(forms.ModelForm):
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+class CreateClubForm(forms.ModelForm):
+    """Form to create or update club information."""
+    
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['name', 'theme', 'meeting_type', 'city', 'country']
+        widgets = {"meeting_type": forms.Select()}

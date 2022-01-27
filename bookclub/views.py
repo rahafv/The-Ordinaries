@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
 from .models import User
+from .forms import CreateClubForm
 
 @login_prohibited
 def welcome(request):
@@ -48,3 +49,15 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('welcome')
+
+@login_required
+def create_club(request):
+    if request.method == "POST":
+        form = CreateClubForm(request.POST)
+        if form.is_valid():
+            form.instance.owner = request.user
+            new_club = form.save()
+            return redirect(home)
+    else:
+        form = CreateClubForm()
+    return render(request, "create_club.html", {"form": form})

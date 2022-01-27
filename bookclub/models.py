@@ -121,3 +121,10 @@ class Club(models.Model):
     def location(self):
         """Return full location."""
         return f'{self.city}, {self.country}'
+
+    def add_member(self, member):
+        if not self.members.all().filter(id=member.id).exist():
+            self.members.add(member)
+
+    def member_count(self):
+        return self.members.all().count()
