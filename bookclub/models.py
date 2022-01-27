@@ -56,6 +56,9 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
+
+    
+    books = models.ManyToManyField('Book', related_name='books')
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -103,7 +106,6 @@ class Book(models.Model):
 
     image_url = models.URLField()
 
-
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
         blank=True,
@@ -112,3 +114,5 @@ class Book(models.Model):
             MinValueValidator(1)
         ]
     )
+
+    readers = models.ManyToManyField(User, related_name='clubs')
