@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookclub',
-    'widget_tweaks'
+    'widget_tweaks',
+    'isbn_field',
 ]
 
 MIDDLEWARE = [
