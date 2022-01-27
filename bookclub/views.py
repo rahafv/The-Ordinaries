@@ -1,10 +1,10 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, BookForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
-from .models import User
+from .models import User, Book
 
 @login_prohibited
 def welcome(request):
@@ -48,3 +48,16 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('welcome')
+
+
+
+def add_book(request):
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            book = form.save()
+            return redirect(home)
+    else:
+        form = BookForm()
+    return render(request, "add_book.html", {"form": form})
+

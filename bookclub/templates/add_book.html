@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block title %}Add book |{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-xs-12 col-lg-6 col-xl-4">
+            <h1 class="text-center sticky-top mt-5 mb-5">Add book</h1>
+        </div>
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <form action="{% url 'add_book' %}" method="post">
+                {% csrf_token %}
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <input id="form_button" type="submit" value="add book" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 
