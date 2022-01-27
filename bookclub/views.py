@@ -1,6 +1,9 @@
 from django.shortcuts import render , redirect
+from django.conf import settings
+from django.urls import reverse
+from django.views.generic.edit import UpdateView
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm,UserForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
@@ -48,3 +51,21 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('welcome')
+
+
+class ProfileUpdateView(UpdateView):#LoginRequiredMixin
+    """View to update logged-in user's profile."""
+
+    model = UserForm
+    template_name = "profile.html"
+    form_class = UserForm
+
+    def get_object(self):
+        """Return the object (user) to be updated."""
+        user = self.request.user
+        return user
+
+    def get_success_url(self):
+        """Return redirect URL after successful update."""
+        messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
