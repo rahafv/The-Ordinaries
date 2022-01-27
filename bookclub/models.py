@@ -50,6 +50,11 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
+
+    clubs = models.ManyToManyField(
+        'Club',
+        blank = True  
+    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -83,7 +88,7 @@ class Club(models.Model):
     )
     
     members = models.ManyToManyField(
-        User, 
+        'User', 
         related_name='members'
     )
 
