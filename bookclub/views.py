@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views.generic.edit import UpdateView
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm,UserForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
@@ -53,7 +54,7 @@ def log_out(request):
     return redirect('welcome')
 
 
-class ProfileUpdateView(UpdateView):#LoginRequiredMixin
+class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
 
     model = UserForm
