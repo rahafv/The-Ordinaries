@@ -25,4 +25,5 @@ urlpatterns = [
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
     path('create_club/', views.create_club , name='create_club'),
+    path("club/<int:club_id>/", views.club_page, name="club_page")
 ]

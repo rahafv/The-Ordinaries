@@ -1,14 +1,80 @@
 {% extends 'base_content.html' %}
+{% block title %}{{ club.name }} |{% endblock %}
 {% block content %}
-<div id = "home-image">
-  <div class="container vh-100 ">
-    <div class="row h-100">
-      <div class="col-12 my-auto">
-        <h1 class="cover-heading">Ordinaries</h1>
-        <div class="card cover-card">
-          <p class="cover-text">Page Under Construction!</p>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+        <h2 class="d-flex justify-content-center">{{ club.name }}</h2>
+        {% if user == club.owner %}
+          <span>
+            <!-- TODO: Add link to edit club here -->
+            <a href="#" class="bi-pencil-square"
+            style="font-size: 1.8rem; color: grey;"></a>
+          </span>
+        {% endif %}
+        <div class="row mt-5">
+          <div class="col-5">
+            <h4 class="mb-3">Theme:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ club.theme }}</p>
+            </div>
+            <h4 class="mb-3">Meeting type:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ meeting_type }}</p>
+            </div>
+            <h4 class="mb-3">City:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ club.city }}</p>
+            </div>
+            <h4 class="mb-3">Country:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ club.country }}</p>
+            </div>    
+            <hr></hr>
+            <button class="btn btn-dark btn-lg mb-3  text-center" type="button btn-block" data-bs-toggle="collapse"
+              data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
+              Owner
+            </button>
+            <div class="collapse" id="owner">
+              <div class="card card-body mb-3 pb-0">
+                <p>{{ club.owner.full_name }}</p>
+                <p>{{ club.owner.email }}</p>
+                <p>{{ club.owner.bio }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-2">
+          </div>
+          <div class="col-5">
+            <div class="col-7">
+              <div class="card text-center">
+                <div class="card-body">
+                  <!-- TODO: Add link to book list here -->
+                  <a href="#" class="btn btn-outline-dark">Book List</a>
+                </div>
+              </div>
+              <div class="card text-center">
+                <div class="card-body">
+                  <!-- TODO: Add link to member list here -->
+                  <a href="#" class="btn btn-outline-dark">Member List</a>  
+                </div>
+              </div>
+              <!-- DO NOT FORGET TO ADD IF STATEMENTS-->
+              <div class="card text-center">
+                <div class="card-body">
+                  <div class="mb-3 pb-0">
+                    <!-- TODO: Add link to join club here -->
+                    <a href="#" class="btn btn-outline-success">Join club</a> 
+                  </div>
+                  <div class="mb-3 pb-0">
+                    <!-- TODO: Add link to withdraw from club here -->
+                    <a href="#" class="btn btn-outline-warning">Withdraw from club</a>   
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
     </div>
   </div>
 </div>
