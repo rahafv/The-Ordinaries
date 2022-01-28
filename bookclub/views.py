@@ -63,7 +63,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
 
     model = UserForm
-    template_name = "profile.html"
+    template_name = "edit_profile.html"
     form_class = UserForm
 
     def get_object(self):
