@@ -1,4 +1,4 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import get_object_or_404, render , redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, BookForm
 from django.contrib import messages
@@ -54,9 +54,12 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect(home) 
+            return redirect('book_details', book_id=book.id) 
 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
 
+def book_details(request, book_id): 
+    book = get_object_or_404(Book.objects, id=book_id)
+    return render(request, "book_details.html", {'book': book})

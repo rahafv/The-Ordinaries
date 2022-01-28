@@ -94,16 +94,16 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'publisher','image_url','year']
+        fields = ['ISBN','title','author', 'publisher','year']
 
     def save(self):
         """Create a new user."""
+        super().save(commit=False)
         book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
             publisher=self.cleaned_data.get('publisher'),
-            image_url=self.cleaned_data.get('image_url'),
             year=self.cleaned_data.get('year'),
         )
         return book

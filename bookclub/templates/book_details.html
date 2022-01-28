@@ -1,0 +1,41 @@
+{% extends 'base_content.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+        <h2 class="d-flex justify-content-center">{{ book.title }}</h2>
+        <div class="row mt-5">
+          <div class="col-5">
+            <h4 class="mb-3">Author:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ book.author }}</p>
+            </div>
+            <h4 class="mb-3">publisher:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ book.author }}</p>
+            </div>
+            <h4 class="mb-3">year published:</h4>
+            <div class="card card-body mb-3 pb-0">
+              <p>{{ book.year }}</p>
+            </div>
+          </div>
+          <div class="col-2">
+          </div>
+          <div class="col-5">
+            <div class="col-7">
+              <div class="card text-center">
+                <div class="card-body">
+                  <!-- TODO: Add link to rate book here -->
+                  <a href="#" class="btn btn-outline-dark">rate book</a>
+                </div>
+              </div>
+              <div class="card text-center">
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

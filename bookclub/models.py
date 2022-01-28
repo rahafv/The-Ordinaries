@@ -81,10 +81,10 @@ class User(AbstractUser):
 class Book(models.Model):
     """Book model."""
 
-    ISBN = models.CharField('ISBN', max_length=13,
-                            unique=True,
-                            help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn'
-                                      '">ISBN number</a>')
+    ISBN = models.CharField(
+        max_length=13, 
+        unique=True
+    )
 
     title = models.CharField(
         max_length=100,
@@ -104,7 +104,7 @@ class Book(models.Model):
         blank=True
     )
 
-    image_url = models.URLField()
+    image_url = models.URLField( blank=True)
 
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
