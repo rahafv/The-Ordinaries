@@ -10,7 +10,7 @@ class CreateClubFormTestCase(TestCase):
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
-        self.form_data = {
+        self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
             'meeting_type': Club.MeetingType.INPERSON,
@@ -18,8 +18,8 @@ class CreateClubFormTestCase(TestCase):
             'country': 'usa'
         }
 
-    def test_valid_sign_up_form(self):
-        form = CreateClubForm(self.form_data)
+    def test_valid_create_club_form(self):
+        form = CreateClubForm(self.form_input)
         self.assertTrue(form.is_valid())
 
     def test_form_has_correct_fields(self):
@@ -32,13 +32,13 @@ class CreateClubFormTestCase(TestCase):
         self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
 
     def test_form_model_validation(self):
-        self.form_data["name"] = ""
-        form = CreateClubForm(self.form_data)
+        self.form_input["name"] = ""
+        form = CreateClubForm(self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_saves_correctly(self):
         count_clubs_before = Club.objects.count()
-        form = CreateClubForm(self.form_data)
+        form = CreateClubForm(self.form_input)
         owner = User.objects.get(username="johndoe")
         form.instance.owner = owner
         form.save()

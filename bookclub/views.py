@@ -52,18 +52,18 @@ def log_out(request):
 
 @login_required
 def create_club(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
             form.instance.owner = request.user
             club = form.save()
-            return redirect("club_page",  club_id=club.id)
+            return redirect('club_page',  club_id=club.id)
     else:
         form = CreateClubForm()
-    return render(request, "create_club.html", {"form": form})
+    return render(request, 'create_club.html', {'form': form})
 
 @login_required
 def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    return render(request, "club_page.html", {"club": club, "meeting_type": club.get_meeting_type_display()})
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display()})
 
