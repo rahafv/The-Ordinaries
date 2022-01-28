@@ -88,13 +88,25 @@ class LogInForm(forms.Form):
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
 
-class BookForm(forms.Form): 
+class BookForm(forms.ModelForm): 
     """Form enabling a user to create a book."""
 
     class Meta:
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher','image_url','year']
+
+    def save(self):
+        """Create a new user."""
+        book = Book.objects.create(
+            ISBN=self.cleaned_data.get('ISBN'),
+            title=self.cleaned_data.get('title'),
+            author=self.cleaned_data.get('author'),
+            publisher=self.cleaned_data.get('publisher'),
+            image_url=self.cleaned_data.get('image_url'),
+            year=self.cleaned_data.get('year'),
+        )
+        return book
 
 
 

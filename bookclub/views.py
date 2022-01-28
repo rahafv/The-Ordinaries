@@ -49,14 +49,13 @@ def log_out(request):
     logout(request)
     return redirect('welcome')
 
-
-
 def add_book(request):
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect(home)
+            return redirect(home) 
+
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
