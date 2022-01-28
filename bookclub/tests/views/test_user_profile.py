@@ -79,7 +79,7 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.bio, "Hello, I'm John Doe.")
 
     def test_unsuccessful_profile_update_due_to_duplicate_username(self):
-        self.create_second_user()
+        self._create_second_user()
         second_user = User.objects.get(username='jd')
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = second_user.username
@@ -131,7 +131,7 @@ class ProfileViewTest(TestCase):
         response = self.client.post(self.url, self.form_input)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def create_second_user(self):
+    def _create_second_user(self):
         User.objects.create_user(
             username = 'jd',
             first_name = 'Jane',

@@ -53,6 +53,11 @@ def log_out(request):
     logout(request)
     return redirect('welcome')
 
+@login_required
+def show_profile_page(request):
+    user = request.user
+    return render(request, 'profile_page.html')
+
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
