@@ -49,6 +49,7 @@ def log_out(request):
     logout(request)
     return redirect('welcome')
 
+@login_required
 def add_book(request):
     if request.method == "POST":
         form = BookForm(request.POST)
@@ -60,6 +61,7 @@ def add_book(request):
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
 
+@login_required
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})

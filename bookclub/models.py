@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
-#from isbn_field import ISBNField
+from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator 
 from tempfile import NamedTemporaryFile
@@ -81,8 +81,7 @@ class User(AbstractUser):
 class Book(models.Model):
     """Book model."""
 
-    ISBN = models.CharField(
-        max_length=13, 
+    ISBN = ISBNField(
         unique=True
     )
 
