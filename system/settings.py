@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,3 +136,9 @@ AUTH_USER_MODEL = 'bookclub.User'
 LOGIN_URL = 'log_in'
 
 REDIRECT_URL_WHEN_LOGGED_IN = 'home'
+
+# Message level tags shoudl use Bootsatrp terms
+MESSAGE_TAGS = {
+    message_constants.DEBUG:"dark",
+    message_constants.ERROR:"danger",
+}

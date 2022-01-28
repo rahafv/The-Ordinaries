@@ -1,10 +1,11 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, PasswordForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
 from .models import User
+from django.contrib.auth.hashers import check_password
 
 @login_prohibited
 def welcome(request):
@@ -48,3 +49,24 @@ def log_in(request):
 def log_out(request):
     logout(request)
     return redirect('welcome')
+
+@login_required
+def password(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = PasswordForm(data=request.POST)
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            if check_password(password, current_user.password):
+                new_password = form.cleaned_data.get('new_password')
+                current_user.set_password(new_password)
+                current_user.save()
+                login(request, current_user)
+                messages.add_message(request, messages.SUCCESS, "Password updated!")
+                return redirect('home')
+            else:
+                messages.add_message(request, messages.ERROR, "Invalid current password!")
+        else:
+                messages.add_message(request, messages.ERROR, "Invalid new password!")
+    form = PasswordForm()
+    return render(request, 'password.html', {'form': form}) 
