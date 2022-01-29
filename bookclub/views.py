@@ -88,6 +88,11 @@ def book_details(request, book_id):
     return render(request, "book_details.html", {'book': book})
 
 @login_required
-def books_list(request):
+def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
+    if club_id:
+        books = Club.objects.get(id=club_id).books.all()
+    if user_id:
+        books = User.objects.filter(id=user_id).books.all()
+
     return render(request, 'books.html', {'current_user': request.user, 'books': books})
