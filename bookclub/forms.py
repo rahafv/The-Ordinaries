@@ -4,7 +4,7 @@ from pickle import FALSE
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Book
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -87,6 +87,7 @@ class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
+
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
 
@@ -110,3 +111,15 @@ class PasswordForm(forms.Form):
     #         password_confirmation = self.cleaned_data.get('password_confirmation')
     #         if new_password != password_confirmation:
     #             self.add_error('password_confirmation', 'Confirmation does not match password.')
+
+
+class BookForm(forms.ModelForm): 
+    """Form enabling a user to create a book."""
+
+    class Meta:
+        """Form options."""
+        model = Book
+        fields = ['ISBN','title','author', 'publisher','image_url','year']
+
+
+

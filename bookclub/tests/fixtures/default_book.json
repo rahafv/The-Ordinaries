@@ -1,0 +1,14 @@
+[
+    {
+      "model": "bookclub.Book",
+      "pk": 1,
+      "fields": {
+        "ISBN": "0195153448",
+        "title": "Classical Mythology",
+        "author": "Mark P. O. Morford",
+        "publisher": "Oxford University Press",
+        "year": "2002"
+      }
+    }
+  ]
+  

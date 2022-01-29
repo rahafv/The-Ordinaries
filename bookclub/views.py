@@ -1,11 +1,12 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import get_object_or_404, render , redirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, PasswordForm
+from .forms import SignUpForm, LogInForm, BookForm, PasswordForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
-from .models import User
+from .models import User, Book
 from django.contrib.auth.hashers import check_password
+
 
 @login_prohibited
 def welcome(request):
@@ -46,6 +47,9 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
+def handler404(request,exception):
+    return render(exception, '404_page.html', status=404)
+
 def log_out(request):
     logout(request)
     return redirect('welcome')
@@ -75,3 +79,20 @@ def password(request):
                 messages.add_message(request, messages.ERROR, "New password does not match criteria!")
     form = PasswordForm()
     return render(request, 'password.html', {'form': form}) 
+
+def add_book(request):
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            book = form.save()
+            return redirect('book_details', book_id=book.id) 
+
+    else:
+        form = BookForm()
+    return render(request, "add_book.html", {"form": form})
+
+@login_required
+def book_details(request, book_id): 
+    book = get_object_or_404(Book.objects, id=book_id)
+    return render(request, "book_details.html", {'book': book})
+
