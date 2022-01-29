@@ -7,7 +7,9 @@ from bookclub.models import User, Book
 class BookModelTestCase(TestCase):
     """Unit tests for the book model."""
 
-    fixtures = ['bookclub/tests/fixtures/default_book.json']
+    fixtures = ['bookclub/tests/fixtures/default_user.json', 
+        'bookclub/tests/fixtures/default_book.json'
+    ]
     
     def setUp(self):
         self.book = Book.objects.get(id=1)
@@ -110,8 +112,8 @@ class BookModelTestCase(TestCase):
         )
 
     def test_reader_addition(self):
-        nonReader = User.objects.get(id=4)
-        count = self.club.reader_count
-        self.club.add_member(nonReader)
-        self.assertEqual(self.club.reader_count, count)
+        nonReader = User.objects.get(id=1)
+        count = self.book.readers_count
+        self.book.add_reader(nonReader)
+        self.assertEqual(self.book.readers_count, count)
 
