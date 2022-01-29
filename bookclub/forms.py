@@ -102,15 +102,17 @@ class PasswordForm(forms.Form):
             )]
     )
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
-    #not sure if this is needed
-    # def clean(self):
-    #         """Clean the data and generate messages for any errors."""
-
-    #         super().clean()
-    #         new_password = self.cleaned_data.get('new_password')
-    #         password_confirmation = self.cleaned_data.get('password_confirmation')
-    #         if new_password != password_confirmation:
-    #             self.add_error('password_confirmation', 'Confirmation does not match password.')
+    
+    def clean(self):
+            """Clean the data and generate messages for any errors."""
+            super().clean()
+            password = self.cleaned_data.get('password')
+            new_password = self.cleaned_data.get('new_password')
+            password_confirmation = self.cleaned_data.get('password_confirmation')
+            if new_password != password_confirmation:
+                self.add_error('password_confirmation', 'Confirmation does not match password')
+            if password == new_password:
+                self.add_error('new_password', 'Your new password cannot be the same as your current one')
 
 
 class BookForm(forms.ModelForm): 

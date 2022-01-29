@@ -71,9 +71,12 @@ def password(request):
             else:
                 messages.add_message(request, messages.ERROR, "Password incorrect!")
         else:
+            password = form.cleaned_data.get('password')
             new_password = form.cleaned_data.get('new_password')
             password_confirmation = form.cleaned_data.get('password_confirmation')
-            if new_password != password_confirmation:
+            if new_password is None and password == password_confirmation:
+                messages.add_message(request, messages.ERROR, 'Your new password cannot be the same as your current one!')
+            elif new_password != None and new_password != password_confirmation:
                 messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
             else:
                 messages.add_message(request, messages.ERROR, "New password does not match criteria!")
