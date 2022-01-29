@@ -6,28 +6,32 @@
     <div class="row py-lg-5">
       <div class="col-lg-6 col-md-8 mx-auto">
         <h1 class="fw-light center" style="text-align: center;">Books</h1>
-        <!-- TODO: Chaneg paragrph here -->
+        <!-- TODO: Change paragrph here -->
         <p class="lead text-muted">Explore Fable’s ever-expanding collection of book categories and genres. Find your next great book to read with friends!</p>
       </div>
     </div>
   </div>
 
    <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-
-      {% for book in books %}
-        <div class="col">
-          <div style="text-align: center;">
-            <img src= "{{ book.image_url }}"  width="250" height="250" class=" image-thumbnail mb-3" />
-            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
-            <p >{{ book.author }}</p>
-            <a href='{% url 'book_details' book.id %}' class="btn my-2">View</a>
-          </div>
-        </div>
-      {% endfor %}
-
-      </div>
+    {% if books.count == 0 %}
+    <div style="text-align: center;   padding-top: 50px;">
+      <h4 class="lead ">The book list is empty! find more book you might like.</h4>
+      <a href='/books' class="btn my-2">More books</a>
     </div>
+      {% endif %}
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for book in books %}
+      <div class="col">
+        <div style="text-align: center;">
+          <img src= "{{ book.image_url }}"  width="250" height="250" class=" image-thumbnail mb-3" />
+          <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
+          <p >{{ book.author }}</p>
+          <a href='{% url 'book_details' book.id %}' class="btn my-2">View</a>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
 
 {% endblock %}
 
