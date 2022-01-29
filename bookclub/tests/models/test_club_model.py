@@ -1,7 +1,7 @@
 """Unit tests for the Club model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import Club
+from bookclub.models import User, Club
 
 class ClubModelTestCase(TestCase):
 
@@ -109,5 +109,12 @@ class ClubModelTestCase(TestCase):
 
     def test_location(self):
         self.assertTrue(self.club.location(), 'london, uk')
+
+    def test_member_addition(self):
+        nonMember = User.objects.get(id=4)
+        count = self.club.member_count
+        self.club.add_member(nonMember)
+        self.assertEqual(self.club.member_count, count)
+
 
 

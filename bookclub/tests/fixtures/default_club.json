@@ -5,7 +5,7 @@
       "fields": {
           "name": "club1",
           "owner": 2,
-          "members": [3, 4],
+          "members": [3],
           "books": [],
           "theme": "Crime",
           "meeting_type": "OL",

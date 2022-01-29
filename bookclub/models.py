@@ -137,7 +137,7 @@ class Club(models.Model):
         return f'{self.city}, {self.country}'
 
     def add_member(self, member):
-        if not self.members.all().filter(id=member.id).exist():
+        if not self.members.all().filter(id=member.id).exists():
             self.members.add(member)
 
     def member_count(self):
@@ -185,7 +185,7 @@ class Book(models.Model):
     )
 
     def add_reader(self, reader):
-        if not self.readers.all().filter(id=reader.id).exist():
+        if not self.readers.all().filter(id=reader.id).exists():
             self.readers.add(reader)
     
     def readers_count(self):

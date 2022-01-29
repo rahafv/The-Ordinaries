@@ -1,7 +1,7 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import Book
+from bookclub.models import User, Book
 
 
 class BookModelTestCase(TestCase):
@@ -108,4 +108,10 @@ class BookModelTestCase(TestCase):
             image_url= "http://images.amazon.com/images/P/0002005018.01.MZZZZZZZ.jpg",
             year= "2001"
         )
+
+    def test_reader_addition(self):
+        nonReader = User.objects.get(id=4)
+        count = self.club.reader_count
+        self.club.add_member(nonReader)
+        self.assertEqual(self.club.reader_count, count)
 
