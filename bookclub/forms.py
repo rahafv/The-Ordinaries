@@ -19,7 +19,7 @@ class SignUpForm(forms.ModelForm):
 
     DOB = forms.DateField(initial= None, 
         label = 'Date of Birth',
-        widget= forms.DateInput(),
+        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
         required= False, 
     )
 

@@ -45,6 +45,9 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
+def handler404(request,exception):
+    return render(exception, '404_page.html', status=404)
+
 def log_out(request):
     logout(request)
     return redirect('welcome')

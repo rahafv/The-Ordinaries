@@ -16,8 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from bookclub import views
+from django.conf.urls import url , handler404
+from django.conf import settings
+from django.views.static import serve
+
 
 urlpatterns = [
+    url(r'^media/(?P<path>.*)$', serve,
+        {'document_root': settings.MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)$', serve,
+        {'document_root': settings.STATIC_ROOT}),
+
+
     path('admin/', admin.site.urls),
     path('', views.welcome,  name='welcome'),
     path('sign_up/', views.sign_up,  name='sign_up'),
@@ -28,3 +38,5 @@ urlpatterns = [
     path('book_details/<int:book_id>', views.book_details, name ='book_details')
 
 ]
+
+handler404 = 'bookclub.views.handler404'
