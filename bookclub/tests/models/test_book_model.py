@@ -113,7 +113,7 @@ class BookModelTestCase(TestCase):
 
     def test_reader_addition(self):
         nonReader = User.objects.get(id=1)
-        count = self.book.readers_count
+        count = self.book.readers_count()
         self.book.add_reader(nonReader)
-        self.assertEqual(self.book.readers_count, count)
+        self.assertEqual(self.book.readers_count(), count+1)
 

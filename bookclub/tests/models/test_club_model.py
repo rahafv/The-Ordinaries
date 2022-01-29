@@ -112,9 +112,9 @@ class ClubModelTestCase(TestCase):
 
     def test_member_addition(self):
         nonMember = User.objects.get(id=4)
-        count = self.club.member_count
+        count = self.club.member_count()
         self.club.add_member(nonMember)
-        self.assertEqual(self.club.member_count, count)
+        self.assertEqual(self.club.member_count(), count+1)
 
 
 
