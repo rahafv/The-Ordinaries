@@ -57,16 +57,21 @@ def password(request):
         form = PasswordForm(data=request.POST)
         if form.is_valid():
             password = form.cleaned_data.get('password')
+            new_password = form.cleaned_data.get('new_password')
             if check_password(password, current_user.password):
-                new_password = form.cleaned_data.get('new_password')
                 current_user.set_password(new_password)
                 current_user.save()
                 login(request, current_user)
                 messages.add_message(request, messages.SUCCESS, "Password updated!")
                 return redirect('home')
             else:
-                messages.add_message(request, messages.ERROR, "Invalid current password!")
+                messages.add_message(request, messages.ERROR, "Password incorrect!")
         else:
-                messages.add_message(request, messages.ERROR, "Invalid new password!")
+            new_password = form.cleaned_data.get('new_password')
+            password_confirmation = form.cleaned_data.get('password_confirmation')
+            if new_password != password_confirmation:
+                messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
+            else:
+                messages.add_message(request, messages.ERROR, "New password does not match criteria!")
     form = PasswordForm()
     return render(request, 'password.html', {'form': form}) 
