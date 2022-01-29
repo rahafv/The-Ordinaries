@@ -6,8 +6,6 @@ import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator 
 from tempfile import NamedTemporaryFile
 
-
-
 class User(AbstractUser):
     """User model used for authentication."""
 
@@ -103,6 +101,11 @@ class Club(models.Model):
         related_name='members'
     )
 
+    books = models.ManyToManyField(
+        'Book', 
+        related_name='clubBooks'
+    )
+
     theme = models.CharField(
         max_length=100, 
         blank=True
@@ -180,3 +183,10 @@ class Book(models.Model):
         User, 
         related_name='readers'
     )
+
+    def add_reader(self, reader):
+        if not self.readers.all().filter(id=reader.id).exist():
+            self.readers.add(reader)
+    
+    def readers_count(self):
+        return self.readers.all().count()  
