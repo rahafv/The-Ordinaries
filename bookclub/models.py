@@ -6,8 +6,6 @@ import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator 
 from tempfile import NamedTemporaryFile
 
-
-
 class User(AbstractUser):
     """User model used for authentication."""
 
@@ -57,16 +55,25 @@ class User(AbstractUser):
         blank=True
     )
 
+    clubs = models.ManyToManyField(
+        'Club',
+        blank = True  
+    )
     
-    books = models.ManyToManyField('Book', related_name='books')
+    books = models.ManyToManyField(
+        'Book', 
+        related_name='books'
+    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
 
     def full_name(self):
+        """Return full name."""
         return f'{self.first_name} {self.last_name}'
 
     def location(self):
+        """Return full location."""
         return f'{self.city}, {self.region},  {self.country}'
 
     def gravatar(self, size=120):
@@ -74,9 +81,67 @@ class User(AbstractUser):
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
+
+class Club(models.Model):
+    """Club model."""
+
+    name = models.CharField(
+        max_length=50, 
+        blank=False, 
+        null=False
+    )
+
+    owner = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE
+    )
     
+    members = models.ManyToManyField(
+        'User', 
+        related_name='members'
+    )
 
+    books = models.ManyToManyField(
+        'Book', 
+        related_name='clubBooks'
+    )
 
+    theme = models.CharField(
+        max_length=100, 
+        blank=True
+    )
+    
+    class MeetingType(models.TextChoices):
+        INPERSON = "IP", "In-person"
+        ONLINE = "OL", "Online"
+
+    meeting_type = models.CharField(
+        max_length=2,
+        choices=MeetingType.choices,
+        default=MeetingType.INPERSON,
+        blank=False,
+    )
+
+    city = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    country = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    def location(self):
+        """Return full location."""
+        return f'{self.city}, {self.country}'
+
+    def add_member(self, member):
+        if not self.members.all().filter(id=member.id).exists():
+            self.members.add(member)
+
+    def member_count(self):
+        return self.members.all().count()   
 
 class Book(models.Model):
     """Book model."""
@@ -114,4 +179,14 @@ class Book(models.Model):
         ]
     )
 
-    readers = models.ManyToManyField(User, related_name='clubs')
+    readers = models.ManyToManyField(
+        User, 
+        related_name='readers'
+    )
+
+    def add_reader(self, reader):
+        if not self.readers.all().filter(id=reader.id).exists():
+            self.readers.add(reader)
+    
+    def readers_count(self):
+        return self.readers.all().count()  

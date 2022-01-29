@@ -1,0 +1,19 @@
+[
+    {
+      "model": "bookclub.club",
+      "pk": 1,
+      "fields": {
+          "name": "club1",
+          "owner": 2,
+          "members": [3],
+          "books": [],
+          "theme": "Crime",
+          "meeting_type": "OL",
+          "city":"london", 
+          "country":"uk"
+        }
+    }
+]
+
+  
+  
