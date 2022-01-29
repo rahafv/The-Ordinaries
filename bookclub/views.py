@@ -1,11 +1,11 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
-from .models import User, Club
-from .forms import CreateClubForm
+from .models import User, Club, Book
+
 
 @login_prohibited
 def welcome(request):
@@ -46,6 +46,9 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
+def handler404(request,exception):
+    return render(exception, '404_page.html', status=404)
+
 def log_out(request):
     logout(request)
     return redirect('welcome')
@@ -67,3 +70,19 @@ def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display()})
 
+@login_required
+def add_book(request):
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            book = form.save()
+            return redirect('book_details', book_id=book.id) 
+
+    else:
+        form = BookForm()
+    return render(request, "add_book.html", {"form": form})
+
+@login_required
+def book_details(request, book_id): 
+    book = get_object_or_404(Book.objects, id=book_id)
+    return render(request, "book_details.html", {'book': book})

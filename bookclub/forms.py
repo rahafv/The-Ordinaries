@@ -4,7 +4,7 @@ from pickle import FALSE
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import User, Club
+from .models import User, Club, Book
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -19,7 +19,7 @@ class SignUpForm(forms.ModelForm):
 
     DOB = forms.DateField(initial= None, 
         label = 'Date of Birth',
-        widget= forms.DateInput(),
+        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
         required= False, 
     )
 
@@ -96,3 +96,11 @@ class CreateClubForm(forms.ModelForm):
         model = Club
         fields = ['name', 'theme', 'meeting_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select()}
+
+class BookForm(forms.ModelForm): 
+    """Form enabling a user to create a book."""
+
+    class Meta:
+        """Form options."""
+        model = Book
+        fields = ['ISBN','title','author', 'publisher','image_url','year']
