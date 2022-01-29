@@ -20,6 +20,7 @@
           <div style="text-align: center;">
             <img src= "{{ book.image_url }}"  width="250" height="250" class=" image-thumbnail mb-3" />
             <h2 >{{ book.title }}</h2>
+            <p >{{ book.author }}</p>
             <a href='{% url 'book_details' book.id %}' class="btn my-2">View</a>
           </div>
         </div>
