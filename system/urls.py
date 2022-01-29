@@ -34,6 +34,9 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
+    path('add_book/', views.add_book, name ='add_book'),
+    path('book_details/<int:book_id>', views.book_details, name ='book_details')
+
 ]
 
 handler404 = 'bookclub.views.handler404'

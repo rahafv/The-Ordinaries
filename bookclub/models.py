@@ -1,6 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
+from isbn_field import ISBNField
+import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator 
+from tempfile import NamedTemporaryFile
+
+
 
 class User(AbstractUser):
     """User model used for authentication."""
@@ -50,6 +56,9 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
+
+    
+    books = models.ManyToManyField('Book', related_name='books')
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -66,3 +75,43 @@ class User(AbstractUser):
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
     
+
+
+
+class Book(models.Model):
+    """Book model."""
+
+    ISBN = ISBNField(
+        unique=True
+    )
+
+    title = models.CharField(
+        max_length=100,
+        unique=False,
+        blank=False
+    )
+
+    author = models.CharField(
+        max_length=100,
+        unique=False,
+        blank=False
+    )
+
+    publisher = models.CharField(
+        max_length=100,
+        unique=False,
+        blank=True
+    )
+
+    image_url = models.URLField( blank=True)
+
+    year = models.PositiveIntegerField(
+        default=datetime.datetime.now().year,
+        blank=True,
+        validators=[
+            MaxValueValidator(datetime.datetime.now().year),
+            MinValueValidator(1)
+        ]
+    )
+
+    readers = models.ManyToManyField(User, related_name='clubs')
