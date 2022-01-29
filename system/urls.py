@@ -35,7 +35,8 @@ urlpatterns = [
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
     path('add_book/', views.add_book, name ='add_book'),
-    path('book_details/<int:book_id>', views.book_details, name ='book_details')
+    path('book_details/<int:book_id>', views.book_details, name ='book_details'),
+    path('books/', views.books_list, name ='books_list')
 
 ]
 

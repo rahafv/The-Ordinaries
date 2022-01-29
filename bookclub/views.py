@@ -68,3 +68,8 @@ def add_book(request):
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})
+
+@login_required
+def books_list(request):
+    books = Book.objects.all()
+    return render(request, 'books.html', {'current_user': request.user, 'books': books})
