@@ -1,3 +1,4 @@
+from gc import get_objects
 from django.shortcuts import render , redirect
 from django.conf import settings
 from django.urls import reverse
@@ -55,7 +56,6 @@ def log_out(request):
 
 @login_required
 def show_profile_page(request):
-    user = request.user
     return render(request, 'profile_page.html')
 
 
@@ -66,6 +66,14 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     template_name = "edit_profile.html"
     form_class = UserForm
 
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display date_of_birth of the given user"""
+
+        kwargs = super(ProfileUpdateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
     def get_object(self):
         """Return the object (user) to be updated."""
         user = self.request.user
@@ -74,4 +82,5 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     def get_success_url(self):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
-        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        return reverse('profile')
+
