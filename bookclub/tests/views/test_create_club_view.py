@@ -61,14 +61,14 @@ class CreateClubViewTestCase(TestCase):
         self.assertTemplateUsed(response, "create_club.html")
         self.assertTrue(isinstance(form, CreateClubForm))
 
-    def test_get_create_club_redirects_when_not_logged_in(self):
-        target_url = reverse("log_in") + f"?next={self.url}"
-        response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "log_in.html")
+    # def test_get_create_club_redirects_when_not_logged_in(self):
+    #     target_url = reverse("log_in") + f"?next={self.url}"
+    #     response = self.client.get(self.url, follow=True)
+    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, "log_in.html")
 
-    def test_post_create_club_redirects_when_not_logged_in(self):
-        target_url = reverse("log_in") + f"?next={self.url}"
-        response = self.client.post(self.url, self.form_input, follow=True)
-        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "log_in.html")
+    # def test_post_create_club_redirects_when_not_logged_in(self):
+    #     target_url = reverse("log_in") + f"?next={self.url}"
+    #     response = self.client.post(self.url, self.form_input, follow=True)
+    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+    #     self.assertTemplateUsed(response, "log_in.html")

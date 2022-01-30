@@ -13,7 +13,7 @@ class PasswordViewTest(TestCase):
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
-        self.user = User.objects.get(username='@johndoe')
+        self.user = User.objects.get(username='johndoe')
         self.url = reverse('password')
         self.form_input = {
             'password': 'Password123',
