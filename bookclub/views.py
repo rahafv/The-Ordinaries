@@ -136,7 +136,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
 
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
-         This is necessary to only display date_of_birth of the given user"""
+         This is necessary to update the date_of_birth of the given user"""
 
         kwargs = super(ProfileUpdateView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
