@@ -195,7 +195,6 @@ class UserForm(forms.ModelForm):
     def save(self):
         """Save user."""
 
-        # self.log_in_user = self.request.user
         if self.is_valid():
             birthdate= self.cleaned_data.get('date_of_birth')
             new_age = self.calculate_age(birthdate)  
