@@ -16,7 +16,7 @@ class ProfileViewTest(TestCase):
         self.url = reverse('edit_profile')
 
         self.user = User.objects.create_user(
-            username = "@johndoe",
+            username = "johndoe",
             first_name = "John",
             last_name = "Doe",
             email = "johndoe@example.org",
@@ -29,7 +29,7 @@ class ProfileViewTest(TestCase):
         )
 
         self.form_input = {
-            'username':'@johndoe2',
+            'username':'johndoe2',
             'first_name': 'John2',
             'last_name': 'Doe2',
             'email':'johndoe2@example.org',
@@ -70,7 +70,7 @@ class ProfileViewTest(TestCase):
         self.assertTrue(isinstance(form, UserForm))
         self.assertTrue(form.is_bound)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, '@johndoe')
+        self.assertEqual(self.user.username, 'johndoe')
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
@@ -93,7 +93,7 @@ class ProfileViewTest(TestCase):
         self.assertTrue(isinstance(form, UserForm))
         self.assertTrue(form.is_bound)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, '@johndoe')
+        self.assertEqual(self.user.username, 'johndoe')
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
@@ -105,7 +105,7 @@ class ProfileViewTest(TestCase):
 
     def test_unsuccessful_profile_update_due_to_duplicate_username(self):
         self._create_second_user()
-        second_user = User.objects.get(username='@jd')
+        second_user = User.objects.get(username='jd')
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = second_user.username
         before_count = User.objects.count()
@@ -118,7 +118,7 @@ class ProfileViewTest(TestCase):
         self.assertTrue(isinstance(form, UserForm))
         self.assertTrue(form.is_bound)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, '@johndoe')
+        self.assertEqual(self.user.username, 'johndoe')
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
@@ -141,7 +141,7 @@ class ProfileViewTest(TestCase):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.SUCCESS)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, '@johndoe2')
+        self.assertEqual(self.user.username, 'johndoe2')
         self.assertEqual(self.user.first_name, 'John2')
         self.assertEqual(self.user.last_name, 'Doe2')
         self.assertEqual(self.user.email, 'johndoe2@example.org')
@@ -158,7 +158,7 @@ class ProfileViewTest(TestCase):
 
     def _create_second_user(self):
         User.objects.create_user(
-            username = '@jd',
+            username = 'jd',
             first_name = 'Jane',
             last_name = 'Doe',
             age = None,
