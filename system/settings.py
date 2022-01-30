@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y#z@-9$x!xugmhek!htjp(ahb0q=4dbtj0#9nrbxrv3cew!bsz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
+DEBUG = True
 ALLOWED_HOSTS = []
 
+# ATTENTION!! this will be commented until the deployment. and the above segmented will be uncommented instead.
+# ALLOWED_HOSTS = ['localhost', ]
+# DEBUG = False
 
 # Application definition
 
@@ -39,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookclub',
-    'widget_tweaks'
+    'widget_tweaks',
+    'isbn_field',
 ]
 
 MIDDLEWARE = [
@@ -120,10 +125,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
+# if DEBUG:
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
+# else:
+    # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -135,3 +145,9 @@ AUTH_USER_MODEL = 'bookclub.User'
 LOGIN_URL = 'log_in'
 
 REDIRECT_URL_WHEN_LOGGED_IN = 'home'
+
+# Message level tags shoudl use Bootsatrp terms
+MESSAGE_TAGS = {
+    message_constants.DEBUG:"dark",
+    message_constants.ERROR:"danger",
+}

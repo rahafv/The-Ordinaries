@@ -8,7 +8,7 @@ import this
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Club, Book
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -23,7 +23,7 @@ class SignUpForm(forms.ModelForm):
 
     DOB = forms.DateField(initial= None, 
         label = 'Date of Birth',
-        widget= forms.DateInput(),
+        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
         required= False, 
     )
 
@@ -90,6 +90,57 @@ class SignUpForm(forms.ModelForm):
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+
+class CreateClubForm(forms.ModelForm):
+    """Form to create or update club information."""
+
+    model = Club
+    fields = ['name', 'theme', 'meeting_type', 'city', 'country']
+    widgets = {"meeting_type": forms.Select()}
+
+class PasswordForm(forms.Form):
+    """Form enabling users to change their password."""
+
+    password = forms.CharField(label='Current password', widget=forms.PasswordInput())
+    new_password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(),
+        validators=[RegexValidator(
+            regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
+            message='Password must contain an uppercase character, a lowercase '
+                    'character and a number.'
+            )]
+    )
+    password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
+    
+    def clean(self):
+            """Clean the data and generate messages for any errors."""
+            super().clean()
+            password = self.cleaned_data.get('password')
+            new_password = self.cleaned_data.get('new_password')
+            password_confirmation = self.cleaned_data.get('password_confirmation')
+            if new_password != password_confirmation:
+                self.add_error('password_confirmation', 'Confirmation does not match password')
+            if password == new_password:
+                self.add_error('new_password', 'Your new password cannot be the same as your current one')
+
+
+class BookForm(forms.ModelForm): 
+    """Form enabling a user to create a book."""
+
+    class Meta:
+        """Form options."""
+        model = Book
+        fields = ['ISBN','title','author', 'publisher','image_url','year']
+        
+    def clean(self): 
+        self.oldISBN = self.cleaned_data.get('ISBN')
+        if self.oldISBN:
+            self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
+            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+                self.add_error('ISBN', 'ISNB already exists')
+
 
 class UserForm(forms.ModelForm):
     """Form to update user profile."""
@@ -192,3 +243,5 @@ class UserForm(forms.ModelForm):
         print(f'{new_age}')
         log_in_user.set_age(new_age)
         return log_in_user
+      
+

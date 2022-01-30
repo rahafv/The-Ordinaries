@@ -1,13 +1,24 @@
 {% extends 'base_content.html' %}
+{% block title %}Home{% endblock %}
 {% block content %}
 <div id = "home-image">
   <div class="container vh-100 ">
-    <div class="row h-100">
+    <div class="row-1 h-100">
       <div class="col-12 my-auto">
-        <h1 class="cover-heading">Ordinaries</h1>
-        <div class="card cover-card">
-          <p class="cover-text">Page Under Construction!</p>
-       
+        <div class="card cover-card mb-2">
+          <p class="cover-text">Be a book club leader now!</p>
+          <p>
+            <a href='{% url 'create_club' %}' class="btn btn-lg btn-secondary">
+              Create club
+            </a>
+        </div>
+        <div class="card cover-card mb-2">
+          <p class="cover-text"> Add your favourite books here!</p>
+          <p>
+            <a href='{% url 'add_book' %}' class="btn btn-lg btn-secondary">
+              add book
+            </a>
+          </p>
         </div>
       </div>
     </div>
