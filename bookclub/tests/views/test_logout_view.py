@@ -6,24 +6,11 @@ from bookclub.tests.helpers import LogInTester
 
 class LogOutViewTestCase(TestCase,LogInTester):
     """Tests of the log out view."""
+    
+    fixtures = ['bookclub/tests/fixtures/default_user.json']
 
-   
     def setUp(self):
         self.url = reverse('log_out')
-        self.user = User.objects.create_user(
-        'johndoe',
-        first_name='John',
-        last_name='Doe',
-        email='johndoe@example.org',
-        password='Password123',
-        bio='The quick brown fox jumps over the lazy dog' , 
-        age = 40 , 
-        city = 'NYC' , 
-        region = 'NY' , 
-        country = 'USA' ,
-
-        )
-
 
     def test_log_out_url(self):
         self.assertEqual(self.url,'/log_out/')

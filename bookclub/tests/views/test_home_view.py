@@ -7,28 +7,16 @@ from bookclub.tests.helpers import LogInTester, reverse_with_next
 class HomeViewTestCase(TestCase , LogInTester):
     """Tests of the home view."""
 
-   
+    fixtures = ['bookclub/tests/fixtures/default_user.json']
+
     def setUp(self):
         self.url = reverse('home')
-        self.user = User.objects.create_user(
-        '@johndoe',
-        first_name='John',
-        last_name='Doe',
-        email='johndoe@example.org',
-        password='Password123',
-        bio='The quick brown fox jumps over the lazy dog' , 
-        age = 40 , 
-        city = 'NYC' , 
-        region = 'NY' , 
-        country = 'USA' ,
-
-        )
 
     def test_home_url(self):
         self.assertEqual(self.url,'/home/')
 
     def test_get_home(self):
-        self.client.login(username='@johndoe', password='Password123')
+        self.client.login(username='johndoe', password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
