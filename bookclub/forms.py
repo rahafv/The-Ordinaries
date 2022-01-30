@@ -1,10 +1,7 @@
-from cProfile import label
-from calendar import month
 from datetime import date, datetime
-from email import message
 from email.policy import default
 from pickle import FALSE
-import this
+from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
@@ -91,13 +88,15 @@ class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
-
 class CreateClubForm(forms.ModelForm):
     """Form to create or update club information."""
+    
+    class Meta:
+        """Form options."""
 
-    model = Club
-    fields = ['name', 'theme', 'meeting_type', 'city', 'country']
-    widgets = {"meeting_type": forms.Select()}
+        model = Club
+        fields = ['name', 'theme', 'meeting_type', 'city', 'country']
+        widgets = {"meeting_type": forms.Select()}
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
@@ -150,28 +149,19 @@ class UserForm(forms.ModelForm):
 
         model = User
         fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
-        widgets = { 'bio': forms.Textarea()} # 'age':forms.DateInput()}
-        # labels = {'age':'Date of birth'}
-        # initial = {'age': date.today()}
+        widgets = { 'bio': forms.Textarea()} 
 
-    date_of_birth = forms.DateField( 
-    label = 'Date of Birth',
-    widget= forms.DateInput(),
-    required= True, 
+    date_of_birth = forms.DateField(initial= None, 
+        label = 'Date of Birth',
+        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
+        required= True, 
     )
 
     def __init__(self, *args, **kwargs):
-        """ Grants access to the request object so that the date of birth can be displayed"""
+        """ Grants access to the request object so that the date of birth can be changed"""
 
-        self.request = kwargs.pop('request')
+        self.log_in_user = kwargs.pop('user',None)
         super(UserForm, self).__init__(*args, **kwargs)
-        log_in_user = self.request.user
-        print(f'{log_in_user.age} {log_in_user.username}')
-        today = date.today()
-        year_of_birth = today.year - log_in_user.age
-        # initial_date = datetime.date(day = today.day, month = today.month, year = year_of_birth)       
-        # self.fields['date_of_birth'].initial = initial_date
-        print(self.fields['date_of_birth'].initial)
             
 
 
@@ -183,7 +173,7 @@ class UserForm(forms.ModelForm):
         self.date_of_birth = self.cleaned_data.get('date_of_birth')
         
         if not self.check_age(self.date_of_birth):
-            self.add_error('date_of_birth', 'Please enter a valid date in the format "dd/mm/yyyy"')
+            self.add_error('date_of_birth', 'Please enter a valid date')
 
 
     def check_age(self, date_of_birth):
@@ -196,52 +186,20 @@ class UserForm(forms.ModelForm):
     def calculate_age(self, dob):
         """Calculate the age from the given date input."""
         today = date.today()
-    
-        # A bool that represents if today's day/month precedes the birth day/month
         one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
-        
-        # Calculate the difference in years from the date object's components
         year_difference = today.year - dob.year
         age = year_difference - one_or_zero
-        print(f'{age}')
         
         return age
 
-    # def check_dob_is_valid(self, date_of_birth):
-    #     if date_of_birth.day > 0 and date_of_birth.day < 32 and date_of_birth.month > 0 and date_of_birth.month <= 12:
-    #         if date_of_birth.year == date.today().year:
-    #             if date_of_birth.month <= date.today().month and date_of_birth.day <= date.today().day:
-    #                 return True
-    #             else: 
-    #                 self.add_error('date_of_birth', 'Please enter a valid date in the format "dd/mm/yyyy"')
-    #                 return False
-    #         elif date_of_birth.year < date.today().year:
-    #             return True
-
-    #     else:
-    #         self.add_error('date_of_birth', 'Please enter a valid date in the format "dd/mm/yyyy"')
-    #         return False
-
-
-    # def calculate_age(self, date_of_birth):
-    #     """Calculate the age from the given date input."""
-    #     # if self.check_dob_is_valid(date_of_birth):
-    #     today = date.today()
-    #     age = today.year - date_of_birth.year
-    #     if ((today.month, today.day) < (date_of_birth.month, date_of_birth.day)):
-    #         age += 1
-    #     return age 
-    #     # else:
-    #     #     self.add_error('date_of_birth', 'Please enter a valid date in the format "dd/mm/yyyy"')
-
-
     def save(self):
         """Save user."""
-        log_in_user = self.request.user
-        birthdate= self.date_of_birth
-        new_age = self.calculate_age(birthdate)  
-        print(f'{new_age}')
-        log_in_user.set_age(new_age)
-        return log_in_user
+
+        # self.log_in_user = self.request.user
+        if self.is_valid():
+            birthdate= self.cleaned_data.get('date_of_birth')
+            new_age = self.calculate_age(birthdate)  
+            self.log_in_user.set_age(new_age)
+            return self.log_in_user
       
 

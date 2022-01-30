@@ -3,6 +3,7 @@ from django import forms
 from django.test import TestCase
 from bookclub.forms import UserForm
 from bookclub.models import User
+from datetime import date 
 
 class UserFormTestCase(TestCase):
     """Unit tests of the user form."""
@@ -11,9 +12,9 @@ class UserFormTestCase(TestCase):
         self.form_input = {
             'first_name': 'Jane',
             'last_name': 'Doe',
-            'username': 'janedoe',
+            'username': '@janedoe',
             'email': 'janedoe@example.org',
-            'age':21,
+            'date_of_birth': date(2001, 1, 5),
             'bio': "Hello, I'm Jane Doe.",
             'city' : 'New York',
             'region' :'NY',
@@ -21,7 +22,7 @@ class UserFormTestCase(TestCase):
         }
 
         self.user = User.objects.create_user(
-            username = "johnd",
+            username = "@johnd",
             first_name = "John",
             last_name = "Doe",
             email = "johndoe@example.org",
@@ -42,7 +43,7 @@ class UserFormTestCase(TestCase):
         email_field = form.fields['email']
         self.assertTrue(isinstance(email_field, forms.EmailField))
         self.assertIn('bio', form.fields)
-        self.assertIn('age', form.fields)
+        self.assertIn('date_of_birth', form.fields)
         self.assertIn('city', form.fields)
         self.assertIn('region', form.fields)
         self.assertIn('country', form.fields)
@@ -53,19 +54,19 @@ class UserFormTestCase(TestCase):
 
     def test_form_uses_model_validation(self):
         self._create_second_user()
-        second_user = User.objects.get(username='jd')       
+        second_user = User.objects.get(username='@jd')       
         self.form_input['username'] = second_user.username
         form = UserForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_must_save_correctly(self):
-        user = User.objects.get(username='johnd')
+        user = User.objects.get(username='@johnd')
         form = UserForm(instance=user, data=self.form_input)
         before_count = User.objects.count()
         form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
-        self.assertEqual(user.username, 'janedoe')
+        self.assertEqual(user.username, '@janedoe')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.email, 'janedoe@example.org')
@@ -78,7 +79,7 @@ class UserFormTestCase(TestCase):
     
     def _create_second_user(self):
         User.objects.create_user(
-            username = 'jd',
+            username = '@jd',
             first_name = 'Jane',
             last_name = 'Doe',
             age = None,
