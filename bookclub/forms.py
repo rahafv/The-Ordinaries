@@ -131,3 +131,13 @@ class BookForm(forms.ModelForm):
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher','image_url','year']
+        
+    def clean(self): 
+        self.oldISBN = self.cleaned_data.get('ISBN')
+        if self.oldISBN:
+            self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
+            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+                self.add_error('ISBN', 'ISNB already exists')
+
+
+
