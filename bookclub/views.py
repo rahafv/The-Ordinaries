@@ -84,7 +84,7 @@ def password(request):
     form = PasswordForm()
     return render(request, 'password.html', {'form': form}) 
 
-
+@login_required
 def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)

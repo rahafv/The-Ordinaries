@@ -46,12 +46,10 @@ class BookModelTestCase(TestCase):
         self.book.publisher = 'x' * 101
         self._assert_book_is_invalid()
 
-
     def test_ISBN_must_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
         self.book.ISBN = second_book.ISBN
         self._assert_book_is_invalid()
-
 
     def test_title_must_not_be_blank(self):
         self.book.title = ''
@@ -60,7 +58,6 @@ class BookModelTestCase(TestCase):
     def test_author_must_not_be_blank(self):
         self.book.author = ''
         self._assert_book_is_invalid()  
-
 
     def test_title_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
@@ -82,7 +79,6 @@ class BookModelTestCase(TestCase):
         self.book.year = second_book.year
         self._assert_book_is_valid()
 
-    
     def test_year_may_be_blank(self):
         self.book.year = None
         self._assert_book_is_valid()
@@ -96,7 +92,6 @@ class BookModelTestCase(TestCase):
     def _assert_book_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.book.full_clean()
-
 
     def test_reader_addition(self):
         nonReader = User.objects.get(id=1)

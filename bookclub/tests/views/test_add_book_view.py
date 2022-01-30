@@ -3,8 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
 from bookclub.models import Book
+from bookclub.tests.helpers import LoginRedirectTester
 
-class AddBookViewTestCase(TestCase):
+class AddBookViewTestCase(TestCase, LoginRedirectTester):
     """Tests of the add bookview."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]
@@ -57,3 +58,9 @@ class AddBookViewTestCase(TestCase):
         self.assertEqual(club.author, "Mark")
         self.assertEqual(club.publisher, "Oxford")
         self.assertEqual(club.year, 2002)
+
+    def test_get_add_book_redirects_when_not_logged_in(self):
+        self.assert_redirects_when_not_logged_in()
+
+    def test_post_add_book_redirects_when_not_logged_in(self):
+        self.assert_post_redirects_when_not_logged_in()

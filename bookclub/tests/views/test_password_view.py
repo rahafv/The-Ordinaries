@@ -5,9 +5,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import PasswordForm
 from bookclub.models import User
-from bookclub.tests.helpers import reverse_with_next
+from bookclub.tests.helpers import LoginRedirectTester, reverse_with_next
 
-class PasswordViewTest(TestCase):
+class PasswordViewTest(TestCase, LoginRedirectTester):
     """Test suite for the password view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']
@@ -34,9 +34,10 @@ class PasswordViewTest(TestCase):
         self.assertTrue(isinstance(form, PasswordForm))
 
     def test_get_password_redirects_when_not_logged_in(self):
-        redirect_url = reverse_with_next('log_in', self.url)
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+       self.assert_redirects_when_not_logged_in()
+    
+    def test_post_password_redirects_when_not_logged_in(self):
+       self.assert_post_redirects_when_not_logged_in()
 
     def test_succesful_password_change(self):
         self.client.login(username=self.user.username, password='Password123')
