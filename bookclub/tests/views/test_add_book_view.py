@@ -33,7 +33,7 @@ class AddBookViewTestCase(TestCase):
 
     def test_unsuccessful_book_addition(self):
         self.client.login(username="johndoe", password="Password123")
-        self.form_input['ISBN'] = '6666666666666'
+        self.form_input['ISBN'] = '1234567890'
         before_count = Book.objects.count()
         response = self.client.post(self.url, self.form_input)
         after_count = Book.objects.count()
@@ -44,7 +44,7 @@ class AddBookViewTestCase(TestCase):
         self.assertTrue(isinstance(form, BookForm))
         self.assertTrue(form.is_bound)
 
-    def test_create_club_successful(self):
+    def test_add_book_successful(self):
         self.client.login(username="johndoe", password="Password123")
         count_books_before = Book.objects.count()
         target_url = reverse("book_details", kwargs={"book_id": 1})
