@@ -44,7 +44,7 @@ class AddBookViewTestCase(TestCase):
         self.assertTrue(isinstance(form, BookForm))
         self.assertTrue(form.is_bound)
 
-    def test_create_club_successful(self):
+    def test_add_book_successful(self):
         self.client.login(username="johndoe", password="Password123")
         count_books_before = Book.objects.count()
         target_url = reverse("book_details", kwargs={"book_id": 1})
