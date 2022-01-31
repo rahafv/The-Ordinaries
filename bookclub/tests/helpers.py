@@ -37,3 +37,7 @@ class MessageTester:
         messages = tuple(response.context["messages"])
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].level, SUCCESS)
+
+    def assert_no_message(self, response):
+        messages_list = list(response.context['messages'])
+        self.assertEqual(len(messages_list), 0)

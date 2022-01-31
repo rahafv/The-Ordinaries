@@ -48,11 +48,13 @@ def log_in(request):
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
 
-def handler404(request,exception):
+def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
 def log_out(request):
-    logout(request)
+    if request.user.is_authenticated:
+        logout(request)
+        messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
 @login_required
