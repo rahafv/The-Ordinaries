@@ -90,9 +90,12 @@ def book_details(request, book_id):
 @login_required
 def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
+    general = True
     if club_id:
         books = Club.objects.get(id=club_id).books.all()
+        general = False
     if user_id:
         books = User.objects.get(id=user_id).books.all()
+        general = False
 
-    return render(request, 'books.html', {'current_user': request.user, 'books': books})
+    return render(request, 'books.html', {'books': books, 'general': general})

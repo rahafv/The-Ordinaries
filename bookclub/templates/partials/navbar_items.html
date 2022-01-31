@@ -13,10 +13,10 @@
                 <span class="bi-person-circle"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <!-- TODO: Move my book item -->
-                <li><a class="dropdown-item" href={% url 'books_list' user.id %}>My books</a></li>
                 <li><a class="dropdown-item" href="#">Profile</a></li>
                 <li><a class="dropdown-item" href="#">Change password</a></li>
+                <!-- TODO: Move my book item -->
+                <li><a class="dropdown-item" href={% url 'books_list' user.id %}>My books</a></li>
                 <hr>
                 <li><a class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
             </ul>
