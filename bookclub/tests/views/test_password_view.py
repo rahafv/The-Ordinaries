@@ -60,6 +60,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
     def test_password_change_unsuccesful_with_new_password_eqaul_old(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['new_password'] = 'Password123'
+        self.form_input['password_confirmation'] = 'Password123'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'password.html')
@@ -73,6 +74,20 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
     def test_password_change_unsuccesful_without_password_confirmation(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['password_confirmation'] = 'WrongPassword123'
+        response = self.client.post(self.url, self.form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'password.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, PasswordForm))
+        self.user.refresh_from_db()
+        is_password_correct = check_password('Password123', self.user.password)
+        self.assertTrue(is_password_correct)
+        self.assert_error_message(response)
+
+    def test_password_change_unsuccesful_with_criteria_not_matched(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.form_input['new_password'] = '1234567890'
+        self.form_input['password_confirmation'] = '1234567890'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'password.html')
