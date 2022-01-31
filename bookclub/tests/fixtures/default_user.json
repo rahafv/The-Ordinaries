@@ -6,7 +6,7 @@
       "first_name": "John",
       "last_name": "Doe",
       "username": "johndoe",
-      "age": "19",
+      "age": 19,
       "email": "johndoe@example.org",
       "city": "new york",
       "region": "NY",
