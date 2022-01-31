@@ -11,22 +11,14 @@ from datetime import date
 class ProfileViewTest(TestCase):
     """Test suite for the profile view."""
 
+    fixtures = [
+        'bookclub/tests/fixtures/default_user.json',
+        'bookclub/tests/fixtures/other_users.json'
+    ]
 
     def setUp(self):
         self.url = reverse('edit_profile')
-
-        self.user = User.objects.create_user(
-            username = "johndoe",
-            first_name = "John",
-            last_name = "Doe",
-            email = "johndoe@example.org",
-            age = 21,
-            bio = "Hello, I'm John Doe.",
-            city = "London",
-            region = "London",
-            country = "England",
-            password = "Password123",
-        )
+        self.user = User.objects.get(username = "johndoe")
 
         self.form_input = {
             'username':'johndoe2',
@@ -74,11 +66,11 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
-        self.assertEqual(self.user.age, 21)
-        self.assertEqual(self.user.city, 'London')
-        self.assertEqual(self.user.region, 'London')
-        self.assertEqual(self.user.country, 'England')
-        self.assertEqual(self.user.bio, "Hello, I'm John Doe.")
+        self.assertEqual(self.user.age, 19)
+        self.assertEqual(self.user.city, 'new york')
+        self.assertEqual(self.user.region, 'NY')
+        self.assertEqual(self.user.country, 'United states')
+        self.assertEqual(self.user.bio, "Hello, this is John Doe.")
 
     def test_unsuccessful_profile_update_due_to_empty_date_of_birth(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -97,15 +89,14 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
-        self.assertEqual(self.user.age, 21)
-        self.assertEqual(self.user.city, 'London')
-        self.assertEqual(self.user.region, 'London')
-        self.assertEqual(self.user.country, 'England')
-        self.assertEqual(self.user.bio, "Hello, I'm John Doe.")
+        self.assertEqual(self.user.age, 19)
+        self.assertEqual(self.user.city, 'new york')
+        self.assertEqual(self.user.region, 'NY')
+        self.assertEqual(self.user.country, 'United states')
+        self.assertEqual(self.user.bio, "Hello, this is John Doe.")
 
     def test_unsuccessful_profile_update_due_to_duplicate_username(self):
-        self._create_second_user()
-        second_user = User.objects.get(username='jd')
+        second_user = User.objects.get(username = 'janedoe')       
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = second_user.username
         before_count = User.objects.count()
@@ -122,11 +113,11 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.first_name, 'John')
         self.assertEqual(self.user.last_name, 'Doe')
         self.assertEqual(self.user.email, 'johndoe@example.org')
-        self.assertEqual(self.user.age, 21)
-        self.assertEqual(self.user.city, 'London')
-        self.assertEqual(self.user.region, 'London')
-        self.assertEqual(self.user.country, 'England')
-        self.assertEqual(self.user.bio, "Hello, I'm John Doe.")
+        self.assertEqual(self.user.age, 19)
+        self.assertEqual(self.user.city, 'new york')
+        self.assertEqual(self.user.region, 'NY')
+        self.assertEqual(self.user.country, 'United states')
+        self.assertEqual(self.user.bio, "Hello, this is John Doe.")
 
     def test_successful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -156,16 +147,4 @@ class ProfileViewTest(TestCase):
         response = self.client.post(self.url, self.form_input)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def _create_second_user(self):
-        User.objects.create_user(
-            username = 'jd',
-            first_name = 'Jane',
-            last_name = 'Doe',
-            age = None,
-            email = 'janedoe@example.com',
-            city = 'new york',
-            region = 'NY',
-            country = 'United states',
-            bio = 'This is jane doe bio',
-        )
          

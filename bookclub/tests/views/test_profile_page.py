@@ -2,28 +2,17 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, reverse_with_next
+from bookclub.tests.helpers import reverse_with_next
 
-class ProfilePageViewTestsCase(TestCase , LogInTester):
+class ProfilePageViewTestsCase(TestCase):
     """Tests of the profile page view."""
 
+    fixtures = [ 'bookclub/tests/fixtures/default_user.json',]
    
     def setUp(self):
         self.url = reverse('profile')
-        self.user = User.objects.create_user(
-        'johndoe',
-        first_name='John',
-        last_name='Doe',
-        email='johndoe@example.org',
-        password='Password123',
-        bio='The quick brown fox jumps over the lazy dog' , 
-        age = 40 , 
-        city = 'NYC' , 
-        region = 'NY' , 
-        country = 'USA' ,
-
-        )
-
+        self.user = User.objects.get(username = "johndoe")
+    
     def test_profile_page_url(self):
         self.assertEqual(self.url,'/profile/')
 
@@ -32,6 +21,11 @@ class ProfilePageViewTestsCase(TestCase , LogInTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile_page.html')
+        menu_urls= [
+            reverse('profile'), reverse('password'), reverse('log_out')
+        ]
+        for url in menu_urls:
+            self.assertContains(response, url)    
     
     def test_get_profile_page_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('log_in', self.url)

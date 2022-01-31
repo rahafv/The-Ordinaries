@@ -7,33 +7,27 @@ from datetime import date
 
 class UserFormTestCase(TestCase):
     """Unit tests of the user form."""
+    fixtures = [
+        'bookclub/tests/fixtures/default_user.json',
+        'bookclub/tests/fixtures/other_users.json'
+    ]
 
     def setUp(self):
+
+        self.user = User.objects.get(username = "johndoe")
+
         self.form_input = {
-            'first_name': 'Jane',
-            'last_name': 'Doe',
-            'username': 'janedoe',
-            'email': 'janedoe@example.org',
+            'first_name': 'John2',
+            'last_name': 'Doe2',
+            'username': 'johndoe2',
+            'email': 'johndoe2@example.org',
             'date_of_birth': date(2001, 1, 5),
-            'bio': "Hello, I'm Jane Doe.",
+            'bio': "Hello, I'm John Doe2.",
             'city' : 'New York',
             'region' :'NY',
             'country' : 'USA',
         }
-
-        self.user = User.objects.create_user(
-            username = "johnd",
-            first_name = "John",
-            last_name = "Doe",
-            email = "johndoe@example.org",
-            age = 21,
-            bio = "Hello, I'm John Doe.",
-            city = "London",
-            region = "London",
-            country = "England",
-            password = "Password123",
-        )
-
+    
     def test_form_has_necessary_fields(self):
         form = UserForm()
         self.assertIn('first_name', form.fields)
@@ -53,39 +47,23 @@ class UserFormTestCase(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_form_uses_model_validation(self):
-        self._create_second_user()
-        second_user = User.objects.get(username='jd')       
+        second_user = User.objects.get(username = 'janedoe')       
         self.form_input['username'] = second_user.username
         form = UserForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_must_save_correctly(self):
-        user = User.objects.get(username='johnd')
-        form = UserForm(instance=user, data=self.form_input)
+        form = UserForm(instance=self.user, data=self.form_input, user = self.user)
         before_count = User.objects.count()
         form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
-        self.assertEqual(user.username, 'janedoe')
-        self.assertEqual(user.first_name, 'Jane')
-        self.assertEqual(user.last_name, 'Doe')
-        self.assertEqual(user.email, 'janedoe@example.org')
-        self.assertEqual(user.age, 21)
-        self.assertEqual(user.bio, "Hello, I'm Jane Doe.")
-        self.assertEqual(user.city, "New York")
-        self.assertEqual(user.region, "NY")
-        self.assertEqual(user.country, "USA")
-
-    
-    def _create_second_user(self):
-        User.objects.create_user(
-            username = 'jd',
-            first_name = 'Jane',
-            last_name = 'Doe',
-            age = None,
-            email = 'janedoe@example.com',
-            city = 'new york',
-            region = 'NY',
-            country = 'United states',
-            bio = 'This is jane doe bio',
-        )
+        self.assertEqual(self.user.username, 'johndoe2')
+        self.assertEqual(self.user.first_name, 'John2')
+        self.assertEqual(self.user.last_name, 'Doe2')
+        self.assertEqual(self.user.email, 'johndoe2@example.org')
+        self.assertEqual(self.user.age, 21)
+        self.assertEqual(self.user.bio, "Hello, I'm John Doe2.")
+        self.assertEqual(self.user.city, "New York")
+        self.assertEqual(self.user.region, "NY")
+        self.assertEqual(self.user.country, "USA")
