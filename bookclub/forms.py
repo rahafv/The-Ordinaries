@@ -97,6 +97,33 @@ class CreateClubForm(forms.ModelForm):
         fields = ['name', 'theme', 'meeting_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select()}
 
+class PasswordForm(forms.Form):
+    """Form enabling users to change their password."""
+
+    password = forms.CharField(label='Current password', widget=forms.PasswordInput())
+    new_password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(),
+        validators=[RegexValidator(
+            regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
+            message='Password must contain an uppercase character, a lowercase '
+                    'character and a number.'
+            )]
+    )
+    password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
+    
+    def clean(self):
+            """Clean the data and generate messages for any errors."""
+            super().clean()
+            password = self.cleaned_data.get('password')
+            new_password = self.cleaned_data.get('new_password')
+            password_confirmation = self.cleaned_data.get('password_confirmation')
+            if new_password != password_confirmation:
+                self.add_error('password_confirmation', 'Confirmation does not match password')
+            if password == new_password:
+                self.add_error('new_password', 'Your new password cannot be the same as your current one')
+
+
 class BookForm(forms.ModelForm): 
     """Form enabling a user to create a book."""
 
@@ -104,3 +131,13 @@ class BookForm(forms.ModelForm):
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher','image_url','year']
+        
+    def clean(self): 
+        self.oldISBN = self.cleaned_data.get('ISBN')
+        if self.oldISBN:
+            self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
+            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+                self.add_error('ISBN', 'ISNB already exists')
+
+
+
