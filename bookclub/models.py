@@ -110,6 +110,12 @@ class Club(models.Model):
         max_length=100, 
         blank=True
     )
+
+    def is_member(self, user):
+        return self.members.filter(pk=user.id).exists()
+
+    def member_count(self):
+        return self.members.all().count()   
     
     class MeetingType(models.TextChoices):
         INPERSON = "IP", "In-person"

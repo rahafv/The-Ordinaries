@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -99,7 +100,9 @@ def create_club(request):
 @login_required
 def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display()})
+    logged_in_user = request.user
+    is_member = club.is_member(logged_in_user)
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
 
 @login_required
 def add_book(request):
@@ -118,3 +121,50 @@ def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})
 
+@login_required
+def join_club(request, club_id):
+    try:
+        club=Club.objects.get(id=club_id)
+        logged_in_user = request.user
+        if(not logged_in_user.is_authenticated):
+            return redirect('sign_up')
+
+        if logged_in_user == club.owner:
+            #print("owner of this club")
+            return redirect('club_page',club_id)
+
+        if club.is_member(logged_in_user):
+            #print("already a member")
+            return redirect('club_page',club_id)
+
+        #print("joining club", club_id)
+        club.members.add(logged_in_user)
+        return redirect('club_page',club_id)
+ 
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "The club does not exist")
+        return redirect('home')
+
+@login_required
+def withdraw_club(request, club_id):
+    try:
+        club=Club.objects.get(id=club_id)
+        logged_in_user = request.user
+        if(not logged_in_user.is_authenticated):
+            return redirect('sign_up')
+
+        if logged_in_user == club.owner:
+            #print("cannot withdraw before transfering ownership")
+            return redirect('club_page',club_id)
+
+        if not club.is_member(logged_in_user):
+            #print("not a member of this club")
+            return redirect('club_page',club_id)
+       
+        #print("withdrawing from club", club_id)
+        club.members.remove(logged_in_user)
+        return redirect('club_page',club_id)
+ 
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR, "The club does not exist")
+        return redirect('home')

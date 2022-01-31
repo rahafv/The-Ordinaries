@@ -64,11 +64,15 @@
                 <div class="card-body">
                   <div class="mb-3 pb-0">
                     <!-- TODO: Add link to join club here -->
-                    <a href="#" class="btn btn-outline-success">Join club</a> 
+                    {% if not user == club.owner and not is_member %}
+                      <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
+                    {% endif %}
                   </div>
-                  <div class="mb-3 pb-0">
+                    <div class="mb-3 pb-0">
                     <!-- TODO: Add link to withdraw from club here -->
-                    <a href="#" class="btn btn-outline-warning">Withdraw from club</a>   
+                    {% if not user == club.owner and is_member%}
+                      <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
+                    {% endif %}   
                   </div>
                 </div>
               </div>
