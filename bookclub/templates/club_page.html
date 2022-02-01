@@ -52,12 +52,13 @@
                   <a href="books/" class="btn btn-outline-dark">Book List</a>
                 </div>
               </div>
+              {%if is_member %}
               <div class="card text-center">
                 <div class="card-body">
-                  <!-- TODO: Add link to member list here -->
-                  <a href="#" class="btn btn-outline-dark">Member List</a>  
+                  <a href='{% url 'members_list' club.id %}' class="btn btn-outline-dark"> Member List</a>  
                 </div>
               </div>
+              {%endif%}
               <!-- DO NOT FORGET TO ADD IF STATEMENTS-->
               <div class="card text-center">
                 <div class="card-body">
