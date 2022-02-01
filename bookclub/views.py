@@ -1,11 +1,14 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
+from django.urls import reverse
+from django.views.generic.edit import UpdateView
 
 
 
@@ -118,6 +121,37 @@ def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})
 
+
+@login_required
+def show_profile_page(request):
+    return render(request, 'profile_page.html')
+
+
+class ProfileUpdateView(LoginRequiredMixin,UpdateView):
+    """View to update logged-in user's profile."""
+
+    model = UserForm
+    template_name = "edit_profile.html"
+    form_class = UserForm
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to update the date_of_birth of the given user"""
+
+        kwargs = super(ProfileUpdateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_object(self):
+        """Return the object (user) to be updated."""
+        user = self.request.user
+        return user
+
+    def get_success_url(self):
+        """Return redirect URL after successful update."""
+        messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
+        return reverse('profile')
+        
 @login_required
 def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
