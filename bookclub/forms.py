@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from email.policy import default
 from pickle import FALSE
+from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
@@ -131,3 +132,74 @@ class BookForm(forms.ModelForm):
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher','image_url','year']
+        
+    def clean(self): 
+        self.oldISBN = self.cleaned_data.get('ISBN')
+        if self.oldISBN:
+            self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
+            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+                self.add_error('ISBN', 'ISNB already exists')
+
+
+class UserForm(forms.ModelForm):
+    """Form to update user profile."""
+    
+    class Meta:
+        """Form options."""
+
+        model = User
+        fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
+        widgets = { 'bio': forms.Textarea()} 
+
+    date_of_birth = forms.DateField(initial= None, 
+        label = 'Date of Birth',
+        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
+        required= True, 
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Grants access to the request object so that the date of birth can be changed"""
+
+        self.log_in_user = kwargs.pop('user',None)
+        super(UserForm, self).__init__(*args, **kwargs)
+            
+
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+
+        super().clean()
+
+        self.date_of_birth = self.cleaned_data.get('date_of_birth')
+        
+        if not self.check_age(self.date_of_birth):
+            self.add_error('date_of_birth', 'Please enter a valid date')
+
+
+    def check_age(self, date_of_birth):
+        """Validate the age and check if it is an acceptable age."""
+        try:
+            return self.calculate_age(date_of_birth) < 100 and self.calculate_age(date_of_birth) > 10
+        except:
+            return True
+    
+    def calculate_age(self, dob):
+        """Calculate the age from the given date input."""
+        today = date.today()
+        one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
+        year_difference = today.year - dob.year
+        age = year_difference - one_or_zero
+        
+        return age
+
+    def save(self):
+        """Save user."""
+
+        if self.is_valid():
+            birthdate= self.cleaned_data.get('date_of_birth')
+            new_age = self.calculate_age(birthdate)  
+            if(self.log_in_user is not None):
+                self.log_in_user.set_age(new_age)
+                return self.log_in_user
+      
+

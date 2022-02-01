@@ -12,6 +12,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
 
     def setUp(self):
         self.url = reverse("create_club")
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
@@ -24,7 +25,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(self.url, "/create_club/")
 
     def test_create_club_get(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "create_club.html")
@@ -33,7 +34,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         self.assertFalse(form.is_bound)
 
     def test_create_club_successful(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
         target_url = reverse("club_page", kwargs={"club_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -50,7 +51,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(club.owner, owner)
 
     def test_create_club_unsuccessful(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
         self.form_input["name"] = ""
         response = self.client.post(self.url, self.form_input)

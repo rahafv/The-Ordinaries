@@ -1,5 +1,4 @@
 """Tests of the log in view."""
-from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import LogInForm
@@ -12,7 +11,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester):
 
     def setUp(self):
         self.url = reverse('log_in')
-        self.user = User.objects.get(username='johndoe')
+        self.user = User.objects.get(id=1)
 
     def test_log_in_url(self):
         self.assertEqual(self.url,'/log_in/')

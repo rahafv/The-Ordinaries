@@ -1,7 +1,5 @@
 """Tests of the handler404 view."""
 from django.test import TestCase
-from django.urls import reverse
-from bookclub.models import User
 
 class handler404ViewTestCase(TestCase):
     """Tests of the 404 handler view."""
