@@ -35,7 +35,7 @@ class RatingModelTestCase(TestCase):
         self._assert_rating_is_invalid() 
     
     def test_review_may_be_blank(self):
-        self.rating.review = None
+        self.rating.review = ''
         self._assert_rating_is_valid()
 
     def test_rating_cannot_be_over_five(self):
