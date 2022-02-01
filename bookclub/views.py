@@ -163,3 +163,14 @@ def books_list(request, club_id=None, user_id=None):
         books = User.objects.get(id=user_id).books.all()
         general = False
     return render(request, 'books.html', {'books': books, 'general': general})
+
+
+@login_required
+def clubs_list(request, user_id=None):
+    clubs = Club.objects.all()
+    # club = get_object_or_404(Club.objects, id=club_id)
+    general = True
+    if user_id:
+        clubs = User.objects.get(id=user_id).clubs.all()
+        general = False
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general})

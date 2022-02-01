@@ -17,6 +17,7 @@
                 <li><a class="dropdown-item" href="{% url 'password' %}">Change password</a></li>
                 <!-- TODO: Move my book item -->
                 <li><a class="dropdown-item" href={% url 'books_list' user.id %}>My books</a></li>
+                <li><a class="dropdown-item" href={% url 'clubs_list' user.id %}>My clubs</a></li>
                 <hr>
                 <li><a class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
             </ul>

@@ -42,9 +42,12 @@ urlpatterns = [
     path('add_book/', views.add_book, name ='add_book'),
     path('book_details/<int:book_id>', views.book_details, name ='book_details'),
     path('books/', views.books_list, name ='books_list'),
+    path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
     #change URL format
-    path('<int:user_id>/books/', views.books_list, name ='books_list')
+    path('<int:user_id>/books/', views.books_list, name ='books_list'),
+    path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list')
+
 
 
 ]
