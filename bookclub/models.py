@@ -199,17 +199,17 @@ class Book(models.Model):
 class Rating(models.Model):
     """rating model."""
 
-    user_id =  models.ForeignKey(
+    user =  models.ForeignKey(
         User, 
         on_delete=models.CASCADE
     )
 
-    book_id = models.ForeignKey(
+    book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE
     )
 
-    review = models.TextField(max_length=250)
+    review = models.CharField(max_length=250)
 
     rating = models.SmallIntegerField(
         default=0 , 
