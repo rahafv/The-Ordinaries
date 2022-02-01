@@ -48,3 +48,9 @@ class PasswordFormTestCase(TestCase):
         self.form_input["password_confirmation"] = "WrongPassword123"
         form = PasswordForm(data=self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_password_and_new_password_must_be_different(self):
+        self.form_input["new_password"] = "Password123"
+        self.form_input["password_confirmation"] = "Password123"
+        form = PasswordForm(data=self.form_input)
+        self.assertFalse(form.is_valid())

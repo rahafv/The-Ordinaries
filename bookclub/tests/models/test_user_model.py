@@ -5,19 +5,13 @@ from bookclub.models import User
 
 class UserModelTestCase(TestCase):
 
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username = 'johndoe',
-            first_name = 'John',
-            last_name = 'Doe',
-            age = '19',
-            email = 'johndoe@example.com',
-            city = 'new york',
-            region = 'NY',
-            country = 'United states',
-            bio = 'This is john doe bio',
-        )
+    fixtures = ['bookclub/tests/fixtures/other_users.json',
+        'bookclub/tests/fixtures/default_user.json'
+    ]
 
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        
     def test_valid_user(self):
         self._assert_user_is_valid()
 
@@ -34,7 +28,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_username_must_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.username = second_user.username
         self._assert_user_is_invalid()
@@ -44,7 +37,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_first_name_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.first_name = second_user.first_name
         self._assert_user_is_valid()
@@ -62,7 +54,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_last_name_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.last_name = second_user.last_name
         self._assert_user_is_valid()
@@ -80,7 +71,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_invalid()
 
     def test_email_must_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.email = second_user.email
         self._assert_user_is_invalid()
@@ -118,7 +108,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_city_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.city = second_user.city
         self._assert_user_is_valid()
@@ -136,7 +125,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_region_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.region = second_user.region
         self._assert_user_is_valid()
@@ -154,7 +142,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_country_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.country = second_user.country
         self._assert_user_is_valid()
@@ -172,7 +159,6 @@ class UserModelTestCase(TestCase):
         self._assert_user_is_valid()
 
     def test_bio_need_not_be_unique(self):
-        self.create_second_user()
         second_user = User.objects.get(username='janedoe')
         self.user.bio = second_user.bio
         self._assert_user_is_valid()
@@ -204,16 +190,3 @@ class UserModelTestCase(TestCase):
     def _assert_user_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
-
-    def create_second_user(self):
-        User.objects.create_user(
-            username = 'janedoe',
-            first_name = 'Jane',
-            last_name = 'Doe',
-            age = None,
-            email = 'janedoe@example.com',
-            city = 'new york',
-            region = 'NY',
-            country = 'United states',
-            bio = 'This is jane doe bio',
-        )

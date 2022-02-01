@@ -13,7 +13,7 @@
                 <span class="bi-person-circle"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
                 <li><a class="dropdown-item" href="{% url 'password' %}">Change password</a></li>
                 <!-- TODO: Move my book item -->
                 <li><a class="dropdown-item" href={% url 'books_list' user.id %}>My books</a></li>

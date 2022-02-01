@@ -3,7 +3,7 @@ from django.db import models
 from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
-from django.core.validators import MaxValueValidator, MinValueValidator 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from tempfile import NamedTemporaryFile
 
 class User(AbstractUser):
@@ -81,6 +81,10 @@ class User(AbstractUser):
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
+    
+    def set_age(self,new_age):
+        self.age = new_age
+        return self.save()
 
 class Club(models.Model):
     """Club model."""
@@ -156,7 +160,7 @@ class Book(models.Model):
     )
 
     title = models.CharField(
-        max_length=100,
+        max_length=200,
         unique=False,
         blank=False
     )
@@ -173,7 +177,9 @@ class Book(models.Model):
         blank=True
     )
 
-    image_url = models.URLField( blank=True)
+    image_url = models.URLField(
+        blank=True
+    )
 
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
