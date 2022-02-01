@@ -1,3 +1,4 @@
+from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
@@ -194,3 +195,31 @@ class Book(models.Model):
     
     def readers_count(self):
         return self.readers.all().count()  
+
+class Rating(models.Model):
+    """rating model."""
+
+    user_id =  models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE
+    )
+
+    book_id = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE
+    )
+
+    review = models.TextField(max_length=250)
+
+    rating = models.SmallIntegerField(
+        default=0 , 
+        blank = False , 
+        validators=[
+            MaxValueValidator(5) , 
+            MinValueValidator(1)
+        ]
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+ 
