@@ -34,7 +34,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester):
 
     def test_unsuccessful_book_addition(self):
         self.client.login(username="johndoe", password="Password123")
-        self.form_input['ISBN'] = '6666666666666'
+        self.form_input['ISBN'] = '1234567890'
         before_count = Book.objects.count()
         response = self.client.post(self.url, self.form_input)
         after_count = Book.objects.count()

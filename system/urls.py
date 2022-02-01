@@ -34,11 +34,19 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
+    path('profile/', views.show_profile_page , name='profile'),
+    path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
     path('create_club/', views.create_club , name='create_club'),
     path("club/<int:club_id>/", views.club_page, name="club_page"),
     path('add_book/', views.add_book, name ='add_book'),
-    path('book_details/<int:book_id>', views.book_details, name ='book_details')
+    path('book_details/<int:book_id>', views.book_details, name ='book_details'),
+    path('books/', views.books_list, name ='books_list'),
+    path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
+    #change URL format
+    path('<int:user_id>/books/', views.books_list, name ='books_list')
+
+
 ]
 
 handler404 = 'bookclub.views.handler404'
