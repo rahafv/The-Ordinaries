@@ -211,10 +211,9 @@ class Rating(models.Model):
         on_delete=models.CASCADE
     )
 
-    review = models.CharField(max_length=250)
+    review = models.CharField(max_length=250 , blank = True)
 
-    rating = models.SmallIntegerField(
-        default=0 , 
+    rating = models.SmallIntegerField( 
         blank = False , 
         validators=[
             MaxValueValidator(5) , 
