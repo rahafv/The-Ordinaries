@@ -7,8 +7,6 @@ from .helpers import login_prohibited
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
 
-
-
 @login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
@@ -89,8 +87,11 @@ def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
-            form.instance.owner = request.user
+            club_owner= request.user
+            form.instance.owner = club_owner
             club = form.save()
+            """ adds the owner to the members list. """
+            club.add_member(club_owner)
             return redirect('club_page',  club_id=club.id)
     else:
         form = CreateClubForm()
@@ -98,8 +99,10 @@ def create_club(request):
 
 @login_required
 def club_page(request, club_id):
+    current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display()})
+    is_member = club.is_member(current_user)
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
 
 @login_required
 def add_book(request):
@@ -130,3 +133,13 @@ def books_list(request, club_id=None, user_id=None):
         general = False
 
     return render(request, 'books.html', {'books': books, 'general': general})
+
+
+@login_required
+def members_list(request, club_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    is_member = club.is_member(current_user)
+    members = club.members.all()
+    return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+    
