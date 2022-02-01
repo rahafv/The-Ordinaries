@@ -174,5 +174,9 @@ def members_list(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     members = club.members.all()
-    return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
-    
+    if (is_member):
+        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot access the members list" )
+        return redirect('club_page', club_id)
+        
