@@ -42,7 +42,7 @@ urlpatterns = [
     path('add_book/', views.add_book, name ='add_book'),
     path('book_details/<int:book_id>', views.book_details, name ='book_details'),
     path('join_club/<int:club_id>/', views.join_club, name ='join_club'),
-    path('withdraw_club/<int:club_id>/', views.withdraw_club, name ='withdraw_club')
+    path('withdraw_club/<int:club_id>/', views.withdraw_club, name ='withdraw_club'),
     path('books/', views.books_list, name ='books_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
     #change URL format
