@@ -146,6 +146,11 @@ class Club(models.Model):
 
     def member_count(self):
         return self.members.all().count()   
+    
+    def is_member(self, user):
+        """ checks if the user is a member"""
+        return self.members.all().filter(id=user.id).exists()
+
 
 class Book(models.Model):
     """Book model."""

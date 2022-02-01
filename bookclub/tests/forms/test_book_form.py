@@ -5,9 +5,11 @@ from bookclub.models import User, Book
 from bookclub.forms import BookForm
 
 
+
 class BookFormTestCase(TestCase):
     """Unit tests of the book form."""
 
+    fixtures = ['bookclub/tests/fixtures/other_books.json']
     def setUp(self):
         self.form_input = {
             'ISBN': '0195153448',
@@ -16,6 +18,14 @@ class BookFormTestCase(TestCase):
             'publisher': 'Oxford',
             'year': 2002,
         }
+        self.wrong_form_input= {
+            'ISBN': '0195153448',
+            'title':'other book',
+            'author': 'Mark',
+            'publisher': 'Oxford',
+            'year': 2013,
+        }
+
     
     def test_valid_add_book_form(self):
         form = BookForm(self.form_input)
@@ -40,3 +50,11 @@ class BookFormTestCase(TestCase):
         self.assertEqual(book.author, 'Mark')
         self.assertEqual(book.publisher, 'Oxford')
         self.assertEqual(book.year, 2002)
+
+    def test_isbn_should_be_unique(self): 
+        self.form_input["ISBN"] = "0002005018"
+        form = BookForm(self.form_input)
+        self.assertFalse(form.is_valid())
+
+
+    
