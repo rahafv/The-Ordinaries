@@ -203,7 +203,8 @@ def withdraw_club(request, club_id):
     except ObjectDoesNotExist:
         messages.add_message(request, messages.ERROR, "The club does not exist")
         return redirect('home')
-
+        
+@login_required
 def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
     general = True
