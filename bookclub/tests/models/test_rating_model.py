@@ -16,12 +16,6 @@ class RatingModelTestCase(TestCase):
     ]
     
     def setUp(self):
-            # self.rating = Rating.objects.create(
-            #     user = User.objects.get(id=1) , 
-            #     book = Book.objects.get(id=1),
-            #     review = 'this book is very nice!' , 
-            #     rating = 3,
-            # )
         self.rating = Rating.objects.get(id=1)
         self.other_rating = Rating.objects.get(id=2)
 
