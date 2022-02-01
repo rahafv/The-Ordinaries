@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User,Book
+from bookclub.tests.helpers import LoginRedirectTester
 
-class BookDetailsTest(TestCase):
+class BookDetailsTest(TestCase, LoginRedirectTester):
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
                 'bookclub/tests/fixtures/default_user.json' ]
@@ -21,15 +22,11 @@ class BookDetailsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'book_details.html')
 
-
     def test_get_book_details_with_invalid_id(self):
         self.client.login(username=self.user.username, password='Password123')
-        url = reverse('book_details', kwargs={'book_id': self.target_book.id+9999})
+        url = reverse('book_details', kwargs={'book_id': self.target_book.id+99999})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404)
 
-
     def test_book_details_redirects_when_not_logged_in(self):
-        redirect_url = reverse('log_in')+f"?next={self.url}"
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assert_redirects_when_not_logged_in()

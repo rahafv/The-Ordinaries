@@ -13,9 +13,7 @@ class UserFormTestCase(TestCase):
     ]
 
     def setUp(self):
-
-        self.user = User.objects.get(username = "johndoe")
-
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'first_name': 'John2',
             'last_name': 'Doe2',
@@ -47,7 +45,7 @@ class UserFormTestCase(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_form_uses_model_validation(self):
-        second_user = User.objects.get(username = 'janedoe')       
+        second_user = User.objects.get(id=2)       
         self.form_input['username'] = second_user.username
         form = UserForm(data=self.form_input)
         self.assertFalse(form.is_valid())

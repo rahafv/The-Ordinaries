@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club, Book
+from bookclub.tests.helpers import LoginRedirectTester
 
-class BooksListTest(TestCase):
+class BooksListTest(TestCase, LoginRedirectTester):
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
                 'bookclub/tests/fixtures/default_user.json',
@@ -25,10 +26,8 @@ class BooksListTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'books.html')
 
-    def test_books_list_redirects_when_not_logged_in(self):
-        redirect_url = reverse('log_in')+f"?next={self.url}"
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    def test_get_books_list_redirects_when_not_logged_in(self):
+       self.assert_redirects_when_not_logged_in()
 
     def test_get_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -58,7 +57,7 @@ class BooksListTest(TestCase):
         isbn_num = ['0425176428', '0002005018', '0060973129','0374157065', '0393045218', '0399135782']
         ctr = 0
         for book_id in range(book_count):
-            book = Book.objects.create(
+            Book.objects.create(
                 ISBN = isbn_num[ctr],
                 title = f'book{book_id} title',
                 author = f'book{book_id} author'
