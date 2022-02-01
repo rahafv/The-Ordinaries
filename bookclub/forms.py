@@ -140,6 +140,25 @@ class BookForm(forms.ModelForm):
             if Book.objects.filter(ISBN=self.ISBN).exists(): 
                 self.add_error('ISBN', 'ISNB already exists')
 
+    def save(self):
+        """Create a new user."""
+
+        super().save(commit=False)
+
+        self.image_url = self.cleaned_data.get('image_url')
+        if not self.image_url:
+            self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
+
+        user = Book.objects.create(
+            ISBN=self.cleaned_data.get('ISBN'),
+            title=self.cleaned_data.get('title'),
+            author=self.cleaned_data.get('author'),
+            publisher=self.cleaned_data.get('publisher'),
+            image_url=self.image_url,
+            year=self.cleaned_data.get('year')
+        )
+        return user
+
 
 class UserForm(forms.ModelForm):
     """Form to update user profile."""

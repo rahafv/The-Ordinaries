@@ -155,7 +155,7 @@ class Book(models.Model):
     )
 
     title = models.CharField(
-        max_length=100,
+        max_length=200,
         unique=False,
         blank=False
     )
@@ -172,7 +172,9 @@ class Book(models.Model):
         blank=True
     )
 
-    image_url = models.URLField( blank=True)
+    image_url = models.URLField(
+        blank=True
+    )
 
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
