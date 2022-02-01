@@ -172,7 +172,9 @@ class Book(models.Model):
         blank=True
     )
 
-    image_url = models.URLField( blank=True)
+    image_url = models.URLField(
+        blank=True
+    )
 
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
