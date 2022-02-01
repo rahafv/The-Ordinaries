@@ -123,11 +123,9 @@ def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})
 
-
 @login_required
 def show_profile_page(request):
     return render(request, 'profile_page.html')
-
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -164,5 +162,4 @@ def books_list(request, club_id=None, user_id=None):
     if user_id:
         books = User.objects.get(id=user_id).books.all()
         general = False
-
     return render(request, 'books.html', {'books': books, 'general': general})

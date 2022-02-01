@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
-from bookclub.models import Book
+from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester
 
 class AddBookViewTestCase(TestCase, LoginRedirectTester):
@@ -12,6 +12,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester):
 
     def setUp(self):
         self.url =reverse('add_book')
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'ISBN': '0195153448',
             'title':'Classical',
@@ -24,7 +25,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(self.url,'/add_book/')
 
     def test_get_add_book(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'add_book.html')
@@ -33,7 +34,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester):
         self.assertFalse(form.is_bound)
 
     def test_unsuccessful_book_addition(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         self.form_input['ISBN'] = '1234567890'
         before_count = Book.objects.count()
         response = self.client.post(self.url, self.form_input)
@@ -46,7 +47,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester):
         self.assertTrue(form.is_bound)
 
     def test_add_book_successful(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         count_books_before = Book.objects.count()
         target_url = reverse("book_details", kwargs={"book_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
