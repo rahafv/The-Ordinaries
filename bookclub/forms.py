@@ -222,3 +222,13 @@ class UserForm(forms.ModelForm):
                 return self.log_in_user
       
 
+class ClubForm(forms.ModelForm):
+    """Form to update club information."""
+    
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['name', 'theme','meeting_type', 'city','country']
+        exclude = ['owner']
+

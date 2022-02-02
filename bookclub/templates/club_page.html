@@ -8,8 +8,8 @@
         {% if user == club.owner %}
           <span>
             <!-- TODO: Add link to edit club here -->
-            <a href="#" class="bi-pencil-square"
-            style="font-size: 1.8rem; color: grey;"></a>
+            <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square"
+            style="font-size: 1.8rem; color: grey;"></a
           </span>
         {% endif %}
         <div class="row mt-5">
@@ -36,7 +36,7 @@
               Owner
             </button>
             <div class="collapse" id="owner">
-              <div class="card card-body mb-3 pb-0">
+              <div class="card card-body mb-3 pb-0"> 
                 <p>{{ club.owner.full_name }}</p>
                 <p>{{ club.owner.email }}</p>
                 <p>{{ club.owner.bio }}</p>

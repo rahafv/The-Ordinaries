@@ -1,6 +1,7 @@
+import contextvars
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
@@ -110,6 +111,7 @@ def club_page(request, club_id):
     is_member = club.is_member(current_user)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
 
+
 @login_required
 def add_book(request):
     if request.method == "POST":
@@ -190,3 +192,22 @@ def members_list(request, club_id):
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
         
+@login_required
+def edit_club_information(request, club_id):
+    club = Club.objects.get(id = club_id)
+    if (request.method == 'GET'):
+        form = ClubForm(instance = club) 
+        context = {
+            'form': form,
+            'club_id':club_id,
+        }
+        return render(request, 'edit_club_info.html', context)
+
+    elif (request.method == 'POST'):
+        form = ClubForm(request.POST, instance=club)
+        if (form.is_valid()):
+            form_owner_detail= form.save(commit=False)
+            form_owner_detail.owner = request.user
+            form_owner_detail.save()
+            club = form.save()
+            return redirect('club_page', club_id)
