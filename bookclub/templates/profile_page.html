@@ -13,7 +13,9 @@
                             <h3 class="profile-title">{{ user.full_name }}</h3>
                             <br/>
                             <span class = "profile-username">{{user.username}}</span>
-                            <span class = "profile-email">{{user.email}}</span>
+                            {% if current_user == club.owner or current_user == user%}
+                                <span class = "profile-email">{{user.email}}</span>
+                            {% endif %}
                             <br/>
                         </div>
                         <div class="profile-text"> 

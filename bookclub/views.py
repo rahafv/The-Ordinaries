@@ -134,11 +134,13 @@ def show_profile_page(request, user_id = None, club_id = None):
     if user_id == request.user.id:
         return redirect('profile') 
 
+    club = None
+    
     if user_id and club_id:
         user = get_object_or_404(User.objects, id=user_id)
-        get_object_or_404(Club.objects, id=club_id)
+        club = get_object_or_404(Club.objects, id=club_id)
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user})
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
