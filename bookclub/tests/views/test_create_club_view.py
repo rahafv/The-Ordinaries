@@ -3,15 +3,16 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import CreateClubForm
 from bookclub.models import Club, User
+from bookclub.tests.helpers import LoginRedirectTester
 
-
-class CreateClubViewTestCase(TestCase):
+class CreateClubViewTestCase(TestCase, LoginRedirectTester):
     """Test suite for the create club view."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]
 
     def setUp(self):
         self.url = reverse("create_club")
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
@@ -24,7 +25,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertEqual(self.url, "/create_club/")
 
     def test_create_club_get(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "create_club.html")
@@ -33,7 +34,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertFalse(form.is_bound)
 
     def test_create_club_successful(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
         target_url = reverse("club_page", kwargs={"club_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -50,7 +51,7 @@ class CreateClubViewTestCase(TestCase):
         self.assertEqual(club.owner, owner)
 
     def test_create_club_unsuccessful(self):
-        self.client.login(username="johndoe", password="Password123")
+        self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
         self.form_input["name"] = ""
         response = self.client.post(self.url, self.form_input)
@@ -61,14 +62,8 @@ class CreateClubViewTestCase(TestCase):
         self.assertTemplateUsed(response, "create_club.html")
         self.assertTrue(isinstance(form, CreateClubForm))
 
-    # def test_get_create_club_redirects_when_not_logged_in(self):
-    #     target_url = reverse("log_in") + f"?next={self.url}"
-    #     response = self.client.get(self.url, follow=True)
-    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, "log_in.html")
+    def test_get_create_club_redirects_when_not_logged_in(self):
+        self.assert_redirects_when_not_logged_in()
 
-    # def test_post_create_club_redirects_when_not_logged_in(self):
-    #     target_url = reverse("log_in") + f"?next={self.url}"
-    #     response = self.client.post(self.url, self.form_input, follow=True)
-    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, "log_in.html")
+    def test_post_create_club_redirects_when_not_logged_in(self):
+        self.assert_post_redirects_when_not_logged_in()

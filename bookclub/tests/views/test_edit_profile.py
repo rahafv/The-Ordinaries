@@ -1,14 +1,13 @@
 """Tests for the profile view."""
-from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import UserForm
 from bookclub.models import User
-from bookclub.tests.helpers import reverse_with_next
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 from datetime import date 
 
 
-class ProfileViewTest(TestCase):
+class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
     """Test suite for the profile view."""
 
     fixtures = [
@@ -18,8 +17,7 @@ class ProfileViewTest(TestCase):
 
     def setUp(self):
         self.url = reverse('edit_profile')
-        self.user = User.objects.get(username = "johndoe")
-
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'username':'johndoe2',
             'first_name': 'John2',
@@ -43,11 +41,6 @@ class ProfileViewTest(TestCase):
         form = response.context['form']
         self.assertTrue(isinstance(form, UserForm)) 
         self.assertEqual(form.instance, self.user)
-
-    def test_get_profile_redirects_when_not_logged_in(self):
-        redirect_url = reverse_with_next('log_in', self.url)
-        response = self.client.get(self.url)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_unsuccessful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -96,7 +89,7 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.bio, "Hello, this is John Doe.")
 
     def test_unsuccessful_profile_update_due_to_duplicate_username(self):
-        second_user = User.objects.get(username = 'janedoe')       
+        second_user = User.objects.get(id=2)       
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = second_user.username
         before_count = User.objects.count()
@@ -128,9 +121,7 @@ class ProfileViewTest(TestCase):
         response_url = reverse('profile')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile_page.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        self.assert_success_message(response)
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'johndoe2')
         self.assertEqual(self.user.first_name, 'John2')
@@ -142,9 +133,10 @@ class ProfileViewTest(TestCase):
         self.assertEqual(self.user.country, 'Germany')
         self.assertEqual(self.user.bio, 'New bio')
 
+    def test_get_profile_redirects_when_not_logged_in(self):
+       self.assert_redirects_when_not_logged_in()
+    
     def test_post_profile_redirects_when_not_logged_in(self):
-        redirect_url = reverse_with_next('log_in', self.url)
-        response = self.client.post(self.url, self.form_input)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+       self.assert_post_redirects_when_not_logged_in()
 
          

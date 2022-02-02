@@ -1,0 +1,38 @@
+{% extends 'base_content.html' %}
+{% block title %} Members {% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-3 mt-3">Members of {{club.name}} club </h1>
+            <table class="table table-bordered" id="membersTable">
+                <thead>
+                <tr style="background-color: white">
+                    <th class="th-sm">Name</th>
+                    <th class="th-sm">Username</th>
+                    <th class="th-sm">Age</th>
+                </tr>
+                </thead>
+                {%if is_member %}
+                    {% for member in members %}
+                        <tr style="background-color: white">
+                            {% if member == current_user %}
+                                <td><p> You </p></td>
+                            {% else %}
+                                <td> <p>{{ member.full_name }}</p> </td>
+                            {% endif %}
+                            <td> 
+                                <p>{{ member.username }}</p>
+                            </td>
+                            <td> 
+                                <p>{{ member.age }}</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
