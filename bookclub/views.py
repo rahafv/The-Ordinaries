@@ -97,6 +97,7 @@ def create_club(request):
             club = form.save()
             """ adds the owner to the members list. """
             club.add_member(club_owner)
+            club_owner.clubs.add(club)
             return redirect('club_page',  club_id=club.id)
     else:
         form = CreateClubForm()
@@ -167,6 +168,15 @@ def books_list(request, club_id=None, user_id=None):
         general = False
     return render(request, 'books.html', {'books': books, 'general': general})
 
+
+@login_required
+def clubs_list(request, user_id=None):
+    clubs = Club.objects.all()
+    general = True
+    if user_id:
+        clubs = User.objects.get(id=user_id).clubs.all()
+        general = False
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general})
 
 @login_required
 def members_list(request, club_id):
