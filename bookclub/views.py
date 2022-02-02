@@ -128,15 +128,15 @@ def book_details(request, book_id):
     return render(request, "book_details.html", {'book': book})
 
 @login_required
-def show_profile_page(request, user_id = None):
+def show_profile_page(request, user_id = None, club_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-
-    if user_id:
-        user = get_object_or_404(User.objects, id=user_id)
 
     if user_id == request.user.id:
         return redirect('profile') 
 
+    if user_id and club_id:
+        user = get_object_or_404(User.objects, id=user_id)
+        get_object_or_404(Club.objects, id=club_id)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user})
 
@@ -175,6 +175,7 @@ def books_list(request, club_id=None, user_id=None):
     if user_id:
         books = User.objects.get(id=user_id).books.all()
         general = False
+        
     return render(request, 'books.html', {'books': books, 'general': general})
 
 
