@@ -128,8 +128,17 @@ def book_details(request, book_id):
     return render(request, "book_details.html", {'book': book})
 
 @login_required
-def show_profile_page(request):
-    return render(request, 'profile_page.html')
+def show_profile_page(request, user_id = None):
+    user = get_object_or_404(User.objects, id=request.user.id)
+
+    if user_id:
+        user = get_object_or_404(User.objects, id=user_id)
+
+    if user_id == request.user.id:
+        return redirect('profile') 
+
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user})
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""

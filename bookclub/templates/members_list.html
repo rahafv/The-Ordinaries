@@ -28,6 +28,9 @@
                             <td> 
                                 <p>{{ member.age }}</p>
                             </td>
+                            <td> 
+                                <a href='{% url 'profile' member.id %}' class="btn btn-outline-dark">Show</a>  
+                            </td>
                         </tr>
                     {% endfor %}
                 {% endif %}
