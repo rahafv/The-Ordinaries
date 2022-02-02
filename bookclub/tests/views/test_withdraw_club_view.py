@@ -17,8 +17,8 @@ class withdrawClubViewTestCase(TestCase):
         self.club = Club.objects.get(id=1)
         self.url = reverse("withdraw_club", kwargs={"club_id": self.club.id})
         self.owner = User.objects.get(username="janedoe")
-        self.member = User.objects.get(username="petrapickles")
-        self.user = User.objects.get(username="peterpickles")
+        self.member = User.objects.get(username="peterpickles")
+        self.user = User.objects.get(username="edgaralen")
 
 
     def test_club_page_url(self):
