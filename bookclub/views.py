@@ -164,10 +164,6 @@ def join_club(request, club_id):
     if(not logged_in_user.is_authenticated):
         return redirect('sign_up')
 
-    if logged_in_user == club.owner:
-        #print("owner of this club")
-        return redirect('club_page',club_id)
-
     if club.is_member(logged_in_user):
         #print("already a member")
         return redirect('club_page',club_id)
