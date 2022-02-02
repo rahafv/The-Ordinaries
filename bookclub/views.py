@@ -162,8 +162,6 @@ def join_club(request, club_id):
    
     club = get_object_or_404(Club.objects, id=club_id)
     logged_in_user = request.user
-    if(not logged_in_user.is_authenticated):
-        return redirect('sign_up')
 
     if club.is_member(logged_in_user):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
@@ -181,8 +179,6 @@ def withdraw_club(request, club_id):
     
     club = get_object_or_404(Club.objects, id=club_id)
     logged_in_user = request.user
-    if(not logged_in_user.is_authenticated):
-        return redirect('sign_up')
 
     if logged_in_user == club.owner:
         messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
