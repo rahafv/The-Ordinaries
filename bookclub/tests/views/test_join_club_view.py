@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 
-class JoinClubViewTestCase(TestCase, LoginRedirectTester):
+class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
     """Test suite for the join club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -27,31 +27,34 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester):
     def test_owner_cannot_join_club(self):
         self.client.login(username=self.owner.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_error_message(response)
         
 
     def test_member_cannot_join_club(self):
         self.client.login(username=self.member.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_error_message(response)
 
     def test_non_member_successful_join_club(self):
         self.client.login(username=self.user.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertTrue(self.club.is_member(self.user))
         self.assertEqual(after_count, before_count + 1)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_success_message(response)
 
 
     def test_join_club_with_invalid_id(self):

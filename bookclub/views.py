@@ -165,11 +165,11 @@ def join_club(request, club_id):
         return redirect('sign_up')
 
     if club.is_member(logged_in_user):
-        #print("already a member")
+        messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page',club_id)
 
-    #print("joining club", club_id)
     club.members.add(logged_in_user)
+    messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page',club_id)
  
    
@@ -183,15 +183,15 @@ def withdraw_club(request, club_id):
         return redirect('sign_up')
 
     if logged_in_user == club.owner:
-        #print("cannot withdraw before transfering ownership")
+        messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
         return redirect('club_page',club_id)
 
     if not club.is_member(logged_in_user):
-        #print("not a member of this club")
+        messages.add_message(request, messages.ERROR, "You are not a member of this club!")
         return redirect('club_page',club_id)
     
-    #print("withdrawing from club", club_id)
     club.members.remove(logged_in_user)
+    messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page',club_id)
  
     

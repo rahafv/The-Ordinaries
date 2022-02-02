@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 
 
-class withdrawClubViewTestCase(TestCase, LoginRedirectTester):
+class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
     """Test suite for the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -28,32 +28,33 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester):
     def test_owner_cannot_withdraw_club(self):
         self.client.login(username=self.owner.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_error_message(response)
         
-
     def test_non_member_cannot_withdraw_club(self):
         self.client.login(username=self.user.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertEqual(after_count, before_count)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_error_message(response)
 
     def test_member_successful_withdraw_club(self):
         self.client.login(username=self.member.username, password="Password123")
         before_count = self.club.member_count()
-        response = self.client.post(self.url)
+        response = self.client.get(self.url, follow=True)
         after_count = self.club.member_count()
         self.assertFalse(self.club.is_member(self.user))
         self.assertEqual(after_count, before_count - 1)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-
+        self.assert_success_message(response)
 
     def test_withdraw_club_with_invalid_id(self):
         self.client.login(username=self.member.username, password="Password123")
