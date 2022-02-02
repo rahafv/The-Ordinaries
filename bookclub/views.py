@@ -172,7 +172,6 @@ def books_list(request, club_id=None, user_id=None):
 @login_required
 def clubs_list(request, user_id=None):
     clubs = Club.objects.all()
-    # club = get_object_or_404(Club.objects, id=club_id)
     general = True
     if user_id:
         clubs = User.objects.get(id=user_id).clubs.all()

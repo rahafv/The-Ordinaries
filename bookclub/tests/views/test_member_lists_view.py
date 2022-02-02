@@ -2,9 +2,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import reverse_with_next
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 
-class MembersListTest(TestCase, LoginRedirectTester):
+class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_club.json',
@@ -38,6 +38,7 @@ class MembersListTest(TestCase, LoginRedirectTester):
         for user_id in range(15):
             self.assertContains(response, f'user{user_id}')
             self.assertContains(response, f'First{user_id} Last{user_id}')
+            """Needed once we implement the show user. """
             # self.assertContains(response, f'Last{user_id}')
             # user = User.objects.get(username=f'@user{user_id}')
             # user_url = reverse('show_user', kwargs={'user_id': user.id})
@@ -49,6 +50,7 @@ class MembersListTest(TestCase, LoginRedirectTester):
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_page.html")
+        self.assert_error_message(response)
 
     def _create_test_members(self, members_count=10):
         for user_id in range(members_count):
