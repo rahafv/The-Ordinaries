@@ -1,0 +1,32 @@
+{% extends 'base_content.html' %}
+{% block title %}Clubs{% endblock %}
+{% block content %}
+  
+   <div class="container">
+    {% if clubs.count == 0 and general %}
+    <div style="text-align: center;   padding-top: 50px;">
+      <h4 class="lead "> There are no clubs, want to create one?</h4>
+      <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
+    </div>
+      {% endif %}
+
+      {% if clubs.count == 0 and not general %}
+    <div style="text-align: center;   padding-top: 50px;">
+      <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
+      <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
+    </div>
+      {% endif %}
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for club in clubs %}
+      <div class="col">
+        <div style="text-align: center;">
+          <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
+          <p >{{ club.theme }}</p>
+          <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -44,9 +44,11 @@ urlpatterns = [
     path('join_club/<int:club_id>/', views.join_club, name ='join_club'),
     path('withdraw_club/<int:club_id>/', views.withdraw_club, name ='withdraw_club'),
     path('books/', views.books_list, name ='books_list'),
+    path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
+    path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list')
 ]
 
