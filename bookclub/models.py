@@ -115,7 +115,7 @@ class Club(models.Model):
         max_length=100, 
         blank=True
     )
-    
+
     class MeetingType(models.TextChoices):
         INPERSON = "IP", "In-person"
         ONLINE = "OL", "Online"
