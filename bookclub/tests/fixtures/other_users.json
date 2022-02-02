@@ -7,6 +7,9 @@
       "last_name": "Doe",
       "username": "janedoe",
       "email": "janedoe@example.org",
+      "city": "new york",
+      "region": "NY",
+      "country": "United states",
       "bio": "The quick brown fox jumps over the lazy dog.",
       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc="
     }
@@ -17,8 +20,11 @@
     "fields": {
       "first_name": "Petra",
       "last_name": "Pickles",
-      "username": "petrapickles",
+      "username": "peterpickles",
       "email": "petrapickles@example.org",
+      "city": "new york",
+      "region": "NY",
+      "country": "United states",
       "bio": "The quick brown fox jumps over the lazy dog.",
       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc="
     }
@@ -29,8 +35,11 @@
     "fields": {
       "first_name": "Peter",
       "last_name": "Pickles",
-      "username": "peterpickles",
-      "email": "peterpickles@example.org",
+      "username": "edgaralen",
+      "email": "edgaralen@example.org",
+      "city": "new york",
+      "region": "NY",
+      "country": "United states",
       "bio": "The quick brown fox jumps over the lazy dog.",
       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc="
     }

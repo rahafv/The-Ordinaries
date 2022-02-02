@@ -13,6 +13,11 @@
                 {% include 'partials/bootstrap_form.html' with form=form %}
                 <input type="hidden" name="next" value="{{ next }}">
                 <input type="submit" class="btn btn-primary mb-3" value="Log in">
+                <div class="sign-up-alternate">
+                    <h5 class="sign-up-alternate-heading">
+                      Don't have an account? Click <a href={% url 'sign_up' %}>here</a> to sign up.
+                    </h5>
+                  </div>
             </form>
         </div>
     </div>

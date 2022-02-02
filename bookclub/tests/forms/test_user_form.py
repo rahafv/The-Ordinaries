@@ -5,6 +5,7 @@ from bookclub.forms import UserForm
 from bookclub.models import User
 from datetime import date 
 
+
 class UserFormTestCase(TestCase):
     """Unit tests of the user form."""
     fixtures = [
@@ -13,9 +14,7 @@ class UserFormTestCase(TestCase):
     ]
 
     def setUp(self):
-
-        self.user = User.objects.get(username = "johndoe")
-
+        self.user = User.objects.get(id=1)
         self.form_input = {
             'first_name': 'John2',
             'last_name': 'Doe2',
@@ -27,6 +26,7 @@ class UserFormTestCase(TestCase):
             'region' :'NY',
             'country' : 'USA',
         }
+    
     
     def test_form_has_necessary_fields(self):
         form = UserForm()
@@ -46,11 +46,19 @@ class UserFormTestCase(TestCase):
         form = UserForm(data = self.form_input)
         self.assertTrue(form.is_valid())
 
+
     def test_form_uses_model_validation(self):
-        second_user = User.objects.get(username = 'janedoe')       
+        second_user = User.objects.get(id=2)       
         self.form_input['username'] = second_user.username
         form = UserForm(data=self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_year_should_be_valid(self): 
+        self.form_input["date_of_birth"] = date(2021, 1, 5)
+        form = UserForm(self.form_input)
+        self.assertFalse(form.is_valid())
+
+
 
     def test_form_must_save_correctly(self):
         form = UserForm(instance=self.user, data=self.form_input, user = self.user)
@@ -67,3 +75,5 @@ class UserFormTestCase(TestCase):
         self.assertEqual(self.user.city, "New York")
         self.assertEqual(self.user.region, "NY")
         self.assertEqual(self.user.country, "USA")
+
+ 

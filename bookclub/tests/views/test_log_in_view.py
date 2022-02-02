@@ -1,18 +1,17 @@
 """Tests of the log in view."""
-from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import LogInForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, reverse_with_next
+from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next
 
-class LogInViewTestCase(TestCase, LogInTester):
+class LogInViewTestCase(TestCase, LogInTester, MessageTester):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
         self.url = reverse('log_in')
-        self.user = User.objects.get(username='johndoe')
+        self.user = User.objects.get(id=1)
 
     def test_log_in_url(self):
         self.assertEqual(self.url,'/log_in/')
@@ -26,8 +25,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         self.assertFalse(next)
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 0)
+        self.assert_no_message(response)
 
     def test_get_log_in_with_redirect(self):
         destination_url = reverse('home')
@@ -40,8 +38,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         self.assertEqual(next, destination_url)
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 0)
+        self.assert_no_message(response)
 
     def test_get_log_in_redirects_when_logged_in(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -59,9 +56,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assert_error_message(response)
 
     def test_log_in_with_blank_username(self):
         form_input = { 'username': '', 'password': 'Password123' }
@@ -72,9 +67,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assert_error_message(response)
 
     def test_log_in_with_blank_password(self):
         form_input = { 'username': 'johndoe', 'password': '' }
@@ -85,9 +78,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.ERROR)
+        self.assert_error_message(response)
 
     def test_succesful_log_in(self):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
@@ -96,8 +87,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 0)
+        self.assert_no_message(response)
 
     def test_succesful_log_in_with_redirect(self):
         redirect_url = reverse('home')
@@ -106,8 +96,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(self._is_logged_in())
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 0)
+        self.assert_no_message(response)
 
     def test_post_log_in_with_incorrect_credentials_and_redirect(self):
         redirect_url = reverse('log_in')
