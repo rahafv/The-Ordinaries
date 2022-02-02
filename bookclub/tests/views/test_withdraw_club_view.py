@@ -58,8 +58,7 @@ class withdrawClubViewTestCase(TestCase):
         self.client.login(username=self.member.username, password="Password123")
         url = reverse("withdraw_club", kwargs={"club_id": self.club.id + 9999})
         response = self.client.get(url, follow=True)
-        response_url = reverse('home')
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertEqual(response.status_code, 404)
         self.assertFalse(self.club.is_member(self.user))
 
   
