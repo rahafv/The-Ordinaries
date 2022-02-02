@@ -2,9 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
+from bookclub.tests.helpers import LoginRedirectTester
 
 
-class withdrawClubViewTestCase(TestCase):
+class withdrawClubViewTestCase(TestCase, LoginRedirectTester):
     """Test suite for the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -63,7 +64,4 @@ class withdrawClubViewTestCase(TestCase):
 
   
     def test_withdraw_club_redirects_when_not_logged_in(self):
-        target_url = reverse("log_in") + f"?next={self.url}"
-        response = self.client.get(self.url, follow=True)
-        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "log_in.html")
+        self.assert_redirects_when_not_logged_in()
