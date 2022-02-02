@@ -192,6 +192,7 @@ def withdraw_club(request, club_id):
         return redirect('club_page',club_id)
     
     club.members.remove(logged_in_user)
+    logged_in_user.clubs.remove(club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page',club_id)
  
