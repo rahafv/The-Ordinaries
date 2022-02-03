@@ -52,22 +52,25 @@
                   <a href="books/" class="btn btn-outline-dark">Book List</a>
                 </div>
               </div>
+              {%if is_member %}
               <div class="card text-center">
                 <div class="card-body">
-                  <!-- TODO: Add link to member list here -->
-                  <a href="#" class="btn btn-outline-dark">Member List</a>  
+                  <a href='{% url 'members_list' club.id %}' class="btn btn-outline-dark"> Member List</a>  
                 </div>
               </div>
+              {%endif%}
               <!-- DO NOT FORGET TO ADD IF STATEMENTS-->
               <div class="card text-center">
                 <div class="card-body">
                   <div class="mb-3 pb-0">
-                    <!-- TODO: Add link to join club here -->
-                    <a href="#" class="btn btn-outline-success">Join club</a> 
+                    {% if not user == club.owner and not is_member %}
+                      <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
+                    {% endif %}
                   </div>
-                  <div class="mb-3 pb-0">
-                    <!-- TODO: Add link to withdraw from club here -->
-                    <a href="#" class="btn btn-outline-warning">Withdraw from club</a>   
+                    <div class="mb-3 pb-0">
+                    {% if not user == club.owner and is_member%}
+                      <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
+                    {% endif %}   
                   </div>
                   {% if user == club.owner %}
                   <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>

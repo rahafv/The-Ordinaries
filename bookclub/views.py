@@ -7,19 +7,18 @@ from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
-
-
 
 @login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
-  
+
 @login_required
 def home(request):
      return render(request, 'home.html')
-     
+
 @login_prohibited
 def sign_up(request):
     if request.method == 'POST':
@@ -87,15 +86,19 @@ def password(request):
             else:
                 messages.add_message(request, messages.ERROR, "New password does not match criteria!")
     form = PasswordForm()
-    return render(request, 'password.html', {'form': form}) 
+    return render(request, 'password.html', {'form': form})
 
 @login_required
 def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
-            form.instance.owner = request.user
+            club_owner= request.user
+            form.instance.owner = club_owner
             club = form.save()
+            """ adds the owner to the members list. """
+            club.add_member(club_owner)
+            club_owner.clubs.add(club)
             return redirect('club_page',  club_id=club.id)
     else:
         form = CreateClubForm()
@@ -103,8 +106,10 @@ def create_club(request):
 
 @login_required
 def club_page(request, club_id):
+    current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display()})
+    is_member = club.is_member(current_user)
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
 
 @login_required
 def add_book(request):
@@ -112,14 +117,14 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id) 
+            return redirect('book_details', book_id=book.id)
 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
 
 @login_required
-def book_details(request, book_id): 
+def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     return render(request, "book_details.html", {'book': book})
 
@@ -151,7 +156,45 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
-        
+
+@login_required
+def join_club(request, club_id):
+
+    club = get_object_or_404(Club.objects, id=club_id)
+    logged_in_user = request.user
+
+    if club.is_member(logged_in_user):
+        messages.add_message(request, messages.ERROR, "Already a member of this club!")
+        return redirect('club_page',club_id)
+
+    club.members.add(logged_in_user)
+    logged_in_user.clubs.add(club)
+    messages.add_message(request, messages.SUCCESS, "Joined club!")
+    return redirect('club_page',club_id)
+
+
+
+@login_required
+def withdraw_club(request, club_id):
+
+    club = get_object_or_404(Club.objects, id=club_id)
+    logged_in_user = request.user
+
+    if logged_in_user == club.owner:
+        messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
+        return redirect('club_page',club_id)
+
+    if not club.is_member(logged_in_user):
+        messages.add_message(request, messages.ERROR, "You are not a member of this club!")
+        return redirect('club_page',club_id)
+
+    club.members.remove(logged_in_user)
+    logged_in_user.clubs.remove(club)
+    messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
+    return redirect('club_page',club_id)
+
+
+
 @login_required
 def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
@@ -165,7 +208,27 @@ def books_list(request, club_id=None, user_id=None):
     return render(request, 'books.html', {'books': books, 'general': general})
 
 @login_required
-def transfer_club_ownership(request, club_id): 
+def clubs_list(request, user_id=None):
+    clubs = Club.objects.all()
+    general = True
+    if user_id:
+        clubs = User.objects.get(id=user_id).clubs.all()
+        general = False
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general})
+
+@login_required
+def members_list(request, club_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    is_member = club.is_member(current_user)
+    members = club.members.all()
+    if (is_member):
+        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot access the members list" )
+        return redirect('club_page', club_id)
+
+def transfer_club_ownership(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     user = request.user
     if request.method == "POST":
@@ -176,4 +239,3 @@ def transfer_club_ownership(request, club_id):
     else:
         form = TransferClubOwnership()
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
-

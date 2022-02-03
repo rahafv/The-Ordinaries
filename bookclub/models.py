@@ -1,3 +1,4 @@
+from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
@@ -114,7 +115,7 @@ class Club(models.Model):
         max_length=100, 
         blank=True
     )
-    
+
     class MeetingType(models.TextChoices):
         INPERSON = "IP", "In-person"
         ONLINE = "OL", "Online"
@@ -146,6 +147,11 @@ class Club(models.Model):
 
     def member_count(self):
         return self.members.all().count()   
+    
+    def is_member(self, user):
+        """ checks if the user is a member"""
+        return self.members.all().filter(id=user.id).exists()
+
 
 class Book(models.Model):
     """Book model."""
@@ -196,3 +202,33 @@ class Book(models.Model):
     
     def readers_count(self):
         return self.readers.all().count()  
+
+class Rating(models.Model):
+    """rating model."""
+
+    user =  models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE
+    )
+
+    book = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE
+    )
+
+    review = models.CharField(
+        max_length=250 , 
+        blank = True
+    )
+
+    rating = models.SmallIntegerField( 
+        blank = False , 
+        validators=[
+            MaxValueValidator(5) , 
+            MinValueValidator(1)
+        ]
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+ 

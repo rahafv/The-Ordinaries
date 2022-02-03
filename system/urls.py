@@ -41,13 +41,16 @@ urlpatterns = [
     path("club/<int:club_id>/", views.club_page, name="club_page"),
     path('add_book/', views.add_book, name ='add_book'),
     path('book_details/<int:book_id>', views.book_details, name ='book_details'),
+    path('join_club/<int:club_id>/', views.join_club, name ='join_club'),
+    path('withdraw_club/<int:club_id>/', views.withdraw_club, name ='withdraw_club'),
     path('books/', views.books_list, name ='books_list'),
+    path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
+    path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
+    path("club/<int:club_id>/members/", views.members_list, name='members_list'),
     path('club/<int:club_id>/transfer_ownership/', views.transfer_club_ownership, name ='transfer_ownership'),
-
-
 ]
 
 handler404 = 'bookclub.views.handler404'

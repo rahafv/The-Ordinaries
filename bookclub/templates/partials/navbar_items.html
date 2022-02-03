@@ -2,10 +2,12 @@
     
     <ul class="navbar-nav mr-auto">
         <li class="nav-item nav-item active">
-          <a class="nav-link" href="{% url 'books_list' %}">Books</a>
+            <a class="nav-link" href="{% url 'clubs_list' %}"> Clubs </a>
+        </li>
+        <li>
+            <a class="nav-link" href="{% url 'books_list' %}"> Books </a>
         </li>
     </ul>
-
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item dropdown">
             <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
@@ -17,6 +19,7 @@
                 <li><a class="dropdown-item" href="{% url 'password' %}">Change password</a></li>
                 <!-- TODO: Move my book item -->
                 <li><a class="dropdown-item" href={% url 'books_list' user.id %}>My books</a></li>
+                <li><a class="dropdown-item" href={% url 'clubs_list' user.id %}>My clubs</a></li>
                 <hr>
                 <li><a class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
             </ul>
