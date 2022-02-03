@@ -248,4 +248,18 @@ def edit_club_information(request, club_id):
             club = form.save()
             messages.add_message(request, messages.SUCCESS, "Successfully updated club information!")
             return redirect('club_page', club_id)
+            
+    data = {
+        'name':club.name,
+        'theme': club.theme,
+        'meeting_type':club.meeting_type,
+        'city': club.city,
+        'country':club.country,
+    }
+    form = ClubForm(data) 
+    context = {
+        'form': form,
+        'club_id':club_id,
+    }
+    return render(request, 'edit_club_info.html', context)
 
