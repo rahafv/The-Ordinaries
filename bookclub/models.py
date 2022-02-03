@@ -152,6 +152,15 @@ class Club(models.Model):
         """ checks if the user is a member"""
         return self.members.all().filter(id=user.id).exists()
 
+    def make_owner(self, club_id, new_owner):
+        club = self.objects.get_or_create(id=club_id)
+        old_owner = club.owner
+        # old_owner.save()
+        # new_owner.save()
+        club.owner = new_owner
+        club.members.add(old_owner)
+        # club.save()
+
 
 class Book(models.Model):
     """Book model."""
