@@ -1,4 +1,3 @@
-import contextvars
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
@@ -112,7 +111,6 @@ def club_page(request, club_id):
     is_member = club.is_member(current_user)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
 
-
 @login_required
 def add_book(request):
     if request.method == "POST":
@@ -158,7 +156,6 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
-
         
 @login_required
 def join_club(request, club_id):
@@ -196,6 +193,7 @@ def withdraw_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page',club_id)
  
+    
 
 @login_required
 def books_list(request, club_id=None, user_id=None):
@@ -229,7 +227,7 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
-        
+
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)

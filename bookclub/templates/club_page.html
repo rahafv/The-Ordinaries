@@ -36,7 +36,7 @@
               Owner
             </button>
             <div class="collapse" id="owner">
-              <div class="card card-body mb-3 pb-0"> 
+              <div class="card card-body mb-3 pb-0">
                 <p>{{ club.owner.full_name }}</p>
                 <p>{{ club.owner.email }}</p>
                 <p>{{ club.owner.bio }}</p>
@@ -67,6 +67,7 @@
                       <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
                     {% endif %}
                   </div>
+                  
                     <div class="mb-3 pb-0">
                     {% if not user == club.owner and is_member%}
                       <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
