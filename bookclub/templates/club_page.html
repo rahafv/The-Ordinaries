@@ -8,7 +8,7 @@
         {% if user == club.owner %}
           <span>
             <!-- TODO: Add link to edit club here -->
-            <a href="#" class="bi-pencil-square"
+            <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square"
             style="font-size: 1.8rem; color: grey;"></a>
           </span>
         {% endif %}
@@ -67,6 +67,7 @@
                       <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
                     {% endif %}
                   </div>
+                  
                     <div class="mb-3 pb-0">
                     {% if not user == club.owner and is_member%}
                       <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
