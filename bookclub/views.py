@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, TransferClubOwnership
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
@@ -163,3 +163,17 @@ def books_list(request, club_id=None, user_id=None):
         books = User.objects.get(id=user_id).books.all()
         general = False
     return render(request, 'books.html', {'books': books, 'general': general})
+
+@login_required
+def transfer_club_ownership(request, club_id): 
+    club = get_object_or_404(Club.objects, id=club_id)
+    user = request.user
+    if request.method == "POST":
+        form = TransferClubOwnership(request.POST)
+        if form.is_valid():
+            club = form.save()
+            return redirect('club_page', club_id=club.id)
+    else:
+        form = TransferClubOwnership()
+    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
+

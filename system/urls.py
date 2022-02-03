@@ -44,7 +44,8 @@ urlpatterns = [
     path('books/', views.books_list, name ='books_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
     #change URL format
-    path('<int:user_id>/books/', views.books_list, name ='books_list')
+    path('<int:user_id>/books/', views.books_list, name ='books_list'),
+    path('club/<int:club_id>/transfer_ownership/', views.transfer_club_ownership, name ='transfer_ownership'),
 
 
 ]

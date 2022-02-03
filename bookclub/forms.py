@@ -220,5 +220,20 @@ class UserForm(forms.ModelForm):
             if(self.log_in_user is not None):
                 self.log_in_user.set_age(new_age)
                 return self.log_in_user
-      
+
+class TransferClubOwnership(forms.ModelForm):
+    """Form to create or update club information."""
+    
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['members']
+        widgets = {"members": forms.Select()}
+
+        confirm = forms.BooleanField(label='Are you sure?', label_suffix = " : ",
+                                  required = True,  disabled = False,
+                                  widget=forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
+                                  help_text = "Please check the box as this field is required.",
+                                  error_messages = {'required':"Please check the box"})
 
