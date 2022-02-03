@@ -8,6 +8,7 @@ from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
 
@@ -157,7 +158,45 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
+
         
+@login_required
+def join_club(request, club_id):
+   
+    club = get_object_or_404(Club.objects, id=club_id)
+    logged_in_user = request.user
+
+    if club.is_member(logged_in_user):
+        messages.add_message(request, messages.ERROR, "Already a member of this club!")
+        return redirect('club_page',club_id)
+
+    club.members.add(logged_in_user)
+    logged_in_user.clubs.add(club)
+    messages.add_message(request, messages.SUCCESS, "Joined club!")
+    return redirect('club_page',club_id)
+ 
+   
+
+@login_required
+def withdraw_club(request, club_id):
+    
+    club = get_object_or_404(Club.objects, id=club_id)
+    logged_in_user = request.user
+
+    if logged_in_user == club.owner:
+        messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
+        return redirect('club_page',club_id)
+
+    if not club.is_member(logged_in_user):
+        messages.add_message(request, messages.ERROR, "You are not a member of this club!")
+        return redirect('club_page',club_id)
+    
+    club.members.remove(logged_in_user)
+    logged_in_user.clubs.remove(club)
+    messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
+    return redirect('club_page',club_id)
+ 
+
 @login_required
 def books_list(request, club_id=None, user_id=None):
     books = Book.objects.all()
@@ -169,7 +208,6 @@ def books_list(request, club_id=None, user_id=None):
         books = User.objects.get(id=user_id).books.all()
         general = False
     return render(request, 'books.html', {'books': books, 'general': general})
-
 
 @login_required
 def clubs_list(request, user_id=None):
@@ -210,4 +248,6 @@ def edit_club_information(request, club_id):
             form_owner_detail.owner = request.user
             form_owner_detail.save()
             club = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated club information!")
             return redirect('club_page', club_id)
+
