@@ -23,14 +23,16 @@
                                 <td> <p>{{ member.full_name }}</p> </td>
                             {% endif %}
                             <td> 
-                                <p>{{ member.username }}</p>
+                                <p>{{member.username}}</p>  
                             </td>
                             <td> 
                                 <p>{{ member.age }}</p>
                             </td>
-                            <td> 
-                                <a href='{% url 'profile' club.id member.id %}' class="btn btn-outline-dark">Show</a>  
+                            {% if member != current_user%}
+                             <td> 
+                                <a href='{% url 'profile' club.id member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
                             </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 {% endif %}

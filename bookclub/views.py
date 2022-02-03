@@ -7,7 +7,6 @@ from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
-from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
 
@@ -53,12 +52,14 @@ def log_in(request):
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
+# add the login required 
 def log_out(request):
     if request.user.is_authenticated:
         logout(request)
         messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
+# this can be done in the form clean method 
 @login_required
 def password(request):
     current_user = request.user
@@ -93,13 +94,13 @@ def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
-            club_owner= request.user
+            club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             club_owner.clubs.add(club)
-            return redirect('club_page',  club_id=club.id)
+            return redirect('club_page', club_id=club.id)
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})

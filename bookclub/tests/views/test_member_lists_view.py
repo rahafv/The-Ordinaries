@@ -21,7 +21,7 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
     def test_get_members_page_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
-    def test_get_club_books_list(self):
+    def test_get_club_members_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self.url = reverse('members_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url)
@@ -38,11 +38,11 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
         for user_id in range(15):
             self.assertContains(response, f'user{user_id}')
             self.assertContains(response, f'First{user_id} Last{user_id}')
-            """Needed once we implement the show user. """
-            # self.assertContains(response, f'Last{user_id}')
-            # user = User.objects.get(username=f'@user{user_id}')
-            # user_url = reverse('show_user', kwargs={'user_id': user.id})
-            # self.assertContains(response, user_url)
+
+        for member in self.club.members.all():
+            if member.id != self.user.id:
+                member_profile_url = reverse('profile', kwargs={'club_id': self.club.id, 'user_id': member.id })
+                self.assertContains(response, member_profile_url)
 
     def test_non_members_cannot_see_members_list(self):
         self.non_member = User.objects.get(id=4)

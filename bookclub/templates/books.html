@@ -16,11 +16,19 @@
 
    <div class="container">
     {% if books.count == 0 %}
-    <div style="text-align: center;   padding-top: 50px;">
-      <h4 class="lead ">The book list is empty! find more book you might like.</h4>
-      <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
-    </div>
+        {% if general %}
+        <div style="text-align: center;   padding-top: 50px;">
+          <h4 class="lead ">There are no books, want to add one?</h4>
+          <a href={% url 'add_book' %} class="btn my-2 btn-outline-secondary">Add a book</a>
+        </div>
+          {% else %}
+          <div style="text-align: center;   padding-top: 50px;">
+            <h4 class="lead ">The book list is empty! find more book you might like.</h4>
+            <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
+          </div>
+            {% endif %}
       {% endif %}
+
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
       {% for book in books %}
       <div class="col">
