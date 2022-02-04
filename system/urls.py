@@ -35,6 +35,7 @@ urlpatterns = [
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
     path('profile/', views.show_profile_page , name='profile'),
+    path('club/<int:club_id>/members/<int:user_id>', views.show_profile_page , name='profile'),
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
     path('create_club/', views.create_club , name='create_club'),

@@ -7,7 +7,6 @@ from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
-from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
 
@@ -53,12 +52,14 @@ def log_in(request):
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
+# add the login required 
 def log_out(request):
     if request.user.is_authenticated:
         logout(request)
         messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
+# this can be done in the form clean method 
 @login_required
 def password(request):
     current_user = request.user
@@ -93,13 +94,13 @@ def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
-            club_owner= request.user
+            club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             club_owner.clubs.add(club)
-            return redirect('club_page',  club_id=club.id)
+            return redirect('club_page', club_id=club.id)
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
@@ -129,8 +130,19 @@ def book_details(request, book_id):
     return render(request, "book_details.html", {'book': book})
 
 @login_required
-def show_profile_page(request):
-    return render(request, 'profile_page.html')
+def show_profile_page(request, user_id = None, club_id = None):
+    user = get_object_or_404(User.objects, id=request.user.id)
+
+    if user_id == request.user.id:
+        return redirect('profile') 
+
+    club = None
+    
+    if user_id and club_id:
+        user = get_object_or_404(User.objects, id=user_id)
+        club = get_object_or_404(Club.objects, id=club_id)
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -205,6 +217,7 @@ def books_list(request, club_id=None, user_id=None):
     if user_id:
         books = User.objects.get(id=user_id).books.all()
         general = False
+        
     return render(request, 'books.html', {'books': books, 'general': general})
 
 @login_required
