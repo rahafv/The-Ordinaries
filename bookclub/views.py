@@ -180,7 +180,6 @@ def join_club(request, club_id):
         return redirect('club_page',club_id)
 
     club.members.add(logged_in_user)
-    logged_in_user.clubs.add(club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page',club_id)
  
@@ -201,7 +200,6 @@ def withdraw_club(request, club_id):
         return redirect('club_page',club_id)
     
     club.members.remove(logged_in_user)
-    logged_in_user.clubs.remove(club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page',club_id)
  

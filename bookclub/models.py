@@ -55,16 +55,6 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
-
-    clubs = models.ManyToManyField(
-        'Club',
-        blank = True  
-    )
-    
-    books = models.ManyToManyField(
-        'Book', 
-        related_name='books'
-    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -102,13 +92,8 @@ class Club(models.Model):
     )
     
     members = models.ManyToManyField(
-        'User', 
-        related_name='members'
-    )
-
-    books = models.ManyToManyField(
-        'Book', 
-        related_name='clubBooks'
+        User, 
+        related_name='clubs'
     )
 
     theme = models.CharField(
@@ -193,7 +178,12 @@ class Book(models.Model):
 
     readers = models.ManyToManyField(
         User, 
-        related_name='readers'
+        related_name='books'
+    )
+
+    clubs = models.ManyToManyField(
+        Club, 
+        related_name='books'
     )
 
     def add_reader(self, reader):
@@ -203,17 +193,26 @@ class Book(models.Model):
     def readers_count(self):
         return self.readers.all().count()  
 
+    def add_club(self, club):
+        if not self.clubs.all().filter(id=club.id).exists():
+            self.clubs.add(club)
+    
+    def clubs_count(self):
+        return self.clubs.all().count()  
+
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
         User, 
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='reviews'
     )
 
     book = models.ForeignKey(
         Book, 
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='reviews'
     )
 
     review = models.CharField(
@@ -224,8 +223,8 @@ class Rating(models.Model):
     rating = models.SmallIntegerField( 
         blank = False , 
         validators=[
-            MaxValueValidator(5) , 
-            MinValueValidator(1)
+            MaxValueValidator(10) , 
+            MinValueValidator(0)
         ]
     )
 

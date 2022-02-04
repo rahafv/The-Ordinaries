@@ -27,8 +27,6 @@ class ClubsListTest(TestCase, LoginRedirectTester):
         self.client.login(username=self.user.username, password='Password123')
         self.club.add_member(self.user)
         self.other_club.add_member(self.user)
-        self.user.clubs.add(self.club)
-        self.user.clubs.add(self.other_club)
         self.url = reverse('clubs_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
