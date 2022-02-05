@@ -6,7 +6,6 @@
           "name": "club1",
           "owner": 2,
           "members": [3,2],
-          "books": [],
           "theme": "Crime",
           "meeting_type": "OL",
           "city":"london", 

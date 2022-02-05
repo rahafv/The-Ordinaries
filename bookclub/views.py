@@ -52,14 +52,12 @@ def log_in(request):
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
-# add the login required 
+@login_required
 def log_out(request):
-    if request.user.is_authenticated:
-        logout(request)
-        messages.add_message(request, messages.SUCCESS, "You've been logged out.")
+    logout(request)
+    messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
-# this can be done in the form clean method 
 @login_required
 def password(request):
     current_user = request.user
@@ -99,7 +97,6 @@ def create_club(request):
             club = form.save()
             """ adds the owner to the members list. """
             club.add_member(club_owner)
-            club_owner.clubs.add(club)
             return redirect('club_page', club_id=club.id)
     else:
         form = CreateClubForm()
@@ -151,11 +148,10 @@ def book_details(request, book_id):
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-
+    club = None
+    
     if user_id == request.user.id:
         return redirect('profile') 
-
-    club = None
     
     if user_id and club_id:
         user = get_object_or_404(User.objects, id=user_id)
@@ -190,41 +186,33 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         
 @login_required
 def join_club(request, club_id):
-   
     club = get_object_or_404(Club.objects, id=club_id)
-    logged_in_user = request.user
+    user = request.user
 
-    if club.is_member(logged_in_user):
+    if club.is_member(user):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
 
-    club.members.add(logged_in_user)
-    logged_in_user.clubs.add(club)
+    club.members.add(user)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
-    return redirect('club_page',club_id)
- 
-   
+    return redirect('club_page', club_id)
 
 @login_required
 def withdraw_club(request, club_id):
-    
     club = get_object_or_404(Club.objects, id=club_id)
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user == club.owner:
+    if user == club.owner:
         messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
 
-    if not club.is_member(logged_in_user):
+    if not club.is_member(user):
         messages.add_message(request, messages.ERROR, "You are not a member of this club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
     
-    club.members.remove(logged_in_user)
-    logged_in_user.clubs.remove(club)
+    club.members.remove(user)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
-    return redirect('club_page',club_id)
- 
-    
+    return redirect('club_page', club_id)
 
 @login_required
 def books_list(request, club_id=None, user_id=None):
