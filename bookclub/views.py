@@ -116,6 +116,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review. ")
             return redirect('book_details', book_id=reviewed_book.id)
     else:
         form = ReviewForm()
@@ -144,7 +145,8 @@ def add_book(request):
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
     form = ReviewForm()
-    return render(request, "book_details.html", {'book': book, 'form':form})
+    review = book.ratings.all().filter(user_id = request.user.id)
+    return render(request, "book_details.html", {'book': book, 'form':form, 'review': review})
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
