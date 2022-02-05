@@ -52,14 +52,12 @@ def log_in(request):
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
-# add the login required 
+@login_required
 def log_out(request):
-    if request.user.is_authenticated:
-        logout(request)
-        messages.add_message(request, messages.SUCCESS, "You've been logged out.")
+    logout(request)
+    messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
-# this can be done in the form clean method 
 @login_required
 def password(request):
     current_user = request.user
