@@ -221,7 +221,7 @@ class Rating(models.Model):
         blank = True
     )
 
-    rating = models.PositiveIntegerField(
+    rating = models.FloatField(
         blank=True,
         validators=[
             MaxValueValidator(10),

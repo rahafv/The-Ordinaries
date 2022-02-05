@@ -115,7 +115,7 @@ def add_review(request, book_id):
             review_user = request.user
             form.instance.user = review_user
             form.instance.book = reviewed_book
-            form.save()
+            form.save(review_user, reviewed_book)
             return redirect('book_details', book_id=reviewed_book.id)
     else:
         form = ReviewForm()

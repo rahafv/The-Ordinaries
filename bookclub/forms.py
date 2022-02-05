@@ -241,12 +241,19 @@ class ReviewForm(forms.ModelForm):
         fields = ['rating', 'review']
         #exclude = ['book', 'user', 'created_at']
         widgets = {
-            'comment': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
-        def clean(self): 
-            self.rating = self.cleaned_data.get('rating')
-            if  self.rating:
-                if Book.objects.filter(ISBN=self.ISBN).exists(): 
-                    self.add_error('ISBN', 'ISNB already exists')
+    def save(self, reviwer, reviewedBook):
+        """Create a new user."""
+        super().save(commit=False)
+        review = Rating.objects.create(
+            rating=self.calculate_rating(self.cleaned_data.get('rating')),
+            review=self.cleaned_data.get('review'),
+            book = reviewedBook,
+            user = reviwer,
+        )
+        return review
 
+    def calculate_rating(self, rating): 
+        return rating*2
