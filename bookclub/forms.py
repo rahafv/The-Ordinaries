@@ -5,7 +5,7 @@ from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from .models import User, Club, Book
+from .models import User, Club, Book, Rating
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -231,4 +231,22 @@ class ClubForm(forms.ModelForm):
         model = Club
         fields = ['name', 'theme','meeting_type', 'city','country']
         exclude = ['owner']
+
+
+class ReviewForm(forms.ModelForm):
+    """Form to post a review."""
+    class Meta:
+        
+        model = Rating
+        fields = ['rating', 'review']
+        #exclude = ['book', 'user', 'created_at']
+        widgets = {
+            'comment': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+
+        def clean(self): 
+            self.rating = self.cleaned_data.get('rating')
+            if  self.rating:
+                if Book.objects.filter(ISBN=self.ISBN).exists(): 
+                    self.add_error('ISBN', 'ISNB already exists')
 

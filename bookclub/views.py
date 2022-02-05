@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, ReviewForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
@@ -105,6 +105,22 @@ def create_club(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
+
+@login_required
+def add_review(request, book_id):
+    reviewed_book = get_object_or_404(Book.objects, id=book_id)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review_user = request.user
+            form.instance.user = review_user
+            form.instance.book = reviewed_book
+            form.save()
+            return redirect('book_details', book_id=reviewed_book.id)
+    else:
+        form = ReviewForm()
+    return render(request, 'book_details.html', {'book':reviewed_book, 'form': form})
+
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -127,7 +143,8 @@ def add_book(request):
 @login_required
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
-    return render(request, "book_details.html", {'book': book})
+    form = ReviewForm()
+    return render(request, "book_details.html", {'book': book, 'form':form})
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
