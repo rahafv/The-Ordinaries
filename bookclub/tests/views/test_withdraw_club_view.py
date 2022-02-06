@@ -22,8 +22,8 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.user = User.objects.get(username="edgaralen")
 
 
-    def test_club_page_url(self):
-        self.assertEqual(self.url, f"/withdraw_club/{self.club.id}/")
+    def test_withdarw_url(self):
+        self.assertEqual(self.url, f"/club/{self.club.id}/withdraw_club")
 
     def test_owner_cannot_withdraw_club(self):
         self.client.login(username=self.owner.username, password="Password123")

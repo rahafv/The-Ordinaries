@@ -1,6 +1,7 @@
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms import ValidationError
 from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
@@ -200,19 +201,29 @@ class Book(models.Model):
     def clubs_count(self):
         return self.clubs.all().count()  
 
+    def average_rating(self):
+        sum = 0.0
+        if self.ratings.all().count() != 0: 
+            for rating in self.ratings.all(): 
+                sum+= rating.rating    
+            return sum/self.ratings.all().count()
+        else: 
+            return 0; 
+
+
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
         User, 
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='ratings'
     )
 
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='ratings'
     )
 
     review = models.CharField(
@@ -221,10 +232,10 @@ class Rating(models.Model):
     )
 
     rating = models.FloatField(
-        blank=True,
+        blank=False,
         validators=[
             MaxValueValidator(10),
-            MinValueValidator(1)
+            MinValueValidator(0)
         ]
     )
 

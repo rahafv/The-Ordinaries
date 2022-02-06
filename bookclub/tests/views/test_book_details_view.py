@@ -6,7 +6,7 @@ from bookclub.tests.helpers import LoginRedirectTester
 class BookDetailsTest(TestCase, LoginRedirectTester):
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
-                'bookclub/tests/fixtures/default_user.json' ]
+            'bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
         self.target_book = Book.objects.get(ISBN='0195153448')
@@ -14,7 +14,7 @@ class BookDetailsTest(TestCase, LoginRedirectTester):
         self.url = reverse('book_details', kwargs={'book_id': self.target_book.id})
 
     def test_book_details_url(self):
-        self.assertEqual(self.url,f'/book_details/{self.target_book.id}')
+        self.assertEqual(self.url,f'/book/{self.target_book.id}/book_details')
 
     def test_get_book_details_with_valid_ISBN(self):
         self.client.login(username=self.user.username, password='Password123')

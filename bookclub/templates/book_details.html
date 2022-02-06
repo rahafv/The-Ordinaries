@@ -4,7 +4,7 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-        <h2 class="d-flex justify-content-center mb-5">{{ book.title }}</h2>
+        <h2 class="d-flex justify-content-center mb-5">{{ book.title }} ({{book.average_rating}})</h2>
         <div class="row mt-5">
           <div class="col-4">
             <div class="row mt-5">
@@ -12,44 +12,35 @@
                 <img src= "{{ book.image_url }}" class=" image-thumbnail mb-3" width="330" height="460" />
               </div>
             </div>
-            <hr></hr>
-                  <!-- rating form start-->
-                  {% if !review %}
-                  <form action="{% url 'add_review' book.id %}" method="post">
-                    {% csrf_token %}
-                    <h5>How do you rate this book?</h5>
-          
-                    <div>
-                      <div class="rate mb-2">
-                        <input class="rate" type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
-                        <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
-                        <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
-                        <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
-                        <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
-                        <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
-                      </div>
-                      <textarea name="review" rows="4" class="form-control mb-3" placeholder="Write your review"></textarea>                    
-                      <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
-                    </div>
-                  </form>
-                  {%else%} 
-                  <div class="row mt-5">
-                    <h4 class="mb-3">Rating:</h4>
-                    <div class="card card-body mb-3 pb-0">
-                      <p>{{ review.rating }}</p>
-                    </div>
-                    <h4 class="mb-3">Review:</h4>
-                    <div class="card card-body mb-3 pb-0">
-                      <p>{{ review.review  }}</p>
-                    </div>
-
-                  {% endif %}
-                  <!-- rating form end-->
-
+            {% if not rating %}
+              <form action="{% url 'add_review' book.id %}" method="post">
+                {% csrf_token %}
+                <h5>How do you rate this book?</h5>
+                <div>
+                  <div class="rate mb-2">
+                    <input class="rate" type="radio" name="rating" id="rating10" value="5" required /><label for="rating10" title="5"></label>
+                    <input type="radio" name="rating" id="rating9" value="4.5" required /><label for="rating9" title="4.5" class="half"></label>
+                    <input type="radio" name="rating" id="rating8" value="4" required /><label for="rating8" title="4"></label>
+                    <input type="radio" name="rating" id="rating7" value="3.5" required /><label for="rating7" title="3.5" class="half"></label>
+                    <input type="radio" name="rating" id="rating6" value="3" required /><label for="rating6" title="3"></label>
+                    <input type="radio" name="rating" id="rating5" value="2.5" required /><label for="rating5" title="2.5" class="half"></label>
+                    <input type="radio" name="rating" id="rating4" value="2" required /><label for="rating4" title="2"></label>
+                    <input type="radio" name="rating" id="rating3" value="1.5" required /><label for="rating3" title="1.5" class="half"></label>
+                    <input type="radio" name="rating" id="rating2" value="1" required /><label for="rating2" title="1"></label>
+                    <input type="radio" name="rating" id="rating1" value="0.5" required /><label for="rating1" title="0.5" class="half"></label>
+                  </div>
+                  <textarea name="review" rows="4" class="form-control mb-3" placeholder="Write your review"></textarea>                    
+                  <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                </div>
+              </form>
+            {%else%}
+              <div>
+                <h5 class="mt-2"> Your rating: {{ rating.rating }}</h5>
+                <h5 class="mb-4"> Your review: {{ rating.review  }}</h5> 
+                <!-- TODO: add link to edit review here. -->
+                <a herf=# class="btn btn-outline-dark mb-3"> Edit </a>
+              </div>
+            {% endif %}
           </div>
           <div class="col-4">
             <div class="row-2 mt-5">
@@ -72,9 +63,8 @@
               <p>{{ book.year }}</p>
             </div>
           </div>
-          <div class="col-2">
-          </div>
         </div>
+        <hr></hr>
     </div>
   </div>
 </div>

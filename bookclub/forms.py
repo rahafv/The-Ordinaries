@@ -4,7 +4,6 @@ from pickle import FALSE
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
 from .models import User, Club, Book, Rating
 
 class SignUpForm(forms.ModelForm):
@@ -233,7 +232,7 @@ class ClubForm(forms.ModelForm):
         exclude = ['owner']
 
 
-class ReviewForm(forms.ModelForm):
+class RatingForm(forms.ModelForm):
     """Form to post a review."""
     class Meta:
         
