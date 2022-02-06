@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User,Book
+from bookclub.models import User, Book
+from bookclub.forms import RatingForm
 from bookclub.tests.helpers import LoginRedirectTester
 
 class BookDetailsTest(TestCase, LoginRedirectTester):
@@ -27,6 +28,15 @@ class BookDetailsTest(TestCase, LoginRedirectTester):
         url = reverse('book_details', kwargs={'book_id': self.target_book.id+99999})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404)
+
+    def test_get_rating_form(self):
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
 
     def test_book_details_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

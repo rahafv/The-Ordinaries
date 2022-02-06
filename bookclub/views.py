@@ -117,10 +117,9 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review. ")
+            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
-    else:
-        form = RatingForm()
+    
     return render(request, 'book_details.html', {'book':reviewed_book})
 
 @login_required
