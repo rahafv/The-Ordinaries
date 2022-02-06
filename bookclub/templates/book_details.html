@@ -4,10 +4,11 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-        <h2 class="d-flex justify-content-center mb-5">{{ book.title }} ({{book.average_rating}})</h2>
+        <h2 class="d-flex justify-content-center mb-5">{{ book.title }} </h2>
         <div class="row mt-5">
           <div class="col-4">
             <div class="row mt-5">
+              <h5>Average Rating: ({{book.average_rating}})</h5>
               <div>
                 <img src= "{{ book.image_url }}" class=" image-thumbnail mb-3" width="330" height="460" />
               </div>
