@@ -151,3 +151,10 @@ MESSAGE_TAGS = {
     message_constants.DEBUG:"dark",
     message_constants.ERROR:"danger",
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'Ordinariesbookclubs@gmail.com'
+EMAIL_HOST_PASSWORD = 'Ordinaries123@'

@@ -3,12 +3,31 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import login_prohibited
+from .helpers import login_prohibited, generate_token, send_activiation_email
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
+
+def activate_user(request, uidb64, token):
+
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+    except:
+        user = None
+    
+    if user and generate_token.check_token(user, token):
+        user.email_verified = True
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 'Account verified!')
+        return redirect(reverse('log_in'))
+
+    return render(request, 'activate-fail.html', {'user': user})
 
 @login_prohibited
 def welcome(request):
@@ -24,8 +43,9 @@ def sign_up(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            return redirect('home')
+            send_activiation_email(user, request)
+            messages.add_message(request, messages.SUCCESS, 'Your email needs verification!')
+            return redirect('log_in')
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
@@ -39,7 +59,13 @@ def log_in(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None:
+
+            if not user.email_verified:
+                messages.add_message(request, messages.ERROR,
+                 "Email is not verified, please check your email inbox!")
+                return render(request, 'log_in.html', {'form': form, 'next': next})
+
+            if user:
                 login(request, user)
                 redirect_url = next or 'home'
                 return redirect(redirect_url)

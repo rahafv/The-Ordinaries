@@ -10,6 +10,8 @@ from tempfile import NamedTemporaryFile
 class User(AbstractUser):
     """User model used for authentication."""
 
+    email_verified = models.BooleanField(default=False)
+    
     username = models.CharField(
         max_length=30,
         unique=True,
