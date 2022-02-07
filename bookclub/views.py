@@ -1,9 +1,10 @@
+from django.http import Http404
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import login_prohibited, generate_token, send_activiation_email
+from .helpers import login_prohibited, generate_token
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
@@ -11,23 +12,12 @@ from django.urls import reverse
 from django.views.generic.edit import UpdateView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
-
-def activate_user(request, uidb64, token):
-
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-
-    except:
-        user = None
-    
-    if user and generate_token.check_token(user, token):
-        user.email_verified = True
-        user.save()
-        messages.add_message(request, messages.SUCCESS, 'Account verified!')
-        return redirect(reverse('log_in'))
-
-    return render(request, 'activate-fail.html', {'user': user})
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import EmailMessage 
+from system import settings
 
 @login_prohibited
 def welcome(request):
@@ -43,13 +33,51 @@ def sign_up(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            send_activiation_email(user, request)
-            messages.add_message(request, messages.SUCCESS, 'Your email needs verification!')
-            return redirect('log_in')
+            return redirect('send_verification', user_id=user.id)
     else:
         form = SignUpForm()
     return render(request, 'sign_up.html', {'form': form})
 
+def send_activiation_email(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except:
+        raise Http404
+    if not user.email_verified:   
+        current_site = get_current_site(request)
+        email_subject = 'Activate your account'
+        email_body = render_to_string('activate.html', {
+            'user': user,
+            'domain': current_site,
+            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+            'token':generate_token.make_token(user)}
+        )
+
+        email = EmailMessage(subject=email_subject, body=email_body, 
+        from_email=settings.EMAIL_HOST_USER, to=[user.email])
+
+        email.send()
+        messages.add_message(request, messages.WARNING, 'Your email needs verification!')
+    return redirect('log_in')
+
+def activate_user(request, uidb64, token):
+
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+
+    except:
+        user = None
+        return render(request, 'activate-fail.html', {'user': user})
+    
+    if user and generate_token.check_token(user, token):
+        user.email_verified = True
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 'Account verified!')
+        return redirect(reverse('log_in'))
+
+    return render(request, 'activate-fail.html', {'user': user})
+    
 @login_prohibited
 def log_in(request):
     if request.method == 'POST':
@@ -60,10 +88,10 @@ def log_in(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
 
-            if not user.email_verified:
+            if user and not user.email_verified:
                 messages.add_message(request, messages.ERROR,
                  "Email is not verified, please check your email inbox!")
-                return render(request, 'log_in.html', {'form': form, 'next': next})
+                return render(request, 'log_in.html', {'form': form, 'next': next, 'request': request, 'user': user})
 
             if user:
                 login(request, user)
