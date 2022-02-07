@@ -1,3 +1,4 @@
+from email.policy import default
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -206,9 +207,11 @@ class Book(models.Model):
         if self.ratings.all().count() != 0: 
             for rating in self.ratings.all(): 
                 sum+= rating.rating    
-            return sum/self.ratings.all().count()
+            return (sum/self.ratings.all().count())
         else: 
-            return 0; 
+            return 0.0
+
+    
 
 
 class Rating(models.Model):
@@ -232,7 +235,8 @@ class Rating(models.Model):
     )
 
     rating = models.FloatField(
-        blank=False,
+        blank=True,
+        default=0,
         validators=[
             MaxValueValidator(10),
             MinValueValidator(0)

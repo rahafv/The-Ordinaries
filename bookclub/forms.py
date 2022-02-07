@@ -238,7 +238,6 @@ class RatingForm(forms.ModelForm):
         
         model = Rating
         fields = ['rating', 'review']
-        #exclude = ['book', 'user', 'created_at']
         widgets = {
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
@@ -246,8 +245,11 @@ class RatingForm(forms.ModelForm):
     def save(self, reviwer, reviewedBook):
         """Create a new user."""
         super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0 
         review = Rating.objects.create(
-            rating=self.calculate_rating(self.cleaned_data.get('rating')),
+            rating=self.calculate_rating(rate),
             review=self.cleaned_data.get('review'),
             book = reviewedBook,
             user = reviwer,
