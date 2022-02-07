@@ -3,10 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import ClubForm
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
-
-class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester):
+class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the profile view."""
 
     fixtures = [
@@ -41,6 +40,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertTrue(isinstance(form, ClubForm)) 
         self.assertEqual(form.instance, self.club)
         self.assertEqual(club_id, self.club.id)
+        self.assert_menu(response)
+
 
     def test_unsuccessful_club_info_update(self):
         self.client.login(username=self.owner.username, password='Password123')
@@ -61,6 +62,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.club.meeting_type, Club.MeetingType.ONLINE)
         self.assertEqual(self.club.city, 'london')
         self.assertEqual(self.club.country, 'uk')
+        self.assert_menu(response)
+
         
     def test_successful_club_info_update(self):
         self.client.login(username=self.owner.username, password="Password123")
@@ -78,6 +81,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")
         self.assertEqual(self.club.owner, self.owner)
+        self.assert_menu(response)
 
 
     def test_get_profile_redirects_when_not_logged_in(self):

@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import CreateClubForm
 from bookclub.models import Club, User
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
-class CreateClubViewTestCase(TestCase, LoginRedirectTester):
+class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
     """Test suite for the create club view."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]
@@ -32,6 +32,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         form = response.context["form"]
         self.assertTrue(isinstance(form, CreateClubForm))
         self.assertFalse(form.is_bound)
+        self.assert_menu(response)
 
     def test_create_club_successful(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -49,6 +50,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(club.country, "usa")
         owner = User.objects.get(username="johndoe")
         self.assertEqual(club.owner, owner)
+        self.assert_menu(response)
 
     def test_create_club_unsuccessful(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -61,6 +63,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester):
         self.assertTrue(form.is_bound)
         self.assertTemplateUsed(response, "create_club.html")
         self.assertTrue(isinstance(form, CreateClubForm))
+        self.assert_menu(response)
 
     def test_get_create_club_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
