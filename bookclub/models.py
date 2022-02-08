@@ -231,3 +231,39 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
  
+class Meeting(models.Model):
+    """ The meeting model."""
+
+    title = models.CharField(
+        max_length=50, 
+        blank=False, 
+        null=False
+    )
+
+    club = models.ForeignKey(
+        Club, 
+        on_delete=models.CASCADE,
+        related_name='meeting'
+    )
+
+    book = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE,
+        related_name='meeting'
+    )
+
+    time = models.DateTimeField(
+        auto_now_add=False,
+        blank=False,
+        null =False
+    )
+
+    link = models.URLField(
+        max_length=1000,
+        blank=False
+    )
+
+    notes = models.CharField(
+        max_length=500,
+        blank=True
+    )
