@@ -3,6 +3,7 @@ coverage==6.0.1
 Django==3.2.11
 django-isbn-field==0.5.3
 django-widget-tweaks==1.4.9
+django-with-asserts==0.0.1
 Faker==9.8.1
 libgravatar==1.0.0
 pytz==2021.3

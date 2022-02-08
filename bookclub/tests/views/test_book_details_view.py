@@ -2,9 +2,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Book
 from bookclub.forms import RatingForm
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MenueTestMixin
 
-class BookDetailsTest(TestCase, LoginRedirectTester):
+
+class BookDetailsTest(TestCase, LoginRedirectTester , MenueTestMixin):
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
             'bookclub/tests/fixtures/default_user.json']
@@ -22,12 +23,13 @@ class BookDetailsTest(TestCase, LoginRedirectTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'book_details.html')
+        self.assert_menu(response)
 
     def test_get_book_details_with_invalid_id(self):
         self.client.login(username=self.user.username, password='Password123')
         url = reverse('book_details', kwargs={'book_id': self.target_book.id+99999})
         response = self.client.get(url, follow=True)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 404) 
 
     def test_get_rating_form(self):
         self.client.login(username=self.user.username, password="Password123")
