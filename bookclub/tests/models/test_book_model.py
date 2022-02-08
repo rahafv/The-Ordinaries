@@ -1,15 +1,17 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Book
+from bookclub.models import User, Book, Club
 
 
 class BookModelTestCase(TestCase):
     """Unit tests for the book model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
+        'bookclub/tests/fixtures/other_users.json', 
         'bookclub/tests/fixtures/default_book.json', 
-        'bookclub/tests/fixtures/other_books.json'
+        'bookclub/tests/fixtures/other_books.json',
+        'bookclub/tests/fixtures/default_club.json'
     ]
     
     def setUp(self):
@@ -98,4 +100,10 @@ class BookModelTestCase(TestCase):
         count = self.book.readers_count()
         self.book.add_reader(nonReader)
         self.assertEqual(self.book.readers_count(), count+1)
+
+    def test_club_addition(self):
+        club = Club.objects.get(id=1)
+        count = self.book.clubs_count()
+        self.book.add_club(club)
+        self.assertEqual(self.book.clubs_count(), count+1)
 

@@ -3,11 +3,11 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import UserForm
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 from datetime import date 
 
 
-class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
+class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the profile view."""
 
     fixtures = [
@@ -41,6 +41,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
         form = response.context['form']
         self.assertTrue(isinstance(form, UserForm)) 
         self.assertEqual(form.instance, self.user)
+        self.assert_menu(response)
 
     def test_unsuccessful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -64,6 +65,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.user.region, 'NY')
         self.assertEqual(self.user.country, 'United states')
         self.assertEqual(self.user.bio, "Hello, this is John Doe.")
+        self.assert_menu(response)
 
     def test_unsuccessful_profile_update_due_to_empty_date_of_birth(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -87,6 +89,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.user.region, 'NY')
         self.assertEqual(self.user.country, 'United states')
         self.assertEqual(self.user.bio, "Hello, this is John Doe.")
+        self.assert_menu(response)
 
     def test_unsuccessful_profile_update_due_to_duplicate_username(self):
         second_user = User.objects.get(id=2)       
@@ -111,6 +114,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.user.region, 'NY')
         self.assertEqual(self.user.country, 'United states')
         self.assertEqual(self.user.bio, "Hello, this is John Doe.")
+        self.assert_menu(response)
 
     def test_successful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -132,6 +136,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(self.user.region, 'Berlin')
         self.assertEqual(self.user.country, 'Germany')
         self.assertEqual(self.user.bio, 'New bio')
+        self.assert_menu(response)
 
     def test_get_profile_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

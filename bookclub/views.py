@@ -1,13 +1,12 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, TransferClubOwnership
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, TransferClubOwnership
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book
 from django.contrib.auth.hashers import check_password
-from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
 
@@ -53,10 +52,10 @@ def log_in(request):
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
+@login_required
 def log_out(request):
-    if request.user.is_authenticated:
-        logout(request)
-        messages.add_message(request, messages.SUCCESS, "You've been logged out.")
+    logout(request)
+    messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
 @login_required
@@ -93,13 +92,12 @@ def create_club(request):
     if request.method == 'POST':
         form = CreateClubForm(request.POST)
         if form.is_valid():
-            club_owner= request.user
+            club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
             """ adds the owner to the members list. """
             club.add_member(club_owner)
-            club_owner.clubs.add(club)
-            return redirect('club_page',  club_id=club.id)
+            return redirect('club_page', club_id=club.id)
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
@@ -129,8 +127,18 @@ def book_details(request, book_id):
     return render(request, "book_details.html", {'book': book})
 
 @login_required
-def show_profile_page(request):
-    return render(request, 'profile_page.html')
+def show_profile_page(request, user_id = None, club_id = None):
+    user = get_object_or_404(User.objects, id=request.user.id)
+    club = None
+
+    if user_id == request.user.id:
+        return redirect('profile')
+
+    if user_id and club_id:
+        user = get_object_or_404(User.objects, id=user_id)
+        club = get_object_or_404(Club.objects, id=club_id)
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -161,39 +169,32 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
 def join_club(request, club_id):
 
     club = get_object_or_404(Club.objects, id=club_id)
-    logged_in_user = request.user
+    user = request.user
 
-    if club.is_member(logged_in_user):
+    if club.is_member(user):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
 
-    club.members.add(logged_in_user)
-    logged_in_user.clubs.add(club)
+    club.members.add(user)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
-    return redirect('club_page',club_id)
-
-
+    return redirect('club_page', club_id)
 
 @login_required
 def withdraw_club(request, club_id):
-
     club = get_object_or_404(Club.objects, id=club_id)
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user == club.owner:
+    if user == club.owner:
         messages.add_message(request, messages.ERROR, "Must transfer ownership before leaving club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
 
-    if not club.is_member(logged_in_user):
+    if not club.is_member(user):
         messages.add_message(request, messages.ERROR, "You are not a member of this club!")
-        return redirect('club_page',club_id)
+        return redirect('club_page', club_id)
 
-    club.members.remove(logged_in_user)
-    logged_in_user.clubs.remove(club)
+    club.members.remove(user)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
-    return redirect('club_page',club_id)
-
-
+    return redirect('club_page', club_id)
 
 @login_required
 def books_list(request, club_id=None, user_id=None):
@@ -205,6 +206,7 @@ def books_list(request, club_id=None, user_id=None):
     if user_id:
         books = User.objects.get(id=user_id).books.all()
         general = False
+
     return render(request, 'books.html', {'books': books, 'general': general})
 
 @login_required
@@ -227,7 +229,7 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
-    
+
 @login_required
 def transfer_club_ownership(request, club_id):
     club = get_object_or_404(Club.objects, id = club_id)
@@ -244,13 +246,37 @@ def transfer_club_ownership(request, club_id):
         print('not valid')
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
 
-# try:
-#         current_user = request.user
-#         club_obj = Club.objects.get(id=pk)
-#         user_ = User.objects.get(pk=pk_of_new_member)
-#     except ObjectDoesNotExist:
-#         return redirect('main')
-#     else:
-#         pk = club_obj.id
-#         Club.make_owner(pk, user_)
-#         return redirect('/')
+@login_required
+def edit_club_information(request, club_id):
+    club = Club.objects.get(id = club_id)
+    if (request.method == 'GET'):
+        form = ClubForm(instance = club)
+        context = {
+            'form': form,
+            'club_id':club_id,
+        }
+        return render(request, 'edit_club_info.html', context)
+
+    elif (request.method == 'POST'):
+        form = ClubForm(request.POST, instance=club)
+        if (form.is_valid()):
+            form_owner_detail= form.save(commit=False)
+            form_owner_detail.owner = request.user
+            form_owner_detail.save()
+            club = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated club information!")
+            return redirect('club_page', club_id)
+
+    data = {
+        'name':club.name,
+        'theme': club.theme,
+        'meeting_type':club.meeting_type,
+        'city': club.city,
+        'country':club.country,
+    }
+    form = ClubForm(data)
+    context = {
+        'form': form,
+        'club_id':club_id,
+    }
+    return render(request, 'edit_club_info.html', context)

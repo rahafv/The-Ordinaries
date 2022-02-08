@@ -1,4 +1,7 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Profile
+{% endblock %}
 {% block content %}
 <div id = "home-image">
     <div class="container vh-100 ">
@@ -13,7 +16,9 @@
                             <h3 class="profile-title">{{ user.full_name }}</h3>
                             <br/>
                             <span class = "profile-username">{{user.username}}</span>
-                            <span class = "profile-email">{{user.email}}</span>
+                            {% if current_user == club.owner or current_user == user%}
+                                <span class = "profile-email">{{user.email}}</span>
+                            {% endif %}
                             <br/>
                         </div>
                         <div class="profile-text"> 
@@ -33,9 +38,11 @@
                             <span >{{user.bio}}<br><br> </span> 
                         </div>
                         <br/>
+                        {% if current_user == user %}
                         <div class=" profile-statistics"> 
                             <a class = "btn btn-lg btn-outline-dark" href ="{% url 'edit_profile'%}" role = "button">Edit profile</a>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 </div>

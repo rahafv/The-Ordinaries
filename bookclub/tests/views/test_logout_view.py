@@ -2,9 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, MessageTester
+from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MessageTester,MenueTestMixin
 
-class LogOutViewTestCase(TestCase,LogInTester, MessageTester):
+
+class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Tests of the log out view."""
     
     fixtures = ['bookclub/tests/fixtures/default_user.json']
@@ -24,11 +25,8 @@ class LogOutViewTestCase(TestCase,LogInTester, MessageTester):
         self.assertTemplateUsed(response, 'welcome.html')
         self.assertFalse(self._is_logged_in())
         self.assert_success_message(response)
+        self.assert_no_menu(response)
 
     def test_get_log_out_without_being_logged_in(self):
-        response = self.client.get(self.url, follow=True)
-        response_url = reverse('welcome')
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'welcome.html')
-        self.assertFalse(self._is_logged_in())
+        self.assert_redirects_when_not_logged_in()
 

@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
-class ClubsListTest(TestCase, LoginRedirectTester):
+class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
@@ -27,8 +27,6 @@ class ClubsListTest(TestCase, LoginRedirectTester):
         self.client.login(username=self.user.username, password='Password123')
         self.club.add_member(self.user)
         self.other_club.add_member(self.user)
-        self.user.clubs.add(self.club)
-        self.user.clubs.add(self.other_club)
         self.url = reverse('clubs_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -39,6 +37,7 @@ class ClubsListTest(TestCase, LoginRedirectTester):
         self.assertContains(response, f'Fictional superheros')
         clubs_url = reverse('clubs_list')
         self.assertContains(response, clubs_url)
+        self.assert_menu(response)
 
     def test_get_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -51,6 +50,7 @@ class ClubsListTest(TestCase, LoginRedirectTester):
             self.assertContains(response, f'theme{club_id}')
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
+        self.assert_menu(response)
 
     def _create_test_clubs(self, club_count=10):
         for club_id in range(club_count):

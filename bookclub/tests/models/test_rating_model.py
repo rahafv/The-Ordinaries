@@ -38,12 +38,12 @@ class RatingModelTestCase(TestCase):
         self.rating.review = ''
         self._assert_rating_is_valid()
 
-    def test_rating_cannot_be_over_five(self):
-        self.rating.rating = 6
+    def test_rating_cannot_be_over_ten(self):
+        self.rating.rating = 11
         self._assert_rating_is_invalid() 
 
-    def test_rating_cannot_be_less_than_one(self):
-        self.rating.rating = 0
+    def test_rating_cannot_be_less_than_zero(self):
+        self.rating.rating = -1
         self._assert_rating_is_invalid() 
 
 

@@ -4,9 +4,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import PasswordForm
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester,MenueTestMixin
 
-class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
+class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the password view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']
@@ -31,6 +31,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertTemplateUsed(response, 'password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
+        self.assert_menu(response)
 
     def test_succesful_password_change(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -42,6 +43,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         is_password_correct = check_password('NewPassword123', self.user.password)
         self.assertTrue(is_password_correct)
         self.assert_success_message(response)
+        self.assert_menu(response)
 
     def test_password_change_unsuccesful_without_correct_old_password(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -55,6 +57,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_password_change_unsuccesful_with_new_password_eqaul_old(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -69,6 +72,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_password_change_unsuccesful_without_password_confirmation(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -82,6 +86,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_password_change_unsuccesful_with_criteria_not_matched(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -96,6 +101,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_get_password_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
