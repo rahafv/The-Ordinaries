@@ -221,19 +221,45 @@ class UserForm(forms.ModelForm):
                 self.log_in_user.set_age(new_age)
                 return self.log_in_user
 
-class TransferClubOwnership(forms.ModelForm):
+class TransferClubOwnership(forms.Form):
     """Form to create or update club information."""
-    
-    class Meta:
-        """Form options."""
 
-        model = Club
-        fields = ['members']
-        widgets = {"members": forms.Select()}
 
-        confirm = forms.BooleanField(label='Are you sure?', label_suffix = " : ",
-                                  required = True,  disabled = False,
-                                  widget=forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
-                                  help_text = "Please check the box as this field is required.",
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        self.club = kwargs.pop('club')
+        super().__init__(*args, **kwargs)
+        self.member_select = forms.ChoiceField(required=True, choices= self.club.members)
+        self.confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
+                                  widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
                                   error_messages = {'required':"Please check the box"})
+
+    # member_select #= forms.ChoiceField(required=True, choices= self.club.members)
+    
+    # confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
+    #                               widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
+    #                               error_messages = {'required':"Please check the box"})
+    
+
+    
+
+    # class Meta:
+
+    #     model = Club
+    #     fields = ['members']
+    #     widgets = {'members': forms.Select()}
+
+        # def __init__(self, *args, **kwargs):
+            # self.request = kwargs.pop("request")
+            # super(TransferClubOwnership, self).__init__(*args, **kwargs)
+            # self.fields['members'].label = "Select Member"
+            # self.fields['members'].queryset = Club.members.objects.filter(owner = self.request.user)
+        
+        # def save(self):
+        #     if self.is_valid(): 
+        #         if(self.log_in_user is not None):
+        #             pass
+        #         return self.log_in_user
+        
+
 

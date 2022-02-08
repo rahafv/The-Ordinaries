@@ -227,15 +227,30 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
-
+    
+@login_required
 def transfer_club_ownership(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
+    club = get_object_or_404(Club.objects, id = club_id)
     user = request.user
     if request.method == "POST":
-        form = TransferClubOwnership(request.POST)
+        form = TransferClubOwnership(data=request.POST, user=user, club = club)
         if form.is_valid():
-            club = form.save()
-            return redirect('club_page', club_id=club.id)
+            print('valid')
+            member_id = form.cleaned_data().get('members')
+            club.make_owner(club_id, member_id)
+            return redirect('club_page', club_id = club.id)
     else:
-        form = TransferClubOwnership()
+        form = TransferClubOwnership(user=user, club = club)
+        print('not valid')
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
+
+# try:
+#         current_user = request.user
+#         club_obj = Club.objects.get(id=pk)
+#         user_ = User.objects.get(pk=pk_of_new_member)
+#     except ObjectDoesNotExist:
+#         return redirect('main')
+#     else:
+#         pk = club_obj.id
+#         Club.make_owner(pk, user_)
+#         return redirect('/')

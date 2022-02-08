@@ -155,11 +155,11 @@ class Club(models.Model):
     def make_owner(self, club_id, new_owner):
         club = self.objects.get_or_create(id=club_id)
         old_owner = club.owner
-        # old_owner.save()
-        # new_owner.save()
+        old_owner.save()
+        new_owner.save()
         club.owner = new_owner
         club.members.add(old_owner)
-        # club.save()
+        club.save()
 
 
 class Book(models.Model):
