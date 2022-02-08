@@ -211,9 +211,6 @@ class Book(models.Model):
         else: 
             return 0.0
 
-    
-
-
 class Rating(models.Model):
     """rating model."""
 

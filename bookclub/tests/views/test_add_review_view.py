@@ -59,7 +59,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
     def test_add_review_unsuccessful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Rating.objects.count()
-        self.form_input["rating"] = ""
+        self.form_input["review"] = "x"*251
         response = self.client.post(self.url, self.form_input)
         self.assertEqual(count_clubs_before, Rating.objects.count())
         self.assertEqual(response.status_code, 200)

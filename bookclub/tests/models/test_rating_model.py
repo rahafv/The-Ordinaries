@@ -30,9 +30,9 @@ class RatingModelTestCase(TestCase):
     def test_rating_created(self):
         self.assertEqual(3, Rating.objects.count())
 
-    def test_rating_cannot_be_blank(self):
+    def test_rating_may_be_blank(self):
         self.rating.rating = ''
-        self._assert_rating_is_invalid() 
+        self._assert_rating_is_valid() 
     
     def test_review_may_be_blank(self):
         self.rating.review = ''
