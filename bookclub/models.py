@@ -243,7 +243,7 @@ class Meeting(models.Model):
     club = models.ForeignKey(
         Club, 
         on_delete=models.CASCADE,
-        related_name='meeting'
+        related_name='meetings'
     )
 
     book = models.ForeignKey(
