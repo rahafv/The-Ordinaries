@@ -3,6 +3,7 @@
     "model": "bookclub.user",
     "pk": 2,
     "fields": {
+      "email_verified":"True",
       "first_name": "Jane",
       "last_name": "Doe",
       "username": "janedoe",
@@ -18,6 +19,7 @@
     "model": "bookclub.user",
     "pk": 3,
     "fields": {
+      "email_verified":"True",
       "first_name": "Petra",
       "last_name": "Pickles",
       "username": "peterpickles",
@@ -33,6 +35,7 @@
     "model": "bookclub.user",
     "pk": 4,
     "fields": {
+      "email_verified":"True",
       "first_name": "Peter",
       "last_name": "Pickles",
       "username": "edgaralen",
