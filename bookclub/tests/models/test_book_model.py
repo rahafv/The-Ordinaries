@@ -1,7 +1,7 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Book, Club
+from bookclub.models import User, Book, Club, Rating
 
 
 class BookModelTestCase(TestCase):
@@ -11,7 +11,8 @@ class BookModelTestCase(TestCase):
         'bookclub/tests/fixtures/other_users.json', 
         'bookclub/tests/fixtures/default_book.json', 
         'bookclub/tests/fixtures/other_books.json',
-        'bookclub/tests/fixtures/default_club.json'
+        'bookclub/tests/fixtures/default_club.json',
+        'bookclub/tests/fixtures/other_ratings.json'
     ]
     
     def setUp(self):
@@ -85,16 +86,6 @@ class BookModelTestCase(TestCase):
         self.book.year = None
         self._assert_book_is_valid()
 
-    def _assert_book_is_valid(self):
-        try:
-            self.book.full_clean()
-        except (ValidationError):
-            self.fail('Test book should be valid')
-
-    def _assert_book_is_invalid(self):
-        with self.assertRaises(ValidationError):
-            self.book.full_clean()
-
     def test_reader_addition(self):
         nonReader = User.objects.get(id=1)
         count = self.book.readers_count()
@@ -106,4 +97,22 @@ class BookModelTestCase(TestCase):
         count = self.book.clubs_count()
         self.book.add_club(club)
         self.assertEqual(self.book.clubs_count(), count+1)
+
+    def test_average_rating(self):
+        book = Book.objects.get(id=2)
+        rating1 = Rating.objects.get(id=2).rating
+        rating2 = Rating.objects.get(id=2).rating
+        self.assertEqual(book.average_rating(), ((rating1+rating2)/2))
+
+    def _assert_book_is_valid(self):
+        try:
+            self.book.full_clean()
+        except (ValidationError):
+            self.fail('Test book should be valid')
+
+    def _assert_book_is_invalid(self):
+        with self.assertRaises(ValidationError):
+            self.book.full_clean()
+
+
 

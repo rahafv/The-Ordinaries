@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
 
-class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
+class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -22,8 +22,8 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.user = User.objects.get(username="edgaralen")
 
 
-    def test_club_page_url(self):
-        self.assertEqual(self.url, f"/withdraw_club/{self.club.id}/")
+    def test_withdarw_url(self):
+        self.assertEqual(self.url, f"/club/{self.club.id}/withdraw_club")
 
     def test_owner_cannot_withdraw_club(self):
         self.client.login(username=self.owner.username, password="Password123")
@@ -34,6 +34,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_error_message(response)
+        self.assert_menu(response)
         
     def test_non_member_cannot_withdraw_club(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -44,6 +45,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_member_successful_withdraw_club(self):
         self.client.login(username=self.member.username, password="Password123")
@@ -55,6 +57,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
+        self.assert_menu(response)
 
     def test_withdraw_club_with_invalid_id(self):
         self.client.login(username=self.member.username, password="Password123")

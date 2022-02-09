@@ -4,10 +4,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import SignUpForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester
+from bookclub.tests.helpers import LogInTester , MenueTestMixin
 from datetime import date 
 
-class SignUpViewTestCase(TestCase, LogInTester):
+class SignUpViewTestCase(TestCase, LogInTester,MenueTestMixin):
     """Tests of the sign up view."""
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
@@ -37,6 +37,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertFalse(form.is_bound)
+        self.assert_no_menu(response)
 
     def test_unsuccesful_sign_up(self):
         self.form_input['email'] = 'bademail'
@@ -50,6 +51,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertTrue(form.is_bound)
         self.assertFalse(self._is_logged_in())
+        self.assert_no_menu(response)
 
     def test_succesful_sign_up(self):
         before_count = User.objects.count()
@@ -81,5 +83,6 @@ class SignUpViewTestCase(TestCase, LogInTester):
         target_url = reverse("home")
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
+        self.assert_menu(response)
 
     
