@@ -3,6 +3,7 @@
     "model": "bookclub.user",
     "pk": 1,
     "fields": {
+      "email_verified":"True",
       "first_name": "John",
       "last_name": "Doe",
       "username": "johndoe",
