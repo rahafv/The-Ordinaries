@@ -43,6 +43,7 @@ def send_activiation_email(request, user_id):
         user = User.objects.get(id=user_id)
     except:
         raise Http404
+        
     if not user.email_verified:   
         current_site = get_current_site(request)
         email_subject = 'Activate your account'
@@ -58,6 +59,9 @@ def send_activiation_email(request, user_id):
 
         email.send()
         messages.add_message(request, messages.WARNING, 'Your email needs verification!')
+    else:
+        messages.add_message(request, messages.WARNING, 'Email is already verified!')
+
     return redirect('log_in')
 
 def activate_user(request, uidb64, token):

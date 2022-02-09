@@ -22,19 +22,8 @@ class VerifiactionViewTestCase(TestCase, LogInTester, MessageTester):
     def test_activate_url(self):
         self.assertEqual(self.url,f'/activate_user/{self.uid}/{self.token}')
 
-    # def test_unsuccesful_log_in(self):
-    #     form_input = { 'username': 'johndoe', 'password': 'WrongPassword123' }
-    #     response = self.client.post(self.url, form_input)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'log_in.html')
-    #     form = response.context['form']
-    #     self.assertTrue(isinstance(form, LogInForm))
-    #     self.assertFalse(form.is_bound)
-    #     self.assertFalse(self._is_logged_in())
-    #     self.assert_error_message(response)
-
     def test_succesful_verification(self):
-        response = self.client.get(self.url,  kwargs={'uidb64': self.uid, 'token': self.token}, follow=True)
+        response = self.client.get(self.url, follow=True)
         self.user.refresh_from_db()
         self.assertTrue(self.user.email_verified)
         response_url = reverse('log_in')
@@ -42,28 +31,35 @@ class VerifiactionViewTestCase(TestCase, LogInTester, MessageTester):
         self.assertTemplateUsed(response, 'log_in.html')
         self.assert_success_message(response)
 
-    
-    def test_unsuccesful_verification(self):
-        response = self.client.get(self.url,  kwargs={'uidb64': self.uid, 'token': self.token}, follow=True)
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.email_verified)
-        response_url = reverse('log_in')
+    def test_invalid_verification_link(self):
+        User.objects.get(id = self.user.id).delete()
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'activate-fail.html')
+        self.assertContains(response, "The link is invalid")
+
+    def test_expired_verification_link(self):
+        # link expire after opening and after 72 hours
+        self.user.email_verified = True
+        self.user.save()
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'activate-fail.html')
+        self.assertContains(response, "The link has expired")
+
+    def test_verification_email_is_not_sent_when_already_logged_in(self):
+        self.user.email_verified = True
+        self.user.save()
+        self.url = reverse('send_verification', kwargs={'user_id': self.user.id})
+        self.client.login(username=self.user.username,  password="Password123")
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'log_in.html')
-        self.assert_success_message(response)
+        self.assertTemplateUsed(response, 'home.html')
+        self.assert_warning_message(response)
 
-    # def test_succesful_log_in_with_redirect(self):
-    #     redirect_url = reverse('home')
-    #     form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
-    #     response = self.client.post(self.url, form_input, follow=True)
-    #     self.assertTrue(self._is_logged_in())
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'home.html')
-    #     self.assert_no_message(response)
-
-    # def test_post_log_in_with_incorrect_credentials_and_redirect(self):
-    #     redirect_url = reverse('log_in')
-    #     form_input = { 'username': 'johndoe', 'password': 'WrongPassword123', 'next': redirect_url }
-    #     response = self.client.post(self.url, form_input)
-    #     next = response.context['next']
-    #     self.assertEqual(next, redirect_url)
+    def test_verification_email_shows_404page_for_non_existing_users(self):
+        self.url = reverse('send_verification', kwargs={'user_id': 1})
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, '404_page.html')
