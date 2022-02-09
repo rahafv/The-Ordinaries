@@ -76,34 +76,19 @@
             <div class='reviews-heading'>
               <a class= "text-capitalize"><i class= "fas fa-user mr-1"></i>{{rating.user.username}}</a>
               <a class= "ml-2"><i class= "fa fa-clock mr-1"></i>{{rating.created_at}}</a>
-            
-              {% comment %} <i class="fa fa-star{% if rating.rating == 1 %}-half-o {% endif %}" aria-hidden="true"></i>
-							<i class="fa fa-star{% if rating.rating == 1.5 %}-half-o{% elif rating.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
-							<i class="fa fa-star{% if rating.rating == 2.5 %}-half-o{% elif rating.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
-							<i class="fa fa-star{% if rating.rating == 3.5 %}-half-o{% elif rating.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
-							<i class="fa fa-star{% if rating.rating == 4.5 %}-half-o{% elif rating.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
-              <i class="fa fa-star{% if rating.rating == 5.5 %}-half-o{% elif rating.rating < 6 %}-o {% endif %}" aria-hidden="true"></i>
-              <i class="fa fa-star{% if rating.rating == 6.5 %}-half-o{% elif rating.rating < 7 %}-o {% endif %}" aria-hidden="true"></i>
-              <i class="fa fa-star{% if rating.rating == 7.5 %}-half-o{% elif rating.rating < 8 %}-o {% endif %}" aria-hidden="true"></i>
-              <i class="fa fa-star{% if rating.rating == 8.5 %}-half-o{% elif rating.rating < 9 %}-o {% endif %}" aria-hidden="true"></i>
-              <i class="fa fa-star{% if rating.rating == 9.5 %}-half-o{% elif rating.rating < 10 %}-o {% endif %}" aria-hidden="true"></i>
-               {% endcomment %}
-               
               <div class="rating-star">
-                <span title="{{ rating.rating }}/5"> 
-                <!-- By default the star is full else it is empty otherwise it is half -->
+              
                     <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
                     <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
                     <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
                     <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
                     <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
-                </span>
-                <span><strong>( {{ rating.rating }}/10.0 )</strong></span>
+                
+                <span>( {{ rating.rating }}/10.0 )</span>
             </div>
             </div> 
           <div class= "review-body mt-2">
             <p>{{rating.review}}</p> 
-    
           </div>
             {% endfor %}
       </div>

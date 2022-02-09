@@ -147,7 +147,7 @@ def add_book(request):
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
-    ratings = book.ratings.all().exclude(user=request.user)
+    ratings = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
         rating = rating[0]
