@@ -249,7 +249,7 @@ class Meeting(models.Model):
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='meeting'
+        related_name='meetings'
     )
 
     time = models.DateTimeField(
