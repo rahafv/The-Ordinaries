@@ -1,9 +1,10 @@
+from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
-from django.core.validators import MaxValueValidator, MinValueValidator 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from tempfile import NamedTemporaryFile
 
 class User(AbstractUser):
@@ -54,16 +55,6 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
-
-    clubs = models.ManyToManyField(
-        'Club',
-        blank = True  
-    )
-    
-    books = models.ManyToManyField(
-        'Book', 
-        related_name='books'
-    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -81,6 +72,10 @@ class User(AbstractUser):
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
+    
+    def set_age(self,new_age):
+        self.age = new_age
+        return self.save()
 
 class Club(models.Model):
     """Club model."""
@@ -97,20 +92,15 @@ class Club(models.Model):
     )
     
     members = models.ManyToManyField(
-        'User', 
-        related_name='members'
-    )
-
-    books = models.ManyToManyField(
-        'Book', 
-        related_name='clubBooks'
+        User, 
+        related_name='clubs'
     )
 
     theme = models.CharField(
         max_length=100, 
         blank=True
     )
-    
+
     class MeetingType(models.TextChoices):
         INPERSON = "IP", "In-person"
         ONLINE = "OL", "Online"
@@ -142,6 +132,11 @@ class Club(models.Model):
 
     def member_count(self):
         return self.members.all().count()   
+    
+    def is_member(self, user):
+        """ checks if the user is a member"""
+        return self.members.all().filter(id=user.id).exists()
+
 
 class Book(models.Model):
     """Book model."""
@@ -151,7 +146,7 @@ class Book(models.Model):
     )
 
     title = models.CharField(
-        max_length=100,
+        max_length=200,
         unique=False,
         blank=False
     )
@@ -168,7 +163,9 @@ class Book(models.Model):
         blank=True
     )
 
-    image_url = models.URLField( blank=True)
+    image_url = models.URLField(
+        blank=True
+    )
 
     year = models.PositiveIntegerField(
         default=datetime.datetime.now().year,
@@ -181,7 +178,12 @@ class Book(models.Model):
 
     readers = models.ManyToManyField(
         User, 
-        related_name='readers'
+        related_name='books'
+    )
+
+    clubs = models.ManyToManyField(
+        Club, 
+        related_name='books'
     )
 
     def add_reader(self, reader):
@@ -190,3 +192,42 @@ class Book(models.Model):
     
     def readers_count(self):
         return self.readers.all().count()  
+
+    def add_club(self, club):
+        if not self.clubs.all().filter(id=club.id).exists():
+            self.clubs.add(club)
+    
+    def clubs_count(self):
+        return self.clubs.all().count()  
+
+class Rating(models.Model):
+    """rating model."""
+
+    user =  models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+
+    book = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+
+    review = models.CharField(
+        max_length=250 , 
+        blank = True
+    )
+
+    rating = models.SmallIntegerField( 
+        blank = False , 
+        validators=[
+            MaxValueValidator(10) , 
+            MinValueValidator(0)
+        ]
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+ 

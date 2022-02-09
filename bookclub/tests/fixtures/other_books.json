@@ -1,0 +1,15 @@
+[
+    {
+        "model": "bookclub.Book",
+        "pk": 2,
+        "fields": {
+          "ISBN": "0002005018",
+          "title": "Clara Callan",
+          "author": "Richard Bruce Wright",
+          "publisher": "HarperFlamingo Canada",
+          "year": "2001",
+          "readers": [], 
+          "clubs": []
+        }
+    }
+]

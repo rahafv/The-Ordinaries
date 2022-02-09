@@ -1,14 +1,17 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Book
+from bookclub.models import User, Book, Club
 
 
 class BookModelTestCase(TestCase):
     """Unit tests for the book model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
-        'bookclub/tests/fixtures/default_book.json'
+        'bookclub/tests/fixtures/other_users.json', 
+        'bookclub/tests/fixtures/default_book.json', 
+        'bookclub/tests/fixtures/other_books.json',
+        'bookclub/tests/fixtures/default_club.json'
     ]
     
     def setUp(self):
@@ -21,12 +24,12 @@ class BookModelTestCase(TestCase):
         self.book.ISBN = ''
         self._assert_book_is_invalid()
 
-    def test_title_can_be_100_characters_long(self):
-        self.book.title = 'x' * 100
+    def test_title_can_be_200_characters_long(self):
+        self.book.title = 'x' * 200
         self._assert_book_is_valid()
 
-    def test_title_cannot_be_over_100_characters_long(self):
-        self.book.title = 'x' * 101
+    def test_title_cannot_be_over_200_characters_long(self):
+        self.book.title = 'x' * 201
         self._assert_book_is_invalid()
 
     def test_author_can_be_100_characters_long(self):
@@ -45,13 +48,10 @@ class BookModelTestCase(TestCase):
         self.book.publisher = 'x' * 101
         self._assert_book_is_invalid()
 
-
     def test_ISBN_must_be_unique(self):
-        self.create_second_book()
         second_book = Book.objects.get(ISBN='0002005018')
         self.book.ISBN = second_book.ISBN
         self._assert_book_is_invalid()
-
 
     def test_title_must_not_be_blank(self):
         self.book.title = ''
@@ -61,32 +61,26 @@ class BookModelTestCase(TestCase):
         self.book.author = ''
         self._assert_book_is_invalid()  
 
-
     def test_title_need_not_be_unique(self):
-        self.create_second_book()
-        second_user = Book.objects.get(ISBN='0002005018')
-        self.book.title = second_user.title
+        second_book = Book.objects.get(ISBN='0002005018')
+        self.book.title = second_book.title
         self._assert_book_is_valid()
 
     def test_author_need_not_be_unique(self):
-        self.create_second_book()
-        second_user = Book.objects.get(ISBN='0002005018')
-        self.book.author = second_user.author
+        second_book = Book.objects.get(ISBN='0002005018')
+        self.book.author = second_book.author
         self._assert_book_is_valid()
 
     def test_publisher_need_not_be_unique(self):
-        self.create_second_book()
-        second_user = Book.objects.get(ISBN='0002005018')
-        self.book.publisher = second_user.publisher
+        second_book = Book.objects.get(ISBN='0002005018')
+        self.book.publisher = second_book.publisher
         self._assert_book_is_valid()
 
     def test_year_need_not_be_unique(self):
-        self.create_second_book()
-        second_user = Book.objects.get(ISBN='0002005018')
-        self.book.year = second_user.year
+        second_book = Book.objects.get(ISBN='0002005018')
+        self.book.year = second_book.year
         self._assert_book_is_valid()
 
-    
     def test_year_may_be_blank(self):
         self.book.year = None
         self._assert_book_is_valid()
@@ -101,19 +95,15 @@ class BookModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.book.full_clean()
 
-    def create_second_book(self):
-        Book.objects.create(
-            ISBN= "0002005018",
-            title= "Clara Callan",
-            author= "Richard Bruce Wright",
-            publisher= "HarperFlamingo Canada",
-            image_url= "http://images.amazon.com/images/P/0002005018.01.MZZZZZZZ.jpg",
-            year= "2001"
-        )
-
     def test_reader_addition(self):
         nonReader = User.objects.get(id=1)
         count = self.book.readers_count()
         self.book.add_reader(nonReader)
         self.assertEqual(self.book.readers_count(), count+1)
+
+    def test_club_addition(self):
+        club = Club.objects.get(id=1)
+        count = self.book.clubs_count()
+        self.book.add_club(club)
+        self.assertEqual(self.book.clubs_count(), count+1)
 

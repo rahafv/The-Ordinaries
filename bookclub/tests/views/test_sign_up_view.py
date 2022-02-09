@@ -9,6 +9,7 @@ from datetime import date
 
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
+    fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
         self.url = reverse('sign_up')
@@ -18,24 +19,13 @@ class SignUpViewTestCase(TestCase, LogInTester):
             'username': '@janedoe',
             'DOB': date(2000, 1, 5),
             'email': 'janedoe@example.org',
-            'city': 'NYC',
-            'region':'Newyork',
-            'country':'USA',
-            'bio': 'My bio',
+            'city': 'new york',
+            'region':'NY',
+            'country':'United states',
+            'bio': 'Hello, this is John Doe.',
             'new_password': 'Password123',
             'password_confirmation': 'Password123'
         }
-        self.user = User.objects.create_user(
-            username = 'johndoe',
-            first_name = 'John',
-            last_name = 'Doe',
-            age = '19',
-            email = 'johndoe@example.com',
-            city = 'new york',
-            region = 'NY',
-            country = 'United states',
-            bio = 'This is john doe bio',
-        )
 
     def test_sign_up_url(self):
         self.assertEqual(self.url,'/sign_up/')
@@ -74,10 +64,10 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.age, 22)
         self.assertEqual(user.email, 'janedoe@example.org')
-        self.assertEqual(user.city, 'NYC')
-        self.assertEqual(user.region, 'Newyork')
-        self.assertEqual(user.country, 'USA')
-        self.assertEqual(user.bio, 'My bio')
+        self.assertEqual(user.city, 'new york')
+        self.assertEqual(user.region, 'NY')
+        self.assertEqual(user.country, 'United states')
+        self.assertEqual(user.bio, 'Hello, this is John Doe.')
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)
         self.assertTrue(self._is_logged_in())
