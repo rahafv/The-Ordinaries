@@ -72,10 +72,6 @@ class SignUpViewTestCase(TestCase, LogInTester,MenueTestMixin):
         self.assertEqual(user.bio, 'Hello, this is John Doe.')
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)
-<<<<<<< HEAD
-=======
-
->>>>>>> FETCH_HEAD
 
     def test_sign_up_log_in_prohibited(self):
         self.client.post(self.url, self.form_input)
