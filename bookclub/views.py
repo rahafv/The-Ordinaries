@@ -1,7 +1,7 @@
-from django.http import Http404
+from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
@@ -160,6 +160,27 @@ def create_club(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
+
+@login_required
+def add_review(request, book_id):
+    reviewed_book = get_object_or_404(Book.objects, id=book_id)
+    review_user = request.user
+    if reviewed_book.ratings.all().filter(user=review_user).exists():
+        return HttpResponseForbidden()
+        
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            form.instance.user = review_user
+            form.instance.book = reviewed_book
+            form.save(review_user, reviewed_book)
+            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+            return redirect('book_details', book_id=reviewed_book.id)
+
+    messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+
+    return render(request, 'book_details.html', {'book':reviewed_book})
+
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -182,7 +203,12 @@ def add_book(request):
 @login_required
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
-    return render(request, "book_details.html", {'book': book})
+    form = RatingForm()
+    rating = book.ratings.all().filter(user = request.user)
+    if rating:
+        rating = rating[0]
+        
+    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating})
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):

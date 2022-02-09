@@ -4,8 +4,7 @@ from pickle import FALSE
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-from .models import User, Club, Book
+from .models import User, Club, Book, Rating
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -232,3 +231,30 @@ class ClubForm(forms.ModelForm):
         fields = ['name', 'theme','meeting_type', 'city','country']
         exclude = ['owner']
 
+
+class RatingForm(forms.ModelForm):
+    """Form to post a review."""
+    class Meta:
+        
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+
+    def save(self, reviwer, reviewedBook):
+        """Create a new user."""
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0 
+        review = Rating.objects.create(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+            book = reviewedBook,
+            user = reviwer,
+        )
+        return review
+
+    def calculate_rating(self, rating): 
+        return rating*2

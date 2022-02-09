@@ -1,6 +1,7 @@
 from logging import WARNING
 from django.urls import reverse
 from django.contrib.messages import ERROR, SUCCESS
+from with_asserts.mixin import AssertHTMLMixin
 
 def reverse_with_next(url_name, next_url):
     url = reverse(url_name)
@@ -46,4 +47,23 @@ class MessageTester:
 
     def assert_no_message(self, response):
         messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 0)
+        self.assertEqual(len(messages_list), 0) 
+
+class MenueTestMixin(AssertHTMLMixin):
+    menu_urls = [
+      reverse('password') ,
+      reverse('profile') ,
+      reverse('books_list') , 
+      reverse('clubs_list'),
+      reverse('log_out')
+      ]
+
+    def assert_menu(self,response):
+        for url in self.menu_urls:
+            with self.assertHTML(response , f'a[href="{url}"]'):
+                pass
+
+    def assert_no_menu(self , response):
+        for url in self.menu_urls:
+            self.assertNotHTML(response , f'a[href="{url}"]')
+

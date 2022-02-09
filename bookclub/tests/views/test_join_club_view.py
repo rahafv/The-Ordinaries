@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
-class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
+class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the join club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -21,8 +21,8 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.user = User.objects.get(username="edgaralen")
 
 
-    def test_club_page_url(self):
-        self.assertEqual(self.url, f"/join_club/{self.club.id}/")
+    def test_join_url(self):
+        self.assertEqual(self.url, f"/club/{self.club.id}/join_club")
 
     def test_owner_cannot_join_club(self):
         self.client.login(username=self.owner.username, password="Password123")
@@ -33,6 +33,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_error_message(response)
+        self.assert_menu(response)
         
 
     def test_member_cannot_join_club(self):
@@ -44,6 +45,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_non_member_successful_join_club(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -55,6 +57,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
+        self.assert_menu(response)
 
 
     def test_join_club_with_invalid_id(self):

@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
-class ShowClubViewTestCase(TestCase, LoginRedirectTester):
+class ShowClubViewTestCase(TestCase, LoginRedirectTester , MenueTestMixin):
     """Test suite for the show club view."""
 
     fixtures = ['bookclub/tests/fixtures/other_users.json',
@@ -25,6 +25,7 @@ class ShowClubViewTestCase(TestCase, LoginRedirectTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_page.html")
+        self.assert_menu(response)
 
     def test_get_club_page_with_invalid_id(self):
         self.client.login(username=self.owner.username, password="Password123")

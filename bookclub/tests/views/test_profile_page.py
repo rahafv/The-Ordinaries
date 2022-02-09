@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester,MenueTestMixin
 
-class ProfilePageViewTestsCase(TestCase, LoginRedirectTester):
+class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenueTestMixin):
     """Tests of the profile page view."""
 
     fixtures = [ 'bookclub/tests/fixtures/default_user.json',
@@ -30,7 +30,8 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester):
             reverse('profile'), reverse('password'), reverse('log_out')
         ]
         for url in menu_urls:
-            self.assertContains(response, url)    
+            self.assertContains(response, url)  
+        self.assert_menu(response)  
     
     def test_get_valid_member_profile_page(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -41,7 +42,8 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester):
         self.assertContains(response, self.user2.username)    
         self.assertContains(response, self.user2.full_name())  
         self.assertNotContains(response, self.user.username)    
-        self.assertNotContains(response, self.user.full_name())    
+        self.assertNotContains(response, self.user.full_name()) 
+        self.assert_menu(response)   
 
     def test_get_member_profile_page_with_request_user_id(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -52,6 +54,7 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester):
         self.assertTemplateUsed(response, 'profile_page.html')
         self.assertContains(response, self.user.username)    
         self.assertContains(response, self.user.full_name()) 
+        self.assert_menu(response)
 
     def test_get_profile_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

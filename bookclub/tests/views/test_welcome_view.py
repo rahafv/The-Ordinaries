@@ -1,8 +1,9 @@
 """Tests for the welcome view."""
-from django.test import TestCase
+from django.test import TestCase 
 from django.urls import reverse
+from bookclub.tests.helpers import MenueTestMixin
 
-class WelcomeViewTestCase(TestCase):
+class WelcomeViewTestCase(TestCase,MenueTestMixin):
 
     def setUp(self):
         self.url = reverse("welcome")
@@ -14,3 +15,4 @@ class WelcomeViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "welcome.html")
+        self.assert_no_menu(response)
