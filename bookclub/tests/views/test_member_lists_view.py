@@ -2,9 +2,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import reverse_with_next
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
-class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
+class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_club.json',
@@ -27,6 +27,7 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'members_list.html')
+        self.assert_menu(response)
 
     def test_get_members_list(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -43,6 +44,7 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
             if member.id != self.user.id:
                 member_profile_url = reverse('profile', kwargs={'club_id': self.club.id, 'user_id': member.id })
                 self.assertContains(response, member_profile_url)
+        self.assert_menu(response)
 
     def test_non_members_cannot_see_members_list(self):
         self.non_member = User.objects.get(id=4)
@@ -51,6 +53,8 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_page.html")
         self.assert_error_message(response)
+        self.assert_menu(response)
+    
 
     def _create_test_members(self, members_count=10):
         for user_id in range(members_count):

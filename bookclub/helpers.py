@@ -8,3 +8,4 @@ def login_prohibited(view_function):
         else:
             return view_function(request)
     return modified_view_function
+
