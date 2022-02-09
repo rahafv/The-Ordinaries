@@ -80,6 +80,15 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester):
         self.assertFalse(self._is_logged_in())
         self.assert_error_message(response)
 
+    def test_unverified_log_in(self):
+        self.user.email_verified = False
+        self.user.save()
+        form_input = { 'username': 'johndoe', 'password': 'Password123' }
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'log_in.html')
+        self.assert_error_message(response)
+
     def test_succesful_log_in(self):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
