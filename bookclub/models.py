@@ -212,12 +212,12 @@ class Book(models.Model):
             return (sum/self.ratings.all().count())
         else: 
             return 0.0
-
+            
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
-        User, 
+        User,  
         on_delete=models.CASCADE,
         related_name='ratings'
     )
