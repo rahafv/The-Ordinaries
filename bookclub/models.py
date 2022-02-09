@@ -210,10 +210,7 @@ class Book(models.Model):
             return (sum/self.ratings.all().count())
         else: 
             return 0.0
-
-    def reviews_count(self):
-        return self.ratings.all().exclude(review = "").count()
-
+            
 class Rating(models.Model):
     """rating model."""
 

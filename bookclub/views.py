@@ -151,8 +151,8 @@ def book_details(request, book_id):
     rating = book.ratings.all().filter(user = request.user)
     if rating:
         rating = rating[0]
-        
-    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews})
+    reviews_count = book.ratings.all().exclude(review = "").exclude( user=request.user).count()
+    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count})
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
