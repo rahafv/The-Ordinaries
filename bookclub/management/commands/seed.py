@@ -81,7 +81,7 @@ class Command(BaseCommand):
         
 
     def create_books(self):
-        MAX_BOOKS = 10000
+        MAX_BOOKS = 20000
         books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = list(csv.reader(csv_file, delimiter=","))
@@ -90,12 +90,9 @@ class Command(BaseCommand):
             for col in books_data[1:]:
               
                 book = Book(
-                    ISBN = col[4],
-                    title = col[6],
+                    ISBN = col[0],
+                    title = col[1],
                     author = col[2],
-                    describtion = col[3],
-                    genre = col[6],
-                    pages_number = col[5],
                     image_url = col[7],
                 )
 
