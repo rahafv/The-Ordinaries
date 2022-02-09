@@ -1,7 +1,6 @@
 """Unit tests of the club form."""
-from django import forms
 from django.test import TestCase
-from bookclub.models import User, Book
+from bookclub.models import Book
 from bookclub.forms import BookForm
 
 

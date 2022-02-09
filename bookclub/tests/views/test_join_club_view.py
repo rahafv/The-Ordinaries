@@ -21,8 +21,8 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.user = User.objects.get(username="edgaralen")
 
 
-    def test_club_page_url(self):
-        self.assertEqual(self.url, f"/join_club/{self.club.id}/")
+    def test_join_url(self):
+        self.assertEqual(self.url, f"/club/{self.club.id}/join_club")
 
     def test_owner_cannot_join_club(self):
         self.client.login(username=self.owner.username, password="Password123")
