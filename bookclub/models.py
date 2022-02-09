@@ -241,10 +241,9 @@ class Rating(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         unique_together = ['user', 'book']
-
  
 class Meeting(models.Model):
     """ The meeting model."""
@@ -258,13 +257,13 @@ class Meeting(models.Model):
     club = models.ForeignKey(
         Club, 
         on_delete=models.CASCADE,
-        related_name='meeting'
+        related_name='meetings'
     )
 
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='meeting'
+        related_name='meetings'
     )
 
     time = models.DateTimeField(
@@ -285,3 +284,8 @@ class Meeting(models.Model):
     
 
  
+
+    
+
+ 
+
