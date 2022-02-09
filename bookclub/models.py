@@ -211,14 +211,14 @@ class Book(models.Model):
         else: 
             return 0.0
 
-    def ratings_count(self):
+    def reviews_count(self):
         return self.ratings.all().exclude(review = "").count()
 
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
-        User, 
+        User,  
         on_delete=models.CASCADE,
         related_name='ratings'
     )
