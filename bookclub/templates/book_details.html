@@ -42,22 +42,6 @@
                 <a herf=# class="btn btn-outline-dark mb-3"> Edit </a>
               </div>
             {% endif %}
-            {% if ratings %}
-              <div>
-                {% for rating in ratings %}
-                <div class="col">
-                  <div style="text-align: center;">
-                    <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
-                    <p >{{ rating.review }}</p>
-                  </div>
-                </div>
-              {% endfor %}
-              </div>
-
-
-
-            {% endif %}
-
           </div>
           <div class="col-4">
             <div class="row-2 mt-5">
@@ -81,7 +65,54 @@
             </div>
           </div>
         </div>
-        <hr></hr>
+      </hr>
+      <div class="container mt-5">
+        <h5 class= "text-uppercase font-weight-bold">Reviews({{ book.ratings_count}})</h5>
+        <hr class= "at-0 pt-0">
+        <div class="row">
+          <div class="col-sm-7 mt-2">
+          {% if ratings %}
+            {% for rating in ratings %}
+            <div class='reviews-heading'>
+              <a class= "text-capitalize"><i class= "fas fa-user mr-1"></i>{{rating.user.username}}</a>
+              <a class= "ml-2"><i class= "fa fa-clock mr-1"></i>{{rating.created_at}}</a>
+            
+              {% comment %} <i class="fa fa-star{% if rating.rating == 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+							<i class="fa fa-star{% if rating.rating == 1.5 %}-half-o{% elif rating.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+							<i class="fa fa-star{% if rating.rating == 2.5 %}-half-o{% elif rating.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+							<i class="fa fa-star{% if rating.rating == 3.5 %}-half-o{% elif rating.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+							<i class="fa fa-star{% if rating.rating == 4.5 %}-half-o{% elif rating.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+              <i class="fa fa-star{% if rating.rating == 5.5 %}-half-o{% elif rating.rating < 6 %}-o {% endif %}" aria-hidden="true"></i>
+              <i class="fa fa-star{% if rating.rating == 6.5 %}-half-o{% elif rating.rating < 7 %}-o {% endif %}" aria-hidden="true"></i>
+              <i class="fa fa-star{% if rating.rating == 7.5 %}-half-o{% elif rating.rating < 8 %}-o {% endif %}" aria-hidden="true"></i>
+              <i class="fa fa-star{% if rating.rating == 8.5 %}-half-o{% elif rating.rating < 9 %}-o {% endif %}" aria-hidden="true"></i>
+              <i class="fa fa-star{% if rating.rating == 9.5 %}-half-o{% elif rating.rating < 10 %}-o {% endif %}" aria-hidden="true"></i>
+               {% endcomment %}
+               
+              <div class="rating-star">
+                <span title="{{ rating.rating }}/5"> 
+                <!-- By default the star is full else it is empty otherwise it is half -->
+                    <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                </span>
+                <span><strong>( {{ rating.rating }}/10.0 )</strong></span>
+            </div>
+            </div> 
+          <div class= "review-body mt-2">
+            <p>{{rating.review}}</p> 
+    
+          </div>
+            {% endfor %}
+      </div>
+          {% endif %}
+    </div>
+    
+
+
+
     </div>
   </div>
 </div>
