@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book
+from .models import User, Club, Book , Rating
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
@@ -147,11 +147,12 @@ def add_book(request):
 def book_details(request, book_id): 
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
+    reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
         rating = rating[0]
-        
-    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating})
+    reviews_count = book.ratings.all().exclude(review = "").exclude( user=request.user).count()
+    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count})
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
@@ -255,6 +256,11 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+
+# def reviews_list(request,rating_id,book_id):
+#     ratings = Rating.objects.all()
+    
+
 
 @login_required
 def edit_club_information(request, club_id):
