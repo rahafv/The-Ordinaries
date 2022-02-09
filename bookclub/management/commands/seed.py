@@ -1,7 +1,7 @@
 import sys
 from django.core.management.base import BaseCommand, CommandError
 
-from bookclub.models import User, Club, Book 
+from bookclub.models import User, Club, Book , Rating
 
 from faker import Faker
 
@@ -22,7 +22,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         unseed.emptyDatabase()
         # start_time = timezone.now()
-        #self.create_users()
+        self.create_users()
         # end_time = timezone.now()
         # self.stdout.write(
         #     self.style.SUCCESS(
@@ -30,10 +30,11 @@ class Command(BaseCommand):
         #     )
         # )
         self.create_books()
+        self.create_ratings()
 
     def create_users(self):
 
-        MAX_USERS = 10000
+        MAX_USERS = 1000
         users_path = os.path.abspath("book-review-dataset/BX-Users.csv")
         with open(users_path, "r", encoding='latin-1') as csv_file:
             users_data = list(csv.reader(csv_file, delimiter=";"))
@@ -81,7 +82,7 @@ class Command(BaseCommand):
         
 
     def create_books(self):
-        MAX_BOOKS = 20000
+        MAX_BOOKS = 1000
         books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = list(csv.reader(csv_file, delimiter=","))
@@ -105,6 +106,30 @@ class Command(BaseCommand):
 
             if books:
                 Book.objects.bulk_create(books)
+
+    def create_ratings(self):
+        MAX_RATINGS = 100
+        ratings_path = os.path.abspath("book-review-dataset/BX-Book-Ratings.csv")
+        with open(ratings_path, "r", encoding='latin-1') as csv_file:
+            ratings_data = list(csv.reader(csv_file, delimiter=","))
+
+            ratings = []
+            for col in ratings_data[1:]:
+                rating = Rating(
+                    user = User.objects.get(id = col[0]),
+                    book = Book.objects.get(ISBN = col[1]),
+                    rating = col[2],
+                )
+
+                ratings.append(rating)
+
+                if len(ratings) > MAX_RATINGS:
+                    Rating.objects.bulk_create(ratings)
+                    ratings = []
+                    break
+
+            if ratings:
+                Rating.objects.bulk_create(ratings)
 
 
 
