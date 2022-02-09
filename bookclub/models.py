@@ -162,24 +162,23 @@ class Book(models.Model):
         blank=False
     )
 
-    description = models.CharField(
-        max_length=500,
+    publisher = models.CharField(
+        max_length=100,
         unique=False,
         blank=True
-    )
-
-    genre = models.CharField(
-        max_length= 100,
-        unique=False,
-        blank=True
-    )
-
-    pages_number = models.PositiveSmallIntegerField(
-        blank = True
     )
 
     image_url = models.URLField(
         blank=True
+    )
+
+    year = models.PositiveIntegerField(
+        default=datetime.datetime.now().year,
+        blank=True,
+        validators=[
+            MaxValueValidator(datetime.datetime.now().year),
+            MinValueValidator(0)
+        ]
     )
 
     readers = models.ManyToManyField(
