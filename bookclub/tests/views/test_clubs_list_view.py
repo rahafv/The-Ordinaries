@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from system import settings
 
 class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
 
@@ -17,7 +18,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         self.other_club = Club.objects.get(id=2)
         self.url = reverse('clubs_list')
         
-    def test_books_list_url(self):
+    def test_clubs_list_url(self):
         self.assertEqual(self.url,f'/clubs/')
 
     def test_get_clubs_list_redirects_when_not_logged_in(self):
@@ -41,16 +42,54 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
 
     def test_get_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(5)
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
-        for club_id in range(5):
+        for club_id in range(settings.CLUBS_PER_PAGE-2):
             self.assertContains(response, f'club{club_id}')
             self.assertContains(response, f'theme{club_id}')
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         self.assert_menu(response)
+
+    def test_get_clubs_list_with_pagination(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_clubs(settings.CLUBS_PER_PAGE*2+3)
+        response = self.client.get(self.url)
+        self.assert_menu(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        page_obj = response.context['clubs']
+        self.assertFalse(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_one_url = reverse('clubs_list') + '?page=1'
+        response = self.client.get(page_one_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        page_obj = response.context['clubs']
+        self.assertFalse(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_two_url = reverse('clubs_list') + '?page=2'
+        response = self.client.get(page_two_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        page_obj = response.context['clubs']
+        self.assertTrue(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_three_url = reverse('clubs_list') + '?page=3'
+        response = self.client.get(page_three_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), 5)
+        page_obj = response.context['clubs']
+        self.assertTrue(page_obj.has_previous())
+        self.assertFalse(page_obj.has_next())
+        self.assert_menu(response)
+
 
     def _create_test_clubs(self, club_count=10):
         for club_id in range(club_count):
