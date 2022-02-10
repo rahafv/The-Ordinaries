@@ -235,14 +235,14 @@ def transfer_club_ownership(request, club_id):
     club = get_object_or_404(Club.objects, id = club_id)
     user = request.user
     if request.method == "POST":
-        form = TransferClubOwnership(data=request.POST, user=user, club = club)
+        form = TransferClubOwnership(data=request.POST, user=user, club=club)
         if form.is_valid():
             print('valid')
             member_id = form.cleaned_data().get('members')
             club.make_owner(club_id, member_id)
             return redirect('club_page', club_id = club.id)
     else:
-        form = TransferClubOwnership(user=user, club = club)
+        form = TransferClubOwnership(user=user, club=club)
         print('not valid')
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
 

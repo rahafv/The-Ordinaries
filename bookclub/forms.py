@@ -224,16 +224,19 @@ class UserForm(forms.ModelForm):
 class TransferClubOwnership(forms.Form):
     """Form to create or update club information."""
 
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
-        self.club = kwargs.pop('club')
-        super().__init__(*args, **kwargs)
-        self.member_select = forms.ChoiceField(required=True, choices= self.club.members)
-        self.confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
+    member_select = forms.ChoiceField(required=True)
+    confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
                                   widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
                                   error_messages = {'required':"Please check the box"})
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        club = kwargs.pop('club')
+        super().__init__(*args, **kwargs)
+        if club:
+            self.fields['member_select'].choices = club.members
+    
+    
     # member_select #= forms.ChoiceField(required=True, choices= self.club.members)
     
     # confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
