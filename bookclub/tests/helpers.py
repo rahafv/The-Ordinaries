@@ -1,3 +1,4 @@
+from logging import WARNING
 from django.urls import reverse
 from django.contrib.messages import ERROR, SUCCESS
 from with_asserts.mixin import AssertHTMLMixin
@@ -38,6 +39,11 @@ class MessageTester:
         messages = tuple(response.context["messages"])
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].level, SUCCESS)
+
+    def assert_warning_message(self, response):
+        messages = tuple(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level, WARNING)
 
     def assert_no_message(self, response):
         messages_list = list(response.context['messages'])

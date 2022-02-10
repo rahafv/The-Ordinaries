@@ -1,6 +1,8 @@
+from email.policy import default
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms import ValidationError
 from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
@@ -10,6 +12,8 @@ from tempfile import NamedTemporaryFile
 class User(AbstractUser):
     """User model used for authentication."""
 
+    email_verified = models.BooleanField(default=False)
+    
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -209,19 +213,28 @@ class Book(models.Model):
     def clubs_count(self):
         return self.clubs.all().count()  
 
+    def average_rating(self):
+        sum = 0.0
+        if self.ratings.all().count() != 0: 
+            for rating in self.ratings.all(): 
+                sum+= rating.rating    
+            return (sum/self.ratings.all().count())
+        else: 
+            return 0.0
+            
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
-        User, 
+        User,  
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='ratings'
     )
 
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='reviews'
+        related_name='ratings'
     )
 
     review = models.CharField(
@@ -229,14 +242,61 @@ class Rating(models.Model):
         blank = True
     )
 
-    rating = models.SmallIntegerField( 
-        blank = False , 
+    rating = models.FloatField(
+        blank=True,
+        default=0,
         validators=[
-            MaxValueValidator(10) , 
+            MaxValueValidator(10),
             MinValueValidator(0)
         ]
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['user', 'book']
+ 
+class Meeting(models.Model):
+    """ The meeting model."""
+
+    title = models.CharField(
+        max_length=50, 
+        blank=False, 
+        null=False
+    )
+
+    club = models.ForeignKey(
+        Club, 
+        on_delete=models.CASCADE,
+        related_name='meetings'
+    )
+
+    book = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE,
+        related_name='meetings'
+    )
+
+    time = models.DateTimeField(
+        auto_now_add=False,
+        blank=False,
+        null =False
+    )
+
+    link = models.URLField(
+        max_length=1000,
+        blank=False
+    )
+
+    notes = models.CharField(
+        max_length=500,
+        blank=True
+    )
+    
 
  
+
+    
+
+ 
+

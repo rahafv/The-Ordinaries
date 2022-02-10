@@ -31,6 +31,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.welcome,  name='welcome'),
     path('sign_up/', views.sign_up,  name='sign_up'),
+    path('send_verification/<int:user_id>', views.send_activiation_email,  name='send_verification'),
+    path('activate_user/<uidb64>/<token>', views.activate_user,  name='activate'),
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
@@ -42,9 +44,11 @@ urlpatterns = [
     path("club/<int:club_id>/", views.club_page, name="club_page"),
 
     path('add_book/', views.add_book, name ='add_book'),
-    path('book_details/<int:book_id>', views.book_details, name ='book_details'),
-    path('join_club/<int:club_id>/', views.join_club, name ='join_club'),
-    path('withdraw_club/<int:club_id>/', views.withdraw_club, name ='withdraw_club'),
+    path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
+    path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
+
+    path('club/<int:club_id>/join_club', views.join_club, name ='join_club'),
+    path('club/<int:club_id>/withdraw_club', views.withdraw_club, name ='withdraw_club'),
     path('books/', views.books_list, name ='books_list'),
     path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
