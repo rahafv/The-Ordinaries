@@ -1,14 +1,13 @@
 import sys
 from django.core.management.base import BaseCommand, CommandError
-
 from bookclub.models import User, Club, Book , Rating
-
 from faker import Faker
-
 import csv
 from django.utils import timezone
+import time
 import os
 from .unseed import unseed
+import random
 
 class Command(BaseCommand):
     USER_COUNT = 100
@@ -21,51 +20,45 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         unseed.emptyDatabase()
-        # start_time = timezone.now()
+        initial_start = time.time()
+        start = time.time()
         self.create_users()
-        # end_time = timezone.now()
-        # self.stdout.write(
-        #     self.style.SUCCESS(
-        #         f"Loading CSV took: {(end_time-start_time).total_seconds()} seconds."
-        #     )
-        # )
+        end = time.time()
+        print("users: ", end - start)
+
+        start = time.time()
         self.create_books()
-        self.create_ratings()
+        end = time.time()
+        print("book: ", end - start)
+
+        # start = time.time()
+        # self.create_ratings()
+        # end = time.time()
+        # print("ratings: ", end - start)
+        
+        #print("total time: ", end - initial_start)
 
     def create_users(self):
 
-        MAX_USERS = 1000
-        users_path = os.path.abspath("book-review-dataset/BX-Users.csv")
+        MAX_USERS = 40000
+        users_path = os.path.abspath("book-review-dataset/Users.csv")
         with open(users_path, "r", encoding='latin-1') as csv_file:
-            users_data = list(csv.reader(csv_file, delimiter=";"))
+            users_data = list(csv.reader(csv_file, delimiter=","))
 
             users = []
-            usernames = []
-            ctr =1
+    
             for row in users_data[1:]:
-                # make them unique
-              
-                first_name = self.faker.first_name()
-                last_name = self.faker.last_name()
-                username = self.create_username(first_name, last_name)
                 
-                
-                if username in usernames: 
-                    username = username+ str(ctr)
-                    ctr += 1
-
-                usernames.append(username)
-
                 user = User(
-                    first_name = first_name,
-                    last_name = last_name,
-                    username = username,
-                    email = self.create_email(username),
-                    age = self.get_age(row[2]),
-                    city = self.get_city(row[1]),
-                    region = self.get_region(row[1]),
-                    country = self.get_country(row[1]),
-                    bio = self.faker.text(max_nb_chars=300),
+                    first_name = row[0],
+                    last_name = row[1],
+                    username = row[4],
+                    email = row[4]+"@example.org",
+                    age = row[7],
+                    city = self.get_city(row[6]),
+                    region = self.get_region(row[6]),
+                    country = self.get_country(row[6]),
+                    bio = row[3],
                     password = Command.DEFAULT_PASSWORD,
                 )
 
@@ -82,7 +75,7 @@ class Command(BaseCommand):
         
 
     def create_books(self):
-        MAX_BOOKS = 1000
+        MAX_BOOKS = 40000
         books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = list(csv.reader(csv_file, delimiter=","))
@@ -108,18 +101,38 @@ class Command(BaseCommand):
                 Book.objects.bulk_create(books)
 
     def create_ratings(self):
-        MAX_RATINGS = 100
+        MAX_RATINGS = 10000
         ratings_path = os.path.abspath("book-review-dataset/BX-Book-Ratings.csv")
+        
         with open(ratings_path, "r", encoding='latin-1') as csv_file:
             ratings_data = list(csv.reader(csv_file, delimiter=","))
 
             ratings = []
+            users = list(User.objects.all().values_list('id', flat=True))
+            books = list(Book.objects.all().values_list('id', flat=True))
             for col in ratings_data[1:]:
-                rating = Rating(
-                    user = User.objects.get(id = col[0]),
-                    book = Book.objects.get(ISBN = col[1]),
-                    rating = col[2],
-                )
+                try:
+                    user = User.objects.get(id = col[0])
+                except: 
+                    rand_id = random.randint(0, len(users)-1)
+                    user = User.objects.get(id = users[rand_id])
+                    users.pop(rand_id)
+                try: 
+                    book = Book.objects.get(ISBN = col[1])
+                except: 
+                    rand_id = random.randint(0, len(books)-1)
+                    book = Book.objects.get(id = books[rand_id])
+                    books.pop(rand_id)
+
+                try: 
+                    rating = Rating(
+                        user = user, 
+                        book = book, 
+                        rating = col[2],
+                    )
+                except: 
+                    continue
+
 
                 ratings.append(rating)
 
