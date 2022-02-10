@@ -194,6 +194,13 @@ class Book(models.Model):
         if not self.readers.all().filter(id=reader.id).exists():
             self.readers.add(reader)
     
+    def remove_reader(self, reader):
+        if self.readers.all().filter(id=reader.id).exists():
+            self.readers.remove(reader)
+
+    def is_reader(self, reader):
+        return self.readers.all().filter(id=reader.id).exists()
+    
     def readers_count(self):
         return self.readers.all().count()  
 
