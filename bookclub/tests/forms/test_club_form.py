@@ -19,7 +19,6 @@ class UserFormTestCase(TestCase):
         self.form_input = {
             'name': 'club2',
             'theme':'Drama',
-            'meeting_type':Club.MeetingType.INPERSON,
             'city' : 'New York',
             'country' : 'USA',
         }
@@ -28,8 +27,6 @@ class UserFormTestCase(TestCase):
         form = ClubForm()
         self.assertIn("name", form.fields)
         self.assertIn("theme", form.fields)
-        self.assertIn("meeting_type", form.fields)
-        self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
         self.assertIn("city", form.fields)
         self.assertIn("country", form.fields)
         
@@ -62,6 +59,5 @@ class UserFormTestCase(TestCase):
         self.assertEqual(members_after_count, members_before_count)
         self.assertEqual(self.club.name, 'club2')
         self.assertEqual(self.club.theme, 'Drama')
-        self.assertEqual(self.club.meeting_type,Club.MeetingType.INPERSON )
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")

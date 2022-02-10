@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["name", "theme", "owner", "meeting_type"]
+    list_display = ["name", "theme", "owner"]
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):

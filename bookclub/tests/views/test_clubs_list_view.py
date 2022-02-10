@@ -57,7 +57,6 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
             Club.objects.create(owner = self.user,
                 name =f'club{club_id}',
                 theme=f'theme{club_id}',
-                meeting_type =Club.MeetingType.INPERSON,
                 city=f'city{club_id}',
                 country=f'country {club_id}',
             )

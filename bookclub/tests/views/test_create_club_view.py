@@ -16,7 +16,6 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
-            'meeting_type': Club.MeetingType.INPERSON,
             'city': 'nyc', 
             'country': 'usa'
         }
@@ -45,7 +44,6 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         club = Club.objects.get(name="Club1")
         self.assertEqual(club.name, "Club1")
         self.assertEqual(club.theme, "Fiction")
-        self.assertEqual(club.meeting_type, Club.MeetingType.INPERSON)
         self.assertEqual(club.city, "nyc")
         self.assertEqual(club.country, "usa")
         owner = User.objects.get(username="johndoe")

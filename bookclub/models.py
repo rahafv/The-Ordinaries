@@ -105,17 +105,6 @@ class Club(models.Model):
         blank=True
     )
 
-    class MeetingType(models.TextChoices):
-        INPERSON = "IP", "In-person"
-        ONLINE = "OL", "Online"
-
-    meeting_type = models.CharField(
-        max_length=2,
-        choices=MeetingType.choices,
-        default=MeetingType.INPERSON,
-        blank=False,
-    )
-
     city = models.CharField(
         max_length=50,
         blank=True

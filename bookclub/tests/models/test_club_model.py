@@ -70,11 +70,6 @@ class ClubModelTestCase(TestCase):
         self.club.theme = 'x' * 101
         self._assert_club_is_invalid()
 
-    def test_club_meeting_type(self):
-        self.club.meeting_type = self.club.MeetingType.INPERSON
-        self.assertEqual(self.club.meeting_type, "IP")
-        self.assertEqual(self.club.get_meeting_type_display(), "In-person")
-
     def test_city_may_be_blank(self):
         self.club.city = ''
         self._assert_club_is_valid()

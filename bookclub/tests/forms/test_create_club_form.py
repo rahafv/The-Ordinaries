@@ -13,7 +13,6 @@ class CreateClubFormTestCase(TestCase):
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
-            'meeting_type': Club.MeetingType.INPERSON,
             'city': 'nyc', 
             'country': 'usa'
         }
@@ -26,10 +25,8 @@ class CreateClubFormTestCase(TestCase):
         form = CreateClubForm()
         self.assertIn("name", form.fields)
         self.assertIn("theme", form.fields)
-        self.assertIn("meeting_type", form.fields)
         self.assertIn("city", form.fields)
         self.assertIn("country", form.fields)
-        self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
 
     def test_form_model_validation(self):
         self.form_input["name"] = ""
@@ -46,7 +43,6 @@ class CreateClubFormTestCase(TestCase):
         self.assertEqual(count_clubs_before + 1, Club.objects.count())
         self.assertEqual(club.name, "Club1")
         self.assertEqual(club.theme, "Fiction")
-        self.assertEqual(club.meeting_type, Club.MeetingType.INPERSON)
         self.assertEqual(club.city, "nyc")
         self.assertEqual(club.country, "usa")
         self.assertEqual(club.owner, owner)

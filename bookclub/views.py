@@ -187,7 +187,7 @@ def club_page(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member})
 
 @login_required
 def add_book(request):
@@ -344,7 +344,6 @@ def edit_club_information(request, club_id):
     data = {
         'name':club.name,
         'theme': club.theme,
-        'meeting_type':club.meeting_type,
         'city': club.city,
         'country':club.country,
     }
