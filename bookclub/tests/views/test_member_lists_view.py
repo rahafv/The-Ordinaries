@@ -3,6 +3,7 @@ from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import reverse_with_next
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from system import settings
 
 class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
 
@@ -31,12 +32,12 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
 
     def test_get_members_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_members(15)
+        self._create_test_members(settings.MEMBERS_PER_PAGE-1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'members_list.html')
-        self.assertEqual(len(response.context['members']), 17)
-        for user_id in range(15):
+        self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
+        for user_id in range(settings.MEMBERS_PER_PAGE-1):
             self.assertContains(response, f'user{user_id}')
             self.assertContains(response, f'First{user_id} Last{user_id}')
 
@@ -44,6 +45,43 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
             if member.id != self.user.id:
                 member_profile_url = reverse('profile', kwargs={'club_id': self.club.id, 'user_id': member.id })
                 self.assertContains(response, member_profile_url)
+        self.assert_menu(response)
+    
+    def test_get_members_list_with_pagination(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_members(settings.MEMBERS_PER_PAGE*2+3)
+        response = self.client.get(self.url)
+        self.assert_menu(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'members_list.html')
+        self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
+        page_obj = response.context['members']
+        self.assertFalse(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_one_url = reverse('members_list', kwargs={'club_id': self.club.id}) + '?page=1'
+        response = self.client.get(page_one_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'members_list.html')
+        self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
+        page_obj = response.context['members']
+        self.assertFalse(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_two_url = reverse('members_list', kwargs={'club_id': self.club.id}) + '?page=2'
+        response = self.client.get(page_two_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'members_list.html')
+        self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
+        page_obj = response.context['members']
+        self.assertTrue(page_obj.has_previous())
+        self.assertTrue(page_obj.has_next())
+        page_three_url = reverse('members_list', kwargs={'club_id': self.club.id}) + '?page=3'
+        response = self.client.get(page_three_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'members_list.html')
+        self.assertEqual(len(response.context['members']), 5)
+        page_obj = response.context['members']
+        self.assertTrue(page_obj.has_previous())
+        self.assertFalse(page_obj.has_next())
         self.assert_menu(response)
 
     def test_non_members_cannot_see_members_list(self):

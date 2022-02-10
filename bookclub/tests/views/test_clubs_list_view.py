@@ -46,6 +46,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-2):
             self.assertContains(response, f'club{club_id}')
             self.assertContains(response, f'theme{club_id}')
