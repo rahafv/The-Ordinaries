@@ -98,7 +98,8 @@ class Club(models.Model):
     
     members = models.ManyToManyField(
         User, 
-        related_name='clubs'
+        related_name='clubs',
+        null = True
     )
 
     theme = models.CharField(

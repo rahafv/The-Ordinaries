@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from bookclub.models import User, Club, Book
+from bookclub.models import User, Club, Book, Rating
 
 class Command(BaseCommand):
 
@@ -10,5 +10,6 @@ class Command(BaseCommand):
         User.objects.filter(is_staff=False).delete()
         Club.objects.all().delete()
         Book.objects.all().delete()
+        #Rating.objects.all().delete()
 
 unseed = Command()
