@@ -232,6 +232,7 @@ class ClubForm(forms.ModelForm):
         exclude = ['owner']
 
 
+
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
     class Meta:
