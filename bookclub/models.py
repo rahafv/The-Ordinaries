@@ -251,6 +251,12 @@ class Meeting(models.Model):
         related_name='meetings'
     )
 
+    # user = models.ForeignKey(
+    #     User, 
+    #     on_delete=models.CASCADE,
+    #     related_name='rotations'
+    # )
+
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
@@ -272,6 +278,8 @@ class Meeting(models.Model):
         max_length=500,
         blank=True
     )
+
+    
     
 
  

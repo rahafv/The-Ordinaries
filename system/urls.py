@@ -55,8 +55,10 @@ urlpatterns = [
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
-    path("club/<int:club_id>/members/", views.members_list, name='members_list'),
+    path('club/<int:club_id>/members/', views.members_list, name='members_list'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+    path('zoom/auth/', views.zoom_auth, name='zoom_auth'),
+    path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
 ]
 
 handler404 = 'bookclub.views.handler404'

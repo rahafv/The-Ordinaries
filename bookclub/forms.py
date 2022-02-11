@@ -4,7 +4,7 @@ from pickle import FALSE
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Book, Rating
+from .models import User, Club, Book, Rating, Meeting
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -233,6 +233,7 @@ class ClubForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
+    
     class Meta:
         
         model = Rating
@@ -248,8 +249,8 @@ class RatingForm(forms.ModelForm):
         if not rate:
             rate = 0 
         review = Rating.objects.create(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
+            rating = self.calculate_rating(rate),
+            review = self.cleaned_data.get('review'),
             book = reviewedBook,
             user = reviwer,
         )
@@ -257,3 +258,22 @@ class RatingForm(forms.ModelForm):
 
     def calculate_rating(self, rating): 
         return rating*2
+
+class MeetingForm(forms.ModelForm):
+    """Form to update club information."""
+    
+    # user = forms.ChoiceField(initial= "Select a member for the next book rotation", 
+    #     label = 'members',
+    #     required= True, 
+    # )
+
+    class Meta:
+        """Form options."""
+
+        model = Meeting
+        fields = ['title', 'time', 'link','notes']
+        widgets = {
+            'time': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+        exclude = ['user', 'club', 'book']

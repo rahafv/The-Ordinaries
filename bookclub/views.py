@@ -1,8 +1,9 @@
-from django.http import Http404
+import json
+from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm
+from .forms import MeetingForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
@@ -19,6 +20,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage 
 from system import settings
+import requests
 
 @login_prohibited
 def welcome(request):
@@ -353,4 +355,45 @@ def edit_club_information(request, club_id):
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
+
+
+def base64_encode(message):
+    import base64
+    message_bytes = message.encode('ascii')
+    base64_bytes = base64.b64encode(message_bytes)
+    base64_message = base64_bytes.decode('ascii')
+    return base64_message
+
+def zoom_auth(request):
+    code = request.GET["code"]
+    data = requests.post(f"https://zoom.us/oauth/token?grant_type=authorization_code&code={code}&redirect_uri=http://localhost:8000/zoom/auth/", headers={
+        "Authorization": "Basic " + base64_encode("5V2wX24dRMyeT2ukdlGNxw:f9Lu9GTbWd5blxs6MJxxeVhAsZZStKxw")
+    })
+    print(data.text)
+    request.session["zoom_access_token"] = data.json()["access_token"]
+    return redirect('schedule_meeting')
+
+def schedule_meeting(request, club_id):
+    if request.method == 'POST':
+        form = MeetingForm(request.POST)
+        if form.is_valid():
+            meeting = form.save()
+
+
+        # data = requests.post("https://api.zoom.us/v2/users/me/meetings", headers={
+        #     'content-type': "application/json",
+        #     "authorization": f"Bearer {request.session['zoom_access_token']}"
+        # }, data=json.dumps({
+        #     "topic": f"Discuss",
+        #     "type": 2,
+        #     "start_time": request.POST["time"],
+        # }))
+
+        # print(data.json()["join_url"], data.json()["start_url"])
+
+
+    else:
+        form = MeetingForm()
+    return render(request, 'schedule_meeting.html', {'form': form})
+
 

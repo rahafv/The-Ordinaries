@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-xs-12 col-lg-6 col-xl-4">
+            <h1 class="text-center sticky-top mt-5 mb-5">Schedule club meeting</h1>
+        </div>
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <form action="{% url 'sign_up' %}" method="post">
+                {% csrf_token %}
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <input type="submit" class="btn btn-primary mb-3" value="Schedule">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
