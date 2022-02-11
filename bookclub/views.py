@@ -161,9 +161,9 @@ def show_profile_page(request, user_id = None, club_id = None):
     
     if user_id == request.user.id:
         return redirect('profile') 
-    
-    if user_id and club_id:
+    if user_id:
         user = get_object_or_404(User.objects, id=user_id)
+    if club_id:
         club = get_object_or_404(Club.objects, id=club_id)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
