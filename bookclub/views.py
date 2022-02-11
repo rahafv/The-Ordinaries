@@ -124,6 +124,26 @@ def add_review(request, book_id):
 
     return render(request, 'book_details.html', {'book':reviewed_book})
 
+# @login_required
+# def edit_review(request, book_id):
+#     reviewed_book = get_object_or_404(Book.objects, id=book_id)
+#     review_user = request.user
+#     if reviewed_book.ratings.all().filter(user=review_user).exists():
+#         return HttpResponseForbidden()
+        
+#     if request.method == 'POST':
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             form.instance.user = review_user
+#             form.instance.book = reviewed_book
+#             form.save(review_user, reviewed_book)
+#             messages.add_message(request, messages.SUCCESS, "you successfully edited your review.")
+#             return redirect('book_details', book_id=reviewed_book.id)
+
+#     messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+
+#     return render(request, 'book_details.html', {'book':reviewed_book})
+
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -256,11 +276,38 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+ 
 
-# def reviews_list(request,rating_id,book_id):
-#     ratings = Rating.objects.all()
-    
+@login_required
+def edit_user_review(request, rating_id):
+    review = Rating.objects.get(id = rating_id)
+    if (request.method == 'GET'):
+        form = RatingForm(instance = review) 
+        context = {
+            'form': form,
+            'rating_id':rating_id,
+        }
+        return render(request, 'book_details.html', context)
 
+    elif (request.method == 'POST'):
+        form = RatingForm(request.POST, instance=review)
+        if (form.is_valid()):
+            form_owner_detail= form.save(commit=False)
+            form_owner_detail.save()
+            review = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+            return redirect('book_detail', rating_id)
+            
+    data = {
+        'rating':review.rating,
+        'review': review.review,
+    }
+    form = RatingForm(data) 
+    context = {
+        'form': form,
+        'rating_id':rating_id,
+    }
+    return render(request, 'book_details.html', context)
 
 @login_required
 def edit_club_information(request, club_id):
@@ -296,4 +343,5 @@ def edit_club_information(request, club_id):
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
+
 
