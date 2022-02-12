@@ -260,6 +260,12 @@ def join_club(request, club_id):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page', club_id)
 
+
+    if(club.get_club_type_display() == "Private" and not club.is_applicant(user)):
+        club.applicants.add(user)
+        messages.add_message(request, messages.SUCCESS, "This club is private and you have successfully applied! ")
+        return redirect('club_page', club_id)
+
     club.members.add(user)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
@@ -315,11 +321,50 @@ def members_list(request, club_id):
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
 
+@login_required
+def applicants_list(request, club_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    is_member = club.is_member(current_user)
+    applicants = club.applicants.all()
+    if (is_member):
+        return render(request, 'applicants_list.html', {'applicants': applicants,'is_member': is_member, 'club': club, 'current_user': current_user }) 
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
+        return redirect('club_page', club_id)
+
+@login_required
+def accept_applicant(request, club_id, user_id):
+    current_user = request.user
+    if current_user is not None:
+        club = get_object_or_404(Club.objects, id=club_id)
+        applicant = get_object_or_404(User.objects, id=user_id)
+        club.members.add(applicant)
+        club.applicants.remove(applicant)
+        messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
+        return redirect('applicants_list', club_id)
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
+        return redirect('club_page', club_id)
+
+
+@login_required
+def reject_applicant(request, club_id, user_id):
+    current_user = request.user
+    if current_user is not None:
+        club = get_object_or_404(Club.objects, id=club_id)
+        applicant = get_object_or_404(User.objects, id=user_id)
+        club.applicants.remove(applicant)
+        messages.add_message(request, messages.SUCCESS, "Applicant rejected!")
+        return redirect('applicants_list', club_id)
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
+        return redirect('club_page', club_id)
+
+
 # def reviews_list(request,rating_id,book_id):
 #     ratings = Rating.objects.all()
     
-
-
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)

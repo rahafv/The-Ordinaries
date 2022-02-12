@@ -1,6 +1,7 @@
 from email.policy import default
 from pickle import FALSE
 from pyclbr import Class
+from queue import Empty
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -113,6 +114,11 @@ class Club(models.Model):
         related_name='clubs'
     )
 
+    applicants = models.ManyToManyField(
+        User, 
+        related_name='clubs_applied_to',
+    )
+
     theme = models.CharField(
         max_length=100, 
         blank=True
@@ -148,11 +154,21 @@ class Club(models.Model):
             self.members.add(member)
 
     def member_count(self):
-        return self.members.all().count()   
-    
+        return self.members.all().count() 
+
     def is_member(self, user):
         """ checks if the user is a member"""
-        return self.members.all().filter(id=user.id).exists()
+        return self.members.all().filter(id=user.id).exists()  
+    
+    def add_applicant(self, applicant):
+        self.applicants.add(applicant)
+
+    def applicants_count(self):
+        return self.applicants.all().count()   
+
+    def is_applicant(self, user):
+        """ checks if the user is a member"""
+        return self.applicants.all().filter(id=user.id).exists()
     
     def get_club_type_display(self):
         return self.club_type

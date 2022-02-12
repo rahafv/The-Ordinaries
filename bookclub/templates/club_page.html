@@ -7,7 +7,6 @@
         <h2 class="d-flex justify-content-center">{{ club.name }}</h2>
         {% if user == club.owner %}
           <span>
-            <!-- TODO: Add link to edit club here -->
             <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square"
             style="font-size: 1.8rem; color: grey;"></a>
           </span>
@@ -56,25 +55,32 @@
                   <a href="books/" class="btn btn-outline-dark">Book List</a>
                 </div>
               </div>
-              {%if is_member %}
+              {% if is_member %}
               <div class="card text-center">
                 <div class="card-body">
                   <a href='{% url 'members_list' club.id %}' class="btn btn-outline-dark"> Member List</a>  
                 </div>
               </div>
               {%endif%}
+              {% if user == club.owner and club.club_type == "Private" %}
+              <div class="card text-center">
+                <div class="card-body">
+                  <a href='{% url 'applicants_list' club.id %}' class="btn btn-outline-dark"> Applicant List</a>  
+                </div>
+              </div>
+              {% endif %}
               <!-- DO NOT FORGET TO ADD IF STATEMENTS-->
               <div class="card text-center">
                 <div class="card-body">
                   <div class="mb-3 pb-0">
                     {% if not user == club.owner and not is_member %}
-                      <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
+                    <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success">Join club</a> 
                     {% endif %}
                   </div>
                   
-                    <div class="mb-3 pb-0">
+                  <div class="mb-3 pb-0">
                     {% if not user == club.owner and is_member%}
-                      <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
+                    <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
                     {% endif %}   
                   </div>
                 </div>

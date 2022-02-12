@@ -7,7 +7,8 @@ from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTes
 class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the join club view."""
 
-    fixtures = ['bookclub/tests/fixtures/default_user.json',
+    fixtures = [
+        'bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',
         'bookclub/tests/fixtures/other_club.json',
         'bookclub/tests/fixtures/default_club.json'
@@ -54,6 +55,24 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         after_count = self.club.member_count()
         self.assertTrue(self.club.is_member(self.user))
         self.assertEqual(after_count, before_count + 1)
+        response_url = reverse('club_page', kwargs={'club_id': self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_success_message(response)
+        self.assert_menu(response)
+
+    def test_user_cannot_join_private_club(self):
+        self.club.club_type = Club.ClubType.PRIVATE
+        self.club.save()
+        self.client.login(username=self.user.username, password="Password123")
+        before_count = self.club.member_count()
+        applicants_before_count = self.club.applicants_count()
+        response = self.client.get(self.url, follow=True)
+        after_count = self.club.member_count()
+        applicants_after_count = self.club.applicants_count()
+        self.assertFalse(self.club.is_member(self.user))
+        self.assertTrue(self.club.is_applicant(self.user))
+        self.assertEqual(after_count, before_count)
+        self.assertEqual(applicants_after_count, applicants_before_count + 1)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
