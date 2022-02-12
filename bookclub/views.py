@@ -19,6 +19,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage 
 from system import settings
+from django.core.paginator import Paginator
+
 
 @login_prohibited
 def welcome(request):
@@ -283,32 +285,45 @@ def withdraw_club(request, club_id):
 
 @login_required
 def books_list(request, club_id=None, user_id=None):
-    books = Book.objects.all()
+    books_queryset = Book.objects.all()
     general = True
     if club_id:
-        books = Club.objects.get(id=club_id).books.all()
+        books_queryset = Club.objects.get(id=club_id).books.all()
         general = False
     if user_id:
-        books = User.objects.get(id=user_id).books.all()
+        books_queryset = User.objects.get(id=user_id).books.all()
         general = False
-        
-    return render(request, 'books.html', {'books': books, 'general': general})
+    
+    count = books_queryset.count()
+    books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+    page_number = request.GET.get('page')
+    books = books_pg.get_page(page_number)
+    return render(request, 'books.html', {'books': books, 'general': general, 'count': count})
 
 @login_required
 def clubs_list(request, user_id=None):
-    clubs = Club.objects.all()
+    clubs_queryset = Club.objects.all()
     general = True
     if user_id:
-        clubs = User.objects.get(id=user_id).clubs.all()
+        clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general})
+
+    count = clubs_queryset.count()
+    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    page_number = request.GET.get('page')
+    clubs = clubs_pg.get_page(page_number)
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count})
 
 @login_required
 def members_list(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
-    members = club.members.all()
+    members_queryset = club.members.all()
+    # count = members_queryset.count()
+    members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    members = members_pg.get_page(page_number)
     if (is_member):
         return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
     else:
