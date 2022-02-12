@@ -251,16 +251,17 @@ class Meeting(models.Model):
         related_name='meetings'
     )
 
-    # user = models.ForeignKey(
-    #     User, 
-    #     on_delete=models.CASCADE,
-    #     related_name='rotations'
-    # )
+    member = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='rotations',
+        blank=True
+    )
 
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='meetings'
+        related_name='meetings',
     )
 
     time = models.DateTimeField(
@@ -269,14 +270,19 @@ class Meeting(models.Model):
         null =False
     )
 
-    link = models.URLField(
-        max_length=1000,
-        blank=False
-    )
-
     notes = models.CharField(
         max_length=500,
         blank=True
+    )
+
+    start_url = models.URLField(
+        max_length=1000,
+        blank=True
+    )
+
+    join_url = models.URLField(
+        max_length=1000,
+        blank=False
     )
 
     

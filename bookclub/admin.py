@@ -21,4 +21,4 @@ class RatingAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ["title", "club", "book", "time", "link", "notes"]
+    list_display = ["title", "club", "time", "notes"]

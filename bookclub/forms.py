@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from email.policy import default
 from pickle import FALSE
+import random
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
@@ -139,7 +140,7 @@ class BookForm(forms.ModelForm):
                 self.add_error('ISBN', 'ISNB already exists')
 
     def save(self):
-        """Create a new user."""
+        """Create a new book."""
 
         super().save(commit=False)
 
@@ -243,7 +244,7 @@ class RatingForm(forms.ModelForm):
         }
 
     def save(self, reviwer, reviewedBook):
-        """Create a new user."""
+        """Create a new rating."""
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
@@ -261,19 +262,36 @@ class RatingForm(forms.ModelForm):
 
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
-    
-    # user = forms.ChoiceField(initial= "Select a member for the next book rotation", 
-    #     label = 'members',
-    #     required= True, 
-    # )
 
     class Meta:
         """Form options."""
 
         model = Meeting
-        fields = ['title', 'time', 'link','notes']
+        fields = ['title', 'time', 'notes']
         widgets = {
             'time': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
             'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
-        exclude = ['user', 'club', 'book']
+        exclude = ['club', 'book']
+
+    def __init__(self, club, *args, **kwargs):
+        self.club = club
+        super(MeetingForm, self).__init__(*args, **kwargs)
+        
+
+    def save(self, start, join):
+        """Create a new meeting."""
+
+        super().save(commit=False)
+        books = self.club.books.all()
+        meeting = Meeting.objects.create(
+            title = self.cleaned_data.get('title'),
+            club = self.club,
+            book = books.filter(id=random.randint(1,len(books))),
+            time = self.cleaned_data.get('time'),
+            notes = self.cleaned_data.get('notes'),
+            start_url = start,
+            join_url = join,
+        )
+        return meeting
+        

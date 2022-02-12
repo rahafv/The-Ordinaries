@@ -374,26 +374,37 @@ def zoom_auth(request):
     return redirect('schedule_meeting')
 
 def schedule_meeting(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    
     if request.method == 'POST':
-        form = MeetingForm(request.POST)
+        form = MeetingForm(club, request.POST)
+        
         if form.is_valid():
-            meeting = form.save()
+            invitees = []
+            for mem in club.members.all():
+                invitees.append({"email": mem.email})
 
-
-        # data = requests.post("https://api.zoom.us/v2/users/me/meetings", headers={
-        #     'content-type': "application/json",
-        #     "authorization": f"Bearer {request.session['zoom_access_token']}"
-        # }, data=json.dumps({
-        #     "topic": f"Discuss",
-        #     "type": 2,
-        #     "start_time": request.POST["time"],
-        # }))
-
-        # print(data.json()["join_url"], data.json()["start_url"])
-
+            data = requests.post("https://api.zoom.us/v2/users/me/meetings", 
+                headers={
+                    'content-type': "application/json",
+                    "authorization": f"Bearer {request.session['zoom_access_token']}"
+                }, 
+                data=json.dumps({
+                    "topic": f"{club.name} discussion",
+                    "type": 2,
+                    "start_time": request.POST["time"],
+                    "settings": {
+                        "meeting_invitees": invitees,
+                        "registrants_email_notification": True,
+                        "registrants_confirmation_email": True,
+                    }
+                })
+            )
+            form.save(data.json()["start_url"], data.json()["join_url"])
+            return redirect('club_page', club_id=club.id)
 
     else:
-        form = MeetingForm()
+        form = MeetingForm(club)
     return render(request, 'schedule_meeting.html', {'form': form})
 
 
