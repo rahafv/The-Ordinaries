@@ -212,13 +212,11 @@ class UserForm(forms.ModelForm):
 
     def save(self):
         """Save user."""
-
-        if self.is_valid():
-            birthdate= self.cleaned_data.get('date_of_birth')
-            new_age = self.calculate_age(birthdate)  
-            if(self.log_in_user is not None):
-                self.log_in_user.set_age(new_age)
-                return self.log_in_user
+        super().save(commit=False) 
+        birthdate= self.cleaned_data.get('date_of_birth')
+        new_age = self.calculate_age(birthdate)  
+        self.log_in_user.set_age(new_age)
+        return self.log_in_user
       
 
 class ClubForm(forms.ModelForm):

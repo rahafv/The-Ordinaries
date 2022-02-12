@@ -323,15 +323,7 @@ def members_list(request, club_id):
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)
-    if (request.method == 'GET'):
-        form = ClubForm(instance = club) 
-        context = {
-            'form': form,
-            'club_id':club_id,
-        }
-        return render(request, 'edit_club_info.html', context)
-
-    elif (request.method == 'POST'):
+    if(request.method == "POST"):
         form = ClubForm(request.POST, instance=club)
         if (form.is_valid()):
             form_owner_detail= form.save(commit=False)
@@ -340,18 +332,10 @@ def edit_club_information(request, club_id):
             club = form.save()
             messages.add_message(request, messages.SUCCESS, "Successfully updated club information!")
             return redirect('club_page', club_id)
-            
-    data = {
-        'name':club.name,
-        'theme': club.theme,
-        'meeting_type':club.meeting_type,
-        'city': club.city,
-        'country':club.country,
-    }
-    form = ClubForm(data) 
+    else:
+        form = ClubForm(instance = club) 
     context = {
         'form': form,
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
-
