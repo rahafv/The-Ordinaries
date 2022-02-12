@@ -1,4 +1,6 @@
 from email.policy import default
+from pickle import FALSE
+from pyclbr import Class
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -94,6 +96,17 @@ class Club(models.Model):
         User, 
         on_delete=models.CASCADE
     )
+
+    class ClubType(models.TextChoices):
+        PRIVATE =  "Private"
+        PUBLIC =  "Public"
+
+    club_type = models.CharField(
+        max_length = 7,
+        choices = ClubType.choices, 
+        default=ClubType.PUBLIC, 
+        blank = False
+    )
     
     members = models.ManyToManyField(
         User, 
@@ -140,7 +153,9 @@ class Club(models.Model):
     def is_member(self, user):
         """ checks if the user is a member"""
         return self.members.all().filter(id=user.id).exists()
-
+    
+    def get_club_type_display(self):
+        return self.club_type
 
 class Book(models.Model):
     """Book model."""

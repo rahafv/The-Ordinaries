@@ -8,6 +8,7 @@
           "members": [2, 4],
           "theme": "Fictional superheros",
           "meeting_type": "OL", 
+          "club_type": "Public", 
           "city": "nyc",
           "country": "usa"
         }
