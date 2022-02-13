@@ -94,8 +94,9 @@ class CreateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme', 'meeting_type', 'city', 'country']
-        widgets = {"meeting_type": forms.Select()}
+        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
+        labels = {'club_type': "Select Club Privacy Status"}
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
@@ -226,7 +227,8 @@ class ClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme','meeting_type', 'city','country']
+        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        labels = {'club_type': "Club Privacy Setting:"}
         exclude = ['owner']
 
 

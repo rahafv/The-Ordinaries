@@ -1,3 +1,4 @@
+from operator import is_
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -189,7 +190,8 @@ def club_page(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(), 'is_member': is_member})
+    is_applicant = club.is_applicant(current_user)
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
 
 @login_required
 def add_book(request):
@@ -287,6 +289,16 @@ def join_club(request, club_id):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page', club_id)
 
+
+    if(club.get_club_type_display() == "Private"):
+        if not club.is_applicant(user):
+            club.applicants.add(user)
+            messages.add_message(request, messages.SUCCESS, "You have successfully applied!")
+            return redirect('club_page', club_id)
+        else:
+            messages.add_message(request, messages.ERROR, "Already applied, awaiting approval!")
+            return redirect('club_page', club_id)
+
     club.members.add(user)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
@@ -355,11 +367,51 @@ def members_list(request, club_id):
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
 
+@login_required
+def applicants_list(request, club_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicants = club.applicants.all()
+    is_owner = (club.owner == current_user)
+    if (is_owner):
+        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user }) 
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
+        return redirect('club_page', club_id)
+
+@login_required
+def accept_applicant(request, club_id, user_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicant = get_object_or_404(User.objects, id=user_id)
+    if(current_user == club.owner):
+        club.members.add(applicant)
+        club.applicants.remove(applicant)
+        messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
+        return redirect('applicants_list', club_id)
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
+        return redirect('club_page', club_id)
+
+
+
+@login_required
+def reject_applicant(request, club_id, user_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicant = get_object_or_404(User.objects, id=user_id)
+    if(current_user == club.owner):
+        club.applicants.remove(applicant)
+        messages.add_message(request, messages.WARNING, "Applicant rejected!")
+        return redirect('applicants_list', club_id)
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
+        return redirect('club_page', club_id)
+
+
 # def reviews_list(request,rating_id,book_id):
 #     ratings = Rating.objects.all()
     
-
-
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)
