@@ -33,10 +33,10 @@
                          <a href='{% url 'profile' club.id applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>
                         </td>
                         <td>
-                            <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Accept</a> 
+                            <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-success" style="color: green" >Accept</a> 
                         </td>
                         <td>
-                            <a href='{% url 'reject_applicant' club.id applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Reject</a>   
+                            <a href='{% url 'reject_applicant' club.id applicant.id %}' class="btn btn-outline-danger" style="color: red" >Reject</a>   
                         </td>
                         {% endif %}
                     </tr>
