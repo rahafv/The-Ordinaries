@@ -1,21 +1,18 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import reverse_with_next
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
-from bookclub.views import accept_applicant
 
-class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
 
     fixtures=[
-        'bookclub/tests/fixtures/default_club.json',
+        'bookclub/tests/fixtures/other_club.json',
         'bookclub/tests/fixtures/other_users.json'
     ]
 
     def setUp(self):
         self.user = User.objects.get(id=3)
-        self.club = Club.objects.get(id=1)
-        self.club.club_type = Club.ClubType.PRIVATE
+        self.club = Club.objects.get(id=2)
         self.url = reverse('applicants_list', kwargs={'club_id': self.club.id})
 
     def test_applicants_list_url(self):
@@ -39,7 +36,6 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'applicants_list.html')
         self.assertEqual(len(response.context['applicants']), 15)
-        members_count = self.club.member_count
         for user_id in range(15):
             self.assertContains(response, f'user{user_id}')
             self.assertContains(response, f'First{user_id} Last{user_id}')

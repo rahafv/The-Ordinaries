@@ -1,3 +1,4 @@
+from operator import is_
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -325,10 +326,10 @@ def members_list(request, club_id):
 def applicants_list(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
-    is_member = club.is_member(current_user)
     applicants = club.applicants.all()
-    if (is_member):
-        return render(request, 'applicants_list.html', {'applicants': applicants,'is_member': is_member, 'club': club, 'current_user': current_user }) 
+    is_owner = (club.owner == current_user)
+    if (is_owner):
+        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user }) 
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
         return redirect('club_page', club_id)
@@ -336,9 +337,9 @@ def applicants_list(request, club_id):
 @login_required
 def accept_applicant(request, club_id, user_id):
     current_user = request.user
-    if current_user is not None:
-        club = get_object_or_404(Club.objects, id=club_id)
-        applicant = get_object_or_404(User.objects, id=user_id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicant = get_object_or_404(User.objects, id=user_id)
+    if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
@@ -348,14 +349,15 @@ def accept_applicant(request, club_id, user_id):
         return redirect('club_page', club_id)
 
 
+
 @login_required
 def reject_applicant(request, club_id, user_id):
     current_user = request.user
-    if current_user is not None:
-        club = get_object_or_404(Club.objects, id=club_id)
-        applicant = get_object_or_404(User.objects, id=user_id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicant = get_object_or_404(User.objects, id=user_id)
+    if(current_user == club.owner):
         club.applicants.remove(applicant)
-        messages.add_message(request, messages.SUCCESS, "Applicant rejected!")
+        messages.add_message(request, messages.WARNING, "Applicant rejected!")
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )

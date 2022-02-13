@@ -14,7 +14,7 @@
                     <th class="th-sm">Age</th>
                 </tr>
                 </thead>
-                {%if is_member %}
+                {%if is_owner %}
                 {% for applicant in applicants %}
                     <tr style="background-color: white">
                         {% if app == current_user %}
