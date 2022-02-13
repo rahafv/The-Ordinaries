@@ -144,6 +144,8 @@ class Club(models.Model):
         max_length=50,
         blank=True
     )
+    class Meta:
+        ordering = ['name']
 
     def location(self):
         """Return full location."""
@@ -220,6 +222,9 @@ class Book(models.Model):
         Club, 
         related_name='books'
     )
+    
+    class Meta:
+        ordering = ['title']
 
     def add_reader(self, reader):
         if not self.readers.all().filter(id=reader.id).exists():

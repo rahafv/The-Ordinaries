@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'bootstrap_pagination',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -151,6 +152,11 @@ MESSAGE_TAGS = {
     message_constants.DEBUG:"dark",
     message_constants.ERROR:"danger",
 }
+
+# Page lengths
+BOOKS_PER_PAGE = 15
+CLUBS_PER_PAGE = 15
+MEMBERS_PER_PAGE = 50
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
