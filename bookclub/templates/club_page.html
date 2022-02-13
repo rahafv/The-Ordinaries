@@ -76,7 +76,7 @@
                     {% if not user == club.owner and not is_member and not is_applicant%}
                     <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button">Join club</a> 
                     {% elif is_applicant and not is_member %}
-                    <label class =  "status_label" id = "status_label">Awaiting approval!</label>
+                    <b>Awaiting approval!</b>
                     {% endif %}
                   
                   </div>

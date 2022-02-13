@@ -16,7 +16,6 @@ class ShowClubViewTestCase(TestCase, LoginRedirectTester , MenueTestMixin):
         self.club = Club.objects.get(id=1)
         self.url = reverse("club_page", kwargs={"club_id": self.club.id})
         self.owner = User.objects.get(username="janedoe")
-        self.applicant = User.objects.get(username ="willsmith")
 
     def test_club_page_url(self):
         self.assertEqual(self.url, f"/club/{self.club.id}/")
@@ -27,19 +26,6 @@ class ShowClubViewTestCase(TestCase, LoginRedirectTester , MenueTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_page.html")
         self.assert_menu(response)
-    
-    def test_get_club_page_with_valid_id_for_applicant(self):
-        self.club.club_type = Club.ClubType.PRIVATE
-        self.club.save()
-        self.client.login(username=self.applicant.username, password="Password123")
-        self.club.add_applicant(self.applicant)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "club_page.html")
-        self.assert_menu(response)
-        self.assertHTML(response, element_id ='status_labe')
-        self.assertNotHTML(response, element_id = 'join_club_view')
-
 
     def test_get_club_page_with_invalid_id(self):
         self.client.login(username=self.owner.username, password="Password123")
