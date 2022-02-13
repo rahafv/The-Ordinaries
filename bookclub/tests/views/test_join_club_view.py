@@ -20,6 +20,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.owner = User.objects.get(username="janedoe")
         self.member = User.objects.get(username="peterpickles")
         self.user = User.objects.get(username="edgaralen")
+        self.applicant = User.objects.get(username = "willsmith")
 
 
     def test_join_url(self):
@@ -60,7 +61,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.assert_success_message(response)
         self.assert_menu(response)
 
-    def test_user_cannot_join_private_club(self):
+    def test_user_cannot_join_private_club_before_approval(self):
         self.club.club_type = Club.ClubType.PRIVATE
         self.club.save()
         self.client.login(username=self.user.username, password="Password123")
@@ -77,6 +78,26 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
         self.assert_menu(response)
+    
+    def test_applicant_cannot_re_apply_for_private_clubs(self):
+        self.club.club_type = Club.ClubType.PRIVATE
+        self.club.save()
+        self.club.add_applicant(self.applicant)
+        self.client.login(username=self.applicant.username, password="Password123")
+        before_count = self.club.member_count()
+        applicants_before_count = self.club.applicants_count()
+        response = self.client.get(self.url, follow=True)
+        after_count = self.club.member_count()
+        applicants_after_count = self.club.applicants_count()
+        self.assertFalse(self.club.is_member(self.applicant))
+        self.assertTrue(self.club.is_applicant(self.applicant))
+        self.assertEqual(after_count, before_count)
+        self.assertEqual(applicants_after_count, applicants_before_count)
+        response_url = reverse('club_page', kwargs={'club_id': self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_error_message(response)
+        self.assert_menu(response)
+
 
 
     def test_join_club_with_invalid_id(self):

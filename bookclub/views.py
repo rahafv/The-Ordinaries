@@ -190,7 +190,8 @@ def club_page(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member})
+    is_applicant = club.is_applicant(current_user)
+    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
 
 @login_required
 def add_book(request):
@@ -264,10 +265,14 @@ def join_club(request, club_id):
         return redirect('club_page', club_id)
 
 
-    if(club.get_club_type_display() == "Private" and not club.is_applicant(user)):
-        club.applicants.add(user)
-        messages.add_message(request, messages.SUCCESS, "This club is private and you have successfully applied! ")
-        return redirect('club_page', club_id)
+    if(club.get_club_type_display() == "Private"):
+        if not club.is_applicant(user):
+            club.applicants.add(user)
+            messages.add_message(request, messages.SUCCESS, "This club is private and you have successfully applied! ")
+            return redirect('club_page', club_id)
+        else:
+            messages.add_message(request, messages.ERROR, "Already applied, awaiting approval!")
+            return redirect('club_page', club_id)
 
     club.members.add(user)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
