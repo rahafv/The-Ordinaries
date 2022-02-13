@@ -206,7 +206,7 @@ def add_book(request):
     return render(request, "add_book.html", {"form": form})
 
 @login_required
-def book_details(request, book_id): 
+def book_details(request, book_id) : 
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
     reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
@@ -214,7 +214,7 @@ def book_details(request, book_id):
     if rating:
         rating = rating[0]
     reviews_count = book.ratings.all().exclude(review = "").exclude( user=request.user).count()
-    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count})
+    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count })
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
@@ -223,9 +223,9 @@ def show_profile_page(request, user_id = None, club_id = None):
     
     if user_id == request.user.id:
         return redirect('profile') 
-    
-    if user_id and club_id:
+    if user_id:
         user = get_object_or_404(User.objects, id=user_id)
+    if club_id:
         club = get_object_or_404(Club.objects, id=club_id)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
@@ -254,6 +254,31 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
+
+# class ReviewUpdateView(LoginRequiredMixin,UpdateView):
+#     """View to update a submitted user review"""
+
+#     model = RatingForm
+#     template_name = "book_details.html"
+#     form_class = RatingForm
+
+#     def get_form_kwargs(self):
+#         """ Passes the request object to the form class.
+#          This is necessary to update the date_of_birth of the given user"""
+
+#         kwargs = super(ReviewUpdateView, self).get_form_kwargs()
+#         kwargs['user'] = self.request.user
+#         return kwargs
+
+#     def get_object(self):
+#         """Return the object (user) to be updated."""
+#         user = self.request.user
+#         return user
+
+#     def get_success_url(self):
+#         """Return redirect URL after successful update."""
+#         messages.add_message(self.request, messages.SUCCESS, "Review updated!")
+#         return reverse('book_details')
         
 @login_required
 def join_club(request, club_id):
