@@ -3,7 +3,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
@@ -427,16 +427,19 @@ def edit_club_information(request, club_id):
     return render(request, 'edit_club_info.html', context)
 
 @login_required
-def edit_review(request , review_id ):
+def edit_review(request, review_id ):
     review =get_object_or_404(Rating.objects , id=review_id)
+   # book =get_object_or_404(Book.objects , id=book_id)
+    print(2)
     if(request.method == "POST"):
-        form = RatingForm(data = request.POST, instance=review)
+        form = EditRatingForm(data = request.POST, instance=review)
         if (form.is_valid()):
-            book = form.save()
+            form.save()
             messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
-            # return redirect('book_details', book_id= book.id)
-            return redirect('home')
+            return redirect('book_details', book_id= review.book.id)
+          
+            
     else:
         form = RatingForm(instance = review) 
 
-    return render(request, 'edit_review.html', {'form' : form , 'review':review })
+    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
