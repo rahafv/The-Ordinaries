@@ -16,7 +16,7 @@
                             <h3 class="profile-title">{{ user.full_name }}</h3>
                             <br/>
                             <span class = "profile-username">{{user.username}}</span>
-                            {% if current_user == club.owner or current_user == user%}
+                            {% if current_user == user%}
                                 <span class = "profile-email">{{user.email}}</span>
                             {% endif %}
                             <br/>
@@ -52,9 +52,9 @@
                             <span class="float-end">
                               {% if followable %}
                                 {% if following %}
-                                  <a href="{% url 'follow_toggle' user_id=user.id club_id=club.id %}" class="btn btn-secondary">Unfollow</a> 
+                                  <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary">Unfollow</a> 
                                 {% else %}
-                                <a href="{% url 'follow_toggle' user_id=user.id club_id=club.id %}" class="btn btn-primary">Follow</a> 
+                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary">Follow</a> 
                                 {% endif %}
                               {% endif %}
                             </span>

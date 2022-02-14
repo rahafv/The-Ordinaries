@@ -52,7 +52,7 @@ class MessageTester:
 class MenueTestMixin(AssertHTMLMixin):
     menu_urls = [
       reverse('password') ,
-      reverse('logged_in_user_profile') ,
+      reverse('profile') ,
       reverse('books_list') , 
       reverse('clubs_list'),
       reverse('log_out')
