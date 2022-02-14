@@ -20,12 +20,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage 
 from system import settings
-<<<<<<< HEAD
-from django.core.mail import send_mail
-=======
 from django.core.paginator import Paginator
 
->>>>>>> 05d3687d8e3a3c6ead3c424c57c5068d27de2e66
 
 @login_prohibited
 def welcome(request):
@@ -61,15 +57,13 @@ def send_activiation_email(request, user_id):
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
             'token':generate_token.make_token(user)}
         )
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [user.email]
-        send_mail(email_subject, email_body, email_from, recipient_list)
+        
 
 
-        # email = EmailMessage(subject=email_subject, body=email_body, 
-        # from_email=settings.EMAIL_HOST_USER, to=[user.email])
+        email = EmailMessage(subject=email_subject, body=email_body, 
+        from_email=settings.EMAIL_HOST_USER, to=[user.email])
 
-        # email.send()
+        email.send()
         messages.add_message(request, messages.WARNING, 'Your email needs verification!')
     else:
         messages.add_message(request, messages.WARNING, 'Email is already verified!')
