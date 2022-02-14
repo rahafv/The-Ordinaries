@@ -49,6 +49,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.assertEqual(count_clubs_before, Rating.objects.count())
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_review.html")
+        self.assert_error_message(response)
 
 
     def test_successful_review_update(self):
