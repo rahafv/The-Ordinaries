@@ -42,7 +42,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
 
         for applicant in self.club.applicants.all():
             if applicant.id != self.user.id:
-                applicant_profile_url = reverse('profile', kwargs={'club_id': self.club.id, 'user_id': applicant.id })
+                applicant_profile_url = reverse('profile', kwargs={'user_id': applicant.id })
                 self.assertContains(response, applicant_profile_url)
         
         for applicant in self.club.applicants.all():

@@ -185,27 +185,6 @@ def add_review(request, book_id):
 
     return render(request, 'book_details.html', {'book':reviewed_book})
 
-# @login_required
-# def edit_review(request, book_id):
-#     reviewed_book = get_object_or_404(Book.objects, id=book_id)
-#     review_user = request.user
-#     if reviewed_book.ratings.all().filter(user=review_user).exists():
-#         return HttpResponseForbidden()
-        
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             form.instance.user = review_user
-#             form.instance.book = reviewed_book
-#             form.save(review_user, reviewed_book)
-#             messages.add_message(request, messages.SUCCESS, "you successfully edited your review.")
-#             return redirect('book_details', book_id=reviewed_book.id)
-
-#     messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
-
-#     return render(request, 'book_details.html', {'book':reviewed_book})
-
-
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -238,18 +217,20 @@ def book_details(request, book_id) :
     return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count })
 
 @login_required
-def show_profile_page(request, user_id = None, club_id = None):
+def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-    club = None
-    
+
     if user_id == request.user.id:
         return redirect('profile') 
+
     if user_id:
         user = get_object_or_404(User.objects, id=user_id)
-    if club_id:
-        club = get_object_or_404(Club.objects, id=club_id)
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
+    following = request.user.is_following(user)
+    followable = (request.user != user)
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
+
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -275,7 +256,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
-        
+
 @login_required
 def join_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -443,3 +424,10 @@ def edit_review(request, review_id ):
         form = EditRatingForm(instance = review) 
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
+
+@login_required
+def follow_toggle(request, user_id):
+    current_user = request.user
+    followee = get_object_or_404(User.objects, id=user_id)
+    current_user.toggle_follow(followee)
+    return redirect('profile', followee.id) 

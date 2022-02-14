@@ -43,7 +43,7 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
 
         for member in self.club.members.all():
             if member.id != self.user.id:
-                member_profile_url = reverse('profile', kwargs={'club_id': self.club.id, 'user_id': member.id })
+                member_profile_url = reverse('profile', kwargs={ 'user_id': member.id })
                 self.assertContains(response, member_profile_url)
         self.assert_menu(response)
     
