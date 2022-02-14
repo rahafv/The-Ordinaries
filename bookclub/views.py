@@ -429,17 +429,17 @@ def edit_club_information(request, club_id):
 @login_required
 def edit_review(request, review_id ):
     review =get_object_or_404(Rating.objects , id=review_id)
-   # book =get_object_or_404(Book.objects , id=book_id)
-    print(2)
+    reviewed_book = get_object_or_404(Book.objects, id=review.book_id)
+    review_user = request.user
     if(request.method == "POST"):
         form = EditRatingForm(data = request.POST, instance=review)
         if (form.is_valid()):
-            form.save()
+            form.instance.user = review_user
+            form.instance.book = reviewed_book
+            form.save(review_user, reviewed_book)
             messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
             return redirect('book_details', book_id= review.book.id)
-          
-            
     else:
-        form = RatingForm(instance = review) 
+        form = EditRatingForm(instance = review) 
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
