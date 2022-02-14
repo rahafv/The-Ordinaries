@@ -4,6 +4,7 @@ cssselect==1.1.0
 Django==3.2.5
 django-bootstrap-pagination==1.7.1
 django-bootstrap3==21.2
+django-environ==0.8.1
 django-isbn-field==0.5.3
 django-widget-tweaks==1.4.8
 django-with-asserts==0.0.1
