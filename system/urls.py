@@ -36,9 +36,10 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
+   
     path('profile/', views.show_profile_page , name='profile'),
     path('profile/<int:user_id>', views.show_profile_page , name='profile'),
-    path('club/<int:club_id>/members/<int:user_id>', views.show_profile_page , name='profile'),
+    
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
     path('create_club/', views.create_club , name='create_club'),
@@ -62,6 +63,8 @@ urlpatterns = [
     path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
     path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+    path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
+
 
 ]
 

@@ -30,7 +30,7 @@
                         </td> 
                         {% if applicant != current_user%}
                         <td> 
-                         <a href='{% url 'profile' club.id applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>
+                         <a href='{% url 'profile' applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>
                         </td>
                         <td>
                             <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-success" style="color: green" >Accept</a> 

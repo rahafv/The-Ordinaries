@@ -217,18 +217,20 @@ def book_details(request, book_id) :
     return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count })
 
 @login_required
-def show_profile_page(request, user_id = None, club_id = None):
+def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-    club = None
-    
+
     if user_id == request.user.id:
         return redirect('profile') 
+
     if user_id:
         user = get_object_or_404(User.objects, id=user_id)
-    if club_id:
-        club = get_object_or_404(Club.objects, id=club_id)
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
+    following = request.user.is_following(user)
+    followable = (request.user != user)
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
+
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -255,6 +257,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
 
+
 # class ReviewUpdateView(LoginRequiredMixin,UpdateView):
 #     """View to update a submitted user review"""
 
@@ -279,7 +282,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
 #         """Return redirect URL after successful update."""
 #         messages.add_message(self.request, messages.SUCCESS, "Review updated!")
 #         return reverse('book_details')
-        
+
 @login_required
 def join_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -431,3 +434,11 @@ def edit_club_information(request, club_id):
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
+
+
+@login_required
+def follow_toggle(request, user_id):
+    current_user = request.user
+    followee = get_object_or_404(User.objects, id=user_id)
+    current_user.toggle_follow(followee)
+    return redirect('profile', followee.id) 

@@ -30,7 +30,7 @@
                             </td>
                             {% if member != current_user%}
                              <td> 
-                                <a href='{% url 'profile' club.id member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
+                                <a href='{% url 'profile' member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
                             </td>
                             {% endif %}
                         </tr>
