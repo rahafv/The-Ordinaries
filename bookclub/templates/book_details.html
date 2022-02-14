@@ -40,8 +40,7 @@
                 <br>
                 <b class="mb-4"> Your review: </b> {{ rating.review  }} 
                 <!-- TODO: add link to edit review here. -->
-
-                {% comment %} <a herf='edit_review' class="btn btn-outline-dark mb-3"> Edit </a> {% endcomment %}
+                <a  href="{% url 'edit_review' review.id%}" class="btn btn-outline-dark mb-3"> Edit </a>
 
               </div>
             {% endif %}

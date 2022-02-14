@@ -205,6 +205,7 @@ def add_review(request, book_id):
 
 #     return render(request, 'book_details.html', {'book':reviewed_book})
 
+
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -274,31 +275,6 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
-
-# class ReviewUpdateView(LoginRequiredMixin,UpdateView):
-#     """View to update a submitted user review"""
-
-#     model = RatingForm
-#     template_name = "book_details.html"
-#     form_class = RatingForm
-
-#     def get_form_kwargs(self):
-#         """ Passes the request object to the form class.
-#          This is necessary to update the date_of_birth of the given user"""
-
-#         kwargs = super(ReviewUpdateView, self).get_form_kwargs()
-#         kwargs['user'] = self.request.user
-#         return kwargs
-
-#     def get_object(self):
-#         """Return the object (user) to be updated."""
-#         user = self.request.user
-#         return user
-
-#     def get_success_url(self):
-#         """Return redirect URL after successful update."""
-#         messages.add_message(self.request, messages.SUCCESS, "Review updated!")
-#         return reverse('book_details')
         
 @login_required
 def join_club(request, club_id):
@@ -430,9 +406,6 @@ def reject_applicant(request, club_id, user_id):
         return redirect('club_page', club_id)
 
 
-# def reviews_list(request,rating_id,book_id):
-#     ratings = Rating.objects.all()
-    
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)
@@ -452,3 +425,18 @@ def edit_club_information(request, club_id):
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
+
+@login_required
+def edit_review(request , review_id ):
+    review =get_object_or_404(Rating.objects , id=review_id)
+    if(request.method == "POST"):
+        form = RatingForm(data = request.POST, instance=review)
+        if (form.is_valid()):
+            book = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+            # return redirect('book_details', book_id= book.id)
+            return redirect('home')
+    else:
+        form = RatingForm(instance = review) 
+
+    return render(request, 'edit_review.html', {'form' : form , 'review':review })
