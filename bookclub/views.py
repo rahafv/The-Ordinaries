@@ -181,7 +181,7 @@ def add_review(request, book_id):
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
-    messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+    messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
 
     return render(request, 'book_details.html', {'book':reviewed_book})
 
@@ -439,6 +439,7 @@ def edit_review(request, review_id ):
             form.save(review_user, reviewed_book)
             messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
             return redirect('book_details', book_id= review.book.id)
+        messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
     else:
         form = EditRatingForm(instance = review) 
 
