@@ -43,6 +43,22 @@
                             <a class = "btn btn-lg btn-outline-dark" href ="{% url 'edit_profile'%}" role = "button">Edit profile</a>
                         </div>
                         {% endif %}
+                        <p class="profile-statistics">
+                            <span>
+                              <b>{{ user.followee_count }}</b> Following
+                              &emsp;
+                              <b>{{ user.follower_count }}</b> Followers
+                            </span>
+                            <span class="float-end">
+                              {% if followable %}
+                                {% if following %}
+                                  <a href="{% url 'follow_toggle' user_id=user.id club_id=club.id %}" class="btn btn-secondary">Unfollow</a> 
+                                {% else %}
+                                <a href="{% url 'follow_toggle' user_id=user.id club_id=club.id %}" class="btn btn-primary">Follow</a> 
+                                {% endif %}
+                              {% endif %}
+                            </span>
+                          </p>
                     </div>
                 </div>
                 </div>

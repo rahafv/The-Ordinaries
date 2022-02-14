@@ -19,6 +19,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage 
 from system import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_prohibited
 def welcome(request):
@@ -214,17 +215,24 @@ def book_details(request, book_id):
 
 @login_required
 def show_profile_page(request, user_id = None, club_id = None):
-    user = get_object_or_404(User.objects, id=request.user.id)
+    user = get_object_or_404(User.objects, id=user_id)
+    current_user = request.user
     club = None
-    
+    following = request.user.is_following(user)
+    followable = (request.user != user)
     if user_id == request.user.id:
         return redirect('profile') 
-    
     if user_id and club_id:
         user = get_object_or_404(User.objects, id=user_id)
         club = get_object_or_404(Club.objects, id=club_id)
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club, 'following': following, 'followable': followable})
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'club': club})
+@login_required
+def logged_in_user_profile(request):
+    return render(request, 'profile_page.html', {'current_user': request.user, 'user': request.user, 'club': None, 'following': None, 'followable': None})
+
+
+
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -249,7 +257,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     def get_success_url(self):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
-        return reverse('profile')
+        return reverse('logged_in_user_profile')
         
 @login_required
 def join_club(request, club_id):
@@ -355,3 +363,11 @@ def edit_club_information(request, club_id):
     }
     return render(request, 'edit_club_info.html', context)
 
+
+@login_required
+def follow_toggle(request, user_id, club_id):
+    current_user = request.user
+    followee = get_object_or_404(User.objects, id=user_id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    current_user.toggle_follow(followee)
+    return redirect('profile', club_id, user_id) 

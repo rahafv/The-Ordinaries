@@ -122,7 +122,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
-        response_url = reverse('profile')
+        response_url = reverse('logged_in_user_profile')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile_page.html')
         self.assert_success_message(response)

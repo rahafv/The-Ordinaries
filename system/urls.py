@@ -36,7 +36,7 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
-    path('profile/', views.show_profile_page , name='profile'),
+    path('profile/', views.logged_in_user_profile , name='logged_in_user_profile'),
     path('club/<int:club_id>/members/<int:user_id>', views.show_profile_page , name='profile'),
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
@@ -57,6 +57,8 @@ urlpatterns = [
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+    path('follow_toggle/<int:user_id>/<int:club_id>', views.follow_toggle, name='follow_toggle'),
+
 ]
 
 handler404 = 'bookclub.views.handler404'

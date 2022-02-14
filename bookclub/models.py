@@ -59,6 +59,10 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
+
+    followers = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followees'
+    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -80,6 +84,38 @@ class User(AbstractUser):
     def set_age(self,new_age):
         self.age = new_age
         return self.save()
+
+    def toggle_follow(self, followee):
+        """Toggles whether self follows the given followee."""
+        #cant follow and unfollow self
+        if followee==self:
+            return
+        #if following, unfollow
+        if self.is_following(followee):
+            self._unfollow(followee)
+        else:
+            self._follow(followee)
+
+    def _follow(self, user):
+        user.followers.add(self)
+
+    def _unfollow(self, user):
+        user.followers.remove(self)
+
+    def is_following(self, user):
+        """Returns whether self follows the given user."""
+
+        return user in self.followees.all()
+
+    def follower_count(self):
+        """Returns the number of followers of self."""
+
+        return self.followers.count()
+
+    def followee_count(self):
+        """Returns the number of followees of self."""
+
+        return self.followees.count()
 
 class Club(models.Model):
     """Club model."""
