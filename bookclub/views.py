@@ -185,27 +185,6 @@ def add_review(request, book_id):
 
     return render(request, 'book_details.html', {'book':reviewed_book})
 
-# @login_required
-# def edit_review(request, book_id):
-#     reviewed_book = get_object_or_404(Book.objects, id=book_id)
-#     review_user = request.user
-#     if reviewed_book.ratings.all().filter(user=review_user).exists():
-#         return HttpResponseForbidden()
-        
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             form.instance.user = review_user
-#             form.instance.book = reviewed_book
-#             form.save(review_user, reviewed_book)
-#             messages.add_message(request, messages.SUCCESS, "you successfully edited your review.")
-#             return redirect('book_details', book_id=reviewed_book.id)
-
-#     messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
-
-#     return render(request, 'book_details.html', {'book':reviewed_book})
-
-
 @login_required
 def club_page(request, club_id):
     current_user = request.user
@@ -278,6 +257,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
 <<<<<<< HEAD
+<<<<<<< HEAD
         
 =======
 
@@ -308,6 +288,9 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
 #         return reverse('book_details')
 
 >>>>>>> ad011967c93d3e95688e06a3d03683cfac97445f
+=======
+
+>>>>>>> a8b01e39ba633fbbed29f98f9b38dbea774f3217
 @login_required
 def join_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -459,6 +442,9 @@ def edit_club_information(request, club_id):
     return render(request, 'edit_club_info.html', context)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a8b01e39ba633fbbed29f98f9b38dbea774f3217
 @login_required
 def edit_review(request, review_id ):
     review =get_object_or_404(Rating.objects , id=review_id)
@@ -477,7 +463,10 @@ def edit_review(request, review_id ):
         form = EditRatingForm(instance = review) 
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> a8b01e39ba633fbbed29f98f9b38dbea774f3217
 
 @login_required
 def follow_toggle(request, user_id):
@@ -485,4 +474,7 @@ def follow_toggle(request, user_id):
     followee = get_object_or_404(User.objects, id=user_id)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id) 
+<<<<<<< HEAD
 >>>>>>> ad011967c93d3e95688e06a3d03683cfac97445f
+=======
+>>>>>>> a8b01e39ba633fbbed29f98f9b38dbea774f3217
