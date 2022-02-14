@@ -242,6 +242,19 @@ class EditRatingForm(forms.ModelForm):
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
     
+    def calculate_rating(self, rating): 
+        return rating*2
+
+    def save(self , reviwer, reviewedBook):
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0 
+        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+        )
+        return review
 
 
 class RatingForm(forms.ModelForm):
@@ -254,20 +267,6 @@ class RatingForm(forms.ModelForm):
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
-    def calculate_rating(self, rating): 
-        return rating*2
-
-    def save(self , reviwer, reviewedBook):
-        super().save(commit=False)
-        rate = self.cleaned_data.get('rating')
-        if not rate:
-            rate = 0 
-        #Rating.objects.filter(user_id = reviwer , bood_id =reviewedBook ).update(rating=self.calculate_rating(rate),review=self.cleaned_data.get('review'))
-        review = Rating.objects.filter(user = reviwer , bood =reviewedBook).update(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
-        )
-        return review
         
     def save(self, reviwer, reviewedBook):
         """Create a new user."""
