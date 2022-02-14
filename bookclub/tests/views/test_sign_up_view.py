@@ -56,12 +56,12 @@ class SignUpViewTestCase(TestCase, LogInTester,MenueTestMixin):
     def test_succesful_sign_up(self):
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
+        user = User.objects.get(username='@janedoe')
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count+1)
-        response_url = reverse('home')
+        response_url = reverse('log_in')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'home.html')
-        user = User.objects.get(username='@janedoe')
+        self.assertTemplateUsed(response, 'log_in.html')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.age, 22)
@@ -72,11 +72,12 @@ class SignUpViewTestCase(TestCase, LogInTester,MenueTestMixin):
         self.assertEqual(user.bio, 'Hello, this is John Doe.')
         is_password_correct = check_password('Password123', user.password)
         self.assertTrue(is_password_correct)
-        self.assertTrue(self._is_logged_in())
-        self.assert_menu(response)
 
     def test_sign_up_log_in_prohibited(self):
         self.client.post(self.url, self.form_input)
+        user = User.objects.get(id=1)
+        user.email_verified = True
+        self.client.login(username=user.username, password="Password123")
         self.assertTrue(self._is_logged_in())
         response = self.client.get(self.url, follow=True)
         target_url = reverse("home")

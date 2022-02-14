@@ -75,6 +75,11 @@ class ClubModelTestCase(TestCase):
         self.assertEqual(self.club.meeting_type, "IP")
         self.assertEqual(self.club.get_meeting_type_display(), "In-person")
 
+    def test_club_type(self):
+        self.club.club_type = self.club.ClubType.PUBLIC
+        self.assertEqual(self.club.club_type, "Public")
+        self.assertEqual(self.club.get_club_type_display(), "Public")
+    
     def test_city_may_be_blank(self):
         self.club.city = ''
         self._assert_club_is_valid()
