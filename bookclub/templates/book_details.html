@@ -36,10 +36,11 @@
               </form>
             {%else%}
               <div>
-                <h5 class="mt-2"> Your rating: {{ rating.rating }}</h5>
-                <h5 class="mb-4"> Your review: {{ rating.review  }}</h5> 
+                <b class="mt-2"> Your rating: </b> {{ rating.rating }}
+                <br>
+                <b class="mb-4"> Your review: </b> {{ rating.review  }} 
                 <!-- TODO: add link to edit review here. -->
-                <a herf=# class="btn btn-outline-dark mb-3"> Edit </a>
+                {% comment %} <a herf='edit_review' class="btn btn-outline-dark mb-3"> Edit </a> {% endcomment %}
               </div>
             {% endif %}
           </div>
@@ -74,8 +75,10 @@
           {% if reviews %}
             {% for review in reviews %}
             <div class='reviews-heading'>
-              <a class= "text-capitalize"><i class= "fas fa-user mr-1"></i>{{review.user.username}}</a>
-              <a class= "ml-2"><i class= "fa fa-clock mr-1"></i>{{rating.created_at}}</a>
+              <h6 class="review-info-alternate-heading">
+              <i class= "fas fa-user mr-1"> <a href= {% url 'profile' review.user.id  %}> {{review.user.username}} </a></i>
+              <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
+              </h6>
               <div class="rating-star">
               
                     <i class="fa fa-star{% if review.rating < 1%}-o{% elif review.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 

@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'bootstrap_pagination',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,8 +153,8 @@ MESSAGE_TAGS = {
     message_constants.DEBUG:"dark",
     message_constants.ERROR:"danger",
 }
-load_dotenv()
 
+load_dotenv()
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND")
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS")

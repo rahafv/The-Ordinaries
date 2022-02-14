@@ -37,6 +37,7 @@ urlpatterns = [
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
     path('profile/', views.show_profile_page , name='profile'),
+    path('profile/<int:user_id>', views.show_profile_page , name='profile'),
     path('club/<int:club_id>/members/<int:user_id>', views.show_profile_page , name='profile'),
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
@@ -52,11 +53,16 @@ urlpatterns = [
     path('books/', views.books_list, name ='books_list'),
     path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
+   
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list'),
+    path("club/<int:club_id>/applicants/", views.applicants_list, name='applicants_list'),
+    path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
+    path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+
 ]
 
 handler404 = 'bookclub.views.handler404'
