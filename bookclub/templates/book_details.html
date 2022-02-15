@@ -36,10 +36,11 @@
               </form>
             {%else%}
               <div>
-                <h5 class="mt-2"> Your rating: {{ rating.rating }}</h5>
-                <h5 class="mb-4"> Your review: {{ rating.review  }}</h5> 
+                <b class="mt-2"> Your rating: </b> {{ rating.rating }}
+                <br>
+                <b class="mb-4"> Your review: </b> {{ rating.review  }} 
                 <!-- TODO: add link to edit review here. -->
-                <a herf=# class="btn btn-outline-dark mb-3"> Edit </a>
+                {% comment %} <a herf='edit_review' class="btn btn-outline-dark mb-3"> Edit </a> {% endcomment %}
               </div>
             {% endif %}
           </div>
@@ -65,7 +66,41 @@
             </div>
           </div>
         </div>
-        <hr></hr>
+      </hr>
+      <div class="container mt-5">
+        <h5 class= "text-uppercase font-weight-bold">Reviews({{reviews_count}})</h5>
+        <hr class= "at-0 pt-0">
+        <div class="row">
+          <div class="col-sm-7 mt-2">
+          {% if reviews %}
+            {% for review in reviews %}
+            <div class='reviews-heading'>
+              <h6 class="review-info-alternate-heading">
+              <i class= "fas fa-user mr-1"> <a href= {% url 'profile' review.user.id  %}> {{review.user.username}} </a></i>
+              <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
+              </h6>
+              <div class="rating-star">
+              
+                    <i class="fa fa-star{% if review.rating < 1%}-o{% elif review.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    <i class="fa fa-star{% if review.rating < 3%}-o{% elif review.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if review.rating < 5%}-o{% elif review.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if review.rating < 7%}-o{% elif review.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if review.rating < 9%}-o{% elif review.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                
+                <span>( {{ review.rating }}/10.0 )</span>
+            </div>
+            </div> 
+          <div class= "review-body mt-2">
+            <p>{{review.review}}</p> 
+          </div>
+            {% endfor %}
+      </div>
+          {% endif %}
+    </div>
+    
+
+
+
     </div>
   </div>
 </div>

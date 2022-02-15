@@ -31,11 +31,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.welcome,  name='welcome'),
     path('sign_up/', views.sign_up,  name='sign_up'),
+    path('send_verification/<int:user_id>', views.send_activiation_email,  name='send_verification'),
+    path('activate_user/<uidb64>/<token>', views.activate_user,  name='activate'),
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
+   
     path('profile/', views.show_profile_page , name='profile'),
-    path('club/<int:club_id>/members/<int:user_id>', views.show_profile_page , name='profile'),
+    path('profile/<int:user_id>', views.show_profile_page , name='profile'),
+    
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('password/',views.password, name = 'password'),
     path('create_club/', views.create_club , name='create_club'),
@@ -50,11 +54,18 @@ urlpatterns = [
     path('books/', views.books_list, name ='books_list'),
     path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
+   
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list'),
+    path("club/<int:club_id>/applicants/", views.applicants_list, name='applicants_list'),
+    path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
+    path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+    path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
+
+
 ]
 
 handler404 = 'bookclub.views.handler404'

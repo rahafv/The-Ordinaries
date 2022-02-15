@@ -1,4 +1,7 @@
 from email.policy import default
+from pickle import FALSE
+from pyclbr import Class
+from queue import Empty
 from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -12,6 +15,8 @@ from tempfile import NamedTemporaryFile
 class User(AbstractUser):
     """User model used for authentication."""
 
+    email_verified = models.BooleanField(default=False)
+    
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -60,6 +65,10 @@ class User(AbstractUser):
         max_length=300,
         blank=True
     )
+
+    followers = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followees'
+    )
   
     class Meta:
         ordering = ['first_name', 'last_name']
@@ -82,6 +91,38 @@ class User(AbstractUser):
         self.age = new_age
         return self.save()
 
+    def toggle_follow(self, followee):
+        """Toggles whether self follows the given followee."""
+        #cant follow and unfollow self
+        if followee==self:
+            return
+        #if following, unfollow
+        if self.is_following(followee):
+            self._unfollow(followee)
+        else:
+            self._follow(followee)
+
+    def _follow(self, user):
+        user.followers.add(self)
+
+    def _unfollow(self, user):
+        user.followers.remove(self)
+
+    def is_following(self, user):
+        """Returns whether self follows the given user."""
+
+        return user in self.followees.all()
+
+    def follower_count(self):
+        """Returns the number of followers of self."""
+
+        return self.followers.count()
+
+    def followee_count(self):
+        """Returns the number of followees of self."""
+
+        return self.followees.count()
+
 class Club(models.Model):
     """Club model."""
 
@@ -95,11 +136,27 @@ class Club(models.Model):
         User, 
         on_delete=models.CASCADE
     )
+
+    class ClubType(models.TextChoices):
+        PRIVATE =  "Private"
+        PUBLIC =  "Public"
+
+    club_type = models.CharField(
+        max_length = 7,
+        choices = ClubType.choices, 
+        default=ClubType.PUBLIC, 
+        blank = False
+    )
     
     members = models.ManyToManyField(
         User, 
         related_name='clubs',
         null = True
+    )
+
+    applicants = models.ManyToManyField(
+        User, 
+        related_name='clubs_applied_to',
     )
 
     theme = models.CharField(
@@ -127,6 +184,8 @@ class Club(models.Model):
         max_length=50,
         blank=True
     )
+    class Meta:
+        ordering = ['name']
 
     def location(self):
         """Return full location."""
@@ -137,12 +196,24 @@ class Club(models.Model):
             self.members.add(member)
 
     def member_count(self):
-        return self.members.all().count()   
-    
+        return self.members.all().count() 
+
     def is_member(self, user):
         """ checks if the user is a member"""
-        return self.members.all().filter(id=user.id).exists()
+        return self.members.all().filter(id=user.id).exists()  
+    
+    def add_applicant(self, applicant):
+        self.applicants.add(applicant)
 
+    def applicants_count(self):
+        return self.applicants.all().count()   
+
+    def is_applicant(self, user):
+        """ checks if the user is a member"""
+        return self.applicants.all().filter(id=user.id).exists()
+    
+    def get_club_type_display(self):
+        return self.club_type
 
 class Book(models.Model):
     """Book model."""
@@ -191,6 +262,9 @@ class Book(models.Model):
         Club, 
         related_name='books'
     )
+    
+    class Meta:
+        ordering = ['title']
 
     def add_reader(self, reader):
         if not self.readers.all().filter(id=reader.id).exists():
@@ -214,12 +288,12 @@ class Book(models.Model):
             return (sum/self.ratings.all().count())
         else: 
             return 0.0
-
+            
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
-        User, 
+        User,  
         on_delete=models.CASCADE,
         related_name='ratings'
     )
@@ -245,8 +319,51 @@ class Rating(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     class Meta:
         unique_together = ['user', 'book']
+ 
+class Meeting(models.Model):
+    """ The meeting model."""
+
+    title = models.CharField(
+        max_length=50, 
+        blank=False, 
+        null=False
+    )
+
+    club = models.ForeignKey(
+        Club, 
+        on_delete=models.CASCADE,
+        related_name='meetings'
+    )
+
+    book = models.ForeignKey(
+        Book, 
+        on_delete=models.CASCADE,
+        related_name='meetings'
+    )
+
+    time = models.DateTimeField(
+        auto_now_add=False,
+        blank=False,
+        null =False
+    )
+
+    link = models.URLField(
+        max_length=1000,
+        blank=False
+    )
+
+    notes = models.CharField(
+        max_length=500,
+        blank=True
+    )
+    
 
  
+
+    
+
+ 
+

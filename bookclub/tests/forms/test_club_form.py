@@ -5,7 +5,7 @@ from bookclub.forms import ClubForm
 from bookclub.models import User, Club
 
 
-class UserFormTestCase(TestCase):
+class ClubFormTestCase(TestCase):
     """Unit tests of the user form."""
     fixtures = [
         'bookclub/tests/fixtures/default_club.json',
@@ -20,6 +20,7 @@ class UserFormTestCase(TestCase):
             'name': 'club2',
             'theme':'Drama',
             'meeting_type':Club.MeetingType.INPERSON,
+            'club_type': Club.ClubType.PUBLIC,
             'city' : 'New York',
             'country' : 'USA',
         }
@@ -30,6 +31,8 @@ class UserFormTestCase(TestCase):
         self.assertIn("theme", form.fields)
         self.assertIn("meeting_type", form.fields)
         self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
+        self.assertIn("club_type", form.fields)
+        self.assertTrue(isinstance(form.fields["club_type"].widget, forms.Select))
         self.assertIn("city", form.fields)
         self.assertIn("country", form.fields)
         
@@ -63,5 +66,6 @@ class UserFormTestCase(TestCase):
         self.assertEqual(self.club.name, 'club2')
         self.assertEqual(self.club.theme, 'Drama')
         self.assertEqual(self.club.meeting_type,Club.MeetingType.INPERSON )
+        self.assertEqual(self.club.club_type, Club.ClubType.PUBLIC)
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")
