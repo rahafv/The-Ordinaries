@@ -10,7 +10,6 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTes
 
     fixtures = [
         'bookclub/tests/fixtures/default_rating.json',
-        # 'bookclub/tests/fixtures/other_ratings.json',
         'bookclub/tests/fixtures/default_user.json' , 
         'bookclub/tests/fixtures/default_book.json'
     ]
