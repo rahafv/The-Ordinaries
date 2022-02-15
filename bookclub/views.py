@@ -413,17 +413,21 @@ def edit_review(request, review_id ):
     review =get_object_or_404(Rating.objects , id=review_id)
     reviewed_book = get_object_or_404(Book.objects, id=review.book_id)
     review_user = request.user
-    if(request.method == "POST"):
-        form = EditRatingForm(data = request.POST, instance=review)
-        if (form.is_valid()):
-            form.instance.user = review_user
-            form.instance.book = reviewed_book
-            form.save(review_user, reviewed_book)
-            messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
-            return redirect('book_details', book_id= review.book.id)
-        messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
+    if (review_user == review.user):
+        if(request.method == "POST"):
+            form = EditRatingForm(data = request.POST, instance=review)
+            if (form.is_valid()):
+                form.instance.user = review_user
+                form.instance.book = reviewed_book
+                form.save(review_user, reviewed_book)
+                messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+                return redirect('book_details', book_id= review.book.id)
+            messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
+        else:
+            form = EditRatingForm(instance = review) 
     else:
-        form = EditRatingForm(instance = review) 
+        return render(request, '404_page.html', status=404)
+        #return redirect('handler404')
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
