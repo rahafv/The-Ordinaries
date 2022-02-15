@@ -52,7 +52,7 @@ class Command(BaseCommand):
 
     def create_users(self):
 
-        MAX_USERS = 10000
+        MAX_USERS = 1000
         users_path = os.path.abspath("book-review-dataset/Users.csv")
         with open(users_path, "r", encoding='latin-1') as csv_file:
             users_data = list(csv.reader(csv_file, delimiter=","))
@@ -77,6 +77,7 @@ class Command(BaseCommand):
                     country = self.get_country(row[8]),
                     bio = row[4],
                     password = Command.DEFAULT_PASSWORD,
+                    email_verified = True,
                 )
 
                 users.append(user)
@@ -90,7 +91,7 @@ class Command(BaseCommand):
                 User.objects.bulk_create(users)
 
     def create_clubs(self):
-        MAX_CLUBS = 3000
+        MAX_CLUBS = 500
         clubs_path = os.path.abspath("book-review-dataset/Clubs.csv")
         with open(clubs_path, "r", encoding='latin-1') as csv_file:
             clubs_data = list(csv.reader(csv_file, delimiter=","))
