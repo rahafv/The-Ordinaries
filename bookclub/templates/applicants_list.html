@@ -1,0 +1,49 @@
+{% extends 'base_content.html' %}
+{% block title %} Applicants {% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-3 mt-3">Applicants for {{club.name}} club </h1>
+            <table class="table table-bordered" id="membersTable">
+                <thead>
+                <tr style="background-color: white">
+                    <th class="th-sm">Name</th>
+                    <th class="th-sm">Username</th>
+                    <th class="th-sm">Age</th>
+                </tr>
+                </thead>
+                {%if is_owner %}
+                {% for applicant in applicants %}
+                    <tr style="background-color: white">
+                        {% if app == current_user %}
+                            <td><p> You </p></td>
+                        {% else %}
+                            <td> <p>{{ applicant.full_name }}</p> </td>
+                        {% endif %}
+                        <td> 
+                            <p>{{applicant.username}}</p>  
+                        </td>
+                        <td> 
+                            <p>{{ applicant.age }}</p>
+                        </td> 
+                        {% if applicant != current_user%}
+                        <td> 
+                         <a href='{% url 'profile' applicant.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>
+                        </td>
+                        <td>
+                            <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-success" style="color: green" >Accept</a> 
+                        </td>
+                        <td>
+                            <a href='{% url 'reject_applicant' club.id applicant.id %}' class="btn btn-outline-danger" style="color: red" >Reject</a>   
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                {% endif %}
+            </table> 
+        </div>
+    </div>
+</div>
+{% endblock %}

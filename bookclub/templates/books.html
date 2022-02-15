@@ -1,4 +1,5 @@
 {% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
 {% block title %}Books{% endblock %}
 {% block content %}
   
@@ -14,35 +15,40 @@
   </div>
  {% endif %}
 
-   <div class="container">
-    {% if books.count == 0 %}
-        {% if general %}
-        <div style="text-align: center;   padding-top: 50px;">
-          <h4 class="lead ">There are no books, want to add one?</h4>
-          <a href={% url 'add_book' %} class="btn my-2 btn-outline-secondary">Add a book</a>
-        </div>
-          {% else %}
-          <div style="text-align: center;   padding-top: 50px;">
-            <h4 class="lead ">The book list is empty! find more book you might like.</h4>
-            <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
-          </div>
-            {% endif %}
-      {% endif %}
-
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-      {% for book in books %}
-      <div class="col">
-        <div style="text-align: center;">
-          <img src= "{{ book.image_url }}"  width="250" height="250" class=" image-thumbnail mb-3" />
-          <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
-          <p >{{ book.author }}</p>
-          <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary">View</a>
-        </div>
+<div class="container">
+  {% if count == 0 %}
+    {% if general %}
+      <div style="text-align: center;   padding-top: 50px;">
+        <h4 class="lead ">There are no books, want to add one?</h4>
+        <a href={% url 'add_book' %} class="btn my-2 btn-outline-secondary">Add a book</a>
       </div>
-    {% endfor %}
+    {% else %}
+      <div style="text-align: center;   padding-top: 50px;">
+        <h4 class="lead ">The book list is empty! find more book you might like.</h4>
+        <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
+      </div>
+    {% endif %}
+            
+  {% else %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for book in books %}
+        <div class="col">
+          <div style="text-align: center;">
+            <img src= "{{ book.image_url }}"  width="220" height="300" class=" image-thumbnail mb-3" />
+            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
+            <p >{{ book.author }}</p>
+            <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary">View</a>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  </div>
+    <ul class="pagination justify-content-center">
+      {% bootstrap_paginate books show_first_last="true"  %}
+    </ul>
+  {% endif %}
+</div>
 
+ 
 {% endblock %}
 
 

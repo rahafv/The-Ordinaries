@@ -1,4 +1,5 @@
 {% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
 {% block title %} Members {% endblock %}
 {% block content %}
 
@@ -14,7 +15,6 @@
                     <th class="th-sm">Age</th>
                 </tr>
                 </thead>
-                {%if is_member %}
                     {% for member in members %}
                         <tr style="background-color: white">
                             {% if member == current_user %}
@@ -30,13 +30,15 @@
                             </td>
                             {% if member != current_user%}
                              <td> 
-                                <a href='{% url 'profile' club.id member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
+                                <a href='{% url 'profile' member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
                             </td>
                             {% endif %}
                         </tr>
                     {% endfor %}
-                {% endif %}
             </table>
+            <ul class="pagination justify-content-center">
+                {% bootstrap_paginate members show_first_last="true"  %}
+            </ul>
         </div>
     </div>
 </div>
