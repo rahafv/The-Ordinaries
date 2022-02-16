@@ -28,7 +28,7 @@ class MeetingAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for events."""
     list_display = [
-        'type_of_actor', 'type_of_action', 'user', 'club', 'meeting', 'book', 'rating','message', 'created_at',
+        'type_of_actor', 'type_of_action', 'message', 'created_at',
     ]
 
     
