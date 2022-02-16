@@ -13,7 +13,7 @@ class Command(BaseCommand):
     USER_COUNT = 100
     POST_COUNT = 2000
 
-    DEFAULT_PASSWORD = 'Password123'
+    DEFAULT_PASSWORD = 'pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc='
 
     def __init__(self):
         super().__init__()
@@ -66,7 +66,6 @@ class Command(BaseCommand):
                     age = None
 
                 user = User(
-                    id = row[7],
                     first_name = row[0],
                     last_name = row[1],
                     username = row[5],
