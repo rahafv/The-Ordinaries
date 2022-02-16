@@ -37,7 +37,7 @@
                     {% endfor %}
             </table>
             <ul class="pagination justify-content-center">
-                {% bootstrap_paginate members show_first_last="true"  %}
+                {% bootstrap_paginate members show_prev_next="false"  show_first_last="true" range=5  %}
             </ul>
         </div>
     </div>

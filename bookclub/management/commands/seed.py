@@ -10,8 +10,6 @@ from .unseed import unseed
 import random
 
 class Command(BaseCommand):
-    USER_COUNT = 100
-    POST_COUNT = 2000
 
     DEFAULT_PASSWORD = 'pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc='
 
@@ -37,16 +35,15 @@ class Command(BaseCommand):
         end = time.time()
         print("populating clubs: ", end - start)
 
+        start = time.time()
+        self.create_books()
+        end = time.time()
+        print("book: ", end - start)
 
-        # start = time.time()
-        # self.create_books()
-        # end = time.time()
-        # print("book: ", end - start)
-
-        # start = time.time()
-        # self.create_ratings()
-        # end = time.time()
-        # print("ratings: ", end - start)
+        start = time.time()
+        self.create_ratings()
+        end = time.time()
+        print("ratings: ", end - start)
         
         print("total time: ", end - initial_start)
 
