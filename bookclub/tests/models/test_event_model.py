@@ -13,7 +13,6 @@ class EventTest(TestCase):
                 'bookclub/tests/fixtures/default_rating.json']
 
     def setUp(self):
-        # super(TestCase, self).setUp()
         self.user = User.objects.get(id=1)
         self.club = Club.objects.get(id=1)
         self.other_club = Club.objects.get(id=2)
