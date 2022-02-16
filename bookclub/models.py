@@ -1,3 +1,4 @@
+from email import message
 from email.policy import default
 from pickle import FALSE
 from pyclbr import Class
@@ -356,10 +357,74 @@ class Meeting(models.Model):
         blank=True
     )
     
-
+ACTOR_CHOICES = (
+    ('U', 'User'),
+    ('C', 'Club'),
+)
+ACTION_CHOICES = (
+    ('B', 'Book'),
+    ('C', 'Club'),
+    ('M', 'Meeting'),
+    ('R', 'Rating'),
+)
  
+class Event(models.Model):
+    """Events by users or clubs."""
 
-    
+    """To allow to types of actors of the event"""
+    type_of_actor = models.CharField(max_length=1, choices=ACTOR_CHOICES)
 
- 
+    """To identify the type of action the actor is responsible for"""
+    type_of_action = models.CharField(max_length=1, choices=ACTION_CHOICES)
+
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
+    meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
+    rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
+    message = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Model options."""
+
+        ordering = ['-created_at']    
+
+    def clean(self):
+
+        super().clean() 
+
+        """ checks that the type of actor and the object are correct """
+        if self.type_of_actor == 'U' and not self.user: 
+            raise ValidationError('Actor must be User')
+        if self.type_of_actor == 'C' and not self.club:
+            raise ValidationError('Actor must be Club')
+
+        """ checks that the type of actor and the object are correct """
+        if self.type_of_action == 'B' and not self.book: 
+            raise ValidationError('Action must be Book')
+        if self.type_of_action == 'C' and not self.club:
+            raise ValidationError('Action must be Club')
+        if self.type_of_action == 'M' and not self.meeting: 
+            raise ValidationError('Action must be meeting')
+        if self.type_of_action == 'R' and not self.rating:
+            raise ValidationError('Action must be rating')
+
+    def get_actor(self):
+        """Return the actor of a given event."""
+        if self.type_of_actor == 'U':
+            return self.user.username
+        else: 
+            return self.club.name
+
+    def get_action(self):
+        """Return the actor of a given event."""
+        if self.type_of_action == 'C':
+            return self.club.name
+        elif self.type_of_action == 'B':
+            return self.book.title
+        elif self.type_of_action == 'M':
+            return self.meeting.title
+        else:
+            return self.rating.book.title
 
