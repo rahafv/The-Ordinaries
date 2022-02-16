@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclub.models import User, Club, Event, Book, Meeting, Rating
 
-class PostTest(TestCase):
+class EventTest(TestCase):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
                 'bookclub/tests/fixtures/default_club.json',
