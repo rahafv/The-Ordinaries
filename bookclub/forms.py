@@ -17,10 +17,10 @@ class SignUpForm(forms.ModelForm):
         widgets = { 'bio': forms.Textarea() }
 
 
-    DOB = forms.DateField(initial= None, 
+    DOB = forms.DateField(initial= None,
         label = 'Date of Birth',
         widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= False, 
+        required= False,
     )
 
     new_password = forms.CharField(
@@ -40,7 +40,7 @@ class SignUpForm(forms.ModelForm):
         super().clean()
 
         self.DOB = self.cleaned_data.get('DOB')
-        
+
         if not self.check_age(self.DOB):
             self.add_error('DOB', 'Please enter a valid date')
 
@@ -61,7 +61,7 @@ class SignUpForm(forms.ModelForm):
         try:
             today = date.today()
             age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-            return age 
+            return age
         except:
             age = None
 
@@ -89,13 +89,14 @@ class LogInForm(forms.Form):
 
 class CreateClubForm(forms.ModelForm):
     """Form to create or update club information."""
-    
+
     class Meta:
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme', 'meeting_type', 'city', 'country']
-        widgets = {"meeting_type": forms.Select()}
+        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
+        labels = {'club_type': "Select Club Privacy Status"}
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
@@ -111,7 +112,7 @@ class PasswordForm(forms.Form):
             )]
     )
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
-    
+
     def clean(self):
             """Clean the data and generate messages for any errors."""
             super().clean()
@@ -124,19 +125,19 @@ class PasswordForm(forms.Form):
                 self.add_error('new_password', 'Your new password cannot be the same as your current one')
 
 
-class BookForm(forms.ModelForm): 
+class BookForm(forms.ModelForm):
     """Form enabling a user to create a book."""
 
     class Meta:
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher','image_url','year']
-        
-    def clean(self): 
+
+    def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
         if self.oldISBN:
             self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
-            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+            if Book.objects.filter(ISBN=self.ISBN).exists():
                 self.add_error('ISBN', 'ISNB already exists')
 
     def save(self):
@@ -161,18 +162,18 @@ class BookForm(forms.ModelForm):
 
 class UserForm(forms.ModelForm):
     """Form to update user profile."""
-    
+
     class Meta:
         """Form options."""
 
         model = User
         fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
-        widgets = { 'bio': forms.Textarea()} 
+        widgets = { 'bio': forms.Textarea()}
 
-    date_of_birth = forms.DateField(initial= None, 
+    date_of_birth = forms.DateField(initial= None,
         label = 'Date of Birth',
         widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= True, 
+        required= True,
     )
 
     def __init__(self, *args, **kwargs):
@@ -180,7 +181,7 @@ class UserForm(forms.ModelForm):
 
         self.log_in_user = kwargs.pop('user',None)
         super(UserForm, self).__init__(*args, **kwargs)
-            
+
 
 
     def clean(self):
@@ -189,7 +190,7 @@ class UserForm(forms.ModelForm):
         super().clean()
 
         self.date_of_birth = self.cleaned_data.get('date_of_birth')
-        
+
         if not self.check_age(self.date_of_birth):
             self.add_error('date_of_birth', 'Please enter a valid date')
 
@@ -200,25 +201,90 @@ class UserForm(forms.ModelForm):
             return self.calculate_age(date_of_birth) < 100 and self.calculate_age(date_of_birth) > 10
         except:
             return True
-    
+
     def calculate_age(self, dob):
         """Calculate the age from the given date input."""
         today = date.today()
         one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
         year_difference = today.year - dob.year
         age = year_difference - one_or_zero
-        
+
         return age
 
     def save(self):
         """Save user."""
+        super().save(commit=False)
+        birthdate= self.cleaned_data.get('date_of_birth')
+        new_age = self.calculate_age(birthdate)
+        self.log_in_user.set_age(new_age)
+        return self.log_in_user
 
-        if self.is_valid():
-            birthdate= self.cleaned_data.get('date_of_birth')
-            new_age = self.calculate_age(birthdate)  
-            if(self.log_in_user is not None):
-                self.log_in_user.set_age(new_age)
-                return self.log_in_user
+
+class ClubForm(forms.ModelForm):
+    """Form to update club information."""
+
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        labels = {'club_type': "Club Privacy Setting:"}
+        exclude = ['owner']
+
+class EditRatingForm(forms.ModelForm):
+    """Form to update club information."""
+
+    class Meta:
+
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+
+    def calculate_rating(self, rating):
+        return rating*2
+
+    def save(self , reviwer, reviewedBook):
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0
+        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+        )
+        return review
+
+
+class RatingForm(forms.ModelForm):
+    """Form to post a review."""
+    class Meta:
+
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+
+
+    def save(self, reviwer, reviewedBook):
+        """Create a new user."""
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0
+        review = Rating.objects.create(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+            book = reviewedBook,
+            user = reviwer,
+        )
+        return review
+
+    def calculate_rating(self, rating):
+        return rating*2
+
 
 class TransferClubOwnership(forms.Form):
     """Form to create or update club information."""
@@ -234,16 +300,16 @@ class TransferClubOwnership(forms.Form):
         super().__init__(*args, **kwargs)
         if club:
             self.fields['member_select'].choices = club.members
-    
-    
+
+
     # member_select #= forms.ChoiceField(required=True, choices= self.club.members)
-    
+
     # confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
     #                               widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
     #                               error_messages = {'required':"Please check the box"})
-    
 
-    
+
+
 
     # class Meta:
 
@@ -256,49 +322,9 @@ class TransferClubOwnership(forms.Form):
             # super(TransferClubOwnership, self).__init__(*args, **kwargs)
             # self.fields['members'].label = "Select Member"
             # self.fields['members'].queryset = Club.members.objects.filter(owner = self.request.user)
-        
+
         # def save(self):
-        #     if self.is_valid(): 
+        #     if self.is_valid():
         #         if(self.log_in_user is not None):
         #             pass
         #         return self.log_in_user
-        
-
-
-class ClubForm(forms.ModelForm):
-    """Form to update club information."""
-    
-    class Meta:
-        """Form options."""
-
-        model = Club
-        fields = ['name', 'theme','meeting_type', 'city','country']
-        exclude = ['owner']
-
-
-class RatingForm(forms.ModelForm):
-    """Form to post a review."""
-    class Meta:
-        
-        model = Rating
-        fields = ['rating', 'review']
-        widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
-        }
-
-    def save(self, reviwer, reviewedBook):
-        """Create a new user."""
-        super().save(commit=False)
-        rate = self.cleaned_data.get('rating')
-        if not rate:
-            rate = 0 
-        review = Rating.objects.create(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
-            book = reviewedBook,
-            user = reviwer,
-        )
-        return review
-
-    def calculate_rating(self, rating): 
-        return rating*2
