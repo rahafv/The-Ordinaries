@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MenueTestMixin, MessageTester
 
-class AddBookToListViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
+class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin, MessageTester):
     
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/default_book.json']
@@ -23,6 +23,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})
         self.assertTemplateUsed(response, 'book_details.html')
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+        self.assert_success_message(response)
         self.assert_menu(response)
         self.assertEqual(self.book.readers_count(), count+1)
 
@@ -34,6 +35,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})
         self.assertTemplateUsed(response, 'book_details.html')
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+        self.assert_success_message(response)
         self.assert_menu(response)
         self.assertEqual(self.book.readers_count(), count-1)
 
