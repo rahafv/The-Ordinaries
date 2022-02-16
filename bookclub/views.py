@@ -1,4 +1,3 @@
-from operator import is_
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -417,9 +416,6 @@ def reject_applicant(request, club_id, user_id):
         return redirect('club_page', club_id)
 
 
-# def reviews_list(request,rating_id,book_id):
-#     ratings = Rating.objects.all()
-
 @login_required
 def edit_club_information(request, club_id):
     club = Club.objects.get(id = club_id)
@@ -444,8 +440,7 @@ def edit_club_information(request, club_id):
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
-    check_reader = book.is_reader(user);
-    if check_reader:
+    if book.is_reader(user):
         book.remove_reader(user)
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:

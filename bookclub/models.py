@@ -262,17 +262,17 @@ class Book(models.Model):
     class Meta:
         ordering = ['title']
 
-    def add_reader(self, reader):
-        if not self.readers.all().filter(id=reader.id).exists():
-            self.readers.add(reader)
-    
-    def remove_reader(self, reader):
-        if self.readers.all().filter(id=reader.id).exists():
-            self.readers.remove(reader)
-
     def is_reader(self, reader):
         return self.readers.all().filter(id=reader.id).exists()
-    
+
+    def add_reader(self, reader):
+        if not self.is_reader(reader):
+            self.readers.add(reader)
+            
+    def remove_reader(self, reader):
+        if self.is_reader(reader):
+            self.readers.remove(reader)
+ 
     def readers_count(self):
         return self.readers.all().count()  
 
