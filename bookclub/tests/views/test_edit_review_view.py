@@ -2,9 +2,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import EditRatingForm
-from bookclub.models import User, Club , Rating
+from bookclub.models import Rating
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
-from bookclub.views import handler404 
 
 class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
     """Test suite for the edit review view."""
@@ -29,17 +28,10 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTes
             'review': 'Great book',
             'rating': 4.0,
         }
-        self.other_form_input = {
-            'user': 2,
-            'book':1,
-            'review': 'Great book',
-            'rating': 4.0,
-        }
-     
+  
     def test_edit_review_url(self):
         self.assertEqual(self.url, f"/edit_review/{self.rating.id}")
 
- 
     def test_get_edit_review(self):
         self.client.login(username=self.rating.user.username, password='Password123')
         response = self.client.get(self.url)
@@ -61,7 +53,6 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "edit_review.html")
         self.assert_error_message(response)
-
 
     def test_successful_review_update(self):
         self.client.login(username=self.rating.user.username, password="Password123")
@@ -85,7 +76,6 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTes
         response = self.client.get(self.other_url)
         self.assertEqual(response.status_code, 404)
         self.assertTemplateUsed(response, '404_page.html')
-
 
     def test_get_profile_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
