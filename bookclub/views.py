@@ -2,7 +2,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
@@ -180,7 +180,7 @@ def add_review(request, book_id):
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
-    messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+    messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
 
     return render(request, 'book_details.html', {'book':reviewed_book})
 
@@ -260,32 +260,6 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         """Return redirect URL after successful update."""
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
-
-
-# class ReviewUpdateView(LoginRequiredMixin,UpdateView):
-#     """View to update a submitted user review"""
-
-#     model = RatingForm
-#     template_name = "book_details.html"
-#     form_class = RatingForm
-
-#     def get_form_kwargs(self):
-#         """ Passes the request object to the form class.
-#          This is necessary to update the date_of_birth of the given user"""
-
-#         kwargs = super(ReviewUpdateView, self).get_form_kwargs()
-#         kwargs['user'] = self.request.user
-#         return kwargs
-
-#     def get_object(self):
-#         """Return the object (user) to be updated."""
-#         user = self.request.user
-#         return user
-
-#     def get_success_url(self):
-#         """Return redirect URL after successful update."""
-#         messages.add_message(self.request, messages.SUCCESS, "Review updated!")
-#         return reverse('book_details')
 
 @login_required
 def join_club(request, club_id):
@@ -374,6 +348,7 @@ def members_list(request, club_id):
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
 
+
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
@@ -447,6 +422,29 @@ def add_book_to_list(request, book_id):
         book.add_reader(user)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
+
+@login_required
+def edit_review(request, review_id ):
+    review =get_object_or_404(Rating.objects , id=review_id)
+    reviewed_book = get_object_or_404(Book.objects, id=review.book_id)
+    review_user = request.user
+    if (review_user == review.user):
+        if(request.method == "POST"):
+            form = EditRatingForm(data = request.POST, instance=review)
+            if (form.is_valid()):
+                form.instance.user = review_user
+                form.instance.book = reviewed_book
+                form.save(review_user, reviewed_book)
+                messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+                return redirect('book_details', book_id= review.book.id)
+            messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
+        else:
+            form = EditRatingForm(instance = review)
+    else:
+        return render(request, '404_page.html', status=404)
+        #return redirect('handler404')
+
+    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
 @login_required
 def follow_toggle(request, user_id):

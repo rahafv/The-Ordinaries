@@ -48,8 +48,11 @@
                 <b class="mt-2"> Your rating: </b> {{ rating.rating }}
                 <br>
                 <b class="mb-4"> Your review: </b> {{ rating.review  }} 
-                <!-- TODO: add link to edit review here. -->
-                {% comment %} <a herf='edit_review' class="btn btn-outline-dark mb-3"> Edit </a> {% endcomment %}
+                <br>
+                <br>
+                <a href= '{% url 'edit_review' review_id=rating.id %}' class="btn btn-outline-dark mb-3"> Edit </a>
+                
+
               </div>
             {% endif %}
           </div>

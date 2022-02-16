@@ -231,6 +231,30 @@ class ClubForm(forms.ModelForm):
         labels = {'club_type': "Club Privacy Setting:"}
         exclude = ['owner']
 
+class EditRatingForm(forms.ModelForm):
+    """Form to update club information."""
+    
+    class Meta:
+        
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+    
+    def calculate_rating(self, rating): 
+        return rating*2
+
+    def save(self , reviwer, reviewedBook):
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0 
+        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+        )
+        return review
 
 
 class RatingForm(forms.ModelForm):
@@ -243,6 +267,7 @@ class RatingForm(forms.ModelForm):
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
+        
     def save(self, reviwer, reviewedBook):
         """Create a new user."""
         super().save(commit=False)
