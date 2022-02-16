@@ -400,6 +400,16 @@ class Event(models.Model):
         if self.type_of_actor == 'C' and not self.club:
             raise ValidationError('Actor must be Club')
 
+
+        """Restrictions on the actors and their allowed actions"""
+        if self.type_of_actor == 'U' and self.type_of_action == 'M':
+            raise ValidationError('User cannot generate a meeting')
+
+        if self.type_of_actor == 'C' and self.type_of_action == 'R':
+            raise ValidationError('Club cannot rate')
+        if self.type_of_actor == 'C' and self.type_of_action == 'C':
+            raise ValidationError('Club cannot create club')
+
         """ checks that the type of actor and the object are correct """
         if self.type_of_action == 'B' and not self.book: 
             raise ValidationError('Action must be Book')

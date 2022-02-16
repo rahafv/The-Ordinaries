@@ -122,3 +122,21 @@ class PostTest(TestCase):
         self.club_event.message = 'x' * 281
         with self.assertRaises(ValidationError):
             self.club_event.full_clean()
+
+    def test_user_event_cannot_be_meeting(self):
+        self.other_user_event.type_of_action= 'M'
+        self.other_user_event.meeting = self.meeting
+        with self.assertRaises(ValidationError):
+            self.other_user_event.full_clean()
+
+    def test_club_event_cannot_be_rating(self):
+        self.other_club_event.type_of_action= 'R'
+        self.other_club_event.rating = self.rating
+        with self.assertRaises(ValidationError):
+            self.other_club_event.full_clean()
+
+    def test_club_event_cannot_be_club(self):
+        self.other_club_event.type_of_action= 'C'
+        self.other_club_event.club = self.other_club
+        with self.assertRaises(ValidationError):
+            self.other_club_event.full_clean()
