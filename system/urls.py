@@ -36,6 +36,7 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
+    path('initial_book_list/', views.initial_book_list , name='initial_book_list'),
    
     path('profile/', views.show_profile_page , name='profile'),
     path('profile/<int:user_id>', views.show_profile_page , name='profile'),
