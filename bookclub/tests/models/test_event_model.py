@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclub.models import User, Club, Event, Book, Meeting, Rating
 
-class PostTest(TestCase):
+class EventTest(TestCase):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
                 'bookclub/tests/fixtures/default_club.json',
@@ -13,7 +13,6 @@ class PostTest(TestCase):
                 'bookclub/tests/fixtures/default_rating.json']
 
     def setUp(self):
-        # super(TestCase, self).setUp()
         self.user = User.objects.get(id=1)
         self.club = Club.objects.get(id=1)
         self.other_club = Club.objects.get(id=2)

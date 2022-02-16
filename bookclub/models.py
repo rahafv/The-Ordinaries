@@ -419,7 +419,11 @@ class Event(models.Model):
             raise ValidationError('Action must be meeting')
         if self.type_of_action == 'R' and not self.rating:
             raise ValidationError('Action must be rating')
+    def save(self, **kwargs):
+        self.clean()
+        return super(Event, self).save(**kwargs)
 
+        
     def get_actor(self):
         """Return the actor of a given event."""
         if self.type_of_actor == 'U':
