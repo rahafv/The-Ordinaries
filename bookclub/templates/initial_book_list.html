@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 {% block body %}
+
+<div class="row py-lg-5">
+    <div class="col-lg-6 col-md-8 mx-auto">
+      <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
+         <p class="lead text-muted"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
+    </div>
+</div>
+
 <div class="container">
     <div class="row">
-        {% for book in books %}
+        {% for book in my_books %}
             <div class="col-sm-6 col-md-3">
                 <div class="profile-card">
                     <div class="profile-img">
@@ -24,4 +32,11 @@
         {% endfor %}
     </div>
 </div>
+
+{%if list_length == 0 %}
+    <a href="#" class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue2</a>
+{% else %}
+    <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>
+{% endif %}
+
 {% endblock %} 
