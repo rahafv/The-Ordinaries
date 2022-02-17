@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book , Rating
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.template.loader import render_to_string
@@ -120,34 +120,60 @@ def log_out(request):
     messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
-@login_required
-def password(request):
-    current_user = request.user
-    if request.method == 'POST':
-        form = PasswordForm(data=request.POST)
-        if form.is_valid():
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            if check_password(password, current_user.password):
-                current_user.set_password(new_password)
-                current_user.save()
-                login(request, current_user)
-                messages.add_message(request, messages.SUCCESS, "Password updated!")
-                return redirect('home')
-            else:
-                messages.add_message(request, messages.ERROR, "Password incorrect!")
-        else:
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            password_confirmation = form.cleaned_data.get('password_confirmation')
-            if new_password is None and password == password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Your new password cannot be the same as your current one!')
-            elif new_password != None and new_password != password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
-            else:
-                messages.add_message(request, messages.ERROR, "New password does not match criteria!")
-    form = PasswordForm()
-    return render(request, 'password.html', {'form': form}) 
+# @login_required
+# def password(request):
+#     current_user = request.user
+#     if request.method == 'POST':
+#         form = PasswordForm(data=request.POST)
+#         if form.is_valid():
+#             password = form.cleaned_data.get('password')
+#             new_password = form.cleaned_data.get('new_password')
+#             if check_password(password, current_user.password):
+#                 current_user.set_password(new_password)
+#                 current_user.save()
+#                 login(request, current_user)
+#                 messages.add_message(request, messages.SUCCESS, "Password updated!")
+#                 return redirect('home')
+#             else:
+#                 messages.add_message(request, messages.ERROR, "Password incorrect!")
+#         else:
+#             password = form.cleaned_data.get('password')
+#             new_password = form.cleaned_data.get('new_password')
+#             password_confirmation = form.cleaned_data.get('password_confirmation')
+#             if new_password is None and password == password_confirmation:
+#                 messages.add_message(request, messages.ERROR, 'Your new password cannot be the same as your current one!')
+#             elif new_password != None and new_password != password_confirmation:
+#                 messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
+#             else:
+#                 messages.add_message(request, messages.ERROR, "New password does not match criteria!")
+#     form = PasswordForm()
+#     return render(request, 'password.html', {'form': form}) 
+
+class PasswordView(LoginRequiredMixin, FormView):
+    """View that handles password change requests."""
+
+    template_name = 'password.html'
+    form_class = PasswordForm
+
+    def get_form_kwargs(self, **kwargs):
+        """Pass the current user to the password change form."""
+
+        kwargs = super().get_form_kwargs(**kwargs)
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def form_valid(self, form):
+        """Handle valid form by saving the new password."""
+
+        form.save()
+        login(self.request, self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirect the user after successful password change."""
+
+        messages.add_message(self.request, messages.SUCCESS, "Password updated!")
+        return reverse('home')
 
 @login_required
 def create_club(request):
