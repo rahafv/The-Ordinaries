@@ -339,11 +339,38 @@ def members_list(request, club_id):
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
- 
+        
+@login_required
+def following_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following = True 
+    list = user.followees.all() 
+    current_user = request.user 
+
+
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+   
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
+@login_required
+def followers_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following= False
+    list = user.followers.all()
+    current_user = request.user
+
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+   
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
 
 @login_required
 def applicants_list(request, club_id):
