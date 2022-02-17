@@ -40,5 +40,18 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenueTestMixin):
         self.assertTrue(isinstance(form, RatingForm))
         self.assertFalse(form.is_bound)
 
+    def test_get_reviews_list(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_books(6)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'books.html')
+        for book_id in range(6):
+            self.assertContains(response, f'book{book_id} title')
+            self.assertContains(response, f'book{book_id} author')
+            books_url = reverse('books_list')
+            self.assertContains(response, books_url)
+        self.assert_menu(response)
+
     def test_book_details_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
