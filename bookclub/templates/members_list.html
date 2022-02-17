@@ -26,7 +26,11 @@
                                 <p>{{member.username}}</p>  
                             </td>
                             <td> 
-                                <p>{{ member.age }}</p>
+                                {% if member.age %}
+                                    <p>{{ member.age }}</p>
+                                {% else %}
+                                    <p>-</p>
+                                {% endif %}
                             </td>
                             {% if member != current_user%}
                              <td> 

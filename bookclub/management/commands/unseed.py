@@ -10,6 +10,6 @@ class Command(BaseCommand):
         User.objects.filter(is_staff=False).delete()
         Club.objects.all().delete()
         Book.objects.all().delete()
-        #Rating.objects.all().delete()
+        Rating.objects.all().delete()
 
 unseed = Command()

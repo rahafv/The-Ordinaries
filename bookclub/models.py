@@ -150,8 +150,7 @@ class Club(models.Model):
     
     members = models.ManyToManyField(
         User, 
-        related_name='clubs',
-        null = True
+        related_name='clubs'
     )
 
     applicants = models.ManyToManyField(

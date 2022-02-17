@@ -9,6 +9,7 @@ import os
 from .unseed import unseed
 import random
 
+
 class Command(BaseCommand):
 
     DEFAULT_PASSWORD = 'pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc='
@@ -22,6 +23,9 @@ class Command(BaseCommand):
         initial_start = time.time()
         start = time.time()
         self.create_users()
+        self.users = User.objects.all()
+        self.create_followers()
+
         end = time.time()
         print("users: ", end - start)
 
@@ -49,7 +53,7 @@ class Command(BaseCommand):
 
     def create_users(self):
 
-        MAX_USERS = 1000
+        MAX_USERS = 100
         users_path = os.path.abspath("book-review-dataset/Users.csv")
         with open(users_path, "r", encoding='latin-1') as csv_file:
             users_data = list(csv.reader(csv_file, delimiter=","))
@@ -86,24 +90,41 @@ class Command(BaseCommand):
             if users:
                 User.objects.bulk_create(users)
 
+    def create_followers(self):
+        for user in self.users:
+            self.create_followers_for_user(user)
+
+    def create_followers_for_user(self, user):
+        FOLLOW_PROBABILITY = 0.1
+
+        for follower in self.users:
+            if random.random() < FOLLOW_PROBABILITY:
+                user.toggle_follow(follower)
+
     def create_clubs(self):
-        MAX_CLUBS = 500
+        MAX_CLUBS = 50
         clubs_path = os.path.abspath("book-review-dataset/Clubs.csv")
         with open(clubs_path, "r", encoding='latin-1') as csv_file:
             clubs_data = list(csv.reader(csv_file, delimiter=","))
 
-            users = User.objects.all()
-            user_ids = list(users.values_list('id', flat=True))
+            user_ids = list(self.users.values_list('id', flat=True))
+        
 
             clubs = []
             for col in clubs_data[1:]:
-                rand_id = random.randint(0, users.count()-1)
+                rand_id = random.randint(0, self.users.count()-1)
+
+                TYPE_PROBABILITY = 0.1
+                if random.random() < TYPE_PROBABILITY:
+                    club_type = 'Private'
+                else:
+                    club_type = 'Public'
                 
                 club = Club(
-                    id = col[5],
-                    name = col[4] + "club",
+                    name = col[4] + " club",
                     owner = User.objects.get(id = user_ids[rand_id]),
                     theme = col[1],
+                    club_type = club_type,
                     city = col[2],
                     country = col[3],
                 )
@@ -114,6 +135,7 @@ class Command(BaseCommand):
                 if len(clubs) > MAX_CLUBS:
                     Club.objects.bulk_create(clubs)
                     clubs = []
+                    break
                     
 
             if clubs:
@@ -121,7 +143,7 @@ class Command(BaseCommand):
 
 
     def create_books(self):
-        MAX_BOOKS = 10000
+        MAX_BOOKS = 1000
         books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = list(csv.reader(csv_file, delimiter=","))
@@ -141,13 +163,14 @@ class Command(BaseCommand):
                 if len(books) > MAX_BOOKS:
                     Book.objects.bulk_create(books)
                     books = []
+                    break
                     
 
             if books:
                 Book.objects.bulk_create(books)
 
     def create_ratings(self):
-        MAX_RATINGS = 1000
+        MAX_RATINGS = 100
         ratings_path = os.path.abspath("book-review-dataset/BX-Book-Ratings.csv")
         
         with open(ratings_path, "r", encoding='latin-1') as csv_file:
@@ -156,6 +179,8 @@ class Command(BaseCommand):
             ratings = []
             users = list(User.objects.all().values_list('id', flat=True))
             books = list(Book.objects.all().values_list('id', flat=True))
+
+
             for col in ratings_data[1:]:
                 try:
                     user = User.objects.get(id = col[0])
@@ -170,15 +195,22 @@ class Command(BaseCommand):
                     book = Book.objects.get(id = books[rand_id])
                     books.pop(rand_id)
 
+                REVIEW_PROBABILITY = 0.6
+                if random.random() < REVIEW_PROBABILITY:
+                    review = 'Good'
+                else:
+                    review = 'Bad'
+
                 try: 
                     rating = Rating(
                         user = user, 
                         book = book, 
                         rating = col[2],
+                        review = review,
                     )
+
                 except: 
                     continue
-
 
                 ratings.append(rating)
 
@@ -226,8 +258,7 @@ class Command(BaseCommand):
 
     def populate_clubs(self):
         clubs = Club.objects.all()
-        users = User.objects.all()
-        user_ids = list(users.values_list('id', flat=True))
+        user_ids = list(self.users.values_list('id', flat=True))
 
         for club in clubs:
             sample = User.objects.order_by('?')[:10]
