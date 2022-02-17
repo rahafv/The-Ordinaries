@@ -8,13 +8,15 @@ from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next
 class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json' , 
-                'bookclub/tests/fixtures/other_users.json'
+                'bookclub/tests/fixtures/other_users.json' , 
+                 'bookclub/tests/fixtures/default_book.json',
+                 'bookclub/tests/fixtures/other_books.json'
     ]
 
     def setUp(self):
         self.url = reverse('log_in')
         self.user = User.objects.get(id=1)
-        self.other_user = User.objects.get(id=2)
+        self.other_user = User.objects.get(id=3)
 
     def test_log_in_url(self):
         self.assertEqual(self.url,'/log_in/')
@@ -97,7 +99,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
         self.assertTemplateUsed(response, 'log_in.html')
         self.assert_error_message(response)
 
-    def test_succesful_log_in(self):
+    def test_succesful_log_in_with_no_prev_books(self):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
@@ -106,13 +108,31 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
         self.assertTemplateUsed(response, 'initial_book_list.html')
         self.assert_no_message(response)
 
-    def test_succesful_log_in_with_redirect(self):
+    def test_succesful_log_in_with_prev_books(self):
+        form_input = { 'username': 'peterpickles', 'password': 'Password123' }
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertTrue(self._is_logged_in())
+        response_url = reverse('home')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'home.html')
+        self.assert_no_message(response)
+
+    def test_succesful_log_in_with_redirect_with_no_prev_books(self):
         redirect_url = reverse('initial_book_list')
         form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'initial_book_list.html')
+        self.assert_no_message(response)
+
+    def test_succesful_log_in_with_redirect_with_prev_books(self):
+        redirect_url = reverse('home')
+        form_input = { 'username': 'peterpickles', 'password': 'Password123', 'next': redirect_url }
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertTrue(self._is_logged_in())
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'home.html')
         self.assert_no_message(response)
 
     def test_post_log_in_with_incorrect_credentials_and_redirect(self):
