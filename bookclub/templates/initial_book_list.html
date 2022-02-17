@@ -23,7 +23,7 @@
                         </h2>
                         <ul class="social-link">
                             <span>
-                                <a href=# class="bi bi-plus-square-fill"
+                                <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi bi-plus-square-fill"
                                 style="font-size: 1.8rem; color: black;"></a>
                             </span>
                         </ul>
@@ -41,10 +41,10 @@
 <div class="row py-lg-5">
     <div class="col-lg-6 col-md-8 mx-auto text-center">
         {%if list_length == 0 %}
-        <a href="#" class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue2</a>
-    {% else %}
-        <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>
-    {% endif %}
+            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue</a>
+        {% else %}
+            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %} 
