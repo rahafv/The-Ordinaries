@@ -240,8 +240,7 @@ label:hover ~ input:checked ~ label{
   color: #ffb503 !important;
 }
 
-
-/* .profile-card{
+.profile-card{
   position:relative;
   overflow: hidden;
   margin-bottom:10px;
@@ -308,7 +307,7 @@ label:hover ~ input:checked ~ label{
 }
    
 .profile-card .profile-content:hover{
-  background-color: rgba(255, 43, 131, 0.5);
+  background-color: rgba(146, 178, 247, 0.5);
 }
       
 .profile-card .profile-content .title{
@@ -368,5 +367,5 @@ label:hover ~ input:checked ~ label{
   text-align: center;
   border-radius:5px;
   background-color: #fff;
-} */
+} 
       

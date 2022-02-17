@@ -103,7 +103,10 @@ def log_in(request):
 
             if user:
                 login(request, user)
-                redirect_url = next or 'initial_book_list'
+                if len(user.books.all()) == 0:
+                    redirect_url = next or 'initial_book_list'
+                else:
+                    redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
@@ -440,7 +443,8 @@ def follow_toggle(request, user_id):
 
 @login_required
 def initial_book_list(request):
-   # my_user = get_object_or_404(User.objects, id=user_id)
-    return render(request, 'initial_book_list.html')
+    books = Book.objects.all()
+    sorted_books = sorted(books,key=lambda b:b.readers_count())
+    return render(request, 'initial_book_list.html', {'books':sorted_books})
 
 
