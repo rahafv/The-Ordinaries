@@ -444,7 +444,7 @@ def follow_toggle(request, user_id):
 @login_required
 def initial_book_list(request):
     books = Book.objects.all()
-    sorted_books = sorted(books,key=lambda b:b.readers_count())
+    sorted_books = sorted(books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
     return render(request, 'initial_book_list.html', {'books':sorted_books})
 
 
