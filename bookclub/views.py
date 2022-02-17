@@ -1,4 +1,3 @@
-from operator import is_
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -18,7 +17,7 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.core.mail import EmailMessage 
+from django.core.mail import EmailMessage
 from system import settings
 from django.core.paginator import Paginator
 
@@ -26,11 +25,11 @@ from django.core.paginator import Paginator
 @login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
-  
+
 @login_required
 def home(request):
      return render(request, 'home.html')
-     
+
 @login_prohibited
 def sign_up(request):
     if request.method == 'POST':
@@ -47,8 +46,8 @@ def send_activiation_email(request, user_id):
         user = User.objects.get(id=user_id)
     except:
         raise Http404
-        
-    if not user.email_verified:   
+
+    if not user.email_verified:
         current_site = get_current_site(request)
         email_subject = 'Activate your account'
         email_body = render_to_string('activate.html', {
@@ -58,7 +57,7 @@ def send_activiation_email(request, user_id):
             'token':generate_token.make_token(user)}
         )
 
-        email = EmailMessage(subject=email_subject, body=email_body, 
+        email = EmailMessage(subject=email_subject, body=email_body,
         from_email=settings.EMAIL_HOST_USER, to=[user.email])
 
         email.send()
@@ -77,7 +76,7 @@ def activate_user(request, uidb64, token):
     except:
         user = None
         return render(request, 'activate-fail.html', {'user': user})
-    
+
     if user and generate_token.check_token(user, token):
         user.email_verified = True
         user.save()
@@ -85,7 +84,7 @@ def activate_user(request, uidb64, token):
         return redirect(reverse('log_in'))
 
     return render(request, 'activate-fail.html', {'user': user})
-    
+
 @login_prohibited
 def log_in(request):
     if request.method == 'POST':
@@ -150,7 +149,7 @@ def password(request):
             else:
                 messages.add_message(request, messages.ERROR, "New password does not match criteria!")
     form = PasswordForm()
-    return render(request, 'password.html', {'form': form}) 
+    return render(request, 'password.html', {'form': form})
 
 @login_required
 def create_club(request):
@@ -174,7 +173,7 @@ def add_review(request, book_id):
     review_user = request.user
     if reviewed_book.ratings.all().filter(user=review_user).exists():
         return HttpResponseForbidden()
-        
+
     if request.method == 'POST':
         form = RatingForm(request.POST)
         if form.is_valid():
@@ -202,29 +201,34 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id) 
+            return redirect('book_details', book_id=book.id)
 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
 
 @login_required
-def book_details(request, book_id) : 
+def book_details(request, book_id) :
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
+    user = request.user
+    check_reader = book.is_reader(user);
     reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
         rating = rating[0]
     reviews_count = book.ratings.all().exclude(review = "").exclude( user=request.user).count()
-    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count })
+    context = {'book': book, 'form':form,
+        'rating': rating , 'reviews' :reviews ,
+        'reviews_count':reviews_count, 'user': user, 'reader': check_reader}
+    return render(request, "book_details.html", context)
 
 @login_required
 def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
 
     if user_id == request.user.id:
-        return redirect('profile') 
+        return redirect('profile')
 
     if user_id:
         user = get_object_or_404(User.objects, id=user_id)
@@ -295,7 +299,7 @@ def withdraw_club(request, club_id):
     if not club.is_member(user):
         messages.add_message(request, messages.ERROR, "You are not a member of this club!")
         return redirect('club_page', club_id)
-    
+
     club.members.remove(user)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
@@ -310,7 +314,7 @@ def books_list(request, club_id=None, user_id=None):
     if user_id:
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
-    
+
     count = books_queryset.count()
     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
     page_number = request.GET.get('page')
@@ -346,7 +350,7 @@ def members_list(request, club_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
- 
+
 
 @login_required
 def applicants_list(request, club_id):
@@ -355,7 +359,7 @@ def applicants_list(request, club_id):
     applicants = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
-        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user }) 
+        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
         return redirect('club_page', club_id)
@@ -403,13 +407,24 @@ def edit_club_information(request, club_id):
             messages.add_message(request, messages.SUCCESS, "Successfully updated club information!")
             return redirect('club_page', club_id)
     else:
-        form = ClubForm(instance = club) 
+        form = ClubForm(instance = club)
     context = {
         'form': form,
         'club_id':club_id,
     }
     return render(request, 'edit_club_info.html', context)
 
+@login_required
+def add_book_to_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    if book.is_reader(user):
+        book.remove_reader(user)
+        messages.add_message(request, messages.SUCCESS, "Book Removed!")
+    else:
+        book.add_reader(user)
+        messages.add_message(request, messages.SUCCESS, "Book Added!")
+    return redirect("book_details", book.id)
 
 @login_required
 def edit_review(request, review_id ):
@@ -427,7 +442,7 @@ def edit_review(request, review_id ):
                 return redirect('book_details', book_id= review.book.id)
             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
-            form = EditRatingForm(instance = review) 
+            form = EditRatingForm(instance = review)
     else:
         return render(request, '404_page.html', status=404)
         #return redirect('handler404')
@@ -450,3 +465,4 @@ def initial_book_list(request):
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
 
 
+   

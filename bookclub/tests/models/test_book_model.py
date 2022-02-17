@@ -92,6 +92,26 @@ class BookModelTestCase(TestCase):
         self.book.add_reader(nonReader)
         self.assertEqual(self.book.readers_count(), count+1)
 
+    def test_reader_addition_when_user_is_already_a_reader(self):
+        reader = User.objects.get(id=1)
+        self.book.add_reader(reader)
+        count = self.book.readers_count()
+        self.book.add_reader(reader)
+        self.assertEqual(self.book.readers_count(), count)
+
+    def test_reader_deletion(self):
+        reader = User.objects.get(id=1)
+        self.book.add_reader(reader)
+        count = self.book.readers_count()
+        self.book.remove_reader(reader)
+        self.assertEqual(self.book.readers_count(), count-1)
+
+    def test_reader_deletion_when_user_is_not_a_reader(self):
+        nonReader = User.objects.get(id=1)
+        count = self.book.readers_count()
+        self.book.remove_reader(nonReader)
+        self.assertEqual(self.book.readers_count(), count)
+
     def test_club_addition(self):
         club = Club.objects.get(id=1)
         count = self.book.clubs_count()
