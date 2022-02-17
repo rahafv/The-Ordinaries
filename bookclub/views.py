@@ -1,4 +1,3 @@
-from operator import is_
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -206,15 +205,20 @@ def add_book(request):
     return render(request, "add_book.html", {"form": form})
 
 @login_required
-def book_details(request, book_id):
+def book_details(request, book_id) :
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
+    user = request.user
+    check_reader = book.is_reader(user);
     reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
         rating = rating[0]
     reviews_count = book.ratings.all().exclude(review = "").exclude( user=request.user).count()
-    return render(request, "book_details.html", {'book': book, 'form':form, 'rating': rating , 'reviews' :reviews , 'reviews_count':reviews_count })
+    context = {'book': book, 'form':form,
+        'rating': rating , 'reviews' :reviews ,
+        'reviews_count':reviews_count, 'user': user, 'reader': check_reader}
+    return render(request, "book_details.html", context)
 
 @login_required
 def show_profile_page(request, user_id = None):
@@ -425,6 +429,17 @@ def edit_club_information(request, club_id):
     }
     return render(request, 'edit_club_info.html', context)
 
+@login_required
+def add_book_to_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    if book.is_reader(user):
+        book.remove_reader(user)
+        messages.add_message(request, messages.SUCCESS, "Book Removed!")
+    else:
+        book.add_reader(user)
+        messages.add_message(request, messages.SUCCESS, "Book Added!")
+    return redirect("book_details", book.id)
 
 @login_required
 def edit_review(request, review_id ):
