@@ -131,7 +131,7 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'image_url']
+        fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
         
     def clean(self): 
         self.oldISBN = self.cleaned_data.get('ISBN')
@@ -149,13 +149,15 @@ class BookForm(forms.ModelForm):
         if not self.image_url:
             self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
 
-        user = Book.objects.create(
+        book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
+            publisher=self.cleaned_data.get('publisher'),
             image_url=self.image_url,
+            year=self.cleaned_data.get('year'),
         )
-        return user
+        return book
 
 
 class UserForm(forms.ModelForm):

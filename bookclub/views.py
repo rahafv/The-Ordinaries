@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book 
+from .models import User, Club, Book, Rating
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
