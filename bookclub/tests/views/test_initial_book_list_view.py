@@ -21,13 +21,16 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
 
     # def test_continue_button_enabled(self):
     #      self.client.login(username=self.other_user.username, password='Password123')
+           #self.assertTemplateUsed(response, 'initial_book_list.html')
+   
 
-    def test_show_only_first_eight_books(self):
-         self.client.login(username=self.user.username, password='Password123')
-         response = self.client.get(self.url)
-         self.assertTemplateUsed(response, 'initial_book_list.html')
+    # def test_show_only_first_eight_books(self):
+    #      self.client.login(username=self.user.username, password='Password123')
+    #      response = self.client.get(self.url)
+    #      self.assertTemplateUsed(response, 'initial_book_list.html')
+    #      number_of_books = 
+    #      self.assertEqual()
 
-        
 
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
