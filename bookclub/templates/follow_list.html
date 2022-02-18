@@ -30,7 +30,7 @@
                     
                              <td> 
                                 {% if user != current_user %}
-                                {% if is_following %}
+                                {% if current_user in user.followers.all  %}
                                   <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary">Unfollow</a> 
                                 {% else %}
                                 <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary">Follow</a> 
