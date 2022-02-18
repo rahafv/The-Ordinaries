@@ -434,7 +434,7 @@ class Event(models.Model):
         if self.type_of_action == 'R' and not self.rating:
             raise ValidationError('Action must be rating')
         if self.type_of_action == 'U' and not self.action_user: 
-            raise ValidationError('Action must be action user')
+            raise ValidationError('Action must be user')
 
     def save(self, **kwargs):
         self.clean()
