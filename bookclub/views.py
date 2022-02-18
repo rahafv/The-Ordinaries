@@ -200,7 +200,6 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            create_event('U', 'B', "added", request.user, book=book)
             return redirect('book_details', book_id=book.id)
 
     else:
