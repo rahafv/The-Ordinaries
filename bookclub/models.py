@@ -46,17 +46,20 @@ class User(AbstractUser):
 
     city = models.CharField(
         max_length=50,
-        blank=True
+        blank=True, 
+        null=True
     )
 
     region = models.CharField(
         max_length=50,
-        blank=True
+        blank=True, 
+        null=True
     )
 
     country = models.CharField(
         max_length=50,
-        blank=True
+        blank=True, 
+        null=True
     )
 
     bio = models.CharField(
@@ -246,7 +249,7 @@ class Book(models.Model):
         blank=True,
         validators=[
             MaxValueValidator(datetime.datetime.now().year),
-            MinValueValidator(1)
+            MinValueValidator(0)
         ]
     )
 
@@ -263,10 +266,17 @@ class Book(models.Model):
     class Meta:
         ordering = ['title']
 
+    def is_reader(self, reader):
+        return self.readers.all().filter(id=reader.id).exists()
+
     def add_reader(self, reader):
-        if not self.readers.all().filter(id=reader.id).exists():
+        if not self.is_reader(reader):
             self.readers.add(reader)
-    
+            
+    def remove_reader(self, reader):
+        if self.is_reader(reader):
+            self.readers.remove(reader)
+ 
     def readers_count(self):
         return self.readers.all().count()  
 
