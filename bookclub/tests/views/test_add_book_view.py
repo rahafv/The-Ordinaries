@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
-from bookclub.models import User, Book
+from bookclub.models import User, Book, Event
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
 class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
@@ -52,11 +52,13 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
     def test_add_book_successful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_books_before = Book.objects.count()
+        count_events_before = Event.objects.count() 
         target_url = reverse("book_details", kwargs={"book_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "book_details.html")
         self.assertEqual(count_books_before + 1, Book.objects.count())
+        self.assertEqual(count_events_before + 1, Event.objects.count())
         club = Book.objects.get(ISBN="0195153448")
         self.assertEqual(club.title, "Classical")
         self.assertEqual(club.author, "Mark")

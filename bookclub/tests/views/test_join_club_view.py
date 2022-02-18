@@ -1,7 +1,7 @@
 """Tests of the join club view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
+from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
 class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
@@ -51,11 +51,12 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
 
     def test_non_member_successful_join_club(self):
         self.client.login(username=self.user.username, password="Password123")
-        before_count = self.club.member_count()
+        members_before_count = self.club.member_count()
+        events_before_count = Event.objects.count() 
         response = self.client.get(self.url, follow=True)
-        after_count = self.club.member_count()
         self.assertTrue(self.club.is_member(self.user))
-        self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(members_before_count + 1, self.club.member_count())
+        self.assertEqual(events_before_count + 1, Event.objects.count())
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
@@ -97,8 +98,6 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTes
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_error_message(response)
         self.assert_menu(response)
-
-
 
     def test_join_club_with_invalid_id(self):
         self.client.login(username=self.user.username, password="Password123")

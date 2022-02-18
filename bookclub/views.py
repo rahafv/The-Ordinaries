@@ -5,9 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import login_prohibited, generate_token
+from .helpers import login_prohibited, generate_token, create_event
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book , Rating
+from .models import User, Club, Book , Rating, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
@@ -156,6 +156,7 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
+            create_event('U', 'C', "created", club_owner, club)
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
@@ -177,6 +178,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            create_event('U', 'B', "reviewed", review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
@@ -198,6 +200,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
+            create_event('U', 'B', "added", request.user, book=book)
             return redirect('book_details', book_id=book.id)
 
     else:
@@ -281,6 +284,7 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
+    create_event('U', 'C', "joined", user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -298,6 +302,7 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
+    create_event('U', 'C', "withdrew", user, club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -417,9 +422,11 @@ def add_book_to_list(request, book_id):
     user = request.user
     if book.is_reader(user):
         book.remove_reader(user)
+        create_event('U', 'B', "removed", user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        create_event('U', 'B', "added", user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
 
@@ -450,5 +457,7 @@ def edit_review(request, review_id ):
 def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
+    if(not current_user.is_following(followee)):
+        create_event('U', 'AU', "followed", current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)

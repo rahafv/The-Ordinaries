@@ -1,7 +1,7 @@
 [
     {
       "model": "bookclub.Event",
-      "pk": 4,
+      "pk": 5,
       "fields": {
         "type_of_actor": "C",
         "type_of_action": "M",
