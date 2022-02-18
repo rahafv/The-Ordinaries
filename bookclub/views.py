@@ -103,13 +103,17 @@ def log_in(request):
 
             if user:
                 login(request, user)
-                redirect_url = next or 'home'
+                if len(user.books.all()) == 0:
+                    redirect_url = next or 'initial_book_list'
+                else:
+                    redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
+
 
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
@@ -437,4 +441,13 @@ def follow_toggle(request, user_id):
     followee = get_object_or_404(User.objects, id=user_id)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id) 
+
+@login_required
+def initial_book_list(request):
+    current_user = request.user
+    my_books = Book.objects.all()
+    list_length = len(current_user.books.all())
+    sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
+
 
