@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import CreateClubForm
-from bookclub.models import Club, User
+from bookclub.models import Club, User, Event
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
 class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
@@ -34,15 +34,17 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertTrue(isinstance(form, CreateClubForm))
         self.assertFalse(form.is_bound)
         self.assert_menu(response)
-
+ 
     def test_create_club_successful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
+        count_events_before = Event.objects.count() 
         target_url = reverse("club_page", kwargs={"club_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
+        self.assertEqual(count_clubs_before + 1, Club.objects.count())
+        self.assertEqual(count_events_before + 1, Event.objects.count())
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "club_page.html")
-        self.assertEqual(count_clubs_before + 1, Club.objects.count())
         club = Club.objects.get(name="Club1")
         self.assertEqual(club.name, "Club1")
         self.assertEqual(club.theme, "Fiction")

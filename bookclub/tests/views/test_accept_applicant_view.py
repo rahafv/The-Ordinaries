@@ -1,7 +1,7 @@
 """Tests of the join club view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
+from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
 class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
@@ -59,6 +59,7 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
     def test_non_member_successful_acceptance_in_club(self):
         self.client.login(username=self.owner.username, password="Password123")
         before_count = self.club.member_count()
+        events_before_count = Event.objects.count() 
         self.assertTrue(self.club.is_applicant(self.user))
         applicants_before_count = self.club.applicants_count()
         response = self.client.get(self.url, follow=True)
@@ -67,6 +68,7 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
         self.assertTrue(self.club.is_member(self.user))
         self.assertFalse(self.club.is_applicant(self.user))
         self.assertEqual(after_count, before_count + 1)
+        self.assertEqual(events_before_count + 1, Event.objects.count())
         self.assertEqual(applicants_after_count, applicants_before_count - 1)
         response_url = reverse('applicants_list', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)

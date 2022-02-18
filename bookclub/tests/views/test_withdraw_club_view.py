@@ -1,7 +1,7 @@
 """Tests of the withdraw club view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
+from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
 
@@ -50,10 +50,11 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
     def test_member_successful_withdraw_club(self):
         self.client.login(username=self.member.username, password="Password123")
         before_count = self.club.member_count()
+        events_before_count = Event.objects.count() 
         response = self.client.get(self.url, follow=True)
-        after_count = self.club.member_count()
         self.assertFalse(self.club.is_member(self.user))
-        self.assertEqual(after_count, before_count - 1)
+        self.assertEqual(before_count - 1, self.club.member_count())
+        self.assertEqual(events_before_count + 1, Event.objects.count())
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
