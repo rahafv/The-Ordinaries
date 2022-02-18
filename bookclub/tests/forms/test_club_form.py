@@ -5,7 +5,7 @@ from bookclub.forms import ClubForm
 from bookclub.models import User, Club
 
 
-class UserFormTestCase(TestCase):
+class ClubFormTestCase(TestCase):
     """Unit tests of the user form."""
     fixtures = [
         'bookclub/tests/fixtures/default_club.json',
@@ -19,6 +19,11 @@ class UserFormTestCase(TestCase):
         self.form_input = {
             'name': 'club2',
             'theme':'Drama',
+<<<<<<< HEAD
+=======
+            'meeting_type':Club.MeetingType.INPERSON,
+            'club_type': Club.ClubType.PUBLIC,
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
             'city' : 'New York',
             'country' : 'USA',
         }
@@ -27,6 +32,13 @@ class UserFormTestCase(TestCase):
         form = ClubForm()
         self.assertIn("name", form.fields)
         self.assertIn("theme", form.fields)
+<<<<<<< HEAD
+=======
+        self.assertIn("meeting_type", form.fields)
+        self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
+        self.assertIn("club_type", form.fields)
+        self.assertTrue(isinstance(form.fields["club_type"].widget, forms.Select))
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         self.assertIn("city", form.fields)
         self.assertIn("country", form.fields)
         
@@ -59,5 +71,10 @@ class UserFormTestCase(TestCase):
         self.assertEqual(members_after_count, members_before_count)
         self.assertEqual(self.club.name, 'club2')
         self.assertEqual(self.club.theme, 'Drama')
+<<<<<<< HEAD
+=======
+        self.assertEqual(self.club.meeting_type,Club.MeetingType.INPERSON )
+        self.assertEqual(self.club.club_type, Club.ClubType.PUBLIC)
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")

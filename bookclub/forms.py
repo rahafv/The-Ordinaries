@@ -95,7 +95,13 @@ class CreateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
+<<<<<<< HEAD
         fields = ['name', 'theme', 'city', 'country']
+=======
+        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
+        labels = {'club_type': "Select Club Privacy Status"}
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
@@ -212,13 +218,11 @@ class UserForm(forms.ModelForm):
 
     def save(self):
         """Save user."""
-
-        if self.is_valid():
-            birthdate= self.cleaned_data.get('date_of_birth')
-            new_age = self.calculate_age(birthdate)  
-            if(self.log_in_user is not None):
-                self.log_in_user.set_age(new_age)
-                return self.log_in_user
+        super().save(commit=False) 
+        birthdate= self.cleaned_data.get('date_of_birth')
+        new_age = self.calculate_age(birthdate)  
+        self.log_in_user.set_age(new_age)
+        return self.log_in_user
       
 
 class ClubForm(forms.ModelForm):
@@ -228,8 +232,38 @@ class ClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
+<<<<<<< HEAD
         fields = ['name', 'theme', 'city','country']
+=======
+        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        labels = {'club_type': "Club Privacy Setting:"}
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         exclude = ['owner']
+
+class EditRatingForm(forms.ModelForm):
+    """Form to update club information."""
+    
+    class Meta:
+        
+        model = Rating
+        fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+    
+    def calculate_rating(self, rating): 
+        return rating*2
+
+    def save(self , reviwer, reviewedBook):
+        super().save(commit=False)
+        rate = self.cleaned_data.get('rating')
+        if not rate:
+            rate = 0 
+        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
+            rating=self.calculate_rating(rate),
+            review=self.cleaned_data.get('review'),
+        )
+        return review
 
 
 class RatingForm(forms.ModelForm):
@@ -243,6 +277,7 @@ class RatingForm(forms.ModelForm):
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
+        
     def save(self, reviwer, reviewedBook):
         """Create a new rating."""
         super().save(commit=False)

@@ -7,6 +7,11 @@
           "owner": 2,
           "members": [3,2],
           "theme": "Crime",
+<<<<<<< HEAD
+=======
+          "meeting_type": "OL",
+          "club_type": "Public",
+>>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
           "city":"london", 
           "country":"uk"
         }

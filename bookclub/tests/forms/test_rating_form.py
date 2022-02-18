@@ -1,10 +1,7 @@
-"""Unit tests of the club form."""
+"""Unit tests of the rating form."""
 from django.test import TestCase
 from bookclub.models import User, Book, Rating
 from bookclub.forms import RatingForm
-from datetime import datetime 
-
-
 
 class RatingFormTestCase(TestCase):
     """Unit tests of the review form."""
@@ -20,11 +17,11 @@ class RatingFormTestCase(TestCase):
             'rating': 4.0,
         }
        
-        self.wrong_form_input= {
+        self.empty_rating_form_input= {
             'user': 1,
             'book':1,
             'review': 'Great book',
-            'rating': 4.0,
+            'rating':None ,
         }
 
     
@@ -49,7 +46,13 @@ class RatingFormTestCase(TestCase):
         self.assertEqual(rating.book, book)
         self.assertEqual(rating.review, 'Great book')
         self.assertEqual(rating.rating, 4*2)
-
+ 
+    def test_review_form_must_save_correctly_and_rating_can_be_empty(self):
+        form = RatingForm(data=self.empty_rating_form_input)
+        user = User.objects.get(id=1)
+        book = Book.objects.get(id=1)
+        form.save(user, book)
+        self.assertTrue(form.is_valid())
         
 
     
