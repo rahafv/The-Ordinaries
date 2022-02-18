@@ -1,5 +1,4 @@
 """Tests of the sign up view."""
-import re
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm

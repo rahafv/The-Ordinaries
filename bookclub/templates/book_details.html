@@ -5,7 +5,16 @@
   <div class="row">
     <div class="col-12">
         <h2 class="d-flex justify-content-center mb-5">{{ book.title }} </h2>
-        <div class="row mt-5">
+        <span class="float-left">
+          {% if reader %}
+          <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill"
+          style="font-size: 1.8rem; color: green;"></a>
+          {% else %}
+          <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-plus"
+          style="font-size: 1.8rem; color: grey;"></a>
+          {% endif %}
+        </span>
+        <div class="row">
           <div class="col-4">
             <div class="row mt-5">
               <h5>Average Rating: ({{book.average_rating}})</h5>
