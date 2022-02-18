@@ -17,7 +17,7 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.core.mail import EmailMessage
+from django.core.mail import send_mail 
 from system import settings
 from django.core.paginator import Paginator
 
@@ -49,18 +49,18 @@ def send_activiation_email(request, user_id):
 
     if not user.email_verified:
         current_site = get_current_site(request)
-        email_subject = 'Activate your account'
-        email_body = render_to_string('activate.html', {
+        subject = 'Activate your account'
+        body = render_to_string('activate.html', {
             'user': user,
             'domain': current_site,
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
             'token':generate_token.make_token(user)}
         )
+        email_from = settings.EMAIL_HOST_USER
+        email_to = [user.email]
 
-        email = EmailMessage(subject=email_subject, body=email_body,
-        from_email=settings.EMAIL_HOST_USER, to=[user.email])
+        send_mail(subject, body, email_from, email_to)
 
-        email.send()
         messages.add_message(request, messages.WARNING, 'Your email needs verification!')
     else:
         messages.add_message(request, messages.WARNING, 'Email is already verified!')

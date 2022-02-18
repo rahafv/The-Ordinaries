@@ -64,6 +64,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(club.author, "Mark")
         self.assertEqual(club.publisher, "Oxford")
         self.assertEqual(club.year, 2002)
+
         self.assert_menu(response)
 
     def test_get_add_book_redirects_when_not_logged_in(self):
