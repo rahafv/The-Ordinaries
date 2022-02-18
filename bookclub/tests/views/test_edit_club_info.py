@@ -21,11 +21,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
         self.form_input = {
             'name': 'club2.0',
             'theme':'Drama',
-<<<<<<< HEAD
-=======
             'meeting_type':Club.MeetingType.INPERSON,
             'club_type': Club.ClubType.PRIVATE,
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
             'city' : 'New York',
             'country' : 'USA',
         }
@@ -63,11 +60,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
         self.club.refresh_from_db()
         self.assertEqual(self.club.name, 'club1')
         self.assertEqual(self.club.theme, 'Crime')
-<<<<<<< HEAD
-=======
         self.assertEqual(self.club.meeting_type, Club.MeetingType.ONLINE)
         self.assertEqual(self.club.club_type, Club.ClubType.PUBLIC)
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         self.assertEqual(self.club.city, 'london')
         self.assertEqual(self.club.country, 'uk')
         self.assert_menu(response)
@@ -85,11 +79,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
         self.club.refresh_from_db()
         self.assertEqual(self.club.name, "club2.0")
         self.assertEqual(self.club.theme, "Drama")
-<<<<<<< HEAD
-=======
         self.assertEqual(self.club.meeting_type, Club.MeetingType.INPERSON)
         self.assertEqual(self.club.club_type, Club.ClubType.PRIVATE)
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")
         self.assertEqual(self.club.owner, self.owner)

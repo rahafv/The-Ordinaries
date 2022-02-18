@@ -13,11 +13,8 @@ class CreateClubFormTestCase(TestCase):
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
-<<<<<<< HEAD
-=======
             'meeting_type': Club.MeetingType.INPERSON,
             'club_type': Club.ClubType.PUBLIC,
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
             'city': 'nyc', 
             'country': 'usa'
         }
@@ -30,10 +27,6 @@ class CreateClubFormTestCase(TestCase):
         form = CreateClubForm()
         self.assertIn("name", form.fields)
         self.assertIn("theme", form.fields)
-<<<<<<< HEAD
-        self.assertIn("city", form.fields)
-        self.assertIn("country", form.fields)
-=======
         self.assertIn("meeting_type", form.fields)
         self.assertIn("club_type", form.fields)
         self.assertIn("city", form.fields)
@@ -41,7 +34,6 @@ class CreateClubFormTestCase(TestCase):
         self.assertTrue(isinstance(form.fields["meeting_type"].widget, forms.Select))
         self.assertTrue(isinstance(form.fields["club_type"].widget, forms.Select))
 
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
 
     def test_form_model_validation(self):
         self.form_input["name"] = ""
@@ -58,11 +50,8 @@ class CreateClubFormTestCase(TestCase):
         self.assertEqual(count_clubs_before + 1, Club.objects.count())
         self.assertEqual(club.name, "Club1")
         self.assertEqual(club.theme, "Fiction")
-<<<<<<< HEAD
-=======
         self.assertEqual(club.meeting_type, Club.MeetingType.INPERSON)
         self.assertEqual(club.club_type, Club.ClubType.PUBLIC)
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         self.assertEqual(club.city, "nyc")
         self.assertEqual(club.country, "usa")
         self.assertEqual(club.owner, owner)

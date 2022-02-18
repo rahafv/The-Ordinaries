@@ -414,55 +414,23 @@ def edit_club_information(request, club_id):
     }
     return render(request, 'edit_club_info.html', context)
 
-# def base64_encode(message):
-#     import base64
-#     message_bytes = message.encode('ascii')
-#     base64_bytes = base64.b64encode(message_bytes)
-#     base64_message = base64_bytes.decode('ascii')
-#     return base64_message
-
-# def zoom_auth(request):
-#     code = request.GET["code"]
-#     data = requests.post(f"https://zoom.us/oauth/token?grant_type=authorization_code&code={code}&redirect_uri=http://localhost:8000/zoom/auth/", headers={
-#         "Authorization": "Basic " + base64_encode("5V2wX24dRMyeT2ukdlGNxw:f9Lu9GTbWd5blxs6MJxxeVhAsZZStKxw")
-#     })
-#     print(data.text)
-#     request.session["zoom_access_token"] = data.json()["access_token"]
-#     return redirect('schedule_meeting')
-
-# def schedule_meeting(request, club_id):
-#     club = get_object_or_404(Club.objects, id=club_id)
+def schedule_meeting(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
     
-#     if request.method == 'POST':
-#         form = MeetingForm(club, request.POST)
-        
-#         if form.is_valid():
-#             invitees = []
-#             for mem in club.members.all():
-#                 invitees.append({"email": mem.email})
+    if request.method == 'POST':
+        form = MeetingForm(club, request.POST)
 
-#             data = requests.post("https://api.zoom.us/v2/users/me/meetings", 
-#                 headers={
-#                     'content-type': "application/json",
-#                     "authorization": f"Bearer {request.session['zoom_access_token']}"
-#                 }, 
-#                 data=json.dumps({
-#                     "topic": f"{club.name} discussion",
-#                     "type": 2,
-#                     "start_time": request.POST["time"],
-#                     "settings": {
-#                         "meeting_invitees": invitees,
-#                         "registrants_email_notification": True,
-#                         "registrants_confirmation_email": True,
-#                     }
-#                 })
-#             )
-#             form.save(data.json()["start_url"], data.json()["join_url"])
-#             return redirect('club_page', club_id=club.id)
+        if form.is_valid():
+            invitees = []
+            for mem in club.members.all():
+                invitees.append(mem.email)
 
-#     else:
-#         form = MeetingForm(club)
-#     return render(request, 'schedule_meeting.html', {'form': form})
+            form.save()
+            return redirect('club_page', club_id=club.id)
+
+    else:
+        form = MeetingForm(club)
+    return render(request, 'schedule_meeting.html', {'form': form})
 
 
 @login_required

@@ -95,13 +95,9 @@ class CreateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-<<<<<<< HEAD
-        fields = ['name', 'theme', 'city', 'country']
-=======
-        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        fields = ['name', 'theme','club_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
         labels = {'club_type': "Select Club Privacy Status"}
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
 
 class PasswordForm(forms.Form):
     """Form enabling users to change their password."""
@@ -232,12 +228,8 @@ class ClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-<<<<<<< HEAD
-        fields = ['name', 'theme', 'city','country']
-=======
-        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        fields = ['name', 'theme', 'club_type','city','country']
         labels = {'club_type': "Club Privacy Setting:"}
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb
         exclude = ['owner']
 
 class EditRatingForm(forms.ModelForm):
@@ -302,19 +294,27 @@ class MeetingForm(forms.ModelForm):
         """Form options."""
 
         model = Meeting
-        fields = ['title', 'time', 'notes']
+        fields = ['title', 'time', 'notes', 'link']
         widgets = {
             'time': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
             'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
-        exclude = ['club', 'book']
+        exclude = ['club', 'book', 'member']
 
     def __init__(self, club, *args, **kwargs):
         self.club = club
         super(MeetingForm, self).__init__(*args, **kwargs)
         
+    def clean(self):
+        super().clean()
+        if self.club.meeting_type == Club.ClubType.PUBLIC:
+            if not self.cleaned_data.get('link'):
+                msg = forms.ValidationError("Provide a link to the meeting.")
+                self.add_error('link', msg)
 
-    def save(self, start, join):
+        return self.cleaned_data
+
+    def save(self):
         """Create a new meeting."""
 
         super().save(commit=False)
@@ -322,11 +322,9 @@ class MeetingForm(forms.ModelForm):
         meeting = Meeting.objects.create(
             title = self.cleaned_data.get('title'),
             club = self.club,
-            book = books.filter(id=random.randint(1,len(books))),
             time = self.cleaned_data.get('time'),
             notes = self.cleaned_data.get('notes'),
-            start_url = start,
-            join_url = join,
+            link = self.cleaned_data.get('link'),
         )
         return meeting
         

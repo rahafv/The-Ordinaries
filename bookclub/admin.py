@@ -22,10 +22,7 @@ class RatingAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-<<<<<<< HEAD
-    list_display = ["title", "club", "time", "notes"]
-=======
-    list_display = ["title", "club", "book", "time", "link", "notes"]
+    list_display = ["title", "club", "book", "time", "notes"]
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -36,4 +33,3 @@ class EventAdmin(admin.ModelAdmin):
 
     
     
->>>>>>> 4155aafe82568a5db1ad8ad471ebb6235b9c50cb

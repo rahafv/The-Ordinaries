@@ -135,6 +135,17 @@ class Club(models.Model):
         on_delete=models.CASCADE
     )
 
+    class MeetingType(models.TextChoices):
+        INPERSON = "IP", "In-person"
+        ONLINE = "OL", "Online"
+
+    meeting_type = models.CharField(
+        max_length=2,
+        choices=MeetingType.choices,
+        default=MeetingType.INPERSON,
+        blank=False,
+    )
+
     class ClubType(models.TextChoices):
         PRIVATE =  "Private"
         PUBLIC =  "Public"
@@ -331,7 +342,7 @@ class Meeting(models.Model):
         related_name='meetings'
     )
 
-    member = models.ForeignKey(
+    chooser = models.ForeignKey(
         User, 
         on_delete=models.CASCADE,
         related_name='rotations',
@@ -355,14 +366,9 @@ class Meeting(models.Model):
         blank=True
     )
 
-    start_url = models.URLField(
+    link = models.URLField(
         max_length=1000,
         blank=True
-    )
-
-    join_url = models.URLField(
-        max_length=1000,
-        blank=False
     )
 
     
