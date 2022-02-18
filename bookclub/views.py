@@ -302,7 +302,7 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    create_event('U', 'C', "withdrew", user, club)
+    create_event('U', 'C', "withdrew from", user, club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
