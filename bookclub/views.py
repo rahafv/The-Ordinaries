@@ -383,6 +383,20 @@ def callback(request):
   store_user(request, user)
   return HttpResponseRedirect(reverse('home'))
 
+def initialize_context(request):
+  context = {}
+
+  # Check for any errors in the session
+  error = request.session.pop('flash_error', None)
+
+  if error != None:
+    context['errors'] = []
+    context['errors'].append(error)
+
+  # Check for user in the session
+  context['user'] = request.session.get('user', {'is_authenticated': False})
+  return context
+  
 def calendar(request):
     context = initialize_context(request)
     user = context['user']
@@ -399,7 +413,8 @@ def calendar(request):
         hour=0,
         minute=0,
         second=0,
-        microsecond=0)
+        microsecond=0
+    )
 
     # Based on today, get the start of the week (Sunday)
     if (today.weekday() != 6):
@@ -415,7 +430,8 @@ def calendar(request):
         token,
         start.isoformat(timespec='seconds'),
         end.isoformat(timespec='seconds'),
-        user['timeZone'])
+        user['timeZone']
+    )
 
     context['errors'] = [
         { 'message': 'Events', 'debug': format(events)}
