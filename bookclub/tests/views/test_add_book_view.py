@@ -1,5 +1,4 @@
 """Tests of the sign up view."""
-import re
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
@@ -58,11 +57,11 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "book_details.html")
         self.assertEqual(count_books_before + 1, Book.objects.count())
-        club = Book.objects.get(ISBN="0195153448")
-        self.assertEqual(club.title, "Classical")
-        self.assertEqual(club.author, "Mark")
-        self.assertEqual(club.publisher, "Oxford")
-        self.assertEqual(club.year, 2002)
+        book = Book.objects.get(ISBN="0195153448")
+        self.assertEqual(book.title, "Classical")
+        self.assertEqual(book.author, "Mark")
+        self.assertEqual(book.publisher, "Oxford")
+        self.assertEqual(book.year, 2002)
         self.assert_menu(response)
 
     def test_get_add_book_redirects_when_not_logged_in(self):
