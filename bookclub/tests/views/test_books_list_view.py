@@ -16,6 +16,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.user = User.objects.get(id=1)
         self.club = Club.objects.get(id=1)
         self.url = reverse('books_list')
+        self.BOOKS_PER_PAGE = 15
 
     def test_books_list_url(self):
         self.assertEqual(self.url,f'/books/')
@@ -33,58 +34,21 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
 
     def test_get_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_books(settings.BOOKS_PER_PAGE-1)
+        self._create_test_books(self.BOOKS_PER_PAGE-1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'books.html')
-        self.assertEqual(len(response.context['books']), settings.BOOKS_PER_PAGE)
-        for book_id in range(settings.BOOKS_PER_PAGE-1):
+        self.assertEqual(len(response.context['books']),self.BOOKS_PER_PAGE)
+        for book_id in range(self.BOOKS_PER_PAGE-1):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
             books_url = reverse('books_list')
             self.assertContains(response, books_url)
         self.assert_menu(response)
 
-    def test_get_books_list_with_pagination(self):
-        self.client.login(username=self.user.username, password='Password123')
-        self._create_test_books(settings.BOOKS_PER_PAGE*2+3)
-        response = self.client.get(self.url)
-        self.assert_menu(response)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
-        self.assertEqual(len(response.context['books']), settings.BOOKS_PER_PAGE)
-        page_obj = response.context['books']
-        self.assertFalse(page_obj.has_previous())
-        self.assertTrue(page_obj.has_next())
-        page_one_url = reverse('books_list') + '?page=1'
-        response = self.client.get(page_one_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
-        self.assertEqual(len(response.context['books']), settings.BOOKS_PER_PAGE)
-        page_obj = response.context['books']
-        self.assertFalse(page_obj.has_previous())
-        self.assertTrue(page_obj.has_next())
-        page_two_url = reverse('books_list') + '?page=2'
-        response = self.client.get(page_two_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
-        self.assertEqual(len(response.context['books']), settings.BOOKS_PER_PAGE)
-        page_obj = response.context['books']
-        self.assertTrue(page_obj.has_previous())
-        self.assertTrue(page_obj.has_next())
-        page_three_url = reverse('books_list') + '?page=3'
-        response = self.client.get(page_three_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
-        self.assertEqual(len(response.context['books']), 4)
-        page_obj = response.context['books']
-        self.assertTrue(page_obj.has_previous())
-        self.assertFalse(page_obj.has_next())
-        self.assert_menu(response)
-
     def test_get_user_empty_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_books(settings.BOOKS_PER_PAGE-1)
+        self._create_test_books(self.BOOKS_PER_PAGE-1)
         self.url = reverse('books_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -97,7 +61,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
     
     def test_get_user_filled_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_books(settings.BOOKS_PER_PAGE-1)
+        self._create_test_books(self.BOOKS_PER_PAGE-1)
         Book.objects.get(id=2).add_reader(self.user)
         Book.objects.get(id=3).add_reader(self.user)
         self.url = reverse('books_list', kwargs={'user_id': self.user.id})

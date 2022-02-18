@@ -1,0 +1,14 @@
+[
+    {
+      "model": "bookclub.Event",
+      "pk": 2,
+      "fields": {
+        "type_of_actor": "C",
+        "type_of_action": "B",
+        "club": 1,
+        "book": 1,
+        "message": "My first club event",
+        "created_at": "2021-11-30T02:15:12.356Z"
+      }
+    }
+]
