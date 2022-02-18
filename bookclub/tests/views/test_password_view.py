@@ -104,8 +104,6 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMix
         self.assert_menu(response)
 
     def test_post_profile_redirects_when_not_logged_in(self):
-        redirect_url = reverse_with_next('log_in', self.url)
-        response = self.client.post(self.url, self.form_input)
-        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+        self.assert_post_redirects_when_not_logged_in()
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
