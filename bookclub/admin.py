@@ -13,7 +13,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ["ISBN", "title", "author", "publisher", "year"]
+    list_display = ["ISBN", "title", "author"]
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
