@@ -421,7 +421,6 @@ def add_book_to_list(request, book_id):
     user = request.user
     if book.is_reader(user):
         book.remove_reader(user)
-        create_event('U', 'B', "removed", user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
