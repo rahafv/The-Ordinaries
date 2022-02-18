@@ -193,7 +193,7 @@ def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     is_applicant = club.is_applicant(current_user)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant})
 
 @login_required
 def add_book(request):
@@ -274,7 +274,7 @@ def join_club(request, club_id):
         return redirect('club_page', club_id)
 
 
-    if(club.get_club_type_display() == "Private"):
+    if(club.club_type == "Private"):
         if not club.is_applicant(user):
             club.applicants.add(user)
             messages.add_message(request, messages.SUCCESS, "You have successfully applied!")

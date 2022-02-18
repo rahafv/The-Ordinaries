@@ -139,11 +139,11 @@ class Club(models.Model):
     )
 
     class MeetingType(models.TextChoices):
-        INPERSON = "IP", "In-person"
-        ONLINE = "OL", "Online"
+        INPERSON = "In-person"
+        ONLINE = "Online"
 
     meeting_type = models.CharField(
-        max_length=2,
+        max_length=9,
         choices=MeetingType.choices,
         default=MeetingType.INPERSON,
         blank=False,
@@ -154,8 +154,8 @@ class Club(models.Model):
         PUBLIC =  "Public"
 
     club_type = models.CharField(
-        max_length = 7,
-        choices = ClubType.choices, 
+        max_length=7,
+        choices=ClubType.choices, 
         default=ClubType.PUBLIC, 
         blank = False
     )
@@ -211,9 +211,6 @@ class Club(models.Model):
     def is_applicant(self, user):
         """ checks if the user is a member"""
         return self.applicants.all().filter(id=user.id).exists()
-    
-    def get_club_type_display(self):
-        return self.club_type
 
 class Book(models.Model):
     """Book model."""
