@@ -31,9 +31,9 @@
                              <td> 
                                 {% if user != current_user %}
                                 {% if current_user in user.followers.all  %}
-                                  <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary">Unfollow</a> 
+                                  <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-outline-secondary">Unfollow</a> 
                                 {% else %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary">Follow</a> 
+                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-outline-info">Follow</a> 
                                 {% endif %}
                               {% endif %} 
                             </td>
