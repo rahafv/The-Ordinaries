@@ -21,9 +21,12 @@
                     <h2 class="title">{{ book.title }}
                         <span>{{ book.author }}</span>
                     </h2>
-                    <ul class="social-link">
-                        <li><a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi bi-plus-square-fill "></a></li>
-                    </ul>
+                    <div class="social-link">
+                      
+                        <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi bi-plus-square-fill"  style="font-size: 1.8rem; color: black;"></a>
+                      
+                        
+                    </div>
                 </div>
             </div>
         </div>

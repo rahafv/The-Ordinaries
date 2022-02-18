@@ -342,19 +342,19 @@ label:hover ~ input:checked ~ label{
     opacity:1;
     transform: translateY(0);
 }
-.profile-card .profile-content .social-link li{
+.profile-card .profile-content .social-link {
     display: inline-block;
     list-style: none;
     margin:0 4px;
 }
-.profile-card .profile-content .social-link li a{
+.profile-card .profile-content .social-link  a{
     color:#333;
     width:30px;
     height:25px;
     line-height:24px;
     text-align: center;
     border-radius:5px;
-    background-color: #fff;
+   
 }
 
 
