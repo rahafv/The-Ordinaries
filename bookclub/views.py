@@ -373,6 +373,7 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
+        create_event('U', 'C', "joined", applicant, club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         return redirect('applicants_list', club_id)
     else:
