@@ -7,14 +7,14 @@ from bookclub.tests.helpers import LoginRedirectTester
 
 class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
 
-    fixtures = ['bookclub/tests/fixtures/other_users.json' , 
-                'bookclub/tests/fixtures/other_books.json'
-    ]
+    fixtures = ['bookclub/tests/fixtures/default_user.json']  
+    #             'bookclub/tests/fixtures/other_books.json'
+    # ]
 
     def setUp(self):
         self.url = reverse('initial_book_list')
-        self.user = User.objects.get(id=5)
-        self.other_user = User.objects.get(id=3)
+        self.user = User.objects.get(id=1)
+        # self.other_user = User.objects.get(id=3)
 
     def test_initial_book_list_url(self):
         self.assertEqual(self.url,'/initial_book_list/') 
@@ -38,20 +38,11 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'initial_book_list.html')
         self.assertEqual(len(response.context['my_books']),8)
-        self.assertContains(response, f'book1 title')
-        self.assertContains(response, f'book2 title')
-        self.assertContains(response, f'book3 title')
-        self.assertContains(response, f'book4 title')
-        self.assertContains(response, f'book5 title')
-        self.assertContains(response, f'book7 title')
-        self.assertContains(response, f'book6 title')
-        self.assertContains(response, f'book8 title')
-
-        # for book_id in range(8):
-            # self.assertContains(response, f'book{book_id} title')
-            # self.assertContains(response, f'book{book_id} author')
-        books_url = reverse('initial_book_list')
-        self.assertContains(response, books_url)
+        for book_id in range(8):
+            self.assertContains(response, f'book{book_id} title')
+            self.assertContains(response, f'book{book_id} author')
+            books_url = reverse('initial_book_list')
+            self.assertContains(response, books_url)
     
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
