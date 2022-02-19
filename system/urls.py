@@ -52,7 +52,7 @@ urlpatterns = [
     path('initial_book_list/', views.initial_book_list, name ='initial_book_list'),
     path('initial_book_list/<int:book_id>', views.initial_book_list, name ='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
-    path('initial_book_list/<int:book_id>/add_book_from_initial_list_to_my_list/', views.add_book_from_initial_list_to_my_list, name ='add_book_from_initial_list_to_my_list'),
+    path('initial_book_list/<int:book_id>/add_book/', views.add_book_from_initial_list, name ='add_book_from_initial_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name ='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name ='withdraw_club'),
