@@ -458,12 +458,19 @@ def follow_toggle(request, user_id):
     return redirect('profile', followee.id) 
 
 @login_required
-def initial_book_list(request):
+def initial_book_list(request , book_id = None):
     current_user = request.user
-    my_books = Book.objects.all()
+    my_books = Book.objects.all().exclude()
     list_length = len(current_user.books.all())
     sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
+
+@login_required
+def add_book_from_initial_list_to_my_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    book.add_reader(user)
+    return redirect("initial_book_list", book.id)
 
 
 
