@@ -474,4 +474,3 @@ def add_book_from_initial_list(request, book_id):
     return redirect("initial_book_list", book.id)
 
 
-

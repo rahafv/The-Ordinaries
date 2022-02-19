@@ -22,7 +22,7 @@
                         <span>{{ book.author }}</span>
                     </h2>
                     <div class="social-link">
-                        <a href='{% url 'add_book_from_initial_list_to_my_list' book_id=book.id %}' class="bi bi-plus-square-fill"  style="font-size: 1.8rem; color: black;"></a>    
+                        <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="bi bi-plus-square-fill"  style="font-size: 1.8rem; color: black;"></a>    
                     </div>
                 </div>
             </div>
