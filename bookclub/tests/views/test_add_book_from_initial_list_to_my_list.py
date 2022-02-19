@@ -16,28 +16,14 @@ class AddBookFromInitialListToListViewTestCase(TestCase, LoginRedirectTester):
     def test_book_details_url(self):
         self.assertEqual(self.url, f'/initial_book_list/{self.book.id}/add_book_from_initial_list_to_my_list/')
 
-    # def test_successful_book_addition(self):
-    #     count = self.book.readers_count()
-    #     self.client.login(username=self.user.username, password='Password123')
-    #     response = self.client.get(self.url, follow=True)
-    #     target_url = reverse("book_details", kwargs={"book_id": self.book.id})
-    #     self.assertTemplateUsed(response, 'book_details.html')
-    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-    #     self.assert_success_message(response)
-    #     self.assert_menu(response)
-    #     self.assertEqual(self.book.readers_count(), count+1)
-
-    # def test_successful_book_removal(self):
-    #     self.client.login(username=self.user.username, password='Password123')
-    #     self.book.add_reader(self.user)
-    #     count = self.book.readers_count()
-    #     response = self.client.get(self.url, follow=True)
-    #     target_url = reverse("book_details", kwargs={"book_id": self.book.id})
-    #     self.assertTemplateUsed(response, 'book_details.html')
-    #     self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-    #     self.assert_success_message(response)
-    #     self.assert_menu(response)
-    #     self.assertEqual(self.book.readers_count(), count-1)
+    def test_successful_book_addition(self):
+        count = self.book.readers_count()
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        target_url = reverse("initial_book_list", kwargs={"book_id": self.book.id})
+        self.assertTemplateUsed(response, 'initial_book_list.html')
+        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
+        self.assertEqual(self.book.readers_count(), count+1)
 
 
     def test_add_to_list_redirects_when_not_logged_in(self):
