@@ -184,6 +184,7 @@ class Club(models.Model):
         max_length=50,
         blank=True
     )
+
     class Meta:
         ordering = ['name']
 
@@ -293,6 +294,7 @@ class Book(models.Model):
         else: 
             return 0.0
             
+
 class Rating(models.Model):
     """rating model."""
 
@@ -327,6 +329,7 @@ class Rating(models.Model):
     class Meta:
         unique_together = ['user', 'book']
  
+
 class Meeting(models.Model):
     """ The meeting model."""
 
@@ -346,13 +349,16 @@ class Meeting(models.Model):
         User, 
         on_delete=models.CASCADE,
         related_name='rotations',
-        blank=True
+        blank=True, 
+        null=True
     )
 
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
         related_name='meetings',
+        blank=True, 
+        null=True
     )
 
     time = models.DateTimeField(
@@ -371,8 +377,16 @@ class Meeting(models.Model):
         blank=True
     )
 
-    
-    
+    def assign_chooser(self):
+        try:
+            members = self.club.members
+            meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
+            id = meeting_ind%members.count()
+            Meeting.objects.filter(id = self.id).update(chooser=members.all()[id])
+        except:
+            Meeting.objects.filter(id = self.id).update(chooser=self.club.owner)
+
+
 ACTOR_CHOICES = (
     ('U', 'User'),
     ('C', 'Club'),
@@ -435,11 +449,11 @@ class Event(models.Model):
             raise ValidationError('Action must be meeting')
         if self.type_of_action == 'R' and not self.rating:
             raise ValidationError('Action must be rating')
+    
     def save(self, **kwargs):
         self.clean()
         return super(Event, self).save(**kwargs)
-
-        
+   
     def get_actor(self):
         """Return the actor of a given event."""
         if self.type_of_actor == 'U':

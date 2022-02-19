@@ -273,7 +273,6 @@ def join_club(request, club_id):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page', club_id)
 
-
     if(club.club_type == "Private"):
         if not club.is_applicant(user):
             club.applicants.add(user)
@@ -414,6 +413,7 @@ def edit_club_information(request, club_id):
     }
     return render(request, 'edit_club_info.html', context)
 
+@login_required
 def schedule_meeting(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     
@@ -430,8 +430,8 @@ def schedule_meeting(request, club_id):
 
     else:
         form = MeetingForm(club)
-    return render(request, 'schedule_meeting.html', {'form': form})
 
+    return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
 
 @login_required
 def add_book_to_list(request, book_id):

@@ -1,10 +1,11 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
 import random
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
+import pytz
 from .models import User, Club, Book, Rating, Meeting
 
 class SignUpForm(forms.ModelForm):
@@ -300,6 +301,15 @@ class MeetingForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
         exclude = ['club', 'book', 'member']
+    
+    cont = forms.BooleanField(
+        label="Is this meeting a contiuation?",
+        widget=forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'})
+    )
+
+    confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
+                                  widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
+                                  error_messages = {'required':"Please check the box"})
 
     def __init__(self, club, *args, **kwargs):
         self.club = club
@@ -307,18 +317,45 @@ class MeetingForm(forms.ModelForm):
         
     def clean(self):
         super().clean()
-        if self.club.meeting_type == Club.ClubType.PUBLIC:
-            if not self.cleaned_data.get('link'):
-                msg = forms.ValidationError("Provide a link to the meeting.")
-                self.add_error('link', msg)
+        if not self.cleaned_data.get('link'):
+            if self.club.meeting_type == Club.MeetingType.ONLINE:
+                self.add_error('link', "Provide a link to the meeting.")
+            else:
+                self.add_error('link', "Provide a link to the meeting location.")
+
+        self.time = self.cleaned_data.get('time')
+        if not self.check_date(self.time):
+            self.add_error('time', 'Date should be at least 2 weeks from today.')
+
+        if not self.check_meetings(self.time):
+            self.add_error('time', 'Meetings should be at least a month apart.')
 
         return self.cleaned_data
 
+    def check_date(self, time):
+        """Validate the time and check if it at least2 weeks from today."""
+        today = datetime.today()
+        start_week = today + timedelta(13)
+        try:
+            return time > pytz.utc.localize(start_week)
+        except:
+            return True
+
+    def check_meetings(self, time):
+        """Check if there are meetings in the same month period."""
+        try:
+            meetings = Meeting.objects.filter(club_id=self.club.id)
+            for met in meetings:
+                if met.time+timedelta(30) > time:
+                    return False
+            print(True)
+            return True
+        except:
+            return True
+
     def save(self):
         """Create a new meeting."""
-
         super().save(commit=False)
-        books = self.club.books.all()
         meeting = Meeting.objects.create(
             title = self.cleaned_data.get('title'),
             club = self.club,
@@ -326,5 +363,6 @@ class MeetingForm(forms.ModelForm):
             notes = self.cleaned_data.get('notes'),
             link = self.cleaned_data.get('link'),
         )
+        meeting.assign_chooser()
         return meeting
         
