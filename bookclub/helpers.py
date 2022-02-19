@@ -28,6 +28,10 @@ def create_event(type_of_actor, type_of_action, message, user=None, club=None, m
     event.save()
     return event
 
+def delete_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
+    event = Event.objects.filter(type_of_actor = type_of_actor, type_of_action = type_of_action, message = message, user = user , club = club, meeting = meeting, book = book, rating = rating, action_user = action_user)
+    event.delete()
+
 class TokenGenerator(PasswordResetTokenGenerator):
 
     def _make_hash_value(self, user, timestamp):
