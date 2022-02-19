@@ -19,21 +19,9 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
     def test_initial_book_list_url(self):
         self.assertEqual(self.url,'/initial_book_list/') 
 
-    # def test_continue_button_enabled(self):
-    #      self.client.login(username=self.other_user.username, password='Password123')
-           #self.assertTemplateUsed(response, 'initial_book_list.html')
-   
-
-    # def test_show_only_first_eight_books(self):
-    #      self.client.login(username=self.user.username, password='Password123')
-    #      response = self.client.get(self.url)
-    #      self.assertTemplateUsed(response, 'initial_book_list.html')
-    #      number_of_books = 
-    #      self.assertEqual()
-
-    def create_test_books(self, book_count):
+    def create_test_books(self, book_count=10):
         isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
-                    ,'155061224','446520802']
+                    ,'155061224','446520802', '380000059','380711524']
         ctr = 0
         for book_id in range(book_count):
             Book.objects.create(
@@ -43,18 +31,27 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
             )
             ctr+=1
 
-    def test_display_eight_books_on_page(self):
+    def test_display_only_eight_books_on_page(self):
         self.client.login(username=self.user.username, password='Password123')
-        self.create_test_books(8)
+        self.create_test_books(10)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'initial_book_list.html')
         self.assertEqual(len(response.context['my_books']),8)
+        self.assertContains(response, f'book1 title')
+        self.assertContains(response, f'book2 title')
+        self.assertContains(response, f'book3 title')
+        self.assertContains(response, f'book4 title')
+        self.assertContains(response, f'book5 title')
+        self.assertContains(response, f'book7 title')
+        self.assertContains(response, f'book6 title')
+        self.assertContains(response, f'book8 title')
+
         # for book_id in range(8):
-        #     self.assertContains(response, f'book{book_id} title')
-        #     self.assertContains(response, f'book{book_id} author')
-        #     books_url = reverse('initial_book_list')
-        #     self.assertContains(response, books_url)
+            # self.assertContains(response, f'book{book_id} title')
+            # self.assertContains(response, f'book{book_id} author')
+        books_url = reverse('initial_book_list')
+        self.assertContains(response, books_url)
     
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
