@@ -460,7 +460,8 @@ def follow_toggle(request, user_id):
 @login_required
 def initial_book_list(request , book_id = None):
     current_user = request.user
-    my_books = Book.objects.all().exclude()
+    already_selected_books = current_user.books.all()
+    my_books =  Book.objects.all().exclude(id__in = already_selected_books)
     list_length = len(current_user.books.all())
     sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
