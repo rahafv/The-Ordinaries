@@ -378,13 +378,7 @@ ACTION_CHOICES = (
     ('R', 'Rating'),
     ('U', 'Action_User')
 )
-class EventType(models.TextChoices):
-    JOIN = "joined"
-    WITHDRAW = "withdrew from"
-    FOLLOW =  "followed"
-    CREATE = "created"
-    REVIEW = "reviewed"
-    ADD = "added"
+
 
 
 class Event(models.Model):
@@ -449,6 +443,13 @@ class Event(models.Model):
         self.clean()
         return super(Event, self).save(**kwargs)
 
+    class EventType(models.TextChoices):
+        JOIN = "joined"
+        WITHDRAW = "withdrew from"
+        FOLLOW =  "followed"
+        CREATE = "created"
+        REVIEW = "reviewed"
+        ADD = "added"
         
     def get_actor(self):
         """Return the actor of a given event."""

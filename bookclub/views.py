@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, login_prohibited, generate_token, create_event
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import EventType, User, Club, Book , Rating, ACTION_CHOICES, ACTOR_CHOICES
+from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView
@@ -156,7 +156,7 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
-            create_event('U', 'C', EventType.CREATE, club_owner, club)
+            create_event('U', 'C', Event.EventType.CREATE, club_owner, club)
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
@@ -178,7 +178,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            create_event('U', 'B', EventType.REVIEW, review_user, book=reviewed_book)
+            create_event('U', 'B', Event.EventType.REVIEW, review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
@@ -283,7 +283,7 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
-    create_event('U', 'C', EventType.JOIN, user, club)
+    create_event('U', 'C', Event.EventType.JOIN, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -301,8 +301,8 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    delete_event('U', 'C', EventType.JOIN, user, club)
-    create_event('U', 'C', EventType.WITHDRAW, user, club)
+    delete_event('U', 'C', Event.EventType.JOIN, user, club)
+    create_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -374,7 +374,7 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        create_event('U', 'C', EventType.JOIN, applicant, club)
+        create_event('U', 'C', Event.EventType.JOIN, applicant, club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         return redirect('applicants_list', club_id)
     else:
@@ -426,7 +426,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
-        create_event('U', 'B', EventType.ADD, user, book=book)
+        create_event('U', 'B', Event.EventType.ADD, user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
 
@@ -458,8 +458,8 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
