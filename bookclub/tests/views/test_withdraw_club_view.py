@@ -60,6 +60,17 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.assert_success_message(response)
         self.assert_menu(response)
 
+    def test_user_joins_then_withdraws_deletes_join_event(self):
+        join_url = reverse("join_club", kwargs={"club_id": self.club.id})
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.get(join_url, follow=True)
+        events_after_joining_count = Event.objects.count() 
+        response = self.client.get(self.url, follow=True)
+        events_after_withdrawing_count = Event.objects.count() 
+        self.assertEqual(events_after_joining_count, 1)
+        self.assertEqual(events_after_withdrawing_count, 1)
+  
+
     def test_withdraw_club_with_invalid_id(self):
         self.client.login(username=self.member.username, password="Password123")
         url = reverse("withdraw_club", kwargs={"club_id": self.club.id + 9999})

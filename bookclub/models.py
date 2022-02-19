@@ -378,7 +378,15 @@ ACTION_CHOICES = (
     ('R', 'Rating'),
     ('U', 'Action_User')
 )
- 
+class EventType(models.TextChoices):
+    JOIN = "joined"
+    WITHDRAW = "withdrew from"
+    FOLLOW =  "followed"
+    CREATE = "created"
+    REVIEW = "reviewed"
+    ADD = "added"
+
+
 class Event(models.Model):
     """Events by users or clubs."""
 
@@ -397,6 +405,7 @@ class Event(models.Model):
     action_user =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    
     class Meta:
         """Model options."""
 

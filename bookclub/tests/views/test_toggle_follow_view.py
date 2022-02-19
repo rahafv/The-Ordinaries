@@ -59,3 +59,12 @@ class ShowUserTest(TestCase):
         url = reverse('follow_toggle', kwargs={'user_id': self.user.id+9999})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404) 
+
+    def test_user_follows_then_unfollows_deletes_follow_event(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        events_after_following_count = Event.objects.count()
+        self.user.toggle_follow(self.followee)
+        events_after_unfollowing_count = Event.objects.count()
+        self.assertEqual(events_after_following_count, 1)
+        self.assertEqual(events_after_unfollowing_count, 1)
