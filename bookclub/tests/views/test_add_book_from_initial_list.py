@@ -3,7 +3,7 @@ from django.urls import reverse
 from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester
 
-class AddBookFromInitialListToListViewTestCase(TestCase, LoginRedirectTester):
+class AddBookFromInitialListViewTestCase(TestCase, LoginRedirectTester):
     
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/default_book.json']
