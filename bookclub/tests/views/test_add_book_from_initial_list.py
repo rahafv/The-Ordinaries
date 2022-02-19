@@ -11,10 +11,10 @@ class AddBookFromInitialListToListViewTestCase(TestCase, LoginRedirectTester):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.book = Book.objects.get(ISBN='0195153448')
-        self.url = reverse('add_book_from_initial_list_to_my_list' ,  kwargs={'book_id': self.book.id})
+        self.url = reverse('add_book_from_initial_list' ,  kwargs={'book_id': self.book.id})
 
     def test_book_details_url(self):
-        self.assertEqual(self.url, f'/initial_book_list/{self.book.id}/add_book_from_initial_list_to_my_list/')
+        self.assertEqual(self.url, f'/initial_book_list/{self.book.id}/add_book/')
 
     def test_successful_book_addition(self):
         count = self.book.readers_count()
