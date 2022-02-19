@@ -467,7 +467,7 @@ def initial_book_list(request , book_id = None):
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
 
 @login_required
-def add_book_from_initial_list_to_my_list(request, book_id):
+def add_book_from_initial_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
     book.add_reader(user)
