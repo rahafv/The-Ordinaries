@@ -9,7 +9,7 @@
     </thead>
         {% for club in Clubs %}
             <tr style="background-color: white">
-                    <td> <p>{{ club.name }}</p> </td>
+                <td> <a href='{% url 'club_page' club.id %}'  style="color: black" > {{ club.name }}</a>  </td>
                     <td> <p>{{club.club_type}}</p> </td>
                     <td> <p>{{ club.theme }}</p> </td>
                     <td> <p>{{club.location }}</p> </td>

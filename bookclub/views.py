@@ -478,17 +478,40 @@ def follow_toggle(request, user_id):
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
 
+@login_required
 def search_page(request):
-    searched = request.GET['searched'] # might work with parenthesis. 
-    category = request.GET['category']
-    if(category=="Users"):
-        filtered_list = User.objects.filter(username__contains=searched)
-    elif(category=="Clubs"):
-        filtered_list = Club.objects.filter(name__contains=searched)
-    else:
-        filtered_list = Book.objects.filter(title__contains=searched)
+    if request.method == 'GET':
+        searched = request.GET['searched'] 
+        category = request.GET['category']
 
-    pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    filtered_list = pg.get_page(page_number)
-    return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
+        if(category=="user-name"):
+            filtered_list = User.objects.filter(username__contains=searched)
+            category= "Users"
+        elif(category=="user-location"):
+            filtered_list = User.objects.filter(country__contains=searched)
+            category= "Users"
+        elif(category=="club-name"):
+            filtered_list = Club.objects.filter(name__contains=searched)
+            category= "Clubs"
+        elif(category=="club-location"):
+            filtered_list = Club.objects.filter(country__contains=searched)
+            category= "Clubs"
+        elif(category=="book-title"):
+            filtered_list = Book.objects.filter(title__contains=searched)
+            category= "Books"
+        elif(category=="book-year"):
+            filtered_list = Book.objects.filter(year__contains=searched)
+            category= "Books"
+        else:
+            filtered_list = Book.objects.filter(author__contains=searched)
+            category= "Books"
+
+
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
+    else: 
+         return render(request, 'search_page.html', {})
+       
