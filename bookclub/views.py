@@ -466,18 +466,17 @@ def follow_toggle(request, user_id):
     return redirect('profile', followee.id)
 
 def search_page(request):
-    if request.method == "POST": 
-        searched = request.POST['searched'] # might work with parenthesis. 
-        category = request.POST['category']
-        if(category=="Users"):
-            filtered_list = User.objects.filter(username__contains=searched)
-        elif(category=="Clubs"):
-            filtered_list = Club.objects.filter(name__contains=searched)
-        else:
-            filtered_list = Book.objects.filter(title__contains=searched)
+    searched = request.GET['searched'] # might work with parenthesis. 
+    category = request.GET['category']
+    if(category=="Users"):
+        filtered_list = User.objects.filter(username__contains=searched)
+    elif(category=="Clubs"):
+        filtered_list = Club.objects.filter(name__contains=searched)
+    else:
+        filtered_list = Book.objects.filter(title__contains=searched)
 
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
+    pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    filtered_list = pg.get_page(page_number)
     return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
    
