@@ -471,6 +471,6 @@ def add_book_from_initial_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
     book.add_reader(user)
-    return redirect("initial_book_list", book.id)
+    return redirect("initial_book_list")
 
 
