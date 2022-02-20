@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
+from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import reverse_with_next
 
 class ShowUserTest(TestCase):
@@ -42,11 +42,13 @@ class ShowUserTest(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         user_followers_before = self.user.follower_count()
         followee_followers_before = self.followee.follower_count()
+        events_before_count = Event.objects.count()
         response = self.client.get(self.url, follow=True)
         user_followers_after = self.user.follower_count()
         followee_followers_after = self.followee.follower_count()
         self.assertEqual(user_followers_before, user_followers_after)
         self.assertEqual(followee_followers_before+1, followee_followers_after)
+        self.assertEqual(events_before_count + 1, Event.objects.count())
         response_url = reverse('profile', kwargs={'user_id': self.followee.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile_page.html')
@@ -57,3 +59,12 @@ class ShowUserTest(TestCase):
         url = reverse('follow_toggle', kwargs={'user_id': self.user.id+9999})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404) 
+
+    def test_user_follows_then_unfollows_deletes_follow_event(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        events_after_following_count = Event.objects.count()
+        self.user.toggle_follow(self.followee)
+        events_after_unfollowing_count = Event.objects.count()
+        self.assertEqual(events_after_following_count, 1)
+        self.assertEqual(events_after_unfollowing_count, 1)

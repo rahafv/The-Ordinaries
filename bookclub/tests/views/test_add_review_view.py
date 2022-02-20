@@ -1,7 +1,7 @@
 """Tests of the sign up view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Book, Rating, User
+from bookclub.models import Book, Rating, User, Event
 from bookclub.tests.helpers import LoginRedirectTester
 
 class AddReviewViewTestCase(TestCase, LoginRedirectTester):
@@ -43,11 +43,13 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
     def test_add_review_successful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_rating_before = Rating.objects.count()
+        count_events_before = Event.objects.count()
         target_url = reverse("book_details",  kwargs={"book_id": self.book.id})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "book_details.html")
         self.assertEqual(count_rating_before + 1, Rating.objects.count())
+        self.assertEqual(count_events_before + 1, Rating.objects.count())
         user = User.objects.get(id=1)
         book = Book.objects.get(id=1)
         rating = Rating.objects.get(user=user.id, book=book.id)
