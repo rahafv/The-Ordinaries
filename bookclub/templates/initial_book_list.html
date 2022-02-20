@@ -21,11 +21,7 @@
                     <h2 class="title">{{ book.title }}
                         <span>{{ book.author }}</span>
                     </h2>
-                    {% comment %} <div class="social-link">
-                        <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="bi bi-plus-square-fill"  style="font-size: 1.8rem; color: black;"></a>    
-                    </div> {% endcomment %}
                 </div>
-                
             </div>
             <br>
             <br>
@@ -33,17 +29,9 @@
             <br>
             <br>
             <br>
-            <br> 
-             <div class ='row'>
-                <div class="add_book"> 
-                    <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " style="margin-left:6em" role="button" >Add</a>
-           
-                </div>
-            </div> 
+            <br>  
+            <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " style="margin-left:6em"  role="button" >Add</a>
         </div>
-        {% comment %} <button type="submit" value={{add_book_from_initial_list}} onclick="location.href='{% url 'add_book_from_initial_list' book_id=book.id %}'" name='mybtn2'>Add</button> {% endcomment %}
-       
-        
         {% endfor %}
     </div>
 </div>
