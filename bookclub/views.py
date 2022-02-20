@@ -479,4 +479,3 @@ def search_page(request):
     page_number = request.GET.get('page')
     filtered_list = pg.get_page(page_number)
     return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
-   
