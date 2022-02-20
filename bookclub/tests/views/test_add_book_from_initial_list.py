@@ -20,7 +20,7 @@ class AddBookFromInitialListViewTestCase(TestCase, LoginRedirectTester):
         count = self.book.readers_count()
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url, follow=True)
-        target_url = reverse("initial_book_list", kwargs={"book_id": self.book.id})
+        target_url = reverse("initial_book_list")
         self.assertTemplateUsed(response, 'initial_book_list.html')
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertEqual(self.book.readers_count(), count+1)
