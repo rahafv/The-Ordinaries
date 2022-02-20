@@ -253,8 +253,8 @@ label:hover ~ input:checked ~ label{
     transform: scale(1.2);
 }
 .profile-card .profile-img img{
-    width:270%;
-    height:400%;
+    width:270;
+    height:400;
     transition: transform 1s;
 }
 .profile-card .profile-content::before{

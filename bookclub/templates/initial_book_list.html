@@ -15,7 +15,7 @@
         <div class="col-sm-6 col-md-3">
             <div class="profile-card">
                 <div class="profile-img">
-                    <img src="{{ book.image_url }}" />
+                    <img src="{{ book.image_url }}"  width="220" height="300" class=" image-thumbnail mb-3" />
                 </div>
                 <div class="profile-content">
                     <h2 class="title">{{ book.title }}
@@ -27,6 +27,7 @@
                 </div>
                 
             </div>
+             <br>
             <br>
             <br>
             <br>
@@ -35,10 +36,13 @@
             <br>
             <br>
             <br>
-            <br>
-            <br>
-                        
-            <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " role="button" >Add</a>
+            <br> 
+            {% comment %} <div class ='row'>
+                <div class="col-sm-15 col-md-10"> {% endcomment %}
+                    <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " role="button" >Add</a>
+           
+                {% comment %} </div>
+            </div> {% endcomment %}
         </div>
         {% comment %} <button type="submit" value={{add_book_from_initial_list}} onclick="location.href='{% url 'add_book_from_initial_list' book_id=book.id %}'" name='mybtn2'>Add</button> {% endcomment %}
        
