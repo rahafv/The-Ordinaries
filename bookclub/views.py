@@ -431,7 +431,18 @@ def schedule_meeting(request, club_id):
             for mem in club.members.all():
                 invitees.append(mem.email)
 
-            form.save()
+            meeting = form.save()
+            current_site = get_current_site(request)
+            subject = 'A New Meeting Has Been Scheduled'
+            body = render_to_string('meeting_invite.html', {
+                'club': club,
+                'domain': current_site,
+                'meeting': meeting,
+            })
+            email_from = settings.EMAIL_HOST_USER
+            email_to = invitees
+
+            send_mail(subject, body, email_from, email_to)
             return redirect('club_page', club_id=club.id)
 
     else:
