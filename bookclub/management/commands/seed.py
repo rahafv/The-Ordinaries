@@ -108,7 +108,7 @@ class Command(BaseCommand):
             pass
 
     def create_followers(self):
-        count = (self.users.count()-1)/10
+        count = int((self.users.count()-1)/10)
         for user in self.users:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?').exclude(id=user.id)[:rand_num]
@@ -153,7 +153,7 @@ class Command(BaseCommand):
 
     def populate_clubs(self):
         clubs = Club.objects.all()
-        count = (self.users.count()-1)/10
+        count = int((self.users.count()-1)/10)
         for club in clubs:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?')[:rand_num]
