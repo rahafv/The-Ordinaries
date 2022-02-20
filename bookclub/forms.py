@@ -301,15 +301,13 @@ class MeetingForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
         exclude = ['club', 'book', 'member']
-    
-    cont = forms.BooleanField(
-        label="Is this meeting a contiuation?",
-        widget=forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'})
-    )
 
-    confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
-                                  widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
-                                  error_messages = {'required':"Please check the box"})
+    cont = forms.BooleanField(
+        label = "This meeting a contiuation of a previous discussion",
+        required = False,
+        help_text = "checkbox",
+        label_suffix=""
+    )
 
     def __init__(self, club, *args, **kwargs):
         self.club = club
@@ -323,33 +321,53 @@ class MeetingForm(forms.ModelForm):
             else:
                 self.add_error('link', "Provide a link to the meeting location.")
 
-        self.time = self.cleaned_data.get('time')
-        if not self.check_date(self.time):
-            self.add_error('time', 'Date should be at least 2 weeks from today.')
+        is_cont = self.cleaned_data.get('cont')
+        print(is_cont)
+        time = self.cleaned_data.get('time')
+        if not is_cont:
+            if not self.check_date(time, is_cont):
+                self.add_error('time', 'Date should be at least 2 weeks from today.')
 
-        if not self.check_meetings(self.time):
-            self.add_error('time', 'Meetings should be at least a month apart.')
+            if not self.check_meetings(time, is_cont):
+                self.add_error('time', 'Meetings should be at least a month apart.')
+        else:
+            if not self.check_date(time, is_cont):
+                self.add_error('time', 'Date cannot be today.')
+            
+            if not self.check_meetings(time, is_cont):
+                self.add_error('time', 'There is a meeting on that day.')
 
-        return self.cleaned_data
+            return self.cleaned_data
 
-    def check_date(self, time):
+    def check_date(self, time, is_cont):
         """Validate the time and check if it at least2 weeks from today."""
         today = datetime.today()
         start_week = today + timedelta(13)
-        try:
-            return time > pytz.utc.localize(start_week)
-        except:
-            return True
+        if not is_cont:
+            try:
+                return time > pytz.utc.localize(start_week)
+            except:
+                return True
+        else:
+            try:
+                return time != pytz.utc.localize(today)
+            except:
+                return True
 
-    def check_meetings(self, time):
+    def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same month period."""
         try:
             meetings = Meeting.objects.filter(club_id=self.club.id)
-            for met in meetings:
-                if met.time+timedelta(30) > time:
-                    return False
-            print(True)
-            return True
+            if not is_cont:
+                for met in meetings:
+                    if met.time+timedelta(30) > time:
+                        return False
+                return True
+            else:
+                for met in meetings:
+                    if met.time.day == time.day:
+                        return False
+                return True
         except:
             return True
 
