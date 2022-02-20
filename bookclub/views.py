@@ -439,10 +439,10 @@ def schedule_meeting(request, club_id):
                 'domain': current_site,
                 'meeting': meeting,
             })
-            email_from = settings.EMAIL_HOST_USER
-            email_to = invitees
 
-            send_mail(subject, body, email_from, email_to)
+            send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+            create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
+            messages.add_message(request, messages.SUCCESS, "Meeting scheduled!")
             return redirect('club_page', club_id=club.id)
 
     else:

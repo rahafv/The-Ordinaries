@@ -470,6 +470,7 @@ class Event(models.Model):
         CREATE = "created"
         REVIEW = "reviewed"
         ADD = "added"
+        SCHEDULE = "scheduled a"
         
     def get_actor(self):
         """Return the actor of a given event."""
@@ -487,7 +488,7 @@ class Event(models.Model):
         elif self.type_of_action == 'U':
             return self.action_user.username
         elif self.type_of_action == 'M':
-            return self.meeting.title
+            return "meeting"
         else:
             return self.rating.book.title
 
