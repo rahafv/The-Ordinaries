@@ -303,7 +303,7 @@ label:hover ~ input:checked ~ label{
     
 }
 .profile-card .profile-content:hover{
-    background-color: rgba(130, 121, 255, 0.5);
+    background-color: rgba(136, 153, 253, 0.466);
 }
 .profile-card .profile-content .title{
     font-size:24px;
