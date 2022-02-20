@@ -3,30 +3,34 @@
 {% block title %} Results {% endblock %}
 {% block content %}
 
+
 <div class="container">
     <div class="row">
         <div class="col-12">
            {% if searched %}
            <h1> You searched for {{searched}} in {{category}}</h1>
-           
-           {% if category == "Users" %}
-           {%include 'partials/users_information_table.html' with Users=filtered_list %}
-           {% endif %}
+                {% if filtered_list %}
+                    {% if category == "Users" %}
+                    {%include 'partials/users_information_table.html' with Users=filtered_list %}
+                    {% endif %}
 
-           {% if category == "Clubs" %}
-           {%include 'partials/clubs_information_table.html' with Clubs=filtered_list %}
-           {% endif %}
+                    {% if category == "Clubs" %}
+                    {%include 'partials/clubs_information_table.html' with Clubs=filtered_list %}
+                    {% endif %}
 
-           {% if category == "Books" %}
-           {%include 'partials/books_information_table.html' with Books=filtered_list %}
-           {% endif %}
-        
+                    {% if category == "Books" %}
+                    {%include 'partials/books_information_table.html' with Books=filtered_list %}
+                    {% endif %}
+                    <ul class="pagination justify-content-center">
+                        {% bootstrap_paginate filtered_list show_prev_next="false"  show_first_last="true" range=5  %}
+                    </ul>
+                {%else %}
+                    <h2> no such information!</h2>
+                {% endif %}
+
            {%else %}
-           <h1> You forgot to search!</h1>
+           <h2> You forgot to search!</h2>
            {% endif %}
-           <ul class="pagination justify-content-center">
-            {% bootstrap_paginate filtered_list show_prev_next="false"  show_first_last="true" range=5  %}
-                  </ul>
         </div>
     </div>
 </div>

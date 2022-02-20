@@ -7,39 +7,7 @@
     <div class="row">
         <div class="col-12">
             <h1 class="mb-3 mt-3">Members of {{club.name}} club </h1>
-            <table class="table table-bordered" id="membersTable">
-                <thead>
-                <tr style="background-color: white">
-                    <th class="th-sm">Name</th>
-                    <th class="th-sm">Username</th>
-                    <th class="th-sm">Age</th>
-                </tr>
-                </thead>
-                    {% for member in members %}
-                        <tr style="background-color: white">
-                            {% if member == current_user %}
-                                <td><p> You </p></td>
-                            {% else %}
-                                <td> <p>{{ member.full_name }}</p> </td>
-                            {% endif %}
-                            <td> 
-                                <p>{{member.username}}</p>  
-                            </td>
-                            <td> 
-                                {% if member.age %}
-                                    <p>{{ member.age }}</p>
-                                {% else %}
-                                    <p>-</p>
-                                {% endif %}
-                            </td>
-                            {% if member != current_user%}
-                             <td> 
-                                <a href='{% url 'profile' member.id %}' class="btn btn-outline-secondary" style="color: grey" >Show</a>  
-                            </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-            </table>
+            {%include 'partials/users_information_table.html' with Users=members %}
             <ul class="pagination justify-content-center">
                 {% bootstrap_paginate members show_prev_next="false"  show_first_last="true" range=5  %}
             </ul>
