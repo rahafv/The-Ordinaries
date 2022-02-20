@@ -1,0 +1,18 @@
+<table class="table table-bordered" id="clubsTable">
+    <thead>
+    <tr style="background-color: white">
+        <th class="th-sm">Name</th>
+        <th class="th-sm">Type</th>
+        <th class="th-sm">Theme</th>
+        <th class="th-sm">Location</th>
+    </tr>
+    </thead>
+        {% for club in Clubs %}
+            <tr style="background-color: white">
+                    <td> <p>{{ club.name }}</p> </td>
+                    <td> <p>{{club.club_type}}</p> </td>
+                    <td> <p>{{ club.theme }}</p> </td>
+                    <td> <p>{{club.location }}</p> </td>
+            </tr>
+        {% endfor %}
+</table>

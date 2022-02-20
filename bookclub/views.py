@@ -194,6 +194,7 @@ def club_page(request, club_id):
     is_applicant = club.is_applicant(current_user)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
 
+
 @login_required
 def add_book(request):
     if request.method == "POST":
@@ -463,3 +464,20 @@ def follow_toggle(request, user_id):
         delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
+
+def search_page(request):
+    if request.method == "POST": 
+        searched = request.POST['searched'] # might work with parenthesis. 
+        category = request.POST['category']
+        if(category=="Users"):
+            filtered_list = User.objects.filter(username__contains=searched)
+        elif(category=="Clubs"):
+            filtered_list = Club.objects.filter(name__contains=searched)
+        else:
+            filtered_list = Book.objects.filter(title__contains=searched)
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+    return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
+   
