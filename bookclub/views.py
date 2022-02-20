@@ -458,7 +458,7 @@ def follow_toggle(request, user_id):
     return redirect('profile', followee.id) 
 
 @login_required
-def initial_book_list(request , book_id = None):
+def initial_book_list(request):
     current_user = request.user
     already_selected_books = current_user.books.all()
     my_books =  Book.objects.all().exclude(id__in = already_selected_books)
