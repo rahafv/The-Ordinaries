@@ -27,9 +27,6 @@
                 </div>
                 
             </div>
-             <br>
-            <br>
-            <br>
             <br>
             <br>
             <br>
@@ -37,12 +34,12 @@
             <br>
             <br>
             <br> 
-            {% comment %} <div class ='row'>
-                <div class="col-sm-15 col-md-10"> {% endcomment %}
-                    <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " role="button" >Add</a>
+             <div class ='row'>
+                <div class="add_book"> 
+                    <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 " style="margin-left:6em" role="button" >Add</a>
            
-                {% comment %} </div>
-            </div> {% endcomment %}
+                </div>
+            </div> 
         </div>
         {% comment %} <button type="submit" value={{add_book_from_initial_list}} onclick="location.href='{% url 'add_book_from_initial_list' book_id=book.id %}'" name='mybtn2'>Add</button> {% endcomment %}
        
