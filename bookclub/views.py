@@ -21,7 +21,6 @@ from django.core.mail import send_mail
 from system import settings
 from django.core.paginator import Paginator
 
-
 @login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
@@ -68,11 +67,9 @@ def send_activiation_email(request, user_id):
     return redirect('log_in')
 
 def activate_user(request, uidb64, token):
-
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-
     except:
         user = None
         return render(request, 'activate-fail.html', {'user': user})
@@ -164,7 +161,6 @@ def create_club(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
-
 @login_required
 def add_review(request, book_id):
     reviewed_book = get_object_or_404(Book.objects, id=book_id)
@@ -183,7 +179,6 @@ def add_review(request, book_id):
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
-
     return render(request, 'book_details.html', {'book':reviewed_book})
 
 @login_required
@@ -201,8 +196,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id)
-
+            return redirect('book_details', book_id=book.id) 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -226,7 +220,6 @@ def book_details(request, book_id) :
 @login_required
 def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-
     if user_id == request.user.id:
         return redirect('profile')
 
@@ -237,7 +230,6 @@ def show_profile_page(request, user_id = None):
     followable = (request.user != user)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
-
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -349,23 +341,47 @@ def members_list(request, club_id):
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+        
+@login_required
+def following_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following = True 
+    list = user.followees.all() 
+    current_user = request.user 
 
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
+@login_required
+def followers_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following= False
+    list = user.followers.all()
+    current_user = request.user
+
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
 
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
+    club = get_object_or_404(Club.objects, id=club_id) 
     applicants = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
         return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
-        return redirect('club_page', club_id)
+        return redirect('club_page', club_id) 
 
 @login_required
 def accept_applicant(request, club_id, user_id):
@@ -382,8 +398,6 @@ def accept_applicant(request, club_id, user_id):
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
 
-
-
 @login_required
 def reject_applicant(request, club_id, user_id):
     current_user = request.user
@@ -396,7 +410,6 @@ def reject_applicant(request, club_id, user_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
-
 
 @login_required
 def edit_club_information(request, club_id):
