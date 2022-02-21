@@ -1,15 +1,30 @@
 [
-    {
-        "model": "bookclub.Book",
-        "pk": 2,
-        "fields": {
-          "ISBN": "0002005018",
-          "title": "Clara Callan",
-          "author": "Richard Bruce Wright",
-          "publisher": "HarperFlamingo Canada",
-          "year": "2001",
-          "readers": [], 
-          "clubs": []
-        }
+  {
+      "model": "bookclub.Book",
+      "pk": 2,
+      "fields": {
+        "ISBN": "0002005018",
+        "title": "Clara Callan",
+        "author": "Richard Bruce Wright",
+        "publisher": "HarperFlamingo Canada",
+        "year": "2001",
+        "readers": [], 
+        "clubs": []
+      }
+  },
+
+  {
+    "model": "bookclub.Book",
+    "pk": 3,
+    "fields": {
+      "ISBN": "1111111111",
+      "title": "Test Book",
+      "author": "Ghaliah",
+      "publisher": "Kings college",
+      "year": "2001",
+      "readers": [3], 
+      "clubs": []
     }
+}
+
 ]
