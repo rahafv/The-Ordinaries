@@ -8,7 +8,9 @@ from bookclub.forms import BookForm
 class BookFormTestCase(TestCase):
     """Unit tests of the book form."""
 
-    fixtures = ['bookclub/tests/fixtures/other_books.json']
+    fixtures = ['bookclub/tests/fixtures/other_books.json' , 
+                'bookclub/tests/fixtures/other_users.json'
+    ]
     def setUp(self):
         self.form_input = {
             'ISBN': '0195153448',
