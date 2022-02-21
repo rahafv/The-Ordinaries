@@ -99,13 +99,17 @@ def log_in(request):
 
             if user:
                 login(request, user)
-                redirect_url = next or 'home'
+                if len(user.books.all()) == 0:
+                    redirect_url = next or 'initial_book_list'
+                else:
+                    redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
+
 
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
@@ -472,4 +476,22 @@ def follow_toggle(request, user_id):
     else:
         delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
-    return redirect('profile', followee.id)
+    return redirect('profile', followee.id) 
+
+@login_required
+def initial_book_list(request):
+    current_user = request.user
+    already_selected_books = current_user.books.all()
+    my_books =  Book.objects.all().exclude(id__in = already_selected_books)
+    list_length = len(current_user.books.all())
+    sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+@login_required
+def add_book_from_initial_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    book.add_reader(user)
+    return redirect("initial_book_list")
+
+
