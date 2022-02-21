@@ -289,17 +289,18 @@ class RatingForm(forms.ModelForm):
 class TransferClubOwnership(forms.Form):
     """Form to create or update club information."""
 
-    member_select = forms.ChoiceField(required=True)
+    member_select = forms.ChoiceField()
     confirmation = forms.BooleanField(label='Are you sure? Please confirm by ticking the box', required = True, disabled = False,
                                   widget = forms.widgets.CheckboxInput(attrs={'class': 'checkbox-inline'}),
                                   error_messages = {'required':"Please check the box"})
 
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')
-        club = kwargs.pop('club')
-        super().__init__(*args, **kwargs)
-        if club:
-            self.fields['member_select'].choices = club.members
+    def __init__(self, club, user, *args, **kwargs):
+        super(TransferClubOwnership, self).__init__(*args, **kwargs)
+        self.fields['member_select'].queryset = club.members.all().exclude(id=user.id)
+        self.fields['member_select'].empty_label = 'select a member'
+        self.fields['member_select'].required = True
+
+
 
 
     # member_select #= forms.ChoiceField(required=True, choices= self.club.members)
@@ -317,11 +318,13 @@ class TransferClubOwnership(forms.Form):
     #     fields = ['members']
     #     widgets = {'members': forms.Select()}
 
-        # def __init__(self, *args, **kwargs):
-            # self.request = kwargs.pop("request")
-            # super(TransferClubOwnership, self).__init__(*args, **kwargs)
-            # self.fields['members'].label = "Select Member"
-            # self.fields['members'].queryset = Club.members.objects.filter(owner = self.request.user)
+    #     def __init__(self, club, user, *args, **kwargs):
+    #         self.club = club
+    #         self.user = user
+    #         super(TransferClubOwnership, self).__init__(*args, **kwargs)
+    #         self.fields['members'].empty_label = "Select Member"
+    #         self.fields['members'].queryset = club.members.exclude(id=user.id)
+    #         self.fields['members'].required = True
 
         # def save(self):
         #     if self.is_valid():

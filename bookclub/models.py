@@ -212,14 +212,11 @@ class Club(models.Model):
     def get_club_type_display(self):
         return self.club_type
 
-    def make_owner(self, club_id, new_owner):
-        club = self.objects.get_or_create(id=club_id)
-        old_owner = club.owner
-        old_owner.save()
-        new_owner.save()
-        club.owner = new_owner
-        club.members.add(old_owner)
-        club.save()
+    def make_owner(self, new_owner):
+        old_owner = self.owner
+        self.owner = new_owner
+        self.add_member(old_owner)
+        self.save()
 
 class Book(models.Model):
     """Book model."""
