@@ -481,8 +481,8 @@ def follow_toggle(request, user_id):
 @login_required
 def search_page(request):
     if request.method == 'GET':
-        searched = request.GET['searched'] 
-        category = request.GET['category']
+        searched = request.GET.get('searched', '')
+        category = request.GET.get('category', '')
 
         if(category=="user-name"):
             filtered_list = User.objects.filter(username__contains=searched)
