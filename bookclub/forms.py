@@ -322,52 +322,40 @@ class MeetingForm(forms.ModelForm):
                 self.add_error('link', "Provide a link to the meeting location.")
 
         is_cont = self.cleaned_data.get('cont')
-        print(is_cont)
         time = self.cleaned_data.get('time')
-        if not is_cont:
-            if not self.check_date(time, is_cont):
-                self.add_error('time', 'Date should be at least 2 weeks from today.')
-
-            if not self.check_meetings(time, is_cont):
-                self.add_error('time', 'Meetings should be at least a month apart.')
-        else:
-            if not self.check_date(time, is_cont):
-                self.add_error('time', 'Date cannot be today.')
-            
-            if not self.check_meetings(time, is_cont):
-                self.add_error('time', 'There is a meeting on that day.')
-
-            return self.cleaned_data
+        self.check_date(time, is_cont)
+        self.check_meetings(time, is_cont)
+        return self.cleaned_data
 
     def check_date(self, time, is_cont):
-        """Validate the time and check if it at least2 weeks from today."""
+        """Validate the time and check if it is appropriate."""
         today = datetime.today()
         start_week = today + timedelta(13)
         try:
-            if not is_cont:
-                return time > pytz.utc.localize(start_week)
-            else:
-                return time.day != pytz.utc.localize(today.day)
+            if not is_cont and time > pytz.utc.localize(start_week):
+                self.add_error('time', 'Date should be at least 2 weeks from today.')
+            elif time.day != pytz.utc.localize(today.day):
+                self.add_error('time', 'Date cannot be today.')
         except:
-            return True
+            pass
 
 
     def check_meetings(self, time, is_cont):
-        """Check if there are meetings in the same month period."""
+        """Check if there are meetings in the same period."""
         try:
             meetings = Meeting.objects.filter(club_id=self.club.id)
             if not is_cont:
                 for met in meetings:
                     if met.time+timedelta(30) > time:
-                        return False
-                return True
+                        self.add_error('time', 'Meetings should be at least a month apart.')
+                        break
             else:
                 for met in meetings:
                     if met.time.day == time.day:
-                        return False
-                return True
+                        self.add_error('time', 'There is a meeting on that day.')
+                        break
         except:
-            return True
+            pass
 
     def save(self):
         """Create a new meeting."""

@@ -8,8 +8,9 @@ The subject of the meeting: "{{meeting.title}}"
 Notes: {{meeting.notes}}
 {% endif %}
 Meeting: {{meeting.link}}
+**The book will be chosen by one of the members within a week.**
 
 The Ordinaries Book Clubs,
-Club page: http://{{domain}}{% url 'club_page' club.id %}
+Club page: http://{{domain}}{% url 'club_page' meeting.club.id %}
 
 {% endautoescape %} 
