@@ -40,15 +40,13 @@
                         <br/>
                         {% if current_user == user %}
                         <div class=" profile-statistics"> 
-                            <a class = "btn btn-lg btn-outline-dark" href ="{% url 'edit_profile'%}" role = "button">Edit profile</a>
+                            <a class="bi-pencil-square mr-2" href ="{% url 'edit_profile'%}" style="font-size: 1rem; color: grey;"> Edit </a>
                         </div>
                         {% endif %}
                         <p class="profile-statistics">
-                            <span>
-                              <b>{{ user.followee_count }}</b> Following
+                                <a href="{% url 'following_list' user_id=user.id %}" style="color: black;"> {{ user.followee_count }} Following </a>
                               &emsp;
-                              <b>{{ user.follower_count }}</b> Followers
-                            </span>
+                                <a href="{% url 'followers_list' user_id=user.id %}" style="color: black;"> {{ user.follower_count }} Followers </a>
                             <span class="float-end">
                               {% if followable %}
                                 {% if following %}

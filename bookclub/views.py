@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.template.loader import render_to_string
@@ -23,7 +23,6 @@ from django.core.mail import send_mail
 from system import settings
 import requests
 from django.core.paginator import Paginator
-
 
 @login_prohibited
 def welcome(request):
@@ -71,11 +70,9 @@ def send_activiation_email(request, user_id):
     return redirect('log_in')
 
 def activate_user(request, uidb64, token):
-
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-
     except:
         user = None
         return render(request, 'activate-fail.html', {'user': user})
@@ -105,13 +102,17 @@ def log_in(request):
 
             if user:
                 login(request, user)
-                redirect_url = next or 'home'
+                if len(user.books.all()) == 0:
+                    redirect_url = next or 'initial_book_list'
+                else:
+                    redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
+
 
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
@@ -122,34 +123,31 @@ def log_out(request):
     messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
-@login_required
-def password(request):
-    current_user = request.user
-    if request.method == 'POST':
-        form = PasswordForm(data=request.POST)
-        if form.is_valid():
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            if check_password(password, current_user.password):
-                current_user.set_password(new_password)
-                current_user.save()
-                login(request, current_user)
-                messages.add_message(request, messages.SUCCESS, "Password updated!")
-                return redirect('home')
-            else:
-                messages.add_message(request, messages.ERROR, "Password incorrect!")
-        else:
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            password_confirmation = form.cleaned_data.get('password_confirmation')
-            if new_password is None and password == password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Your new password cannot be the same as your current one!')
-            elif new_password != None and new_password != password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
-            else:
-                messages.add_message(request, messages.ERROR, "New password does not match criteria!")
-    form = PasswordForm()
-    return render(request, 'password.html', {'form': form})
+class PasswordView(LoginRequiredMixin, FormView):
+    """View that handles password change requests."""
+
+    template_name = 'password.html'
+    form_class = PasswordForm
+
+    def get_form_kwargs(self, **kwargs):
+        """Pass the current user to the password change form."""
+
+        kwargs = super().get_form_kwargs(**kwargs)
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def form_valid(self, form):
+        """Handle valid form by saving the new password."""
+
+        form.save()
+        login(self.request, self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirect the user after successful password change."""
+
+        messages.add_message(self.request, messages.SUCCESS, "Password updated!")
+        return reverse('home')
 
 @login_required
 def create_club(request):
@@ -166,7 +164,6 @@ def create_club(request):
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
-
 
 @login_required
 def add_review(request, book_id):
@@ -186,7 +183,6 @@ def add_review(request, book_id):
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
-
     return render(request, 'book_details.html', {'book':reviewed_book})
 
 @login_required
@@ -203,8 +199,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id)
-
+            return redirect('book_details', book_id=book.id) 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -228,7 +223,6 @@ def book_details(request, book_id) :
 @login_required
 def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-
     if user_id == request.user.id:
         return redirect('profile')
 
@@ -239,7 +233,6 @@ def show_profile_page(request, user_id = None):
     followable = (request.user != user)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
-
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -350,23 +343,47 @@ def members_list(request, club_id):
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+        
+@login_required
+def following_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following = True 
+    list = user.followees.all() 
+    current_user = request.user 
 
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
+@login_required
+def followers_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following= False
+    list = user.followers.all()
+    current_user = request.user
+
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
 
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
+    club = get_object_or_404(Club.objects, id=club_id) 
     applicants = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
         return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
-        return redirect('club_page', club_id)
+        return redirect('club_page', club_id) 
 
 @login_required
 def accept_applicant(request, club_id, user_id):
@@ -383,8 +400,6 @@ def accept_applicant(request, club_id, user_id):
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
 
-
-
 @login_required
 def reject_applicant(request, club_id, user_id):
     current_user = request.user
@@ -397,7 +412,6 @@ def reject_applicant(request, club_id, user_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
-
 
 @login_required
 def edit_club_information(request, club_id):
@@ -509,4 +523,22 @@ def follow_toggle(request, user_id):
     else:
         delete_event('U', 'AU', Event.EventType.FOLLOW, user=current_user, action_user=followee)
     current_user.toggle_follow(followee)
-    return redirect('profile', followee.id)
+    return redirect('profile', followee.id) 
+
+@login_required
+def initial_book_list(request):
+    current_user = request.user
+    already_selected_books = current_user.books.all()
+    my_books =  Book.objects.all().exclude(id__in = already_selected_books)
+    list_length = len(current_user.books.all())
+    sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+@login_required
+def add_book_from_initial_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    book.add_reader(user)
+    return redirect("initial_book_list")
+
+

@@ -42,14 +42,17 @@ urlpatterns = [
     
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
-    path('password/',views.password, name = 'password'),
+    path('password/',views.PasswordView.as_view(), name = 'password'),
     path('create_club/', views.create_club , name='create_club'),
     path("club/<int:club_id>/", views.club_page, name="club_page"),
     
     path('add_book/', views.add_book, name ='add_book'),
     path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
+    path('initial_book_list/', views.initial_book_list, name ='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
+
+    path('initial_book_list/<int:book_id>/add_book/', views.add_book_from_initial_list, name ='add_book_from_initial_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name ='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name ='withdraw_club'),
@@ -66,6 +69,8 @@ urlpatterns = [
     path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
+    path('followings/<int:user_id>/', views.following_list, name='following_list'),
+    path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
     path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
 ]
 
