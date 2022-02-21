@@ -41,10 +41,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
             'category': 'book-year',
             'searched':'2020',
         }
-        self.empty_form_input = {
-            'category': '',
-            'searched':'',
-        }
+
 
     def test_get_books_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
