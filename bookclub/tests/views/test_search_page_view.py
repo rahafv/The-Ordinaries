@@ -31,7 +31,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         }
         self.book_title_form_input = {
             'category': 'book-title',
-            'searched':'The',
+            'searched':'uio',
         }
         self.book_author_form_input = {
             'category': 'book-author',
@@ -57,6 +57,8 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertTemplateUsed(response, 'search_page.html')
         for user_id in range(3):
             self.assertContains(response, f'joelast{user_id}')
+        for user_id in range(3, 6): 
+            self.assertNotContains(response, f'janelast{user_id}')
         self.assert_menu(response)
        
     
@@ -68,6 +70,8 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertTemplateUsed(response, 'search_page.html')
         for user_id in range(3):
             self.assertContains(response, f'joelast{user_id}')
+        for user_id in range(3, 6): 
+            self.assertNotContains(response, f'janelast{user_id}')
         self.assert_menu(response)
 
 
@@ -79,6 +83,8 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertTemplateUsed(response, 'search_page.html')
         for club_id in range(3):
             self.assertContains(response, f'The{club_id}')
+        for club_id in range(3, 6):
+            self.assertNotContains(response, f'or{club_id}')
         self.assert_menu(response)
 
     def test_search_club_with_country(self):
@@ -88,6 +94,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
         self.assertContains(response, "uk")
+        self.assertNotContains(response, "usa")
         self.assert_menu(response)
 
     def test_search_books_with_title(self):
@@ -96,7 +103,8 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         response = self.client.get(self.url,self.book_title_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
-        self.assertContains(response, "The")
+        self.assertContains(response, "uio")
+        self.assertNotContains(response, "xyz")
         self.assert_menu(response)
 
     def test_search_books_with_author(self):
@@ -106,6 +114,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
         self.assertContains(response, "James")
+        self.assertNotContains(response, "joe")
         self.assert_menu(response)
 
     def test_search_books_with_year(self):
@@ -115,6 +124,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
         self.assertContains(response, "2020")
+        self.assertNotContains(response, "2000")
         self.assert_menu(response)
 
     def test_search_with_empty_str(self):
@@ -170,11 +180,11 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
                     '451166892','8440682697','034544003X','380000059','380711524']
         for book_id in range(book_count):
             if book_id < 3: 
-                title = 'The'
+                title = 'uio'
                 author = 'James'
                 year = '2020'
             else: 
-                title = 'or'
+                title = 'xyz'
                 author = 'joe'
                 year = '2000'
 
