@@ -80,7 +80,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         response = self.client.get(self.url,self.club_name_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
-        for club_id in range(5):
+        for club_id in range(3):
             self.assertContains(response, f'The{club_id}')
         self.assert_menu(response)
 
@@ -108,8 +108,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         response = self.client.get(self.url,self.book_author_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
-        for club_id in range(5):
-            self.assertContains(response, "James")
+        self.assertContains(response, "James")
         self.assert_menu(response)
 
     def test_search_books_with_year(self):
@@ -118,8 +117,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
         response = self.client.get(self.url,self.book_year_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
-        for club_id in range(5):
-            self.assertContains(response, "2020")
+        self.assertContains(response, "2020")
         self.assert_menu(response)
 
     def test_search_with_empty_str(self):
@@ -151,9 +149,9 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
 
             )
 
-    def _create_test_clubs(self, club_count=10):
+    def _create_test_clubs(self, club_count=6):
         for club_id in range(club_count):
-            if club_id < 5: 
+            if club_id < 3: 
                 name = "The"
                 country = "uk"
             else: 
@@ -173,7 +171,6 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
                     '342310538', '425115801','449006522','553561618', '055356451X','786013990','786014512','60517794','451192001','609801279',
                     '671537458','679776818','943066433','1570231028','1885408226','747558167','3442437407','033390804X','3596218098','684867621',
                     '451166892','8440682697','034544003X','380000059','380711524']
-        ctr = 0
         for book_id in range(book_count):
             if book_id < 3: 
                 title = 'The'
@@ -185,12 +182,11 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenueTestMixin):
                 year = '2000'
 
             Book.objects.create(
-                ISBN = isbn_num[ctr],
+                ISBN = isbn_num[book_id],
                 title =title,
                 author = author, 
                 year = year
             )
-            ctr+=1
 
 
     
