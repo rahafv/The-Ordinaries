@@ -216,7 +216,6 @@ class Club(models.Model):
         old_owner = self.owner
         self.owner = new_owner
         self.add_member(old_owner)
-        self.save()
 
 class Book(models.Model):
     """Book model."""
