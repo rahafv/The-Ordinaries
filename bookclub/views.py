@@ -159,7 +159,7 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
-            create_event('U', 'C', Event.EventType.CREATE, club_owner, club)
+            create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=club)
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
@@ -181,7 +181,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, review_user, book=reviewed_book)
+            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
@@ -285,7 +285,7 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
-    create_event('U', 'C', Event.EventType.JOIN, user, club)
+    create_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -303,8 +303,8 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    delete_event('U', 'C', Event.EventType.JOIN, user, club)
-    create_event('U', 'C', Event.EventType.WITHDRAW, user, club)
+    delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
+    create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -376,7 +376,7 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        create_event('U', 'C', Event.EventType.JOIN, applicant, club)
+        create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         return redirect('applicants_list', club_id)
     else:
@@ -427,20 +427,29 @@ def schedule_meeting(request, club_id):
         form = MeetingForm(club, request.POST)
 
         if form.is_valid():
-            invitees = []
-            for mem in club.members.all():
-                invitees.append(mem.email)
-
             meeting = form.save()
+            
+            """send email invites"""
             current_site = get_current_site(request)
             subject = 'A New Meeting Has Been Scheduled'
             body = render_to_string('meeting_invite.html', {
-                'club': club,
                 'domain': current_site,
                 'meeting': meeting,
             })
-
+            invitees = []
+            for mem in club.members.all():
+                invitees.append(mem.email)
             send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+
+            if meeting.chooser:
+                """send email to member who has to choose a book"""
+                subject = 'It Is Your Turn!'
+                body = render_to_string('meeting_invite.html', {
+                    'domain': current_site,
+                    'meeting': meeting,
+                })
+                send_mail(subject, body, settings.EMAIL_HOST_USER, meeting.chooser.email)
+
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting scheduled!")
             return redirect('club_page', club_id=club.id)
@@ -451,6 +460,11 @@ def schedule_meeting(request, club_id):
     return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
 
 @login_required
+def choose_book(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    return redirect('club_page', club_id=club.id)
+
+@login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
@@ -459,7 +473,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
-        create_event('U', 'B', Event.EventType.ADD, user, book=book)
+        create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
 
@@ -491,8 +505,8 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'AU', Event.EventType.FOLLOW, user=current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'AU', Event.EventType.FOLLOW, user=current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)

@@ -464,13 +464,13 @@ class Event(models.Model):
         return super(Event, self).save(**kwargs)
 
     class EventType(models.TextChoices):
-        JOIN = "joined"
-        WITHDRAW = "withdrew from"
-        FOLLOW =  "followed"
-        CREATE = "created"
-        REVIEW = "reviewed"
-        ADD = "added"
-        SCHEDULE = "scheduled a"
+        JOIN = " joined "
+        WITHDRAW = " withdrew from "
+        FOLLOW =  " followed "
+        CREATE = " created "
+        REVIEW = " reviewed "
+        ADD = " added "
+        SCHEDULE = " scheduled a meeting about "
         
     def get_actor(self):
         """Return the actor of a given event."""
@@ -488,7 +488,7 @@ class Event(models.Model):
         elif self.type_of_action == 'U':
             return self.action_user.username
         elif self.type_of_action == 'M':
-            return "meeting"
+            return self.meeting.title
         else:
             return self.rating.book.title
 

@@ -343,16 +343,14 @@ class MeetingForm(forms.ModelForm):
         """Validate the time and check if it at least2 weeks from today."""
         today = datetime.today()
         start_week = today + timedelta(13)
-        if not is_cont:
-            try:
+        try:
+            if not is_cont:
                 return time > pytz.utc.localize(start_week)
-            except:
-                return True
-        else:
-            try:
-                return time != pytz.utc.localize(today)
-            except:
-                return True
+            else:
+                return time.day != pytz.utc.localize(today.day)
+        except:
+            return True
+
 
     def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same month period."""
@@ -381,6 +379,7 @@ class MeetingForm(forms.ModelForm):
             notes = self.cleaned_data.get('notes'),
             link = self.cleaned_data.get('link'),
         )
-        meeting.assign_chooser()
+        if not self.cleaned_data.get('cont'):
+            meeting.assign_chooser()
         return meeting
         
