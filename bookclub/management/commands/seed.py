@@ -176,6 +176,7 @@ class Command(BaseCommand):
                     title = col[1],
                     author = col[2],
                     image_url = col[7],
+                    year= col[3]
                 )
 
                 books.append(book)

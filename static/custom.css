@@ -240,7 +240,6 @@ label:hover ~ input:checked ~ label{
   color: #ffb503 !important;
 }
 
-
 .profile-card{
     position:relative;
     overflow: hidden;
@@ -248,15 +247,18 @@ label:hover ~ input:checked ~ label{
     box-shadow:0px 2px 3px #222;
     top:150px;
 }
+
 .profile-card:hover .profile-img img
 {
     transform: scale(1.2);
 }
+
 .profile-card .profile-img img{
     width:260px;
     height: 400px;;
     transition: transform 1s;
 }
+
 .profile-card .profile-content::before{
     content: "";
     position:absolute;
@@ -270,6 +272,7 @@ label:hover ~ input:checked ~ label{
     transform: scale(1,1);
     transition: all 0.50s linear;
 }
+
 .profile-card .profile-content::after{
     content: "";
     position:absolute;
@@ -283,10 +286,12 @@ label:hover ~ input:checked ~ label{
     transition: all 0.50s linear;
     
 }
+
 .profile-card:hover .profile-content:before{
     top:20px;
     left:20px;
 }
+
 .profile-card:hover .profile-content:after{
     bottom:20px;
     right:20px;
@@ -302,9 +307,11 @@ label:hover ~ input:checked ~ label{
     text-align: center;
     
 }
+
 .profile-card .profile-content:hover{
     background-color: rgba(136, 153, 253, 0.466);
 }
+
 .profile-card .profile-content .title{
     font-size:24px;
     color:#333;
@@ -314,10 +321,12 @@ label:hover ~ input:checked ~ label{
     transform: translateY(-100px);
     transition:all 900ms cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.20s;
 }
+
 .profile-card:hover .title{
     opacity:1;
     transform: translateY(0);
 }
+
 .profile-card:hover .title::after{
     content:"";
     display:block;
@@ -325,12 +334,14 @@ label:hover ~ input:checked ~ label{
     margin:10px auto;
     border-bottom:2px solid #222;
 }
+
 .profile-card .profile-content .title > span{
     display:block;
     margin:5px 0;
     font-size: 14px;
     text-transform: capitalize;
 }
+
 .profile-card .profile-content .social-link{
     margin:20px 0;
     padding:0;
@@ -338,23 +349,23 @@ label:hover ~ input:checked ~ label{
     transform: translateY(100px);
     transition:all 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.20s;
 }
+
 .profile-card:hover .social-link{
     opacity:1;
     transform: translateY(0);
 }
+
 .profile-card .profile-content .social-link {
     display: inline-block;
     list-style: none;
     margin:0 4px;
 }
+
 .profile-card .profile-content .social-link  a{
     color:#333;
     width:30px;
     height:25px;
     line-height:24px;
     text-align: center;
-    border-radius:5px;
-   
+    border-radius:5px;   
 }
-
-

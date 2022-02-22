@@ -71,6 +71,7 @@ urlpatterns = [
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
+    path('search_page', views.search_page, name='search_page'),
 
 
 ]

@@ -190,6 +190,7 @@ def club_page(request, club_id):
     is_applicant = club.is_applicant(current_user)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
 
+
 @login_required
 def add_book(request):
     if request.method == "POST":
@@ -476,7 +477,44 @@ def follow_toggle(request, user_id):
     else:
         delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
-    return redirect('profile', followee.id) 
+    return redirect('profile', followee.id)
+
+@login_required
+def search_page(request):
+    if request.method == 'GET':
+        searched = request.GET.get('searched', '')
+        category = request.GET.get('category', '')
+
+        if(category=="user-name"):
+            filtered_list = User.objects.filter(username__contains=searched)
+            category= "Users"
+        elif(category=="user-location"):
+            filtered_list = User.objects.filter(country__contains=searched)
+            category= "Users"
+        elif(category=="club-name"):
+            filtered_list = Club.objects.filter(name__contains=searched)
+            category= "Clubs"
+        elif(category=="club-location"):
+            filtered_list = Club.objects.filter(country__contains=searched)
+            category= "Clubs"
+        elif(category=="book-title"):
+            filtered_list = Book.objects.filter(title__contains=searched)
+            category= "Books"
+        elif(category=="book-year"):
+            filtered_list = Book.objects.filter(year__contains=searched)
+            category= "Books"
+        else:
+            filtered_list = Book.objects.filter(author__contains=searched)
+            category= "Books"
+
+
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
+    else: 
+         return render(request, 'search_page.html', {})
 
 @login_required
 def initial_book_list(request):
@@ -493,5 +531,3 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
-
-
