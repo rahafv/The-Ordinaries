@@ -466,6 +466,7 @@ body {
 }
 
 .bd-placeholder-img {
+  background-image: url( static/images/home.png );
   font-size: 1.125rem;
   text-anchor: middle;
   -webkit-user-select: none;
@@ -475,6 +476,7 @@ body {
 
 @media (min-width: 768px) {
   .bd-placeholder-img-lg {
+    background-image: url( static/images/home.png );
     font-size: 3.5rem;
   }
 }
