@@ -343,8 +343,8 @@ def members_list(request, club_id):
     if form.is_valid():
         sort_by = form.cleaned_data.get('sort_by')
     #default ordering is in ascending order so we reverse for descending order
-    if(sort_by == "name-desc"):
-        members_queryset = club.members.all().reverse()
+        if(sort_by == "name-desc"):
+            members_queryset = club.members.all().reverse()
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
@@ -397,9 +397,9 @@ def applicants_list(request, club_id):
             #get the value to sort by from the valid form 
             sort_by = form.cleaned_data.get('sort_by')
         #default ordering is in ascending order so we reverse for descending order
-        if(sort_by == "name-desc"):
-            applicants_queryset = applicants_queryset.reverse()
-            
+            if(sort_by == "name-desc"):
+                applicants_queryset = applicants_queryset.reverse()
+
         applicants_pg = Paginator(applicants_queryset, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         applicants = applicants_pg.get_page(page_number)
