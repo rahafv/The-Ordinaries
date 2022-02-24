@@ -11,18 +11,9 @@
 
                 {% csrf_token %}
                 {% include 'partials/bootstrap_form.html' with form=form %}
-            <button class="btn btn-outline-dark" type="submit" style="color: light-grey;">Sort</button>
+                <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
             </form>
 
-              <!-- <select name="sort">
-                <option value="user-name" >Name A-Z</option>
-                <option value="user-name-desc">Name Z - A</option>
-              </select>
-            
-              &emsp;
-            
-              <button class="btn btn-outline-dark" type="submit" style="color: light-grey;">Sort</button>
-            </form>         -->
         </div>
         <div class="col-12">
             <h1 class="mb-3 mt-3">Members of {{club.name}} club </h1>
