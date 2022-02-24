@@ -86,16 +86,27 @@
 
 
     <!-- START THE FEATURETTES -->
+   
   
-    <hr class="featurette-divider">
-    <h2>Feed</h2>
-    <div class="row featurette">
-      <div class="col-md-7">
-        {% include 'partials/events_as_table.html' with events=events%}
+    <div class="row g-20">
+      <div class="col-md-8">
+        <hr class="featurette-divider">
+        <h2>Feed</h2>
+            {% include 'partials/events_as_table.html' with user_events=user_events%}
+      </div>
+      <div class="col-md-4">
+        <div class="position-sticky" style="top: 10rem;">
+          <div class="p-4 mb-3 bg-light rounded">
+            <h4 class="fst-italic">Updates</h4>
+            {% include 'partials/events_as_list.html' with club_events=club_events%}
+            
+          </div>
+        </div>
+      </div>
     </div>
-
+    
     </div>
-    <hr class="featurette-divider">
+  </div>
 
     <!-- /END THE FEATURETTES -->
 

@@ -33,12 +33,24 @@ def home(request):
 
     current_user = request.user
     authors = list(current_user.followees.all()) + [current_user]
-    events  = [] 
+    clubs = list(User.objects.get(id=current_user.id).clubs.all())
+    user_events  = [] 
+    club_events = []
     for author in authors:
-        events += list(Event.objects.filter(user=author))
-    events.sort(reverse = True , key = events_created_at)
-    events_len = len(events)
-    return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len })
+        user_events += list(Event.objects.filter(user=author))
+    user_events.sort(reverse = True , key = events_created_at)
+
+    for club in clubs:
+        club_events += list(Event.objects.filter(club=club))
+
+    final_club_events = club_events
+    final_club_events.sort(reverse = True , key = events_created_at)
+    first_ten = final_club_events[0:10]
+
+    club_events_length = len(first_ten)
+  
+
+    return render(request, 'home.html', { 'user': current_user, 'user_events': user_events , 'club_events':first_ten , 'club_events_length':club_events_length})
    
 
 @login_prohibited
