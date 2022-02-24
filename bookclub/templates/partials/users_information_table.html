@@ -1,0 +1,30 @@
+
+<table class="table table-bordered" id="followTable">
+<thead>
+<tr style="background-color: white">
+    <th class="th-sm">Name</th>
+    <th class="th-sm">Username</th>
+</tr>
+</thead>
+    {% for user in Users %}
+        <tr style="background-color: white">
+            
+            <td> <a href='{% url 'profile' user.id %}'  style="color: black" > {{ user.full_name }}</a>  </td>
+            
+            <td> 
+                <p>{{user.username}}</p>  
+            </td>
+                <td> 
+                {% if user != current_user %}
+                {% if current_user in user.followers.all  %}
+                    <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-outline-secondary">Unfollow</a> 
+                {% else %}
+                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-outline-info">Follow</a> 
+                {% endif %}
+                {% endif %} 
+            </td>
+            
+        </tr>
+    {% endfor %}
+</table>
+          

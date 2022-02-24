@@ -1,0 +1,25 @@
+<form class="d-flex" method=GET 
+action="{% url 'search_page'%}">
+{% csrf_token %}
+
+  <select id="category" name="category">
+    <optgroup label="User">
+      <option value="user-name">Name</option>
+      <option value="user-location">Country</option>
+    </optgroup>
+    <optgroup label="Club">
+      <option value="club-name">Name</option>
+      <option value="club-location">Country</option>
+    </optgroup>
+    <optgroup label="Book">
+      <option value="book-title">Title</option>
+      <option value="book-author">Author</option>
+      <option value="book-year">Year</option>
+    </optgroup>
+  </select>
+
+  &emsp;
+  <input class="form-control me-2"
+  type="search" placeholder="Search" aria-label="Search" name="searched"> 
+  <button class="btn btn-outline-light bi bi-search" type="submit" style="color: light-grey;"></button>
+</form>
