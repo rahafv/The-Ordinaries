@@ -347,8 +347,8 @@ class ClubSortForm(forms.Form):
     SORT_CHOICES = [
         (ASC_NAME, "Name A-Z"),
         (DESC_NAME, "Name Z-A"),
-        (DESC_DATE, "Latest Clubs"),
-        (ASC_DATE, "Older Clubs"),
+        (DESC_DATE, "Latest"),
+        (ASC_DATE, "Older"),
     ]
 
     sort = forms.ChoiceField(

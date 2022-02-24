@@ -313,11 +313,36 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
+    # form = SortForm(request.GET or None)
+    # sort = ""
+
+    # if form.is_valid():
+    #     sort_by = form.cleaned_data.get('sort_by')
+    #     #default ordering is in ascending order so we reverse for descending order
+    #     if(sort_by == 'desc'):
+    #         books_queryset = books_queryset.order_by(Lower("title").desc())
+    #     else:
+    #         books_queryset = books_queryset.order_by(Lower("title").asc())
+
+    form = ClubSortForm(request.GET or None)
+    sort = ""
+
+    if form.is_valid():
+        sort = form.cleaned_data.get('sort')
+        if(sort == 'name_asc'):
+            books_queryset = books_queryset.order_by(Lower('title').asc())
+        elif (sort == 'name_desc'):
+            books_queryset = books_queryset.order_by(Lower('title').desc())
+        elif(sort == "date_asc"):
+            books_queryset = books_queryset.order_by('year')
+        else:
+            books_queryset = books_queryset.order_by(Lower('year').desc())
+
     count = books_queryset.count()
     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
     page_number = request.GET.get('page')
     books = books_pg.get_page(page_number)
-    return render(request, 'books.html', {'books': books, 'general': general, 'count': count})
+    return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form':form})
 
 @login_required
 def clubs_list(request, user_id=None):
