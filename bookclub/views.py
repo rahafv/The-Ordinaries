@@ -1,3 +1,4 @@
+from imaplib import _Authenticator
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -27,7 +28,14 @@ def welcome(request):
 
 @login_required
 def home(request):
-     return render(request, 'home.html')
+    current_user = request.user
+    authors = list(current_user.followees.all()) + [current_user]
+    events  = [] 
+    for author in authors:
+        events += list(Event.objects.filter(user=author))
+    events_len = len(events)
+    return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len })
+    #  return render(request, 'home.html')
 
 @login_prohibited
 def sign_up(request):
@@ -473,9 +481,9 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
 
@@ -531,3 +539,16 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
+
+@login_required
+def feed(request):
+    current_user = request.user
+    authors = list(current_user.followees.all()) + [current_user]
+    first_event = Event.objects.get(id=1)
+    events  = [] 
+    for author in authors:
+        events += list(Event.objects.filter(user=author))
+    events_len = len(events)
+    print(len(events))
+    return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len , 'first_event':first_event})
+

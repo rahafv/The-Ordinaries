@@ -1,0 +1,31 @@
+<table class="table">
+    {% for event in events %}
+        <tr>
+            <td>
+            {% comment %} <img src="{{ post.author.mini_gravatar }}" alt="Gravatar of author {{ post.author.username }}" class="rounded-circle"> {% endcomment %}
+            </td>
+            <td>
+            <p class="event-author">
+                <span class="author-user-details">
+                <i class= "fa fa-user mr-1">{{ event.user.username }}
+                &nbsp;&middot;&nbsp;
+                <i class= "fa fa-clock mr-1"> </i> {{ event.created_at }}
+                </span>
+            </p>
+            <p class="post-text">
+                {{ event.get_actor }}
+                &nbsp;&middot;&nbsp;
+               {{ event.get_action }} 
+               &nbsp;&middot;&nbsp;
+               {{ event.type_of_action }}
+
+            </p> 
+            {% comment %} <p class="post-text">
+                {{ post.text }}
+            </p> {% endcomment %}
+            </td>
+        </tr>
+  
+    {% endfor %}
+  </table>
+  

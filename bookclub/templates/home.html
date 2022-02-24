@@ -86,7 +86,11 @@
 
 
     <!-- START THE FEATURETTES -->
-
+    {% include 'partials/events_as_table.html' with events=events%}
+    <p>the user is: : {{events.user.username}}</p>
+    <i class= "fa fa-clock mr-1"> </i>  <p>the size is : {{events_len}}</p>
+    <h2>to test</h2>
+{% comment %} 
     <hr class="featurette-divider">
 
     <div class="row featurette">
@@ -126,7 +130,7 @@
       </div>
     </div>
 
-    <hr class="featurette-divider">
+    <hr class="featurette-divider"> {% endcomment %}
 
     <!-- /END THE FEATURETTES -->
 

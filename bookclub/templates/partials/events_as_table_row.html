@@ -1,0 +1,24 @@
+
+<tr>
+  <td>
+    <i class= "fa fa-clock mr-1"> </i>
+    {% comment %} <img src="{{ post.author.mini_gravatar }}" alt="Gravatar of author {{ post.author.username }}" class="rounded-circle"> {% endcomment %}
+  </td>
+  <td>
+    <p class="event-author">
+      <span class="author-user-details">
+        {{ events.user.username }}
+        &nbsp;&middot;&nbsp;
+        <i class= "fa fa-clock mr-1"> </i> {{ events.created_at }}
+      </span>
+    </p>
+     <p class="post-text">
+      {{ events.get_actor }}
+      &nbsp;&middot;&nbsp;
+      {{ events.get_action }}
+    </p> 
+    {% comment %} <p class="post-text">
+      {{ post.text }}
+    </p> {% endcomment %}
+  </td>
+</tr>
