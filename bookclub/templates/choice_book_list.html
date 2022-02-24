@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-3"></div>
     <div class="col-6 mt-3">
-        <form class="d-flex" method=GET action="{% url 'search_book' club_id%}">
+        <form class="d-flex" method=GET action="{% url 'search_book' meeting_id %}">
             {% csrf_token %}
             <input class="fw-light center form-control" type="search" placeholder="looking for a specific book?" aria-label="Search" name="searched"> 
             &emsp;
@@ -40,7 +40,7 @@
                     <br>
                     <br>
                     <br>  
-                    <a href='{% url "choose_book" club_id=club_id book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
+                    <a href="{% url 'choose_book' book_id=book.id meeting_id=meeting_id %}" class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
                 </div>
                 {% endfor %}
             </div>
@@ -73,7 +73,7 @@
                 <br>
                 <br>
                 <br>  
-                <a href='{% url "choose_book" club_id=club_id book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
+                <a href="{% url 'choose_book' book_id=book.id meeting_id=meeting_id %}" class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
             </div>
             {% endfor %}
         </div>

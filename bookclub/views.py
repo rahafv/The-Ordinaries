@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, login_prohibited, generate_token, create_event
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
+from .models import Meeting, User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
@@ -446,7 +446,7 @@ def schedule_meeting(request, club_id):
             """send email invites"""
             current_site = get_current_site(request)
             subject = 'A New Meeting Has Been Scheduled'
-            body = render_to_string('meeting_invite.html', {
+            body = render_to_string('emails/meeting_invite.html', {
                 'domain': current_site,
                 'meeting': meeting,
             })
@@ -474,15 +474,14 @@ def schedule_meeting(request, club_id):
     return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
 
 @login_required
-def choice_book_list(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
+def choice_book_list(request, meeting_id):
     current_user = request.user
     my_books =  Book.objects.all()
     sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
-    return render(request, 'choice_book_list.html', {'rec_books':sorted_books , 'user':current_user, 'club_id':club.id})
+    return render(request, 'choice_book_list.html', {'rec_books':sorted_books , 'user':current_user, 'meeting_id':meeting_id})
 
 @login_required
-def search_book(request, club_id):
+def search_book(request, meeting_id):
     if request.method == 'GET':
         current_user = request.user
         searched = request.GET.get('searched', '')
@@ -491,16 +490,17 @@ def search_book(request, club_id):
         pg = Paginator(books, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         books = pg.get_page(page_number)
-        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'user':current_user, 'club_id':club_id})
+        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'user':current_user, 'meeting_id':meeting_id})
     else: 
-        return redirect('choice_book_list', club_id=club_id)
+        return redirect('choice_book_list', meeting_id=meeting_id)
 
 @login_required
-def choose_book(request, club_id, book_id):
-    club = get_object_or_404(Club.objects, id=club_id)
+def choose_book(request, book_id, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     book = get_object_or_404(Book.objects, id=book_id)
-    book.add_club(club)
-    return redirect('club_page', club_id=club.id)
+    book.add_club(meeting.club)
+    Meeting.objects.filter(id = meeting_id).update(book=book)
+    return redirect('club_page', club_id=meeting.club.id)
 
 @login_required
 def add_book_to_list(request, book_id):
