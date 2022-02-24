@@ -28,11 +28,15 @@ def welcome(request):
 
 @login_required
 def home(request):
+    def events_created_at(event):
+        return event.created_at
+        
     current_user = request.user
     authors = list(current_user.followees.all()) + [current_user]
     events  = [] 
     for author in authors:
         events += list(Event.objects.filter(user=author))
+    events.sort(reverse = True , key = events_created_at)
     events_len = len(events)
     return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len })
     #  return render(request, 'home.html')
