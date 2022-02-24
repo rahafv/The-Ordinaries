@@ -5,22 +5,21 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import login_prohibited, generate_token
+from .helpers import delete_event, login_prohibited, generate_token, create_event
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book , Rating
+from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
 from django.urls import reverse
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.core.mail import EmailMessage
+from django.core.mail import send_mail 
 from system import settings
 from django.core.paginator import Paginator
-
 
 @login_prohibited
 def welcome(request):
@@ -49,18 +48,18 @@ def send_activiation_email(request, user_id):
 
     if not user.email_verified:
         current_site = get_current_site(request)
-        email_subject = 'Activate your account'
-        email_body = render_to_string('activate.html', {
+        subject = 'Activate your account'
+        body = render_to_string('activate.html', {
             'user': user,
             'domain': current_site,
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
             'token':generate_token.make_token(user)}
         )
+        email_from = settings.EMAIL_HOST_USER
+        email_to = [user.email]
 
-        email = EmailMessage(subject=email_subject, body=email_body,
-        from_email=settings.EMAIL_HOST_USER, to=[user.email])
+        send_mail(subject, body, email_from, email_to)
 
-        email.send()
         messages.add_message(request, messages.WARNING, 'Your email needs verification!')
     else:
         messages.add_message(request, messages.WARNING, 'Email is already verified!')
@@ -68,11 +67,9 @@ def send_activiation_email(request, user_id):
     return redirect('log_in')
 
 def activate_user(request, uidb64, token):
-
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-
     except:
         user = None
         return render(request, 'activate-fail.html', {'user': user})
@@ -102,13 +99,17 @@ def log_in(request):
 
             if user:
                 login(request, user)
-                redirect_url = next or 'home'
+                if len(user.books.all()) == 0:
+                    redirect_url = next or 'initial_book_list'
+                else:
+                    redirect_url = next or 'home'
                 return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     else:
         next = request.GET.get('next') or ''
     form = LogInForm()
     return render(request, 'log_in.html', {'form': form, 'next': next})
+
 
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
@@ -119,34 +120,31 @@ def log_out(request):
     messages.add_message(request, messages.SUCCESS, "You've been logged out.")
     return redirect('welcome')
 
-@login_required
-def password(request):
-    current_user = request.user
-    if request.method == 'POST':
-        form = PasswordForm(data=request.POST)
-        if form.is_valid():
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            if check_password(password, current_user.password):
-                current_user.set_password(new_password)
-                current_user.save()
-                login(request, current_user)
-                messages.add_message(request, messages.SUCCESS, "Password updated!")
-                return redirect('home')
-            else:
-                messages.add_message(request, messages.ERROR, "Password incorrect!")
-        else:
-            password = form.cleaned_data.get('password')
-            new_password = form.cleaned_data.get('new_password')
-            password_confirmation = form.cleaned_data.get('password_confirmation')
-            if new_password is None and password == password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Your new password cannot be the same as your current one!')
-            elif new_password != None and new_password != password_confirmation:
-                messages.add_message(request, messages.ERROR, 'Password confirmation does not match password!')
-            else:
-                messages.add_message(request, messages.ERROR, "New password does not match criteria!")
-    form = PasswordForm()
-    return render(request, 'password.html', {'form': form})
+class PasswordView(LoginRequiredMixin, FormView):
+    """View that handles password change requests."""
+
+    template_name = 'password.html'
+    form_class = PasswordForm
+
+    def get_form_kwargs(self, **kwargs):
+        """Pass the current user to the password change form."""
+
+        kwargs = super().get_form_kwargs(**kwargs)
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def form_valid(self, form):
+        """Handle valid form by saving the new password."""
+
+        form.save()
+        login(self.request, self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirect the user after successful password change."""
+
+        messages.add_message(self.request, messages.SUCCESS, "Password updated!")
+        return reverse('home')
 
 @login_required
 def create_club(request):
@@ -156,13 +154,13 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
+            create_event('U', 'C', Event.EventType.CREATE, club_owner, club)
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
-
 
 @login_required
 def add_review(request, book_id):
@@ -177,11 +175,11 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            create_event('U', 'B', Event.EventType.REVIEW, review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
-
     return render(request, 'book_details.html', {'book':reviewed_book})
 
 @login_required
@@ -192,14 +190,14 @@ def club_page(request, club_id):
     is_applicant = club.is_applicant(current_user)
     return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
 
+
 @login_required
 def add_book(request):
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id)
-
+            return redirect('book_details', book_id=book.id) 
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -223,7 +221,6 @@ def book_details(request, book_id) :
 @login_required
 def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
-
     if user_id == request.user.id:
         return redirect('profile')
 
@@ -234,7 +231,6 @@ def show_profile_page(request, user_id = None):
     followable = (request.user != user)
 
     return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
-
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
@@ -282,6 +278,7 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
+    create_event('U', 'C', Event.EventType.JOIN, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -299,6 +296,8 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
+    delete_event('U', 'C', Event.EventType.JOIN, user, club)
+    create_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -344,23 +343,47 @@ def members_list(request, club_id):
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'is_member': is_member, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+        
+@login_required
+def following_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following = True 
+    list = user.followees.all() 
+    current_user = request.user 
 
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
+@login_required
+def followers_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    is_following= False
+    list = user.followers.all()
+    current_user = request.user
+
+    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    follow_list = follow_pg.get_page(page_number)
+    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
+    
 
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
+    club = get_object_or_404(Club.objects, id=club_id) 
     applicants = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
         return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user })
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
-        return redirect('club_page', club_id)
+        return redirect('club_page', club_id) 
 
 @login_required
 def accept_applicant(request, club_id, user_id):
@@ -370,13 +393,12 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
+        create_event('U', 'C', Event.EventType.JOIN, applicant, club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
-
-
 
 @login_required
 def reject_applicant(request, club_id, user_id):
@@ -390,7 +412,6 @@ def reject_applicant(request, club_id, user_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
-
 
 @login_required
 def transfer_club_ownership(request, club_id):
@@ -440,6 +461,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        create_event('U', 'B', Event.EventType.ADD, user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
 
@@ -470,5 +492,62 @@ def edit_review(request, review_id ):
 def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
+    if(not current_user.is_following(followee)):
+        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+    else:
+        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
+
+@login_required
+def search_page(request):
+    if request.method == 'GET':
+        searched = request.GET.get('searched', '')
+        category = request.GET.get('category', '')
+
+        if(category=="user-name"):
+            filtered_list = User.objects.filter(username__contains=searched)
+            category= "Users"
+        elif(category=="user-location"):
+            filtered_list = User.objects.filter(country__contains=searched)
+            category= "Users"
+        elif(category=="club-name"):
+            filtered_list = Club.objects.filter(name__contains=searched)
+            category= "Clubs"
+        elif(category=="club-location"):
+            filtered_list = Club.objects.filter(country__contains=searched)
+            category= "Clubs"
+        elif(category=="book-title"):
+            filtered_list = Book.objects.filter(title__contains=searched)
+            category= "Books"
+        elif(category=="book-year"):
+            filtered_list = Book.objects.filter(year__contains=searched)
+            category= "Books"
+        else:
+            filtered_list = Book.objects.filter(author__contains=searched)
+            category= "Books"
+
+
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
+    else: 
+         return render(request, 'search_page.html', {})
+
+@login_required
+def initial_book_list(request):
+    current_user = request.user
+    already_selected_books = current_user.books.all()
+    my_books =  Book.objects.all().exclude(id__in = already_selected_books)
+    list_length = len(current_user.books.all())
+    sorted_books = sorted(my_books,key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:8]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+@login_required
+def add_book_from_initial_list(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    book.add_reader(user)
+    return redirect("initial_book_list")

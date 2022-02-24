@@ -5,6 +5,7 @@ from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 from .models import User, Club, Book, Rating
+from django.contrib.auth import authenticate
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""
@@ -98,8 +99,8 @@ class CreateClubForm(forms.ModelForm):
         widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
         labels = {'club_type': "Select Club Privacy Status"}
 
-class PasswordForm(forms.Form):
-    """Form enabling users to change their password."""
+class NewPasswordMixin(forms.Form):
+    """Form mixing for new_password and password_confirmation fields."""
 
     password = forms.CharField(label='Current password', widget=forms.PasswordInput())
     new_password = forms.CharField(
@@ -114,16 +115,48 @@ class PasswordForm(forms.Form):
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
     def clean(self):
-            """Clean the data and generate messages for any errors."""
-            super().clean()
-            password = self.cleaned_data.get('password')
-            new_password = self.cleaned_data.get('new_password')
-            password_confirmation = self.cleaned_data.get('password_confirmation')
-            if new_password != password_confirmation:
-                self.add_error('password_confirmation', 'Confirmation does not match password')
-            if password == new_password:
-                self.add_error('new_password', 'Your new password cannot be the same as your current one')
+        """Form mixing for new_password and password_confirmation fields."""
 
+        super().clean()
+        password = self.cleaned_data.get('password')
+        new_password = self.cleaned_data.get('new_password')
+        password_confirmation = self.cleaned_data.get('password_confirmation')
+        if new_password != password_confirmation:
+            self.add_error('password_confirmation', 'Confirmation does not match password.')
+        if password == new_password:
+            self.add_error('new_password', 'Your new password cannot be the same as your current one')
+
+class PasswordForm(NewPasswordMixin):
+    """Form enabling users to change their password."""
+
+    password = forms.CharField(label='Current password', widget=forms.PasswordInput())
+
+    def __init__(self, user=None, **kwargs):
+        """Construct new form instance with a user instance."""
+
+        super().__init__(**kwargs)
+        self.user = user
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+
+        super().clean()
+        password = self.cleaned_data.get('password')
+        if self.user is not None:
+            user = authenticate(username=self.user.username, password=password)
+        else:
+            user = None
+        if user is None:
+            self.add_error('password', "Password is invalid")
+
+    def save(self):
+        """Save the user's new password."""
+
+        new_password = self.cleaned_data['new_password']
+        if self.user is not None:
+            self.user.set_password(new_password)
+            self.user.save()
+        return self.user
 
 class BookForm(forms.ModelForm):
     """Form enabling a user to create a book."""
@@ -131,7 +164,7 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'publisher','image_url','year']
+        fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
 
     def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
@@ -149,15 +182,15 @@ class BookForm(forms.ModelForm):
         if not self.image_url:
             self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
 
-        user = Book.objects.create(
+        book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
             publisher=self.cleaned_data.get('publisher'),
             image_url=self.image_url,
-            year=self.cleaned_data.get('year')
+            year=self.cleaned_data.get('year'),
         )
-        return user
+        return book
 
 
 class UserForm(forms.ModelForm):

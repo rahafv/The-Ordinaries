@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Trending Now ..{% endblock %}
+{% block body %}
+
+<div class="row py-lg-5">
+    <div class="col mx-auto">
+      <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
+         <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
+         <p class="lead text-muted text-center"> You need to add at least one book in your list</p>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        {% for book in my_books %}
+        <div class="col-sm-6 col-md-3">
+            <div class="profile-card">
+                <div class="profile-img">
+                    <img src="{{ book.image_url }}"  width="220" height="300"  />
+                </div>
+                <div class="profile-content">
+                    <h2 class="title">{{ book.title }}
+                        <span>{{ book.author }}</span>
+                    </h2>
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>  
+            <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-plus-lg mr-2" style="margin-left:6em"  role="button" > Add </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="row py-lg-5">
+    <div class="col-lg-6 col-md-8 mx-auto text-center">
+        {%if list_length == 0 %}
+            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue</a>
+        {% else %}
+            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
-from bookclub.models import User, Book
+from bookclub.models import User, Book, Event
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 
 class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
@@ -62,6 +62,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(club.author, "Mark")
         self.assertEqual(club.publisher, "Oxford")
         self.assertEqual(club.year, 2002)
+
         self.assert_menu(response)
 
     def test_get_add_book_redirects_when_not_logged_in(self):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book
+from bookclub.models import User, Book, Event
 from bookclub.tests.helpers import LoginRedirectTester, MenueTestMixin, MessageTester
 
 class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin, MessageTester):
@@ -18,6 +18,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin, M
 
     def test_successful_book_addition(self):
         count = self.book.readers_count()
+        events_before_count = Event.objects.count() 
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url, follow=True)
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})
@@ -26,6 +27,8 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin, M
         self.assert_success_message(response)
         self.assert_menu(response)
         self.assertEqual(self.book.readers_count(), count+1)
+        self.assertEqual(events_before_count + 1, Event.objects.count())
+        
 
     def test_successful_book_removal(self):
         self.client.login(username=self.user.username, password='Password123')
