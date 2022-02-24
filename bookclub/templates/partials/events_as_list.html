@@ -5,20 +5,22 @@
             <p> No Club Updates Yet! </p>
         {% else %}
             <li class="post-text">
-                <a href= {% url 'club_page' event.club.id %}>  {{ event.get_actor }}  </a>
+                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
                 {{ event.message }}
                 {{ event.get_action }}
             </li>
+            &emsp;
         {% endif %}
     {%elif event.type_of_action == 'B' %}
         {% if club_events_length == 0  %}
             <p> No Club Updates Yet! </p>
         {% else %}
             <li class="post-text">
-                <a href= {% url 'club_page' event.club.id %}>  {{ event.get_actor }}  </a>
+                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
                 {{ event.message }}
-                <a href= {% url 'book_details' event.book.id  %}>  {{ event.get_action }}  </a>
+                <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
              </li>
+             &emsp;
         {% endif %}
     {% endif %}
     

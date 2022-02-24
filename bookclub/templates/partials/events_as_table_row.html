@@ -6,7 +6,7 @@
     <td>
     <p class="event-author">
         <span class="author-user-details">
-            <i class= "fas fa-user mr-1"> <a href= {% url 'profile' event.user.id  %}> {{event.user.username}} </a></i>
+            <i class= "fas fa-user mr-1"> <a href= {% url 'profile' event.user.id  %} style= "color: black"> {{event.user.username}} </a></i>
             &nbsp;&middot;&nbsp;
             <i class= "fa fa-clock mr-1"> </i> {{ event.created_at | naturaltime}}
         </span>
@@ -15,11 +15,11 @@
         {{ event.get_actor }}
         {{ event.message }}
         {% if event.type_of_action == 'C' %}
-            <a href= {% url 'club_page' event.club.id  %}>  {{ event.get_action }}  </a>
+            <a href= {% url 'club_page' event.club.id  %} style= "color: black">  {{ event.get_action }}  </a>
         {% elif event.type_of_action == 'B' %}
-            <a href= {% url 'book_details' event.book.id  %}>  {{ event.get_action }}  </a>
+            <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
         {% elif event.type_of_action == 'U' %}
-            <a href= {% url 'profile' event.user.id  %}>  {{ event.get_action }}  </a>
+            <a href= {% url 'profile' event.user.id  %} style= "color: black">  {{ event.get_action }}  </a>
         {% endif %}
 
     </p> 
