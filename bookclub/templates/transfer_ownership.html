@@ -5,9 +5,18 @@
 {% comment %} <form action="{% url 'transfer_ownership' %}" method="post"> {% endcomment %}
 <form method="post">
     {% csrf_token %}
-    {{ form }}
+    <select id="selected_member" name="selected_member">
+        {% for member in memberlist %}
+        <option value={{member.id}}> {{member.username}} </option>
+        {% endfor %}
+    </select>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="checked" id="defaultCheck" required>
+        <label class="form-check-label" for="defaultCheck">
+          Please confirm by checking this box
+        </label>
+      </div>
     <input type="submit" class="btn btn-primary mb-3" value="Save">
-    {% comment %} <button type="submit" class="btn btn-success">Save</button> {% endcomment %}
 </form>
 {% endif %}
 {% endblock %}

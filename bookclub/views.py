@@ -2,7 +2,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, TransferClubOwnership
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import login_prohibited, generate_token
@@ -392,22 +392,24 @@ def reject_applicant(request, club_id, user_id):
         return redirect('club_page', club_id)
 
 
-
 @login_required
 def transfer_club_ownership(request, club_id):
-    club = get_object_or_404(Club.objects, id = club_id)
+    club = get_object_or_404(Club.objects, id=club_id)
     user = request.user
+    memberlist=club.members.all().exclude(id=user.id)
+    if memberlist.count() == 0:
+        messages.add_message(request, messages.WARNING, "There are no other members to tranfer club to!")
+        return redirect('club_page', club_id = club.id)
     if request.method == "POST":
-        form = TransferClubOwnership(data=request.POST, user=user, club=club)
-        if form.is_valid():
-            print('valid')
-            member_id = form.cleaned_data().get('members')
-            club.make_owner(club_id, member_id)
+        selectedmember = request.POST.get('selected_member', '')
+        if selectedmember != '':
+            member = get_object_or_404(User.objects, id = int(selectedmember))
+            club.make_owner(member)
+            messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
             return redirect('club_page', club_id = club.id)
-    else:
-        form = TransferClubOwnership(user=user, club=club)
-        print('not valid')
-    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'form':form})
+        else:
+            messages.add_message(request, messages.ERROR, "Selection not valid" )
+    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
 @login_required
 def edit_club_information(request, club_id):
