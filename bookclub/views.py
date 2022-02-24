@@ -474,9 +474,17 @@ def schedule_meeting(request, club_id):
     return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
 
 @login_required
-def choose_book(request, club_id):
+def choice_book_list(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    return redirect('club_page', club_id=club.id)
+    current_user = request.user
+    books = set()
+    for mem in club.members:
+        mem_books = mem.books.all()
+        for book in mem_books:
+            books.add(book)
+    my_books =  Book.objects.all().exclude(id__in = list(books))
+    sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:12]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user})
 
 @login_required
 def add_book_to_list(request, book_id):
