@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from email.policy import default
 from pickle import FALSE
+from tkinter import Widget
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
@@ -319,14 +320,19 @@ class RatingForm(forms.ModelForm):
         return rating*2
 
 class SortForm(forms.Form):
-    SORT_CHOICES = (
-        ("name-asc", "Name A-Z"),
-        ("name-desc", "Name Z-A"),
-    )
+    
+    ASCENDING = 'asc'
+    DESCENDING = 'desc'
 
-    sort_by = forms.ChoiceField(choices = SORT_CHOICES, initial = "name_asc" )
+    SORT_CHOICES = [
+        (ASCENDING, "Name A-Z"),
+        (DESCENDING, "Name Z-A")
+    ]   
 
-    def clean(self):
-        """Clean the data and generate messages for any errors."""
+    sort_by = forms.ChoiceField(choices = SORT_CHOICES, initial = ASCENDING )
+    widgets = {'sort_by': forms.Select(),}
+    # def clean(self):
+    #     """Clean the data and generate messages for any errors."""
 
-        super().clean()
+    #     super().clean()
+    #     return self.cleaned_data

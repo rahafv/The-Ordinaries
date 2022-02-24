@@ -338,24 +338,55 @@ def members_list(request, club_id):
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
     #form to display user sorting options
-    form = SortForm(request.POST or None)
+    form = SortForm(request.GET or None)
     sort_by = ""
     if form.is_valid():
         sort_by = form.cleaned_data.get('sort_by')
-    #default ordering is in ascending order so we reverse for descending order
-        if(sort_by == "name-desc"):
-            members_queryset = club.members.all().reverse()
+        #default ordering is in ascending order so we reverse for descending order
+        if(sort_by == 'desc'):
+            members_queryset = members_queryset.reverse()
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form})
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form}) #'form':form
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
     
         
+# @login_required
+# def members_list_sorted_asc(request, club_id):
+#     print(f'{request}')
+#     current_user = request.user
+#     club = get_object_or_404(Club.objects, id=club_id)
+#     is_member = club.is_member(current_user)
+#     members_queryset = club.members.all()
+#     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     members = members_pg.get_page(page_number)
+#     if (is_member):
+#         return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user}) #'form':form
+#     else:
+#         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
+#         return redirect('club_page', club_id)
+
+# @login_required
+# def members_list_sorted_desc(request, club_id):
+#     print(f'{request}')
+#     current_user = request.user
+#     club = get_object_or_404(Club.objects, id=club_id)
+#     is_member = club.is_member(current_user)
+#     members_queryset = club.members.all().order_by(-("first_name", "last_name"))
+#     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     members = members_pg.get_page(page_number)
+#     if (is_member):
+#         return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user}) #'form':form
+#     else:
+#         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
+#         return redirect('club_page', club_id)
     
 @login_required
 def following_list(request, user_id):
@@ -390,14 +421,14 @@ def applicants_list(request, club_id):
     is_owner = (club.owner == current_user)
     if (is_owner):
         #Form to display sorting options for Users
-        form = SortForm(request.POST or None)
+        form = SortForm(request.GET or None)
         #sorting attribute ascending initially
         sort_by = ""
         if form.is_valid():
             #get the value to sort by from the valid form 
             sort_by = form.cleaned_data.get('sort_by')
         #default ordering is in ascending order so we reverse for descending order
-            if(sort_by == "name-desc"):
+            if(sort_by == "desc"):
                 applicants_queryset = applicants_queryset.reverse()
 
         applicants_pg = Paginator(applicants_queryset, settings.MEMBERS_PER_PAGE)
