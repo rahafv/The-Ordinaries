@@ -1,0 +1,13 @@
+<form class="d-flex" method=POST 
+action='{% url 'members_list' club.id %}'>
+{% csrf_token %}
+
+  <select id="sort" name="sort_by">
+    <option value="user-name" >Name A - Z</option>
+    <option value="user-name-desc" selected>Name Z - A</option>
+  </select>
+
+  &emsp;
+
+  <button class="btn btn-outline-dark" type="submit" style="color: light-grey;">Sort</button>
+</form>

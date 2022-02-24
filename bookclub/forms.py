@@ -317,3 +317,16 @@ class RatingForm(forms.ModelForm):
 
     def calculate_rating(self, rating): 
         return rating*2
+
+class SortForm(forms.Form):
+    SORT_CHOICES = (
+        ("name-asc", "Name A-Z"),
+        ("name-desc", "Name Z-A"),
+    )
+
+    sort_by = forms.ChoiceField(choices = SORT_CHOICES, initial = "name_asc" )
+
+    def clean(self):
+        """Clean the data and generate messages for any errors."""
+
+        super().clean()

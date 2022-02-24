@@ -2,7 +2,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, SortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, login_prohibited, generate_token, create_event
@@ -337,16 +337,24 @@ def members_list(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
+    form = SortForm(request.POST or None)
+    sort_by = ""
+    if form.is_valid():
+        sort_by = form.cleaned_data.get('sort_by')
+    if(sort_by == "name-desc"):
+        members_queryset = club.members.all().reverse()
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form})
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
+    
         
+    
 @login_required
 def following_list(request, user_id):
     user = get_object_or_404(User.objects, id=user_id)
