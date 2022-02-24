@@ -1,53 +1,83 @@
-{% extends 'base.html' %}
+{% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
 {% block title %}Trending Now ..{% endblock %}
-{% block body %}
+{% block content %}
 
-<div class="row py-lg-5">
-    <div class="col mx-auto">
-      <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
-         <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
-         <p class="lead text-muted text-center"> You need to add at least one book in your list</p>
+<h1 class="fw-light center mt-5" style="text-align:center;">Choose a book</h1>
+<div class="row">
+    <div class="col-3"></div>
+    <div class="col-6 mt-3">
+        <form class="d-flex" method=GET action="{% url 'search_book' club_id%}">
+            {% csrf_token %}
+            <input class="fw-light center form-control" type="search" placeholder="looking for a specific book?" aria-label="Search" name="searched"> 
+            &emsp;
+            <button class="btn btn-outline-dark bi bi-search" type="submit" style="color: dark-grey;"></button>
+        </form>
     </div>
+    <div class="col-3"></div>
 </div>
-<div class="container">
-    <div class="row">
-        {% for book in my_books %}
-        <div class="col-sm-6 col-md-3">
-            <div class="profile-card">
-                <div class="profile-img">
-                    <img src="{{ book.image_url }}"  width="220" height="300"  />
+
+{% if searched %}
+     {% if books %}
+        <div class="container">
+            <div class="row">
+                {% for book in books %}
+                <div class="col-sm-6 col-md-3">
+                    <div class="profile-card">
+                        <div class="profile-img">
+                            <img src="{{ book.image_url }}"  width="220" height="300"  />
+                        </div>
+                        <div class="profile-content">
+                            <h2 class="title">{{ book.title }}
+                                <span>{{ book.author }}</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>  
+                    <a href='{% url "choose_book" club_id=club_id book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
                 </div>
-                <div class="profile-content">
-                    <h2 class="title">{{ book.title }}
-                        <span>{{ book.author }}</span>
-                    </h2>
-                </div>
+                {% endfor %}
             </div>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>  
-            <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-plus-lg mr-2" style="margin-left:6em"  role="button" > Add </a>
         </div>
-        {% endfor %}
+        <ul class="pagination justify-content-center">
+            {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
+        </ul>
+     {%else %}
+         <h2> no such information!</h2>
+     {% endif %}
+{%else %}
+    <div class="container">
+        <div class="row">
+            {% for book in rec_books %}
+            <div class="col-sm-6 col-md-3">
+                <div class="profile-card">
+                    <div class="profile-img">
+                        <img src="{{ book.image_url }}"  width="220" height="300"  />
+                    </div>
+                    <div class="profile-content">
+                        <h2 class="title">{{ book.title }}
+                            <span>{{ book.author }}</span>
+                        </h2>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>  
+                <a href='{% url "choose_book" club_id=club_id book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-</div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div class="row py-lg-5">
-    <div class="col-lg-6 col-md-8 mx-auto text-center">
-        {%if list_length == 0 %}
-            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue</a>
-        {% else %}
-            <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>
-        {% endif %}
-    </div>
-</div>
+{% endif %}
 {% endblock %}
 

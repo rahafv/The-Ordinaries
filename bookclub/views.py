@@ -373,7 +373,6 @@ def followers_list(request, user_id):
     follow_list = follow_pg.get_page(page_number)
     return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
     
-
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
@@ -478,14 +477,30 @@ def schedule_meeting(request, club_id):
 def choice_book_list(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     current_user = request.user
-    books = set()
-    for mem in club.members:
-        mem_books = mem.books.all()
-        for book in mem_books:
-            books.add(book)
-    my_books =  Book.objects.all().exclude(id__in = list(books))
-    sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:12]
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user})
+    my_books =  Book.objects.all()
+    sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
+    return render(request, 'choice_book_list.html', {'rec_books':sorted_books , 'user':current_user, 'club_id':club.id})
+
+@login_required
+def search_book(request, club_id):
+    if request.method == 'GET':
+        current_user = request.user
+        searched = request.GET.get('searched', '')
+        books = Book.objects.filter(title__contains=searched)
+
+        pg = Paginator(books, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        books = pg.get_page(page_number)
+        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'user':current_user, 'club_id':club_id})
+    else: 
+        return redirect('choice_book_list', club_id=club_id)
+
+@login_required
+def choose_book(request, club_id, book_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    book = get_object_or_404(Book.objects, id=book_id)
+    book.add_club(club)
+    return redirect('club_page', club_id=club.id)
 
 @login_required
 def add_book_to_list(request, book_id):
