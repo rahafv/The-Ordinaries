@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
+from bookclub.forms import ClubSortForm
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 from system import settings
 
@@ -17,6 +18,9 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         self.club = Club.objects.get(id=1)
         self.other_club = Club.objects.get(id=2)
         self.url = reverse('clubs_list')
+        self.form_input = {
+            'sort':ClubSortForm.DESC_DATE,
+        }
         
     def test_clubs_list_url(self):
         self.assertEqual(self.url,f'/clubs/')
@@ -29,7 +33,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         self.club.add_member(self.user)
         self.other_club.add_member(self.user)
         self.url = reverse('clubs_list', kwargs={'user_id': self.user.id})
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
         self.assertContains(response, f'club1')
@@ -38,12 +42,16 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         self.assertContains(response, f'Fictional superheros')
         clubs_url = reverse('clubs_list')
         self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
         self.assert_menu(response)
 
     def test_get_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
@@ -52,6 +60,87 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
             self.assertContains(response, f'theme{club_id}')
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
+        self.assert_menu(response)
+    
+    def test_get_clubs_list_descending_date(self):
+        self.form_input['sort'] = ClubSortForm.DESC_DATE
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
+        response = self.client.get(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        for club_id in range(settings.CLUBS_PER_PAGE-2):
+            self.assertContains(response, f'club{club_id}')
+            self.assertContains(response, f'theme{club_id}')
+            clubs_url = reverse('clubs_list')
+            self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
+        self.assert_menu(response)
+
+    def test_get_clubs_list_ascending_date(self):
+        self.form_input['sort'] = ClubSortForm.ASC_DATE
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
+        response = self.client.get(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        for club_id in range(settings.CLUBS_PER_PAGE-2):
+            self.assertContains(response, f'club{club_id}')
+            self.assertContains(response, f'theme{club_id}')
+            clubs_url = reverse('clubs_list')
+            self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'date_asc')   
+        self.assert_menu(response)
+
+
+    def test_get_clubs_list_ascending_name(self):
+        self.form_input['sort'] = ClubSortForm.ASC_NAME
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
+        response = self.client.get(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        for club_id in range(settings.CLUBS_PER_PAGE-2):
+            self.assertContains(response, f'club{club_id}')
+            self.assertContains(response, f'theme{club_id}')
+            clubs_url = reverse('clubs_list')
+            self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')   
+        self.assert_menu(response)
+    
+    def test_get_clubs_list_descending_name(self):
+        self.form_input['sort'] = ClubSortForm.DESC_NAME
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
+        response = self.client.get(self.url, self.form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
+        for club_id in range(settings.CLUBS_PER_PAGE-2):
+            self.assertContains(response, f'club{club_id}')
+            self.assertContains(response, f'theme{club_id}')
+            clubs_url = reverse('clubs_list')
+            self.assertContains(response, clubs_url)
+        form= response.context['form']
+        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')   
         self.assert_menu(response)
 
     def test_get_clubs_list_with_pagination(self):

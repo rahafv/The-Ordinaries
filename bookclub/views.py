@@ -338,7 +338,7 @@ def clubs_list(request, user_id=None):
             clubs_queryset = clubs_queryset.order_by(Lower('name').desc())
         elif(sort == "date_asc"):
             clubs_queryset = clubs_queryset.order_by('created_at')
-        elif( sort == "date_desc"):
+        else:
             clubs_queryset = clubs_queryset.order_by('-created_at')
 
     count = clubs_queryset.count()
