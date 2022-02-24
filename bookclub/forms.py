@@ -1,8 +1,11 @@
 from datetime import date, datetime
 from email.policy import default
 from pickle import FALSE
+from random import choices
 from tkinter import Widget
+from tkinter.tix import Select
 from typing import Any
+from typing_extensions import Required, Self
 from django import forms
 from django.core.validators import RegexValidator
 from .models import User, Club, Book, Rating
@@ -328,11 +331,34 @@ class SortForm(forms.Form):
         (ASCENDING, "Name A-Z"),
         (DESCENDING, "Name Z-A")
     ]   
-
+    
     sort_by = forms.ChoiceField(choices = SORT_CHOICES, initial = ASCENDING )
-    widgets = {'sort_by': forms.Select(),}
-    # def clean(self):
-    #     """Clean the data and generate messages for any errors."""
 
-    #     super().clean()
-    #     return self.cleaned_data
+    widgets = {'sort_by': forms.Select()}       
+   
+   
+class ClubSortForm(forms.Form):
+
+    ASC_DATE = "date_asc"
+    DESC_DATE = "date_desc"
+    ASC_NAME = 'name_asc'
+    DESC_NAME = 'name_desc'
+
+    SORT_CHOICES = [
+        (ASC_NAME, "Name A-Z"),
+        (DESC_NAME, "Name Z-A"),
+        (DESC_DATE, "Latest Clubs"),
+        (ASC_DATE, "Older Clubs"),
+    ]
+
+    sort = forms.ChoiceField(
+      choices=SORT_CHOICES,
+      label='Sort by:',
+      initial = DESC_DATE,
+      widget=forms.Select()
+    )
+
+    
+    
+   
+     

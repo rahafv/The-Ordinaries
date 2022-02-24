@@ -12,6 +12,7 @@ from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 from tempfile import NamedTemporaryFile
+from django.utils import timezone
 
 class User(AbstractUser):
     """User model used for authentication."""
@@ -184,6 +185,11 @@ class Club(models.Model):
         max_length=50,
         blank=True
     )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
     class Meta:
         ordering = ['name']
 
@@ -262,7 +268,7 @@ class Book(models.Model):
         Club, 
         related_name='books'
     )
-    
+
     class Meta:
         ordering = ['title']
 

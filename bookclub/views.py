@@ -2,7 +2,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, SortForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, SortForm, ClubSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, login_prohibited, generate_token, create_event
@@ -20,6 +20,8 @@ from django.utils.encoding import force_bytes
 from django.core.mail import send_mail 
 from system import settings
 from django.core.paginator import Paginator
+from django.db.models.functions import Lower
+
 
 @login_prohibited
 def welcome(request):
@@ -324,12 +326,26 @@ def clubs_list(request, user_id=None):
     if user_id:
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+    
+    form = ClubSortForm(request.GET or None)
+    sort = ""
+
+    if form.is_valid():
+        sort = form.cleaned_data.get('sort')
+        if(sort == 'name_asc'):
+            clubs_queryset = clubs_queryset.order_by(Lower('name').asc())
+        elif (sort == 'name_desc'):
+            clubs_queryset = clubs_queryset.order_by(Lower('name').desc())
+        elif(sort == "date_asc"):
+            clubs_queryset = clubs_queryset.order_by('created_at')
+        elif( sort == "date_desc"):
+            clubs_queryset = clubs_queryset.order_by('-created_at')
 
     count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form':form})
 
 @login_required
 def members_list(request, club_id):
@@ -355,38 +371,6 @@ def members_list(request, club_id):
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
     
-        
-# @login_required
-# def members_list_sorted_asc(request, club_id):
-#     print(f'{request}')
-#     current_user = request.user
-#     club = get_object_or_404(Club.objects, id=club_id)
-#     is_member = club.is_member(current_user)
-#     members_queryset = club.members.all()
-#     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
-#     page_number = request.GET.get('page')
-#     members = members_pg.get_page(page_number)
-#     if (is_member):
-#         return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user}) #'form':form
-#     else:
-#         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
-#         return redirect('club_page', club_id)
-
-# @login_required
-# def members_list_sorted_desc(request, club_id):
-#     print(f'{request}')
-#     current_user = request.user
-#     club = get_object_or_404(Club.objects, id=club_id)
-#     is_member = club.is_member(current_user)
-#     members_queryset = club.members.all().order_by(-("first_name", "last_name"))
-#     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
-#     page_number = request.GET.get('page')
-#     members = members_pg.get_page(page_number)
-#     if (is_member):
-#         return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user}) #'form':form
-#     else:
-#         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
-#         return redirect('club_page', club_id)
     
 @login_required
 def following_list(request, user_id):

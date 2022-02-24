@@ -2,6 +2,7 @@
 {% load bootstrap_pagination %}
 {% block title %}Clubs{% endblock %}
 {% block content %}
+{% load humanize %}
   
 <div class="container">
   {% if count == 0 %}
@@ -18,12 +19,20 @@
     {% endif %}
     
   {% else %}
+    <div class = "col - 12">
+      <form class="d-flex" method=GET action='{% url 'clubs_list' %}'> 
+          {% csrf_token %}
+          {% include 'partials/bootstrap_form.html' with form=form %}
+          <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
+      </form>
+    </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
       {% for club in clubs %}
         <div class="col">
           <div style="text-align: center;">
             <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
             <p >{{ club.theme }}</p>
+            <p >{{ club.created_at|naturaltime  }}</p>
             <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
           </div>
         </div>
