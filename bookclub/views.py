@@ -531,3 +531,26 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
+
+
+@login_required
+def delete_club(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    if(not request.user == club.owner):
+        messages.add_message(request, messages.ERROR, "Must be owner to delete club!")
+        return redirect('club_page', club_id)
+
+    club.delete()
+    messages.add_message(request, messages.SUCCESS, "Deletion successful!")
+    return redirect('home')
+
+@login_required
+def delete_club_confirmation(request, club_id):
+    current_user = request.user
+    club = get_object_or_404(Club.objects, id=club_id)
+    members = club.members.all()
+    club = get_object_or_404(Club.objects, id=club_id)
+    if(current_user == club.owner):
+        return render(request, 'delete_club_confirmation_page.html', {'club': club, 'club_id': club_id, 'members': members})
+    messages.add_message(request, messages.ERROR, "Only owners can access this page!")
+    return redirect('club_page', club_id)

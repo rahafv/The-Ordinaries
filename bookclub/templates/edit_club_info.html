@@ -11,6 +11,7 @@
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
         <input type="submit" value="Update" class="btn btn-lg btn-outline-dark">
+        <a href="{% url 'delete_club_confirmation' club_id=club_id %}" class="btn btn-lg btn-outline-danger">Delete club</a>
       </form>
     </div>
   </div>
