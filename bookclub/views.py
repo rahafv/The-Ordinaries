@@ -30,7 +30,7 @@ def welcome(request):
 def home(request):
     def events_created_at(event):
         return event.created_at
-        
+
     current_user = request.user
     authors = list(current_user.followees.all()) + [current_user]
     events  = [] 
@@ -39,7 +39,7 @@ def home(request):
     events.sort(reverse = True , key = events_created_at)
     events_len = len(events)
     return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len })
-    #  return render(request, 'home.html')
+   
 
 @login_prohibited
 def sign_up(request):

@@ -14,12 +14,14 @@
     <p class="post-text">
         {{ event.get_actor }}
         {{ event.message }}
-       {{ event.get_action }} 
-       
+        {% if event.type_of_action == 'C' %}
+            <a href= {% url 'club_page' event.club.id  %}>  {{ event.get_action }}  </a>
+        {% elif event.type_of_action == 'B' %}
+            <a href= {% url 'book_details' event.book.id  %}>  {{ event.get_action }}  </a>
+        {% elif event.type_of_action == 'U' %}
+            <a href= {% url 'profile' event.user.id  %}>  {{ event.get_action }}  </a>
+        {% endif %}
 
     </p> 
-    {% comment %} <p class="post-text">
-        {{ post.text }}
-    </p> {% endcomment %}
     </td>
 </tr>

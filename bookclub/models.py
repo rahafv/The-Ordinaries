@@ -470,4 +470,6 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
+    
+  
 
