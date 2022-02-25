@@ -48,7 +48,6 @@
             <img src= "{{ book.image_url }}"  width="220" height="300" class=" image-thumbnail mb-3" />
             <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
             <p >{{ book.author }}</p>
-            <p >{{ book.year }}</p>
             <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary">View</a>
           </div>
         </div>

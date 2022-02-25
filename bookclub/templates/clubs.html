@@ -36,7 +36,6 @@
           <div style="text-align: center;">
             <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
             <p >{{ club.theme }}</p>
-            <p >{{ club.created_at|naturaltime  }}</p>
             <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
           </div>
         </div>
