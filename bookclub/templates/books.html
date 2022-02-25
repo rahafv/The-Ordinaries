@@ -31,7 +31,11 @@
             
   {% else %}
     <div class = "col - 12">
-      <form class="d-flex" method=GET action='{% url 'books_list' %}'> 
+      {% if general %}
+        <form class="d-flex" method=GET action='{% url 'books_list' %}'> 
+      {% else %}
+        <form class = "d-flex" method = "GET" action = '{% url 'books_list' user.id %}'>
+      {% endif %}
           {% csrf_token %}
           {% include 'partials/bootstrap_form.html' with form=form %}
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
