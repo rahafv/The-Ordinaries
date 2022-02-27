@@ -485,7 +485,8 @@ def choice_book_list(request, meeting_id):
 
 @login_required
 def search_book(request, meeting_id):
-    if request.method == 'GET':
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if request.method == 'GET' and request.user == meeting.chooser:
         current_user = request.user
         searched = request.GET.get('searched', '')
         books = Book.objects.filter(title__contains=searched)
@@ -506,7 +507,7 @@ def choose_book(request, book_id, meeting_id):
         Meeting.objects.filter(id = meeting_id).update(book=book)
         return redirect('club_page', club_id=meeting.club.id)
     else:
-        return HttpResponseForbidden
+        return render(request, '404_page.html', status=404) 
 
 @login_required
 def add_book_to_list(request, book_id):
