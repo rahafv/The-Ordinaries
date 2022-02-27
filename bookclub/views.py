@@ -304,6 +304,7 @@ def join_club(request, club_id):
 
     club.members.add(user)
     create_event('U', 'C', Event.EventType.JOIN, user, club)
+    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
