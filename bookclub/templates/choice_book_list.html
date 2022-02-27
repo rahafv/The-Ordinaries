@@ -22,26 +22,7 @@
         <div class="container">
             <div class="row">
                 {% for book in books %}
-                <div class="col-sm-6 col-md-3">
-                    <div class="profile-card">
-                        <div class="profile-img">
-                            <img src="{{ book.image_url }}"  width="220" height="300"  />
-                        </div>
-                        <div class="profile-content">
-                            <h2 class="title">{{ book.title }}
-                                <span>{{ book.author }}</span>
-                            </h2>
-                        </div>
-                    </div>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>  
-                    <a href="{% url 'choose_book' book_id=book.id meeting_id=meeting_id %}" class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
-                </div>
+                    {% include 'partials/book_card.html' with book=book url="{{ url 'choose_book' book_id=book.id meeting_id=meeting_id }}" action="choose" icon="bi bi-check-lg" %}
                 {% endfor %}
             </div>
         </div>
@@ -55,26 +36,7 @@
     <div class="container">
         <div class="row">
             {% for book in rec_books %}
-            <div class="col-sm-6 col-md-3">
-                <div class="profile-card">
-                    <div class="profile-img">
-                        <img src="{{ book.image_url }}"  width="220" height="300"  />
-                    </div>
-                    <div class="profile-content">
-                        <h2 class="title">{{ book.title }}
-                            <span>{{ book.author }}</span>
-                        </h2>
-                    </div>
-                </div>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>
-                <br>  
-                <a href="{% url 'choose_book' book_id=book.id meeting_id=meeting_id %}" class="btn btn-outline-dark mb-3 bi bi-check-lg mr-2" style="margin-left:6em"  role="button" > choose </a>
-            </div>
+                {% include 'partials/book_card.html' with book=book url="{{ url 'choose_book' book_id=book.id meeting_id=meeting_id }}" action="choose" icon="bi bi-check-lg" %}
             {% endfor %}
         </div>
     </div>

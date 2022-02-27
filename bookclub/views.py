@@ -465,7 +465,7 @@ def schedule_meeting(request, club_id):
                 send_mail(subject, body, settings.EMAIL_HOST_USER, meeting.chooser.email)
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
-            messages.add_message(request, messages.SUCCESS, "Meeting scheduled!")
+            messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
             return redirect('club_page', club_id=club.id)
 
     else:
@@ -475,10 +475,13 @@ def schedule_meeting(request, club_id):
 
 @login_required
 def choice_book_list(request, meeting_id):
-    current_user = request.user
-    my_books =  Book.objects.all()
-    sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
-    return render(request, 'choice_book_list.html', {'rec_books':sorted_books , 'user':current_user, 'meeting_id':meeting_id})
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if request.user == meeting.chooser:
+        my_books =  Book.objects.all()
+        sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
+        return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
+    else:
+        return render(request, '404_page.html', status=404) 
 
 @login_required
 def search_book(request, meeting_id):
@@ -497,10 +500,13 @@ def search_book(request, meeting_id):
 @login_required
 def choose_book(request, book_id, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    book = get_object_or_404(Book.objects, id=book_id)
-    book.add_club(meeting.club)
-    Meeting.objects.filter(id = meeting_id).update(book=book)
-    return redirect('club_page', club_id=meeting.club.id)
+    if request.user == meeting.chooser:
+        book = get_object_or_404(Book.objects, id=book_id)
+        book.add_club(meeting.club)
+        Meeting.objects.filter(id = meeting_id).update(book=book)
+        return redirect('club_page', club_id=meeting.club.id)
+    else:
+        return HttpResponseForbidden
 
 @login_required
 def add_book_to_list(request, book_id):
