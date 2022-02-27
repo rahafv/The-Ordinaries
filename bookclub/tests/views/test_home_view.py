@@ -24,17 +24,11 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenueTestMixi
         self.url = reverse('home')
         self.user = User.objects.get(id=1)
         self.second_user = User.objects.get(id=2)
-        self.third_user = User.objects.get(id=3)
-
+     
         self.first_club = Club.objects.get(id=1)
         self.second_club = Club.objects.get(id=2)
 
         self.first_book = Book.objects.get(id=1)
-
-
-        self.user_event = Event.objects.get(id=1)
-        self.second_user_event = Event.objects.get(id=3)
-
 
     def test_home_url(self):
         self.assertEqual(self.url,'/home/')
@@ -58,14 +52,15 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenueTestMixi
         self.assertContains(response,  self.second_club.name)
         self.assertContains(response, self.second_user.username)
         self.assertContains(response, "My other user event")
+        self.assert_menu(response)
 
-    def test_updates_contains_events_related_to_club_user_is_member_in(self):
+    def test_updates_contains_events_related_to_clubs_user_is_member_in(self):
         self.client.login(username=self.second_user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertContains(response, self.first_club.name)
-     
         self.assertContains(response, "My first club event")
         self.assertContains(response, self.first_book.title)
+        self.assert_menu(response)
 
 
         
