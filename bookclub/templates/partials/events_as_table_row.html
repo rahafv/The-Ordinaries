@@ -6,7 +6,7 @@
     <td>
     <p class="event-author">
         <span class="author-user-details">
-            <i class= "fas fa-user mr-1"> <a href= {% url 'profile' event.user.id  %} style= "color: black"> {{event.user.username}} </a></i>
+            <i class= "fa fa-user mr-1"> <a href= {% url 'profile' event.user.id  %} style= "color: black"> {{event.user.username}} </a></i>
             &nbsp;&middot;&nbsp;
             <i class= "fa fa-clock mr-1"> </i> {{ event.created_at | naturaltime}}
         </span>
