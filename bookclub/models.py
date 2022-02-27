@@ -391,7 +391,7 @@ class Event(models.Model):
     type_of_action = models.CharField(max_length=1, choices=ACTION_CHOICES)
 
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
-    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE , related_name='events')
     meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
@@ -470,4 +470,6 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
+    
+  
 

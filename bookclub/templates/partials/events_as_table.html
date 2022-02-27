@@ -1,0 +1,6 @@
+<table class="table">
+    {% for event in user_events %}
+        {% include 'partials/events_as_table_row.html' with user_events=user_events%}
+    {% endfor %}
+  </table>
+  
