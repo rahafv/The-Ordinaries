@@ -365,7 +365,7 @@ class MeetingForm(forms.ModelForm):
         today = datetime.today()
         start_week = today + timedelta(13)
         try:
-            if not is_cont and time > pytz.utc.localize(start_week):
+            if not is_cont and time < pytz.utc.localize(start_week):
                 self.add_error('time', 'Date should be at least 2 weeks from today.')
             elif time.day != pytz.utc.localize(today.day):
                 self.add_error('time', 'Date cannot be today.')

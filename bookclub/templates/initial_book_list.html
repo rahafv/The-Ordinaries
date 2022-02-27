@@ -12,7 +12,10 @@
 <div class="container">
     <div class="row">
         {% for book in my_books %}
-            {% include 'partials/book_card.html' with book=book url="{{ url 'add_book_from_initial_list' book_id=book.id }}" action="Add" icon="bi bi-plus-lg"%}
+            <div class="col-sm-6 col-md-3">
+                {% include 'partials/book_card.html' with book=book %}
+                <a href={% url "add_book_from_initial_list" book_id=book.id %} class="btn btn-outline-dark bi bi-plus-lg" style="margin-left:6em"  role="button" > Add </a>
+            </div>
         {% endfor %}
     </div>
 </div>
