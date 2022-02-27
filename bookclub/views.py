@@ -38,8 +38,10 @@ def home(request):
     club_events = []
     for author in authors:
         user_events += list(Event.objects.filter(user=author))
-    user_events.sort(reverse = True , key = events_created_at)
-
+    final_user_events = user_events
+    final_user_events.sort(reverse = True , key = events_created_at)
+    first_twentyFive = final_user_events[0:25]
+ 
     for club in clubs:
         club_events += list(Event.objects.filter(club=club))
 
@@ -50,7 +52,7 @@ def home(request):
     club_events_length = len(first_ten)
   
 
-    return render(request, 'home.html', { 'user': current_user, 'user_events': user_events , 'club_events':first_ten , 'club_events_length':club_events_length})
+    return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
    
 
 @login_prohibited
@@ -556,15 +558,5 @@ def add_book_from_initial_list(request, book_id):
     book.add_reader(user)
     return redirect("initial_book_list")
 
-@login_required
-def feed(request):
-    current_user = request.user
-    authors = list(current_user.followees.all()) + [current_user]
-    first_event = Event.objects.get(id=1)
-    events  = [] 
-    for author in authors:
-        events += list(Event.objects.filter(user=author))
-    events_len = len(events)
-    print(len(events))
-    return render(request, 'home.html', { 'user': current_user, 'events': events , 'events_len':events_len , 'first_event':first_event})
+
 

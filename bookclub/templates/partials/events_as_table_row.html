@@ -19,7 +19,8 @@
         {% elif event.type_of_action == 'B' %}
             <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
         {% elif event.type_of_action == 'U' %}
-            <a href= {% url 'profile' event.action_user.id  %} style= "color: black">  {{ event.get_action }}  </a>
+            {{ event.get_action }}
+            {% comment %} <a href= {% url 'profile' event.action_user.id  %} style= "color: black">  {{ event.get_action }}  </a> {% endcomment %}
         {% endif %}
 
     </p> 
