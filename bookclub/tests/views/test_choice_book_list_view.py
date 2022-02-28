@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Book, Meeting
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MenueTestMixin
 
 
-class ChoiceBookListTestCase(TestCase, LoginRedirectTester ):
+class ChoiceBookListTestCase(TestCase, LoginRedirectTester, MenueTestMixin):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 
@@ -19,14 +19,14 @@ class ChoiceBookListTestCase(TestCase, LoginRedirectTester ):
         self.sec_meeting = Meeting.objects.get(id=3)
         self.url = reverse('choice_book_list', kwargs={ 'meeting_id':self.meeting.id})
         self.sec_url = reverse('choice_book_list', kwargs={ 'meeting_id':self.sec_meeting.id})
-        self.user1 = User.objects.get(id=1)
+        self.user = User.objects.get(id=1)
         self.sec_user = User.objects.get(id=2)
 
     def test_choice_book_list_url(self):
         self.assertEqual(self.url, f'/meeting/{self.meeting.id}/book_choices/') 
 
     def test_cant_access_when_book(self):
-        self.client.login(username=self.user1.username, password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
@@ -45,7 +45,8 @@ class ChoiceBookListTestCase(TestCase, LoginRedirectTester ):
         for book_id in range(10):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
-    
+        self.assert_menu(response)
+        
     def test_choice_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 

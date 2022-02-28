@@ -36,16 +36,20 @@
          <h2> no such information!</h2>
      {% endif %}
 {%else %}
-    <div class="container">
-        <div class="row">
-            {% for book in rec_books %}
-            <div class="col-sm-6 col-md-3">
-                {% include 'partials/book_card.html' with book=book %}
-                <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
+    {% if rec_books%}
+        <div class="container">
+            <div class="row">
+                {% for book in rec_books %}
+                <div class="col-sm-6 col-md-3">
+                    {% include 'partials/book_card.html' with book=book %}
+                    <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
-    </div>
+    {% else %}
+        <h2 class="mt-5" style="text-align: center"> You forgot to search!</h2>
+    {% endif %}
 {% endif %}
 {% endblock %}
 
