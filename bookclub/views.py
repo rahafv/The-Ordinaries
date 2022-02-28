@@ -50,7 +50,7 @@ def send_activiation_email(request, user_id):
     if not user.email_verified:
         current_site = get_current_site(request)
         subject = 'Activate your account'
-        body = render_to_string('activate.html', {
+        body = render_to_string('emails/activate.html', {
             'user': user,
             'domain': current_site,
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
@@ -453,16 +453,17 @@ def schedule_meeting(request, club_id):
                 invitees.append(mem.email)
             send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
 
+            print(meeting.chooser.first_name)
             if meeting.chooser:
                 """send email to member who has to choose a book"""
                 subject = 'It Is Your Turn!'
-                body = render_to_string('meeting_invite.html', {
+                body = render_to_string('emails/chooser_reminder.html', {
                     'domain': current_site,
                     'meeting': meeting,
                 })
-                send_mail(subject, body, settings.EMAIL_HOST_USER, meeting.chooser.email)
-            deadline = timedelta(0.00069444).total_seconds() #0.00069444
-            Timer(deadline, assign_rand_book, [request, meeting.id]).start()
+                send_mail(subject, body, settings.EMAIL_HOST_USER, [meeting.chooser.email])
+                deadline = timedelta(7).total_seconds() #0.00069444
+                Timer(deadline, assign_rand_book, [request, meeting.id]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
@@ -507,7 +508,7 @@ def choose_book(request, book_id, meeting_id):
         """send email to member who has to choose a book"""
         current_site = get_current_site(request)
         subject = 'A book has be chosen'
-        body = render_to_string('book_confirmation.html', {
+        body = render_to_string('emails/book_confirmation.html', {
             'domain': current_site,
             'meeting': meeting,
         })
@@ -521,7 +522,6 @@ def choose_book(request, book_id, meeting_id):
         return render(request, '404_page.html', status=404) 
 
 def assign_rand_book(request, meeting_id):
-    print(datetime.now(), ": --------------------------------------------------------------------")
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if not meeting.book:
         meeting.assign_book()
@@ -529,7 +529,7 @@ def assign_rand_book(request, meeting_id):
         """send email to member who has to choose a book"""
         current_site = get_current_site(request)
         subject = 'A book has be chosen'
-        body = render_to_string('book_confirmation.html', {
+        body = render_to_string('emails/book_confirmation.html', {
             'domain': current_site,
             'meeting': meeting,
         })

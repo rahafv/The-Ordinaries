@@ -378,13 +378,12 @@ class Meeting(models.Model):
     )
 
     def assign_chooser(self):
-        try:
-            members = self.club.members
-            meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
-            id = meeting_ind%members.count()
-            Meeting.objects.filter(id = self.id).update(chooser=members.all()[id])
-        except:
-            Meeting.objects.filter(id = self.id).update(chooser=self.club.owner)
+        members = self.club.members
+        meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
+        id = meeting_ind%members.count()
+        mem = members.all()[id]
+        self.chooser = mem
+        Meeting.objects.filter(id = self.id).update(chooser=mem)
 
     def assign_book(self, book_in=None):
         if not book_in:
@@ -393,6 +392,7 @@ class Meeting(models.Model):
         else:
             book_in.add_club(self.club)
         
+        self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
 
