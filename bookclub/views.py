@@ -453,7 +453,6 @@ def schedule_meeting(request, club_id):
                 invitees.append(mem.email)
             send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
 
-            print(meeting.chooser.first_name)
             if meeting.chooser:
                 """send email to member who has to choose a book"""
                 subject = 'It Is Your Turn!'
@@ -474,11 +473,12 @@ def schedule_meeting(request, club_id):
 
     return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
 
-@login_required
+@login_required 
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
-        my_books =  Book.objects.all()
+        read_books = meeting.club.books.all()
+        my_books =  Book.objects.all().exclude(id__in = read_books)
         sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
         return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
     else:
@@ -517,6 +517,7 @@ def choose_book(request, book_id, meeting_id):
             invitees.append(mem.email)
         send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
 
+        messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
         return redirect('club_page', club_id=meeting.club.id)
     else:
         return render(request, '404_page.html', status=404) 
@@ -528,7 +529,7 @@ def assign_rand_book(request, meeting_id):
 
         """send email to member who has to choose a book"""
         current_site = get_current_site(request)
-        subject = 'A book has be chosen'
+        subject = 'A book has been chosen'
         body = render_to_string('emails/book_confirmation.html', {
             'domain': current_site,
             'meeting': meeting,
