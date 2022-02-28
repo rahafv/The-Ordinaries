@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
-import json
-import threading
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -10,8 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, login_prohibited, generate_token, create_event
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Meeting, User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
-from django.contrib.auth.hashers import check_password
+from .models import Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -456,7 +453,6 @@ def schedule_meeting(request, club_id):
                 invitees.append(mem.email)
             send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
 
-            print(meeting.chooser.first_name)
             if meeting.chooser:
                 """send email to member who has to choose a book"""
                 subject = 'It Is Your Turn!'
@@ -465,8 +461,8 @@ def schedule_meeting(request, club_id):
                     'meeting': meeting,
                 })
                 send_mail(subject, body, settings.EMAIL_HOST_USER, meeting.chooser.email)
-                deadline = timedelta(7).total_seconds() #0.00069444
-                Timer(deadline, assign_rand_book, [request, meeting.id]).start()
+            deadline = timedelta(0.00069444).total_seconds() #0.00069444
+            Timer(deadline, assign_rand_book, [request, meeting.id]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
@@ -491,14 +487,13 @@ def choice_book_list(request, meeting_id):
 def search_book(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.method == 'GET' and request.user == meeting.chooser and not meeting.book:
-        current_user = request.user
         searched = request.GET.get('searched', '')
         books = Book.objects.filter(title__contains=searched)
 
         pg = Paginator(books, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         books = pg.get_page(page_number)
-        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'user':current_user, 'meeting_id':meeting_id})
+        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'meeting_id':meeting_id})
     else: 
         return redirect('choice_book_list', meeting_id=meeting_id)
 
@@ -508,16 +503,41 @@ def choose_book(request, book_id, meeting_id):
     if request.user == meeting.chooser and not meeting.book:
         book = get_object_or_404(Book.objects, id=book_id)
         meeting.assign_book(book)
+
+        """send email to member who has to choose a book"""
+        current_site = get_current_site(request)
+        subject = 'A book has be chosen'
+        body = render_to_string('book_confirmation.html', {
+            'domain': current_site,
+            'meeting': meeting,
+        })
+        invitees = []
+        for mem in meeting.club.members.all():
+            invitees.append(mem.email)
+        send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+
         return redirect('club_page', club_id=meeting.club.id)
     else:
         return render(request, '404_page.html', status=404) 
 
 def assign_rand_book(request, meeting_id):
+    print(datetime.now(), ": --------------------------------------------------------------------")
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if not meeting.book:
         meeting.assign_book()
-        
 
+        """send email to member who has to choose a book"""
+        current_site = get_current_site(request)
+        subject = 'A book has be chosen'
+        body = render_to_string('book_confirmation.html', {
+            'domain': current_site,
+            'meeting': meeting,
+        })
+        invitees = []
+        for mem in meeting.club.members.all():
+            invitees.append(mem.email)
+        send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+        
 @login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)

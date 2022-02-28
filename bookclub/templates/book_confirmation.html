@@ -1,0 +1,12 @@
+{% autoescape off %}
+Dear members of the {{meeting.club.name}},
+
+This is a confirmation that the book for your meeting on {{meeting.time}} has been chosen.
+Choice:
+{{meeting.book.title}}: http://{{domain}}{% url 'book_details' meeting.book.id %}
+
+Enjoy Reading!
+The Ordinaries Book Clubs,
+Club page: http://{{domain}}{% url 'club_page' meeting.club.id %}
+
+{% endautoescape %} 
