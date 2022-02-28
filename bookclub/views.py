@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import json
+import threading
 from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -21,7 +22,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail 
 from system import settings
-import requests
+from threading import Timer
 from django.core.paginator import Paginator
 
 @login_prohibited
@@ -455,6 +456,7 @@ def schedule_meeting(request, club_id):
                 invitees.append(mem.email)
             send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
 
+            print(meeting.chooser.first_name)
             if meeting.chooser:
                 """send email to member who has to choose a book"""
                 subject = 'It Is Your Turn!'
@@ -463,6 +465,8 @@ def schedule_meeting(request, club_id):
                     'meeting': meeting,
                 })
                 send_mail(subject, body, settings.EMAIL_HOST_USER, meeting.chooser.email)
+                deadline = timedelta(7).total_seconds() #0.00069444
+                Timer(deadline, assign_rand_book, [request, meeting.id]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
@@ -476,7 +480,7 @@ def schedule_meeting(request, club_id):
 @login_required
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if request.user == meeting.chooser:
+    if request.user == meeting.chooser and not meeting.book:
         my_books =  Book.objects.all()
         sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
         return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
@@ -486,7 +490,7 @@ def choice_book_list(request, meeting_id):
 @login_required
 def search_book(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if request.method == 'GET' and request.user == meeting.chooser:
+    if request.method == 'GET' and request.user == meeting.chooser and not meeting.book:
         current_user = request.user
         searched = request.GET.get('searched', '')
         books = Book.objects.filter(title__contains=searched)
@@ -501,13 +505,18 @@ def search_book(request, meeting_id):
 @login_required
 def choose_book(request, book_id, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if request.user == meeting.chooser:
+    if request.user == meeting.chooser and not meeting.book:
         book = get_object_or_404(Book.objects, id=book_id)
-        book.add_club(meeting.club)
-        Meeting.objects.filter(id = meeting_id).update(book=book)
+        meeting.assign_book(book)
         return redirect('club_page', club_id=meeting.club.id)
     else:
         return render(request, '404_page.html', status=404) 
+
+def assign_rand_book(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if not meeting.book:
+        meeting.assign_book()
+        
 
 @login_required
 def add_book_to_list(request, book_id):

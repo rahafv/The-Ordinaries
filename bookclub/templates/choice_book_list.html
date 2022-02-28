@@ -23,6 +23,7 @@
             <div class="row">
                 {% for book in books %}
                     <div class="col-sm-6 col-md-3">
+                        {% include 'partials/book_card.html' with book=book %}
                         <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
                     </div>
                 {% endfor %}
@@ -39,6 +40,7 @@
         <div class="row">
             {% for book in rec_books %}
             <div class="col-sm-6 col-md-3">
+                {% include 'partials/book_card.html' with book=book %}
                 <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
             </div>
             {% endfor %}
