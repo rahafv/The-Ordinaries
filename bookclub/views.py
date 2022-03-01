@@ -446,7 +446,7 @@ def transfer_club_ownership(request, club_id):
     user = request.user
     memberlist=club.members.all().exclude(id=user.id)
     if memberlist.count() == 0:
-        messages.add_message(request, messages.WARNING, "There are no other members to tranfer club to!")
+        messages.add_message(request, messages.WARNING, "There are no other members to tranfer the club to!")
         return redirect('club_page', club_id = club.id)
     if request.method == "POST":
         selectedmember = request.POST.get('selected_member', '')
