@@ -483,7 +483,7 @@ def schedule_meeting(request, club_id):
                     letter='emails/chooser_reminder.html', 
                     all_mem=False
                 )
-                deadline = timedelta(0.00069444).total_seconds() #0.00069444
+                deadline = timedelta(7).total_seconds() #0.00069444
                 Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)

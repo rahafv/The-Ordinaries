@@ -100,6 +100,12 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertTrue(isinstance(form, MeetingForm))
         self.assert_menu(response)
 
+    def test_assign_book_when_not_book(self):
+        meeting = Meeting.objects.get(id=3)
+        self.assertEqual(meeting.book, None)
+        request = requests.post('https://api.github.com/user', auth=('user', 'pass'))
+        MeetingHelper().assign_rand_book(meeting, request)
+
     def test_assign_book_when_book(self):
         meeting = Meeting.objects.get(id=1)
         self.assertEqual(meeting.book, Book.objects.get(id=1))
