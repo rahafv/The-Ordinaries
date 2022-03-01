@@ -17,16 +17,22 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenueTestMixin, Log
         self.member = User.objects.get(username="peterpickles")
         self.url = reverse("transfer_ownership", kwargs={"club_id": self.club.id})
         self.form_input = {
-            'selected_member':f'{self.member.id}',
-            'defaultCheck':'checked'
+            'selected_member':{self.member.id},
+            'defaultCheck':'checked',
+            'submit':'Save'
 	    }
 
     def test_accept_applicant_url(self):
         self.assertEqual(self.url, f"/club/{self.club.id}/transfer_ownership/")
+    
+    def test_form(self):
+        self.client.login(username=self.owner.username, password="Password123")
+        response = self.client.get(self.url, follow=True)
+        self.assert_menu(response)
 
     def test_successful_ownership_transfer(self):
         self.client.login(username=self.owner.username, password="Password123")
-        response = self.client.post(self.url,self.form_input, follow=True)
+        response = self.client.post(self.url, self.form_input, follow=True)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertEqual(self.club.owner, self.member)
@@ -37,11 +43,9 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenueTestMixin, Log
         self.client.login(username=self.owner.username, password="Password123")
         self.club.members.remove(self.member)
         response = self.client.get(self.url, follow=True)
-        # self.assertEqual(response.status_code, 200)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertEqual(self.club.owner, self.owner)
-        # self.assert_warning_message(response)
         self.assert_menu(response)
 
     def test_ownership_transfer_with_invalid_input(self):
