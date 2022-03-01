@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
-import pytz
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
 from bookclub.models import Book, Meeting, User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin, MessageTester
-import requests
+import pytz
 
 class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, MessageTester):
 
@@ -103,8 +102,9 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
     def test_assign_book_when_not_book(self):
         meeting = Meeting.objects.get(id=3)
         self.assertEqual(meeting.book, None)
-        request = requests.post('https://api.github.com/user', auth=('user', 'pass'))
+        request = RequestFactory().get(self.url)
         MeetingHelper().assign_rand_book(meeting, request)
+        self.assertNotEqual(meeting.book, None)
 
     def test_assign_book_when_book(self):
         meeting = Meeting.objects.get(id=1)
