@@ -1,3 +1,4 @@
+from imaplib import _Authenticator
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -27,7 +28,32 @@ def welcome(request):
 
 @login_required
 def home(request):
-     return render(request, 'home.html')
+    def events_created_at(event):
+        return event.created_at
+
+    current_user = request.user
+    authors = list(current_user.followees.all()) + [current_user]
+    clubs = list(User.objects.get(id=current_user.id).clubs.all())
+    user_events  = [] 
+    club_events = []
+    for author in authors:
+        user_events += list(Event.objects.filter(user=author))
+    final_user_events = user_events
+    final_user_events.sort(reverse = True , key = events_created_at)
+    first_twentyFive = final_user_events[0:25]
+ 
+    for club in clubs:
+        club_events += list(Event.objects.filter(club=club))
+
+    final_club_events = club_events
+    final_club_events.sort(reverse = True , key = events_created_at)
+    first_ten = final_club_events[0:10]
+
+    club_events_length = len(first_ten)
+  
+
+    return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
+   
 
 @login_prohibited
 def sign_up(request):
@@ -279,6 +305,7 @@ def join_club(request, club_id):
 
     club.members.add(user)
     create_event('U', 'C', Event.EventType.JOIN, user, club)
+    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -493,9 +520,9 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
 
@@ -551,3 +578,6 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
+
+
+
