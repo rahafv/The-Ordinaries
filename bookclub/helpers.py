@@ -1,6 +1,10 @@
 from django.shortcuts import redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail 
 import six
+from system import settings
 from django.conf import settings
 from .models import Event
 
@@ -31,6 +35,35 @@ def create_event(type_of_actor, type_of_action, message, user=None, club=None, m
 def delete_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
     event = Event.objects.filter(type_of_actor = type_of_actor, type_of_action = type_of_action, message = message, user = user , club = club, meeting = meeting, book = book, rating = rating, action_user = action_user)
     event.delete()
+
+class MeetingHelper:
+    def assign_rand_book(self, request, meeting):
+        if not meeting.book:
+            meeting.assign_book()
+            self.send_email(request=request, 
+                meeting=meeting, 
+                subject='A book has be chosen', 
+                letter='emails/book_confirmation.html', 
+                all_mem=True
+            )
+
+    def get_email(self, meeting, all_mem):
+        if all_mem:
+            invitees = []
+            for mem in meeting.club.members.all():
+                invitees.append(mem.email)
+            return invitees
+        else:
+            return [meeting.chooser.email]
+
+    def send_email(self, request, meeting, subject, letter, all_mem):
+        current_site = get_current_site(request)
+        subject = subject
+        body = render_to_string(letter, {
+            'domain': current_site,
+            'meeting': meeting,
+        })
+        send_mail(subject, body, settings.EMAIL_HOST_USER, self.get_email(meeting, all_mem))
 
 class TokenGenerator(PasswordResetTokenGenerator):
 

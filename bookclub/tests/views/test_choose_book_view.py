@@ -45,3 +45,6 @@ class ChooseBookViewTest(TestCase, LoginRedirectTester, MessageTester):
         self.assertTemplateUsed(response, "emails/book_confirmation.html")
         self.meeting.refresh_from_db()
         self.assertEqual(self.meeting.book, self.book)
+
+    def test_get_create_club_redirects_when_not_logged_in(self):
+        self.assert_redirects_when_not_logged_in()

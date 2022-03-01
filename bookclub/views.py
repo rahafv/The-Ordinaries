@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, login_prohibited, generate_token, create_event
+from .helpers import delete_event, login_prohibited, generate_token, create_event, MeetingHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -442,27 +442,23 @@ def schedule_meeting(request, club_id):
             meeting = form.save()
             
             """send email invites"""
-            current_site = get_current_site(request)
-            subject = 'A New Meeting Has Been Scheduled'
-            body = render_to_string('emails/meeting_invite.html', {
-                'domain': current_site,
-                'meeting': meeting,
-            })
-            invitees = []
-            for mem in club.members.all():
-                invitees.append(mem.email)
-            send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+            MeetingHelper().send_email(request=request, 
+                meeting=meeting, 
+                subject='A New Meeting Has Been Scheduled', 
+                letter='emails/meeting_invite.html', 
+                all_mem=True
+            )
 
             if meeting.chooser:
                 """send email to member who has to choose a book"""
-                subject = 'It Is Your Turn!'
-                body = render_to_string('emails/chooser_reminder.html', {
-                    'domain': current_site,
-                    'meeting': meeting,
-                })
-                send_mail(subject, body, settings.EMAIL_HOST_USER, [meeting.chooser.email])
+                MeetingHelper().send_email(request=request, 
+                    meeting=meeting, 
+                    subject='It Is Your Turn!', 
+                    letter='emails/chooser_reminder.html', 
+                    all_mem=False
+                )
                 deadline = timedelta(7).total_seconds() #0.00069444
-                Timer(deadline, assign_rand_book, [request, meeting.id]).start()
+                Timer(deadline, MeetingHelper().assign_rand_book, [request, meeting.id]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
@@ -506,38 +502,17 @@ def choose_book(request, book_id, meeting_id):
         meeting.assign_book(book)
 
         """send email to member who has to choose a book"""
-        current_site = get_current_site(request)
-        subject = 'A book has be chosen'
-        body = render_to_string('emails/book_confirmation.html', {
-            'domain': current_site,
-            'meeting': meeting,
-        })
-        invitees = []
-        for mem in meeting.club.members.all():
-            invitees.append(mem.email)
-        send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
+        MeetingHelper().send_email(request=request, 
+            meeting=meeting, 
+            subject='A book has be chosen', 
+            letter='emails/book_confirmation.html', 
+            all_mem=True
+        )
 
         messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
         return redirect('club_page', club_id=meeting.club.id)
     else:
         return render(request, '404_page.html', status=404) 
-
-def assign_rand_book(request, meeting_id):
-    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if not meeting.book:
-        meeting.assign_book()
-
-        """send email to member who has to choose a book"""
-        current_site = get_current_site(request)
-        subject = 'A book has been chosen'
-        body = render_to_string('emails/book_confirmation.html', {
-            'domain': current_site,
-            'meeting': meeting,
-        })
-        invitees = []
-        for mem in meeting.club.members.all():
-            invitees.append(mem.email)
-        send_mail(subject, body, settings.EMAIL_HOST_USER, invitees)
         
 @login_required
 def add_book_to_list(request, book_id):
