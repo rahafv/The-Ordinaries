@@ -25,7 +25,7 @@ class ClubModelTestCase(TestCase):
             self.club.full_clean()
 
     def test_club_created(self):
-        self.assertEqual(2, Club.objects.count())
+        self.assertEqual(3, Club.objects.count())
 
     def test_valid_club(self):
         self._assert_club_is_valid()
@@ -119,5 +119,9 @@ class ClubModelTestCase(TestCase):
         self.club.add_member(nonMember)
         self.assertEqual(self.club.member_count(), count+1)
 
-
-
+    def test_member_addition_when_user_is_already_a_member(self):
+        nonMember = User.objects.get(id=4)
+        self.club.add_member(nonMember)
+        count = self.club.member_count()
+        self.club.add_member(nonMember)
+        self.assertEqual(self.club.member_count(), count)

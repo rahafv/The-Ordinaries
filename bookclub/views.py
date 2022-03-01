@@ -434,8 +434,7 @@ def edit_club_information(request, club_id):
 @login_required
 def schedule_meeting(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user == club.owner:
         form = MeetingForm(club, request.POST)
 
         if form.is_valid():
@@ -457,8 +456,8 @@ def schedule_meeting(request, club_id):
                     letter='emails/chooser_reminder.html', 
                     all_mem=False
                 )
-                deadline = timedelta(7).total_seconds() #0.00069444
-                Timer(deadline, MeetingHelper().assign_rand_book, [request, meeting.id]).start()
+                deadline = timedelta(0.00069444).total_seconds() #0.00069444
+                Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
 
             create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
             messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")

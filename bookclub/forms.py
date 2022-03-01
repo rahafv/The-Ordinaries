@@ -358,6 +358,7 @@ class MeetingForm(forms.ModelForm):
         time = self.cleaned_data.get('time')
         self.check_date(time, is_cont)
         self.check_meetings(time, is_cont)
+
         return self.cleaned_data
 
     def check_date(self, time, is_cont):
@@ -367,11 +368,11 @@ class MeetingForm(forms.ModelForm):
         try:
             if not is_cont and time < pytz.utc.localize(start_week):
                 self.add_error('time', 'Date should be at least 2 weeks from today.')
-            elif time.day != pytz.utc.localize(today.day):
-                self.add_error('time', 'Date cannot be today.')
+            else:
+                if time.day == today.day:
+                    self.add_error('time', 'Date cannot be today.')
         except:
             pass
-
 
     def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same period."""

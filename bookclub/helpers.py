@@ -37,8 +37,8 @@ def delete_event(type_of_actor, type_of_action, message, user=None, club=None, m
     event.delete()
 
 class MeetingHelper:
-    def assign_rand_book(self, request, meeting):
-        if not meeting.book:
+    def assign_rand_book(self, meeting, request=None):
+        if not meeting.book and request:
             meeting.assign_book()
             self.send_email(request=request, 
                 meeting=meeting, 

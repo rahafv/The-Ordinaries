@@ -408,8 +408,6 @@ ACTION_CHOICES = (
     ('U', 'Action_User')
 )
 
-
-
 class Event(models.Model):
     """Events by users or clubs."""
 
