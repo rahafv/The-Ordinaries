@@ -111,8 +111,8 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertEqual(meeting.book, Book.objects.get(id=1))
         MeetingHelper().assign_rand_book(meeting)
 
-    def test_get_create_club_redirects_when_not_logged_in(self):
+    def test_get_schedule_meeting_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
-    def test_post_create_club_redirects_when_not_logged_in(self):
+    def test_post_schedule_meeting_redirects_when_not_logged_in(self):
         self.assert_post_redirects_when_not_logged_in()
