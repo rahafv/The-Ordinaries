@@ -5,14 +5,14 @@ from bookclub.models import User , Book, Meeting
 from bookclub.tests.helpers import LoginRedirectTester, MenueTestMixin
 
 
-class ChoiceBookListTestCase(TestCase, LoginRedirectTester, MenueTestMixin):
+class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 
         'bookclub/tests/fixtures/default_club.json',
         'bookclub/tests/fixtures/default_book.json',
         'bookclub/tests/fixtures/default_meeting.json', 
-        'bookclub/tests/fixtures/other_meeting.json',]  
+        'bookclub/tests/fixtures/other_meeting.json']  
    
     def setUp(self):
         self.meeting = Meeting.objects.get(id=1)
