@@ -355,6 +355,9 @@ class MeetingForm(forms.ModelForm):
                 self.add_error('link', "Provide a link to the meeting location.")
 
         is_cont = self.cleaned_data.get('cont')
+        if is_cont and self.club.meetings.count() == 0:
+            self.add_error('cont', "There are no previous meetings.")
+
         time = self.cleaned_data.get('time')
         self.check_date(time, is_cont)
         self.check_meetings(time, is_cont)

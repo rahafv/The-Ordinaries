@@ -23,7 +23,7 @@ class MeetingFormTestCase(TestCase):
         self.sec_club = Club.objects.get(id=3)
         self.meeting = Meeting.objects.get(id=2)
         self.date = pytz.utc.localize(datetime.today()+timedelta(15))
-        
+
         self.form_input = {
             'title': 'meeting1',
             'time': self.date,
@@ -88,6 +88,10 @@ class MeetingFormTestCase(TestCase):
     def test_second_meeting_validation(self):
         self.sec_form_input["time"] = self.meeting.time
         form = MeetingForm(self.club, self.sec_form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_cont_vaalidation(self):
+        form = MeetingForm(self.sec_club, self.sec_form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_saves_correctly(self):
