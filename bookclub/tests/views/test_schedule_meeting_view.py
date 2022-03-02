@@ -82,6 +82,17 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertTrue(isinstance(form, MeetingForm))
         self.assert_menu(response)
 
+    def test_send_email_to_chooser(self):
+        meeting = Meeting.objects.get(id=1)
+        self.assertNotEqual(meeting.chooser, None)
+        request = RequestFactory().get(self.url)
+        MeetingHelper().send_email(request=request, 
+            meeting=meeting, 
+            subject='email to chooser', 
+            letter='emails/chooser_reminder.html', 
+            all_mem=False 
+        ) 
+
     def test_assign_book_when_not_book(self):
         meeting = Meeting.objects.get(id=3)
         self.assertEqual(meeting.book, None)
