@@ -20,8 +20,11 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
     def setUp(self):
         self.club = Club.objects.get(id=1)
         self.owner = User.objects.get(id=2)
+        self.sec_club = Club.objects.get(id=3)
+        self.sec_owner = User.objects.get(id=3)
         self.user = User.objects.get(id=3)
         self.url = reverse("schedule_meeting", kwargs={'club_id':self.club.id})
+        self.sec_url = reverse("schedule_meeting", kwargs={'club_id':self.sec_club.id})
         self.date = pytz.utc.localize(datetime.today()+timedelta(15))
 
         self.form_input = {
@@ -68,6 +71,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertEqual(meeting.time, self.date)
         self.assertEqual(meeting.notes, "bring the book")
         self.assertEqual(meeting.link, "https://goo.gl/maps/DbTzHjUu8cP4zNjRA")
+        self.assert_success_message(response)
         self.assert_menu(response)
 
     def test_schedule_meeting_unsuccessful(self):
@@ -88,6 +92,13 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         count_meetings_before = Meeting.objects.count()
         response = self.client.post(self.url, self.form_input)
         self.assertEqual(response.status_code, 404)
+        self.assertEqual(count_meetings_before, Meeting.objects.count())
+
+    def test_cant_schedule_with_no_members(self):
+        self.client.login(username=self.sec_owner.username, password="Password123")
+        count_meetings_before = Meeting.objects.count()
+        response = self.client.get(self.sec_url)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(count_meetings_before, Meeting.objects.count())
 
     def test_send_email_to_chooser(self):
