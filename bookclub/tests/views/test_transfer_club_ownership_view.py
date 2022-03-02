@@ -53,7 +53,6 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenueTestMixin, Log
         self.assertTemplateUsed(response, 'transfer_ownership.html')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.club.owner, self.owner)
-        self.assert_error_message(response)
         self.assert_menu(response)
 
     def test_ownership_transfer_by_a_member_not_owner(self):

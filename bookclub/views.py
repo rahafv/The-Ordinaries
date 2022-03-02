@@ -458,8 +458,6 @@ def transfer_club_ownership(request, club_id):
             club.make_owner(member)
             messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
             return redirect('club_page', club_id = club.id)
-        else:
-            messages.add_message(request, messages.ERROR, "Selection not valid" )
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
 @login_required
