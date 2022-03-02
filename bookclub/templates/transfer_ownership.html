@@ -1,7 +1,6 @@
 {% extends 'base_content.html' %}
 {% block title %}{{ club.name }}{% endblock %}
 {% block content %}
-{% if user == club.owner %}
 {% comment %} <form action="{% url 'transfer_ownership' %}" method="post"> {% endcomment %}
 <form method="post">
     {% csrf_token %}
@@ -18,5 +17,4 @@
       </div>
     <input type="submit" class="btn btn-primary mb-3" value="Save" id="submit">
 </form>
-{% endif %}
 {% endblock %}
