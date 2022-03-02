@@ -216,9 +216,7 @@ class Club(models.Model):
         return self.club_type
 
     def make_owner(self, new_owner):
-        old_owner = self.owner
         self.owner = new_owner
-        self.add_member(old_owner)
         self.save()
 
 class Book(models.Model):
