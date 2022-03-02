@@ -56,6 +56,13 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenueTestMixin, Log
         self.assert_error_message(response)
         self.assert_menu(response)
 
+    def test_ownership_transfer_by_a_member_not_owner(self):
+        self.client.login(username=self.member.username, password="Password123")
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assert_error_message(response)
+        self.assert_menu(response)
+
     def test_get_transfer_ownership_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
     
