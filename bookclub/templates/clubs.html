@@ -1,40 +1,59 @@
 {% extends 'base_content.html' %}
+{% load static %}
 {% load bootstrap_pagination %}
-{% block title %}Clubs{% endblock %}
+{% block title %}Clubs {% endblock %}
 {% block content %}
-  
-<div class="container">
-  {% if count == 0 %}
-    {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
-        <h4 class="lead "> There are no clubs, want to create one?</h4>
-        <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
-      </div>
-    {% else %}
-      <div style="text-align: center;   padding-top: 50px;">
-        <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
-        <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
-      </div>
-    {% endif %}
-    
-  {% else %}
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-      {% for club in clubs %}
-        <div class="col">
-          <div style="text-align: center;">
-            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
-            <p >{{ club.theme }}</p>
-            <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
+
+
+<h1 class="fw-light center" style="text-align: center; background-color:#74a5b4;">Clubs</h1>
+<div class="carousel-inner" style="top: -8px;">
+  <div class="carousel-item active">
+    <img class="bd-placeholder-img" width="1400" height="600"  aria-hidden="true" focusable="false"> <rect width="100%" height="100%" fill="#5d486e"/> 
+    <image src="{% static '/images/clubs_page.png' %}" width="1400" height="620"  style = "position:relative; left:0px; bottom:30px;" /> </img>
+    <div class="container row py-lg-1" style = "position:relative; right:90px; bottom:180px;">
+      <div class="carousel-caption">
+          <div class="col-sm-6 col-md-3 col-lg-4">
+            <h1 style="color: #000000" class="fw-light center">Create Your Own Community!</h1>
+            <p><a class="btn btn-lg btn-outline-dark mt-2" href='{% url 'add_book' %}'>Create Club</a></p>
           </div>
-        </div>
-      {% endfor %}
+      </div>
     </div>
-    
+  </div>
+</div>
+
+
+
+<div class="row py-lg-3">
+    <div class="col mx-auto">
+      
+    </div>
+</div>
+<div class="container marketing">
+  <div class="row">
+    {% for club in clubs %}
+      <div class="col-sm-6 col-md-3 col-lg-4">    
+        <img class="card-img" src="{% static '/images/2.png' %}" alt="Avatar" style="width:180px">
+          <h2>{{club.name}}</h2>
+          <p>{{club.theme}}</p>
+          <p><a class="btn btn-outline-dark" href='{% url 'club_page' club.id %}'>View &raquo;</a></p>
+
+      </div>
+
+    {% endfor %}
     <ul class="pagination justify-content-center">
       {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
     </ul>
-
-  {% endif %}
+  </div>
 </div>
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="row py-lg-5">
+</div>
 {% endblock %}
+
+
+
+

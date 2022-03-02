@@ -12,6 +12,7 @@ from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 from tempfile import NamedTemporaryFile
+import random
 
 class User(AbstractUser):
     """User model used for authentication."""
@@ -183,6 +184,11 @@ class Club(models.Model):
     country = models.CharField(
         max_length=50,
         blank=True
+    )
+   
+    club_icon =  models.CharField( 
+        max_length = 10,
+        default = "/images/1.png" #+str(random.randint(1, 4))+
     )
     class Meta:
         ordering = ['name']
