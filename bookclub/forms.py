@@ -385,7 +385,7 @@ class MeetingForm(forms.ModelForm):
                         break
             else:
                 for met in meetings:
-                    if met.time.day == time.day and met.month == time.month and met.year == time.year:
+                    if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
                         self.add_error('time', 'There is a meeting on that day.')
                         break
         except:
