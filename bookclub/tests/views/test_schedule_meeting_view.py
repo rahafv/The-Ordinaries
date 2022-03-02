@@ -69,23 +69,6 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertEqual(meeting.link, "https://goo.gl/maps/DbTzHjUu8cP4zNjRA")
         self.assert_menu(response)
 
-    def test_schedule_meeting_successful(self):
-        self.client.login(username=self.owner.username, password="Password123")
-        count_meetings_before = Meeting.objects.count()
-        count_events_before = Event.objects.count() 
-        response = self.client.post(self.url, self.form_input, follow=True)
-        self.assertEqual(count_meetings_before + 1, Meeting.objects.count())
-        self.assertEqual(count_events_before + 1, Event.objects.count())
-        target_url = reverse("club_page", kwargs={"club_id": self.club.id})
-        self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "club_page.html")
-        meeting = Meeting.objects.get(title="meeting1")
-        self.assertEqual(meeting.title, "meeting1")
-        self.assertEqual(meeting.time, self.date)
-        self.assertEqual(meeting.notes, "bring the book")
-        self.assertEqual(meeting.link, "https://goo.gl/maps/DbTzHjUu8cP4zNjRA")
-        self.assert_menu(response)
-
     def test_schedule_meeting_unsuccessful(self):
         self.client.login(username=self.owner.username, password="Password123")
         count_meetings_before = Meeting.objects.count()
