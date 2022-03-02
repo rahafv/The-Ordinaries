@@ -20,6 +20,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
     def setUp(self):
         self.club = Club.objects.get(id=1)
         self.owner = User.objects.get(id=2)
+        self.user = User.objects.get(id=3)
         self.url = reverse("schedule_meeting", kwargs={'club_id':self.club.id})
         self.date = pytz.utc.localize(datetime.today()+timedelta(15))
 
@@ -81,6 +82,13 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, Message
         self.assertTemplateUsed(response, "schedule_meeting.html")
         self.assertTrue(isinstance(form, MeetingForm))
         self.assert_menu(response)
+
+    def test_only_owner_can_schedule(self):
+        self.client.login(username=self.user.username, password="Password123")
+        count_meetings_before = Meeting.objects.count()
+        response = self.client.post(self.url, self.form_input)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(count_meetings_before, Meeting.objects.count())
 
     def test_send_email_to_chooser(self):
         meeting = Meeting.objects.get(id=1)

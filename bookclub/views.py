@@ -461,39 +461,41 @@ def edit_club_information(request, club_id):
 @login_required
 def schedule_meeting(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    if request.method == 'POST' and request.user == club.owner:
-        form = MeetingForm(club, request.POST)
+    if request.user == club.owner:
+        if request.method == 'POST':
+            form = MeetingForm(club, request.POST)
 
-        if form.is_valid():
-            meeting = form.save()
-            
-            """send email invites"""
-            MeetingHelper().send_email(request=request, 
-                meeting=meeting, 
-                subject='A New Meeting Has Been Scheduled', 
-                letter='emails/meeting_invite.html', 
-                all_mem=True
-            )
-
-            if meeting.chooser:
-                """send email to member who has to choose a book"""
+            if form.is_valid():
+                meeting = form.save()
+                
+                """send email invites"""
                 MeetingHelper().send_email(request=request, 
                     meeting=meeting, 
-                    subject='It Is Your Turn!', 
-                    letter='emails/chooser_reminder.html', 
-                    all_mem=False
+                    subject='A New Meeting Has Been Scheduled', 
+                    letter='emails/meeting_invite.html', 
+                    all_mem=True
                 )
-                deadline = timedelta(7).total_seconds() #0.00069444
-                Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
 
-            create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
-            messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
-            return redirect('club_page', club_id=club.id)
+                if meeting.chooser:
+                    """send email to member who has to choose a book"""
+                    MeetingHelper().send_email(request=request, 
+                        meeting=meeting, 
+                        subject='It Is Your Turn!', 
+                        letter='emails/chooser_reminder.html', 
+                        all_mem=False
+                    )
+                    deadline = timedelta(7).total_seconds() #0.00069444
+                    Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
 
+                create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
+                messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
+                return redirect('club_page', club_id=club.id)
+
+        else:
+            form = MeetingForm(club)
+        return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
     else:
-        form = MeetingForm(club)
-
-    return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
+        return render(request, '404_page.html', status=404) 
 
 @login_required 
 def choice_book_list(request, meeting_id):
