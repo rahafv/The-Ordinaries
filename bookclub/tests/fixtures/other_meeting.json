@@ -6,9 +6,35 @@
          "title" : "second meeting",
          "club" : 1 , 
          "book" : 1 , 
+         "chooser" : 2,
          "time": "2022-1-05T02:15:12.356Z",
          "link" : "https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1" , 
          "notes": "no need to prepare"
         }
-    }
+    },
+
+    {
+        "model": "bookclub.meeting",
+        "pk": 3,
+        "fields": {
+           "title" : "second meeting",
+           "club" : 1 , 
+           "chooser" : 2,
+           "time": "2022-1-05T02:15:12.356Z",
+           "link" : "https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1" , 
+           "notes": "no need to prepare"
+          }
+    },
+
+    {
+        "model": "bookclub.meeting",
+        "pk": 4,
+        "fields": {
+           "title" : "second meeting",
+           "club" : 1 , 
+           "time": "2022-1-05T02:15:12.356Z",
+           "link" : "https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1" , 
+           "notes": "no need to prepare"
+          }
+      }
 ]
