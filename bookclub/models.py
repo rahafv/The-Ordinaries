@@ -34,6 +34,13 @@ class User(AbstractUser):
         blank=False
     )
 
+    DOB = models.DateField(
+        auto_now_add=False,
+        blank=True,
+        null =True,
+        validators=[MaxValueValidator(limit_value=datetime.date.today)]
+    )
+
     age = models.PositiveSmallIntegerField(
         null=True,
         blank=True

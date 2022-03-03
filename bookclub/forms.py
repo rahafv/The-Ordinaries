@@ -1,7 +1,9 @@
+from cProfile import label
 from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
 import random
+from tkinter import Label
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
@@ -16,15 +18,8 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'city', 'region', 'country', 'bio']
-        widgets = { 'bio': forms.Textarea() }
-
-
-    DOB = forms.DateField(initial= None,
-        label = 'Date of Birth',
-        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= False,
-    )
+        fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
+        widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'}) }
 
     new_password = forms.CharField(
         label='Password',
@@ -76,6 +71,7 @@ class SignUpForm(forms.ModelForm):
             self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
+            DOB=self.cleaned_data.get('DOB'),
             age = self.calculate_age(self.DOB),
             email=self.cleaned_data.get('email'),
             city=self.cleaned_data.get('city'),
@@ -202,14 +198,8 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
-        widgets = { 'bio': forms.Textarea()}
-
-    date_of_birth = forms.DateField(initial= None,
-        label = 'Date of Birth',
-        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= True,
-    )
+        fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
+        widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'})}
 
     def __init__(self, *args, **kwargs):
         """ Grants access to the request object so that the date of birth can be changed"""
@@ -218,38 +208,36 @@ class UserForm(forms.ModelForm):
         super(UserForm, self).__init__(*args, **kwargs)
 
 
-
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
         super().clean()
 
-        self.date_of_birth = self.cleaned_data.get('date_of_birth')
+        self.DOB = self.cleaned_data.get('DOB')
 
-        if not self.check_age(self.date_of_birth):
-            self.add_error('date_of_birth', 'Please enter a valid date')
+        if not self.check_age(self.DOB):
+            self.add_error('DOB', 'Please enter a valid date')
 
-
-    def check_age(self, date_of_birth):
+    def check_age(self, dob):
         """Validate the age and check if it is an acceptable age."""
         try:
-            return self.calculate_age(date_of_birth) < 100 and self.calculate_age(date_of_birth) > 10
+            return self.calculate_age(dob) < 100 and self.calculate_age(dob) > 10
         except:
             return True
 
     def calculate_age(self, dob):
         """Calculate the age from the given date input."""
-        today = date.today()
-        one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
-        year_difference = today.year - dob.year
-        age = year_difference - one_or_zero
-
-        return age
+        try:
+            today = date.today()
+            age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+            return age
+        except:
+            age = None
 
     def save(self):
         """Save user."""
         super().save(commit=False)
-        birthdate= self.cleaned_data.get('date_of_birth')
+        birthdate= self.cleaned_data.get('DOB')
         new_age = self.calculate_age(birthdate)
         self.log_in_user.set_age(new_age)
         return self.log_in_user
