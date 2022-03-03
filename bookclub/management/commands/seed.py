@@ -157,6 +157,7 @@ class Command(BaseCommand):
         for club in clubs:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?')[:rand_num]
+            club.members.add(club.owner)
             club.members.add(*sample)
 
 
