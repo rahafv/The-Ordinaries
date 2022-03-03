@@ -12,26 +12,10 @@
 <div class="container">
     <div class="row">
         {% for book in my_books %}
-        <div class="col-sm-6 col-md-3">
-            <div class="profile-card">
-                <div class="profile-img">
-                    <img src="{{ book.image_url }}"  width="220" height="300"  />
-                </div>
-                <div class="profile-content">
-                    <h2 class="title">{{ book.title }}
-                        <span>{{ book.author }}</span>
-                    </h2>
-                </div>
+            <div class="col-sm-6 col-md-3">
+                {% include 'partials/book_card.html' with book=book %}
+                <a href={% url "add_book_from_initial_list" book_id=book.id %} class="btn btn-outline-dark bi bi-plus-lg" style="margin-left:6em"  role="button" > Add </a>
             </div>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>  
-            <a href='{% url 'add_book_from_initial_list' book_id=book.id %}' class="btn btn-outline-dark mb-3 bi bi-plus-lg mr-2" style="margin-left:6em"  role="button" > Add </a>
-        </div>
         {% endfor %}
     </div>
 </div>

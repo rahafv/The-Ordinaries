@@ -118,6 +118,13 @@ class BookModelTestCase(TestCase):
         self.book.add_club(club)
         self.assertEqual(self.book.clubs_count(), count+1)
 
+    def test_club_addition_when_club_is_already_in(self):
+        club = Club.objects.get(id=1)
+        self.book.add_club(club)
+        count = self.book.clubs_count()
+        self.book.add_club(club)
+        self.assertEqual(self.book.clubs_count(), count)
+
     def test_average_rating(self):
         book = Book.objects.get(id=2)
         rating1 = Rating.objects.get(id=2).rating

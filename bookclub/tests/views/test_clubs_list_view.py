@@ -16,6 +16,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         self.user = User.objects.get(id=1)
         self.club = Club.objects.get(id=1)
         self.other_club = Club.objects.get(id=2)
+        self.num_of_clubs = Club.objects.count()
         self.url = reverse('clubs_list')
         
     def test_clubs_list_url(self):
@@ -42,12 +43,12 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
 
     def test_get_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-2)
+        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
-        for club_id in range(settings.CLUBS_PER_PAGE-2):
+        for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
             self.assertContains(response, f'theme{club_id}')
             clubs_url = reverse('clubs_list')
@@ -56,7 +57,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
 
     def test_get_clubs_list_with_pagination(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE*2+3)
+        self._create_test_clubs(settings.CLUBS_PER_PAGE*2+self.num_of_clubs)
         response = self.client.get(self.url)
         self.assert_menu(response)
         self.assertEqual(response.status_code, 200)
@@ -85,7 +86,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
-        self.assertEqual(len(response.context['clubs']), 5)
+        self.assertEqual(len(response.context['clubs']), 6)
         page_obj = response.context['clubs']
         self.assertTrue(page_obj.has_previous())
         self.assertFalse(page_obj.has_next())
@@ -97,7 +98,6 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
             Club.objects.create(owner = self.user,
                 name =f'club{club_id}',
                 theme=f'theme{club_id}',
-                meeting_type =Club.MeetingType.INPERSON,
                 city=f'city{club_id}',
                 country=f'country {club_id}',
             )

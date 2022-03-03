@@ -72,8 +72,10 @@ urlpatterns = [
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
     path('search_page', views.search_page, name='search_page'),
-
-
+    path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
+    path('meeting/<int:meeting_id>/book_choices/', views.choice_book_list, name='choice_book_list'),
+    path('meeting/<int:meeting_id>/search/', views.search_book, name='search_book'),
+    path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
 ]
 
 handler404 = 'bookclub.views.handler404'
