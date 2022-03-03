@@ -1,9 +1,9 @@
 """Unit tests of the sort form."""
 from django.test import TestCase
 from bookclub.models import User, Club
-from bookclub.forms import ClubSortForm
+from bookclub.forms import NameAndDateSortForm
 
-class ClubSortFormTestCase(TestCase):
+class NameAndDateSortFormTestCase(TestCase):
     """Unit tests of the review form."""
 
     fixtures=[
@@ -16,30 +16,30 @@ class ClubSortFormTestCase(TestCase):
         self.club = Club.objects.get(id = 1)
         self.member = User.objects.get(id = 1)
         self.form_input = {
-            'sort':ClubSortForm.DESC_DATE,
+            'sort':NameAndDateSortForm.DESC_DATE,
         }
     
     def test_form_has_necessary_fields(self):
-        form = ClubSortForm()
+        form = NameAndDateSortForm()
         self.assertIn('sort', form.fields)
 
     def test_valid_sort_form(self):
-        form = ClubSortForm(self.form_input)
+        form = NameAndDateSortForm(self.form_input)
         self.assertTrue(form.is_valid())
     
     def test_valid_sort_form_with_updated_name_sort_field_desc(self):
-        self.form_input['sort'] = ClubSortForm.DESC_NAME
-        form = ClubSortForm(self.form_input)
+        self.form_input['sort'] = NameAndDateSortForm.DESC_NAME
+        form = NameAndDateSortForm(self.form_input)
         self.assertTrue(form.is_valid())
     
     def test_valid_sort_form_with_updated_updated_name_sort_field_asc(self):
-        self.form_input['sort'] = ClubSortForm.ASC_NAME
-        form = ClubSortForm(self.form_input)
+        self.form_input['sort'] = NameAndDateSortForm.ASC_NAME
+        form = NameAndDateSortForm(self.form_input)
         self.assertTrue(form.is_valid())
     
     def test_valid_sort_form_with_updated_updated_date_sort_field_desc(self):
-        self.form_input['sort'] = ClubSortForm.ASC_DATE
-        form = ClubSortForm(self.form_input)
+        self.form_input['sort'] = NameAndDateSortForm.ASC_DATE
+        form = NameAndDateSortForm(self.form_input)
         self.assertTrue(form.is_valid())
 
 

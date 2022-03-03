@@ -64,8 +64,6 @@ urlpatterns = [
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list'),
-    # path("club/<int:club_id>/members/", views.members_list_sorted_asc, name='members_list_sorted_asc'),
-    # path("club/<int:club_id>/members/", views.members_list_sorted_desc, name='members_list_sorted_desc'),
     path("club/<int:club_id>/applicants/", views.applicants_list, name='applicants_list'),
     path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
     path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
@@ -73,7 +71,8 @@ urlpatterns = [
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
-    path('search_page', views.search_page, name='search_page'),
+    path('search_page', views.search_page, name='search_page'),  
+    path('search_page/<str:searched>/<str:label>/', views.show_sorted, name = "show_sorted")
 
 
 ]

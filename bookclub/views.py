@@ -1,11 +1,12 @@
+from imaplib import _Authenticator
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, SortForm, ClubSortForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, UserSortForm, NameAndDateSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, login_prohibited, generate_token, create_event
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, sort_users, sort_books, sort_clubs
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
 from django.contrib.auth.hashers import check_password
@@ -29,7 +30,32 @@ def welcome(request):
 
 @login_required
 def home(request):
-     return render(request, 'home.html')
+    def events_created_at(event):
+        return event.created_at
+
+    current_user = request.user
+    authors = list(current_user.followees.all()) + [current_user]
+    clubs = list(User.objects.get(id=current_user.id).clubs.all())
+    user_events  = [] 
+    club_events = []
+    for author in authors:
+        user_events += list(Event.objects.filter(user=author))
+    final_user_events = user_events
+    final_user_events.sort(reverse = True , key = events_created_at)
+    first_twentyFive = final_user_events[0:25]
+ 
+    for club in clubs:
+        club_events += list(Event.objects.filter(club=club))
+
+    final_club_events = club_events
+    final_club_events.sort(reverse = True , key = events_created_at)
+    first_ten = final_club_events[0:10]
+
+    club_events_length = len(first_ten)
+  
+
+    return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
+   
 
 @login_prohibited
 def sign_up(request):
@@ -280,6 +306,7 @@ def join_club(request, club_id):
 
     club.members.add(user)
     create_event('U', 'C', Event.EventType.JOIN, user, club)
+    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -313,30 +340,12 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
-    # form = SortForm(request.GET or None)
-    # sort = ""
-
-    # if form.is_valid():
-    #     sort_by = form.cleaned_data.get('sort_by')
-    #     #default ordering is in ascending order so we reverse for descending order
-    #     if(sort_by == 'desc'):
-    #         books_queryset = books_queryset.order_by(Lower("title").desc())
-    #     else:
-    #         books_queryset = books_queryset.order_by(Lower("title").asc())
-
-    form = ClubSortForm(request.GET or None)
+    form = NameAndDateSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
-        if(sort == 'name_asc'):
-            books_queryset = books_queryset.order_by(Lower('title').asc())
-        elif (sort == 'name_desc'):
-            books_queryset = books_queryset.order_by(Lower('title').desc())
-        elif(sort == "date_asc"):
-            books_queryset = books_queryset.order_by('year')
-        else:
-            books_queryset = books_queryset.order_by(Lower('year').desc())
+        books_queryset = sort_books(sort, books_queryset)
 
     count = books_queryset.count()
     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
@@ -352,19 +361,12 @@ def clubs_list(request, user_id=None):
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
     
-    form = ClubSortForm(request.GET or None)
+    form = NameAndDateSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
-        if(sort == 'name_asc'):
-            clubs_queryset = clubs_queryset.order_by(Lower('name').asc())
-        elif (sort == 'name_desc'):
-            clubs_queryset = clubs_queryset.order_by(Lower('name').desc())
-        elif(sort == "date_asc"):
-            clubs_queryset = clubs_queryset.order_by('created_at')
-        else:
-            clubs_queryset = clubs_queryset.order_by('-created_at')
+        clubs_queryset = sort_clubs(sort, clubs_queryset)
 
     count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
@@ -379,19 +381,18 @@ def members_list(request, club_id):
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
     #form to display user sorting options
-    form = SortForm(request.GET or None)
-    sort_by = ""
+    form = UserSortForm(request.GET or None)
+    sort = ""
     if form.is_valid():
-        sort_by = form.cleaned_data.get('sort_by')
-        #default ordering is in ascending order so we reverse for descending order
-        if(sort_by == 'desc'):
-            members_queryset = members_queryset.reverse()
+        sort = form.cleaned_data.get('sort')
+        members_queryset = sort_users(sort, members_queryset)
+
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form}) #'form':form
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form})
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
@@ -430,15 +431,12 @@ def applicants_list(request, club_id):
     is_owner = (club.owner == current_user)
     if (is_owner):
         #Form to display sorting options for Users
-        form = SortForm(request.GET or None)
-        #sorting attribute ascending initially
-        sort_by = ""
+        form = UserSortForm(request.GET or None)
+        sort = ""
         if form.is_valid():
             #get the value to sort by from the valid form 
-            sort_by = form.cleaned_data.get('sort_by')
-        #default ordering is in ascending order so we reverse for descending order
-            if(sort_by == "desc"):
-                applicants_queryset = applicants_queryset.reverse()
+            sort = form.cleaned_data.get('sort')
+            applicants_queryset = sort_users(sort,  applicants_queryset)
 
         applicants_pg = Paginator(applicants_queryset, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
@@ -537,48 +535,90 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
 
 @login_required
 def search_page(request):
     if request.method == 'GET':
-        searched = request.GET.get('searched', '')
-        category = request.GET.get('category', '')
+        searched = request.GET.get('searched')
+        category = request.GET.get('category')
+        label= category
 
-        if(category=="user-name"):
-            filtered_list = User.objects.filter(username__contains=searched)
-            category= "Users"
-        elif(category=="user-location"):
-            filtered_list = User.objects.filter(country__contains=searched)
-            category= "Users"
-        elif(category=="club-name"):
-            filtered_list = Club.objects.filter(name__contains=searched)
-            category= "Clubs"
-        elif(category=="club-location"):
-            filtered_list = Club.objects.filter(country__contains=searched)
-            category= "Clubs"
-        elif(category=="book-title"):
-            filtered_list = Book.objects.filter(title__contains=searched)
-            category= "Books"
-        elif(category=="book-year"):
-            filtered_list = Book.objects.filter(year__contains=searched)
-            category= "Books"
+        #method in helpers to return a dictionary with a list of users, clubs or books searched
+        search_page_results = get_list_of_objects(searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+
+        # if(category=="user-name"):
+        #     filtered_list = User.objects.filter(username__contains=searched)
+        #     category= "Users"
+        # elif(category=="user-location"):
+        #     filtered_list = User.objects.filter(country__contains=searched)
+        #     category= "Users"
+        # elif(category=="club-name"):
+        #     filtered_list = Club.objects.filter(name__contains=searched)
+        #     category= "Clubs"
+        # elif(category=="club-location"):
+        #     filtered_list = Club.objects.filter(country__contains=searched)
+        #     category= "Clubs"
+        # elif(category=="book-title"):
+        #     filtered_list = Book.objects.filter(title__contains=searched)
+        #     category= "Books"
+        # elif(category=="book-year"):
+        #     filtered_list = Book.objects.filter(year__contains=searched)
+        #     category= "Books"
+        # else:
+        #     filtered_list = Book.objects.filter(author__contains=searched)
+        #     category= "Books"
+                        
+        sortForm = ""
+        if(category == "Clubs" or category == "Books"):
+            sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            filtered_list = Book.objects.filter(author__contains=searched)
-            category= "Books"
-
-
+            sortForm = UserSortForm(request.GET or None)
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
-        return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
-    else: 
-         return render(request, 'search_page.html', {})
+
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, 'label': label, "filtered_list":filtered_list, "form":sortForm})
+   
+    else:   
+        return render(request, 'search_page.html', {})
+
+
+@login_required
+def show_sorted(request, searched, label):
+    if request.method=="GET":
+
+        search_page_results = get_list_of_objects(searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+
+        sortForm = ""
+        if(category == "Clubs" or category == "Books"):
+            sortForm = NameAndDateSortForm(request.GET or None)
+        else:
+            sortForm = UserSortForm(request.GET or None)
+
+        if (sortForm.is_valid()):
+            sort = sortForm.cleaned_data.get('sort')
+            if(category == "Clubs"):
+                filtered_list = sort_clubs(sort, filtered_list)
+            elif(category == "Books"):
+                filtered_list = sort_books(sort, filtered_list)
+            else:
+                filtered_list = sort_users(sort, filtered_list)
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        return render(request, 'search_page.html', {'searched':searched,'label': label,  'category':category, 'form':sortForm, "filtered_list":filtered_list})
+
 
 @login_required
 def initial_book_list(request):
@@ -595,3 +635,6 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
+
+
+

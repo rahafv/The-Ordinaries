@@ -1,0 +1,29 @@
+
+{% for event in club_events %}
+    {% if club_events_length == 0  %}
+        <p> No Club Updates Yet! </p>
+    {% else %}
+        {% if event.type_of_action == 'M'  %}
+            <li class="post-text">
+                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
+                {{ event.message }}
+                {{ event.get_action }}
+            </li>
+            &emsp;
+        {%elif event.type_of_action == 'B' %}
+            <li class="post-text">
+                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
+                {{ event.message }}
+                <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
+             </li>
+             &emsp;
+        {% endif %}
+    {% endif %}
+    
+{% endfor %}
+
+
+   
+
+
+

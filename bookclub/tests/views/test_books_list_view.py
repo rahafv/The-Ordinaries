@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club, Book
-from bookclub.forms import ClubSortForm
+from bookclub.forms import NameAndDateSortForm
 from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
 from system import settings
 
@@ -19,7 +19,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.url = reverse('books_list')
         self.BOOKS_PER_PAGE = 15
         self.form_input = {
-            'sort':ClubSortForm.DESC_DATE,
+            'sort':NameAndDateSortForm.DESC_DATE,
         }
 
     def test_books_list_url(self):
@@ -32,7 +32,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'books.html')
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')  
         self.assert_menu(response)
@@ -53,7 +53,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
             books_url = reverse('books_list')
             self.assertContains(response, books_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')  
         self.assert_menu(response)
@@ -84,13 +84,13 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')  
         self.assert_menu(response)
     
     def test_get_user_filled_books_list_asc_date_older_books(self):
-        self.form_input['sort'] = ClubSortForm.ASC_DATE
+        self.form_input['sort'] = NameAndDateSortForm.ASC_DATE
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_books(self.BOOKS_PER_PAGE-1)
         Book.objects.get(id=2).add_reader(self.user)
@@ -103,13 +103,13 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_asc')  
         self.assert_menu(response)
 
     def test_get_user_filled_books_list_asc_title(self):
-        self.form_input['sort'] = ClubSortForm.ASC_NAME
+        self.form_input['sort'] = NameAndDateSortForm.ASC_NAME
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_books(self.BOOKS_PER_PAGE-1)
         Book.objects.get(id=2).add_reader(self.user)
@@ -122,14 +122,14 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')  
         self.assert_menu(response)
 
 
     def test_get_user_filled_books_list_desc_title(self):
-        self.form_input['sort'] = ClubSortForm.DESC_NAME
+        self.form_input['sort'] = NameAndDateSortForm.DESC_NAME
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_books(self.BOOKS_PER_PAGE-1)
         Book.objects.get(id=2).add_reader(self.user)
@@ -142,7 +142,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenueTestMixin):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
         form= response.context['form']
-        self.assertTrue(isinstance(form, ClubSortForm)) 
+        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')  
         self.assert_menu(response)

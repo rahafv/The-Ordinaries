@@ -8,8 +8,8 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ["username", "email", "first_name", "last_name"]
 
 @admin.register(Club)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ["name", "theme", "owner", "meeting_type"]
+class ClubAdmin(admin.ModelAdmin):
+    list_display = ["name", "theme", "owner", "meeting_type", "club_type"]
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
