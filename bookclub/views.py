@@ -286,6 +286,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
 
 @login_required
 def join_club(request, club_id):
+
     club = get_object_or_404(Club.objects, id=club_id)
     user = request.user
 
@@ -437,6 +438,26 @@ def reject_applicant(request, club_id, user_id):
     else:
         messages.add_message(request, messages.ERROR, "You cannot change applicant status list" )
         return redirect('club_page', club_id)
+
+@login_required
+def transfer_club_ownership(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    user = request.user
+    memberlist=club.members.all().exclude(id=user.id)
+    if user != club.owner:
+        messages.add_message(request, messages.ERROR, "You are not permitted to access this page!")
+        return redirect('club_page', club_id = club.id)
+    if memberlist.count() == 0:
+        messages.add_message(request, messages.WARNING, "There are no other members to tranfer the club to!")
+        return redirect('club_page', club_id = club.id)
+    if request.method == "POST":
+        selectedmember = request.POST.get('selected_member', '')
+        if selectedmember != '':
+            member = get_object_or_404(User.objects, id = int(selectedmember))
+            club.make_owner(member)
+            messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
+            return redirect('club_page', club_id = club.id)
+    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
 @login_required
 def edit_club_information(request, club_id):

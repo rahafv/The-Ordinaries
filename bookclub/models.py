@@ -17,7 +17,7 @@ class User(AbstractUser):
     """User model used for authentication."""
 
     email_verified = models.BooleanField(default=False)
-    
+
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -46,19 +46,19 @@ class User(AbstractUser):
 
     city = models.CharField(
         max_length=50,
-        blank=True, 
+        blank=True,
         null=True
     )
 
     region = models.CharField(
         max_length=50,
-        blank=True, 
+        blank=True,
         null=True
     )
 
     country = models.CharField(
         max_length=50,
-        blank=True, 
+        blank=True,
         null=True
     )
 
@@ -70,7 +70,7 @@ class User(AbstractUser):
     followers = models.ManyToManyField(
         'self', symmetrical=False, related_name='followees'
     )
-  
+
     class Meta:
         ordering = ['first_name', 'last_name']
 
@@ -87,7 +87,7 @@ class User(AbstractUser):
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
-    
+
     def set_age(self,new_age):
         self.age = new_age
         return self.save()
@@ -128,13 +128,13 @@ class Club(models.Model):
     """Club model."""
 
     name = models.CharField(
-        max_length=50, 
-        blank=False, 
+        max_length=50,
+        blank=False,
         null=False
     )
 
     owner = models.ForeignKey(
-        User, 
+        User,
         on_delete=models.CASCADE
     )
 
@@ -154,24 +154,24 @@ class Club(models.Model):
         PUBLIC =  "Public"
 
     club_type = models.CharField(
-        max_length=7,
-        choices=ClubType.choices, 
-        default=ClubType.PUBLIC, 
+        max_length = 7,
+        choices = ClubType.choices,
+        default=ClubType.PUBLIC,
         blank = False
     )
-    
+
     members = models.ManyToManyField(
-        User, 
+        User,
         related_name='clubs'
     )
 
     applicants = models.ManyToManyField(
-        User, 
+        User,
         related_name='clubs_applied_to',
     )
 
     theme = models.CharField(
-        max_length=100, 
+        max_length=100,
         blank=True
     )
 
@@ -197,21 +197,29 @@ class Club(models.Model):
             self.members.add(member)
 
     def member_count(self):
-        return self.members.all().count() 
+        return self.members.all().count()
 
     def is_member(self, user):
         """ checks if the user is a member"""
-        return self.members.all().filter(id=user.id).exists()  
-    
+        return self.members.all().filter(id=user.id).exists()
+
     def add_applicant(self, applicant):
         self.applicants.add(applicant)
 
     def applicants_count(self):
-        return self.applicants.all().count()   
+        return self.applicants.all().count()
 
     def is_applicant(self, user):
         """ checks if the user is a member"""
         return self.applicants.all().filter(id=user.id).exists()
+
+    def get_club_type_display(self):
+        return self.club_type
+
+
+    def make_owner(self, new_owner):
+        self.owner = new_owner
+        self.save()
 
 class Book(models.Model):
     """Book model."""
@@ -252,15 +260,15 @@ class Book(models.Model):
     )
 
     readers = models.ManyToManyField(
-        User, 
+        User,
         related_name='books'
     )
 
     clubs = models.ManyToManyField(
-        Club, 
+        Club,
         related_name='books'
     )
-    
+
     class Meta:
         ordering = ['title']
 
@@ -270,48 +278,47 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
-            
+
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
- 
+
     def readers_count(self):
-        return self.readers.all().count()  
+        return self.readers.all().count()
 
     def add_club(self, club):
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
-    
+
     def clubs_count(self):
-        return self.clubs.all().count()  
+        return self.clubs.all().count()
 
     def average_rating(self):
         sum = 0.0
-        if self.ratings.all().count() != 0: 
-            for rating in self.ratings.all(): 
-                sum+= rating.rating    
+        if self.ratings.all().count() != 0:
+            for rating in self.ratings.all():
+                sum+= rating.rating
             return (sum/self.ratings.all().count())
-        else: 
+        else:
             return 0.0
-            
 
 class Rating(models.Model):
     """rating model."""
 
     user =  models.ForeignKey(
-        User,  
+        User,
         on_delete=models.CASCADE,
         related_name='ratings'
     )
 
     book = models.ForeignKey(
-        Book, 
+        Book,
         on_delete=models.CASCADE,
         related_name='ratings'
     )
 
     review = models.CharField(
-        max_length=250 , 
+        max_length=250 ,
         blank = True
     )
 
@@ -325,22 +332,21 @@ class Rating(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         unique_together = ['user', 'book']
- 
 
 class Meeting(models.Model):
     """ The meeting model."""
 
     title = models.CharField(
-        max_length=50, 
-        blank=False, 
+        max_length=50,
+        blank=False,
         null=False
     )
 
     club = models.ForeignKey(
-        Club, 
+        Club,
         on_delete=models.CASCADE,
         related_name='meetings'
     )
@@ -354,7 +360,7 @@ class Meeting(models.Model):
     )
 
     book = models.ForeignKey(
-        Book, 
+        Book,
         on_delete=models.CASCADE,
         related_name='meetings',
         blank=True, 
@@ -395,7 +401,7 @@ class Meeting(models.Model):
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
-
+        
 ACTOR_CHOICES = (
     ('U', 'User'),
     ('C', 'Club'),
@@ -426,18 +432,18 @@ class Event(models.Model):
     action_user =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    
+
     class Meta:
         """Model options."""
 
-        ordering = ['-created_at']    
+        ordering = ['-created_at']
 
     def clean(self):
 
-        super().clean() 
+        super().clean()
 
         """ checks that the type of actor and the object are correct """
-        if self.type_of_actor == 'U' and not self.user: 
+        if self.type_of_actor == 'U' and not self.user:
             raise ValidationError('Actor must be User')
         if self.type_of_actor == 'C' and not self.club:
             raise ValidationError('Actor must be Club')
@@ -455,15 +461,15 @@ class Event(models.Model):
             raise ValidationError('Club cannot join and withdraw from clubs')
 
         """ checks that the type of actor and the object are correct """
-        if self.type_of_action == 'B' and not self.book: 
+        if self.type_of_action == 'B' and not self.book:
             raise ValidationError('Action must be Book')
         if self.type_of_action == 'C' and not self.club:
             raise ValidationError('Action must be Club')
-        if self.type_of_action == 'M' and not self.meeting: 
+        if self.type_of_action == 'M' and not self.meeting:
             raise ValidationError('Action must be meeting')
         if self.type_of_action == 'R' and not self.rating:
             raise ValidationError('Action must be rating')
-        if self.type_of_action == 'U' and not self.action_user: 
+        if self.type_of_action == 'U' and not self.action_user:
             raise ValidationError('Action must be user')
 
     def save(self, **kwargs):
@@ -471,6 +477,7 @@ class Event(models.Model):
         return super(Event, self).save(**kwargs)
 
     class EventType(models.TextChoices):
+
         JOIN = " joined "
         WITHDRAW = " withdrew from "
         FOLLOW =  " followed "
@@ -483,7 +490,7 @@ class Event(models.Model):
         """Return the actor of a given event."""
         if self.type_of_actor == 'U':
             return self.user.username
-        else: 
+        else:
             return self.club.name
 
     def get_action(self):
@@ -498,6 +505,3 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
-    
-  
-

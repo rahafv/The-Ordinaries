@@ -36,16 +36,16 @@ urlpatterns = [
     path('log_in/', views.log_in, name='log_in'),
     path('home/' , views.home , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
-   
+
     path('profile/', views.show_profile_page , name='profile'),
     path('profile/<int:user_id>', views.show_profile_page , name='profile'),
-    
+
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
     path('password/',views.PasswordView.as_view(), name = 'password'),
     path('create_club/', views.create_club , name='create_club'),
     path("club/<int:club_id>/", views.club_page, name="club_page"),
-    
+
     path('add_book/', views.add_book, name ='add_book'),
     path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
@@ -59,7 +59,7 @@ urlpatterns = [
     path('books/', views.books_list, name ='books_list'),
     path('clubs/', views.clubs_list, name ='clubs_list'),
     path('club/<int:club_id>/books/', views.books_list, name ='books_list'),
-   
+
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
@@ -68,6 +68,7 @@ urlpatterns = [
     path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
     path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
     path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
+    path('club/<int:club_id>/transfer_ownership/', views.transfer_club_ownership, name ='transfer_ownership'),
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),

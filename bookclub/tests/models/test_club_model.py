@@ -119,6 +119,12 @@ class ClubModelTestCase(TestCase):
         self.club.add_member(nonMember)
         self.assertEqual(self.club.member_count(), count+1)
 
+    def test_change_ownership(self):
+        otherMember = self.club.members.get(id=3)
+        self.club.make_owner(otherMember)
+        self.assertEqual(self.club.owner, otherMember)
+
+
     def test_member_addition_when_user_is_already_a_member(self):
         nonMember = User.objects.get(id=4)
         self.club.add_member(nonMember)

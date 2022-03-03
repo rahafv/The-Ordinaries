@@ -89,6 +89,10 @@
                   <div class="mb-3 pb-0">
                     <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
                   </div>
+                  {% if user == club.owner %}
+                  <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>
+                  {% endif %}
+                </div>
                 {% endif %}   
               </div>
             </div>
