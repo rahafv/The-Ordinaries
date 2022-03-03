@@ -223,7 +223,6 @@ class Club(models.Model):
     def get_club_type_display(self):
         return self.club_type
 
-
     def make_owner(self, new_owner):
         self.owner = new_owner
         self.save()

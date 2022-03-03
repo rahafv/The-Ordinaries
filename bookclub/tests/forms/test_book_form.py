@@ -17,6 +17,7 @@ class BookFormTestCase(TestCase):
             'title':'Classical',
             'author': 'Mark',
             'publisher': 'Oxford',
+            'image_url': 'https://i.imgur.com/f6LoJwT.jpg',
             'year': 2002,
         }
         self.wrong_form_input= {
@@ -56,6 +57,13 @@ class BookFormTestCase(TestCase):
         self.form_input["ISBN"] = "0002005018"
         form = BookForm(self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_image_can_be_blank(self): 
+        self.form_input["image_url"] = ""
+        form = BookForm(self.form_input)
+        self.assertTrue(form.is_valid())
+
+
 
 
     

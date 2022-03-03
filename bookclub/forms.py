@@ -140,10 +140,11 @@ class PasswordForm(NewPasswordMixin):
 
         super().clean()
         password = self.cleaned_data.get('password')
-        if self.user is not None:
+        if self.user:
             user = authenticate(username=self.user.username, password=password)
         else:
             user = None
+
         if user is None:
             self.add_error('password', "Password is invalid")
 
@@ -151,9 +152,8 @@ class PasswordForm(NewPasswordMixin):
         """Save the user's new password."""
 
         new_password = self.cleaned_data['new_password']
-        if self.user is not None:
-            self.user.set_password(new_password)
-            self.user.save()
+        self.user.set_password(new_password)
+        self.user.save()
         return self.user
 
 class BookForm(forms.ModelForm):
