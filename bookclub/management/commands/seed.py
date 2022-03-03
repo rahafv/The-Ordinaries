@@ -1,11 +1,15 @@
 from django.core.management.base import BaseCommand
-from bookclub.models import User, Club, Book , Rating
+from numpy import choose
+from bookclub.models import User, Club, Book , Rating, Event, Meeting
 from faker import Faker
 import csv
 import time
 import os
 from .unseed import unseed
 import random
+from bookclub.helpers import create_event
+from datetime import datetime, timedelta
+import pytz
 
 
 class Command(BaseCommand):
@@ -31,15 +35,17 @@ class Command(BaseCommand):
         print("users: ", end - start)
 
         start = time.time()
-        self.create_clubs()
-        self.populate_clubs()
-        end = time.time()
-        print("club: ", end - start)
-
-        start = time.time()
         self.create_books()
         end = time.time()
         print("book: ", end - start)
+
+        start = time.time()
+        self.create_clubs()
+        self.clubs = Club.objects.all()
+        self.populate_clubs()
+        self.create_meetings()
+        end = time.time()
+        print("club: ", end - start)
 
         start = time.time()
         self.create_ratings()
@@ -152,14 +158,28 @@ class Command(BaseCommand):
                 Club.objects.bulk_create(clubs)
 
     def populate_clubs(self):
-        clubs = Club.objects.all()
         count = int((self.users.count()-1)/10)
-        for club in clubs:
+        for club in self.clubs:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?')[:rand_num]
-            club.members.add(club.owner)
             club.members.add(*sample)
 
+            club.members.add(club.owner)
+            create_event('U', 'C', Event.EventType.CREATE, user=club.owner, club=club)
+
+    def create_meetings(self):
+        for club in self.clubs:
+            meeting = Meeting.objects.create(
+                title = 'Meeting 1',
+                club = club,
+                chooser = club.owner,
+                book = Book.objects.first(),
+                time = pytz.utc.localize(datetime.today()+timedelta(15)),
+                link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
+
+            )
+
+            create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
 
     def create_books(self):
         MAX_BOOKS = 1000
@@ -228,6 +248,11 @@ class Command(BaseCommand):
                         rating = col[2],
                         review = review,
                     )
+
+                    user.books.add(book)
+
+                    create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
+                    create_event('U', 'B', Event.EventType.REVIEW, user=user, book=book)
 
                     pairs.append(pair)
                     ratings.append(rating)
