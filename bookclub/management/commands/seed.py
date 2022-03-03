@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand
-from numpy import choose
 from bookclub.models import User, Club, Book , Rating, Event, Meeting
 from faker import Faker
 import csv

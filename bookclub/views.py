@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from imaplib import _Authenticator
+from datetime import timedelta
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404

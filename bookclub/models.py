@@ -1,9 +1,3 @@
-from email import message
-from email.policy import default
-from pickle import FALSE
-from pyclbr import Class
-from queue import Empty
-from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import ValidationError
@@ -11,7 +5,6 @@ from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
-from tempfile import NamedTemporaryFile
 
 class User(AbstractUser):
     """User model used for authentication."""
