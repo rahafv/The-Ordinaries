@@ -58,6 +58,16 @@ class UserFormTestCase(TestCase):
         form = UserForm(self.form_input)
         self.assertFalse(form.is_valid())
 
+    def test_invalid_date(self):
+        self.form_input['DOB'] = date(2024, 1, 5)
+        form = UserForm(self.form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_blank_date(self):
+        self.form_input['DOB'] = None
+        form = UserForm(self.form_input)
+        self.assertTrue(form.is_valid())
+
     def test_form_must_save_correctly(self):
         form = UserForm(instance=self.user, data=self.form_input, user = self.user)
         before_count = User.objects.count()
