@@ -429,6 +429,7 @@ def edit_club_information(request, club_id):
     context = {
         'form': form,
         'club_id':club_id,
+        'club': club,
     }
     return render(request, 'edit_club_info.html', context)
 
@@ -544,13 +545,4 @@ def delete_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
 
-@login_required
-def delete_club_confirmation(request, club_id):
-    current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
-    members = club.members.all()
-    club = get_object_or_404(Club.objects, id=club_id)
-    if(current_user == club.owner):
-        return render(request, 'delete_club_confirmation_page.html', {'club': club, 'club_id': club_id, 'members': members})
-    messages.add_message(request, messages.ERROR, "Only owners can access this page!")
-    return redirect('club_page', club_id)
+
