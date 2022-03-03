@@ -518,7 +518,7 @@ def search_book(request, meeting_id):
         searched = request.GET.get('searched', '')
         books = Book.objects.filter(title__contains=searched)
 
-        pg = Paginator(books, settings.MEMBERS_PER_PAGE)
+        pg = Paginator(books, settings.BOOKS_PER_PAGE)
         page_number = request.GET.get('page')
         books = pg.get_page(page_number)
         return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'meeting_id':meeting_id})
