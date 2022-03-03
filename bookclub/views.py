@@ -476,6 +476,7 @@ def edit_club_information(request, club_id):
     context = {
         'form': form,
         'club_id':club_id,
+        'club': club,
     }
     return render(request, 'edit_club_info.html', context)
 
@@ -665,6 +666,18 @@ def add_book_from_initial_list(request, book_id):
     user = request.user
     book.add_reader(user)
     return redirect("initial_book_list")
+
+
+@login_required
+def delete_club(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    if(not request.user == club.owner):
+        messages.add_message(request, messages.ERROR, "Must be owner to delete club!")
+        return redirect('club_page', club_id)
+
+    club.delete()
+    messages.add_message(request, messages.SUCCESS, "Deletion successful!")
+    return redirect('home')
 
 
 
