@@ -2,7 +2,7 @@
 action="{% url 'search_page'%}">
 {% csrf_token %}
 
-  <select id="category" name="category">
+  <select id="category" name="category" class="fw-light center">
     <optgroup label="User">
       <option value="user-name">Name</option>
       <option value="user-location">Country</option>
@@ -19,7 +19,7 @@ action="{% url 'search_page'%}">
   </select>
 
   &emsp;
-  <input class="form-control me-2"
+  <input class="fw-light center form-control me-2"
   type="search" placeholder="Search" aria-label="Search" name="searched"> 
   <button class="btn btn-outline-light bi bi-search" type="submit" style="color: light-grey;"></button>
 </form>

@@ -1,10 +1,12 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
+import random
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Book, Rating
+import pytz
+from .models import User, Club, Book, Rating, Meeting
 from django.contrib.auth import authenticate
 
 class SignUpForm(forms.ModelForm):
@@ -95,7 +97,7 @@ class CreateClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        fields = ['name', 'theme', 'meeting_type', 'club_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
         labels = {'club_type': "Select Club Privacy Status"}
 
@@ -174,7 +176,7 @@ class BookForm(forms.ModelForm):
                 self.add_error('ISBN', 'ISNB already exists')
 
     def save(self):
-        """Create a new user."""
+        """Create a new book."""
 
         super().save(commit=False)
 
@@ -260,7 +262,7 @@ class ClubForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
         labels = {'club_type': "Club Privacy Setting:"}
         exclude = ['owner']
 
@@ -292,6 +294,7 @@ class EditRatingForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
+    
     class Meta:
         
         model = Rating
@@ -302,14 +305,14 @@ class RatingForm(forms.ModelForm):
 
         
     def save(self, reviwer, reviewedBook):
-        """Create a new user."""
+        """Create a new rating."""
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0 
         review = Rating.objects.create(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
+            rating = self.calculate_rating(rate),
+            review = self.cleaned_data.get('review'),
             book = reviewedBook,
             user = reviwer,
         )
@@ -317,3 +320,91 @@ class RatingForm(forms.ModelForm):
 
     def calculate_rating(self, rating): 
         return rating*2
+
+class MeetingForm(forms.ModelForm):
+    """Form to update club information."""
+
+    class Meta:
+        """Form options."""
+
+        model = Meeting
+        fields = ['title', 'time', 'notes', 'link']
+        widgets = {
+            'time': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+        exclude = ['club', 'book', 'member']
+
+    cont = forms.BooleanField(
+        label = "This meeting a contiuation of a previous discussion",
+        required = False,
+        help_text = "checkbox",
+        label_suffix=""
+    )
+
+    def __init__(self, club, *args, **kwargs):
+        self.club = club
+        super(MeetingForm, self).__init__(*args, **kwargs)
+        
+    def clean(self):
+        super().clean()
+        if not self.cleaned_data.get('link'):
+            if self.club.meeting_type == Club.MeetingType.ONLINE:
+                self.add_error('link', "Provide a link to the meeting.")
+            else:
+                self.add_error('link', "Provide a link to the meeting location.")
+
+        is_cont = self.cleaned_data.get('cont')
+        if is_cont and self.club.meetings.count() == 0:
+            self.add_error('cont', "There are no previous meetings.")
+
+        time = self.cleaned_data.get('time')
+        self.check_date(time, is_cont)
+        self.check_meetings(time, is_cont)
+
+        return self.cleaned_data
+
+    def check_date(self, time, is_cont):
+        """Validate the time and check if it is appropriate."""
+        today = datetime.today()
+        start_week = today + timedelta(13)
+        try:
+            if not is_cont and time < pytz.utc.localize(start_week):
+                self.add_error('time', 'Date should be at least 2 weeks from today.')
+            else:
+                if time.day == today.day and time.month == today.month and time.year == today.year:
+                    self.add_error('time', 'Date cannot be today.')
+        except:
+            pass
+
+    def check_meetings(self, time, is_cont):
+        """Check if there are meetings in the same period."""
+        try:
+            meetings = Meeting.objects.filter(club_id=self.club.id)
+            if not is_cont:
+                for met in meetings:
+                    if met.time+timedelta(30) > time:
+                        self.add_error('time', 'Meetings should be at least a month apart.')
+                        break
+            else:
+                for met in meetings:
+                    if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
+                        self.add_error('time', 'There is a meeting on that day.')
+                        break
+        except:
+            pass
+
+    def save(self):
+        """Create a new meeting."""
+        super().save(commit=False)
+        meeting = Meeting.objects.create(
+            title = self.cleaned_data.get('title'),
+            club = self.club,
+            time = self.cleaned_data.get('time'),
+            notes = self.cleaned_data.get('notes'),
+            link = self.cleaned_data.get('link'),
+        )
+        if not self.cleaned_data.get('cont'):
+            meeting.assign_chooser()
+        return meeting
+        

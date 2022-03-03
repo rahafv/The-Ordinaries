@@ -138,13 +138,24 @@ class Club(models.Model):
         on_delete=models.CASCADE
     )
 
+    class MeetingType(models.TextChoices):
+        INPERSON = "In-person"
+        ONLINE = "Online"
+
+    meeting_type = models.CharField(
+        max_length=9,
+        choices=MeetingType.choices,
+        default=MeetingType.INPERSON,
+        blank=False,
+    )
+
     class ClubType(models.TextChoices):
         PRIVATE =  "Private"
         PUBLIC =  "Public"
 
     club_type = models.CharField(
-        max_length = 7,
-        choices = ClubType.choices, 
+        max_length=7,
+        choices=ClubType.choices, 
         default=ClubType.PUBLIC, 
         blank = False
     )
@@ -164,17 +175,6 @@ class Club(models.Model):
         blank=True
     )
 
-    class MeetingType(models.TextChoices):
-        INPERSON = "IP", "In-person"
-        ONLINE = "OL", "Online"
-
-    meeting_type = models.CharField(
-        max_length=2,
-        choices=MeetingType.choices,
-        default=MeetingType.INPERSON,
-        blank=False,
-    )
-
     city = models.CharField(
         max_length=50,
         blank=True
@@ -184,6 +184,7 @@ class Club(models.Model):
         max_length=50,
         blank=True
     )
+
     class Meta:
         ordering = ['name']
 
@@ -211,9 +212,6 @@ class Club(models.Model):
     def is_applicant(self, user):
         """ checks if the user is a member"""
         return self.applicants.all().filter(id=user.id).exists()
-    
-    def get_club_type_display(self):
-        return self.club_type
 
 class Book(models.Model):
     """Book model."""
@@ -296,6 +294,7 @@ class Book(models.Model):
         else: 
             return 0.0
             
+
 class Rating(models.Model):
     """rating model."""
 
@@ -330,6 +329,7 @@ class Rating(models.Model):
     class Meta:
         unique_together = ['user', 'book']
  
+
 class Meeting(models.Model):
     """ The meeting model."""
 
@@ -345,10 +345,20 @@ class Meeting(models.Model):
         related_name='meetings'
     )
 
+    chooser = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='rotations',
+        blank=True, 
+        null=True
+    )
+
     book = models.ForeignKey(
         Book, 
         on_delete=models.CASCADE,
-        related_name='meetings'
+        related_name='meetings',
+        blank=True, 
+        null=True
     )
 
     time = models.DateTimeField(
@@ -357,16 +367,35 @@ class Meeting(models.Model):
         null =False
     )
 
-    link = models.URLField(
-        max_length=1000,
-        blank=False
-    )
-
     notes = models.CharField(
         max_length=500,
         blank=True
     )
-    
+
+    link = models.URLField(
+        max_length=1000,
+        blank=True
+    )
+
+    def assign_chooser(self):
+        members = self.club.members
+        meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
+        id = meeting_ind%members.count()
+        mem = members.all()[id]
+        self.chooser = mem
+        Meeting.objects.filter(id = self.id).update(chooser=mem)
+
+    def assign_book(self, book_in=None):
+        if not book_in:
+            read_books = self.club.books.all()
+            book_in = Book.objects.all().exclude(id__in = read_books).order_by("?")[0]
+        else:
+            book_in.add_club(self.club)
+        
+        self.book = book_in
+        Meeting.objects.filter(id = self.id).update(book=book_in)
+
+
 ACTOR_CHOICES = (
     ('U', 'User'),
     ('C', 'Club'),
@@ -379,8 +408,6 @@ ACTION_CHOICES = (
     ('U', 'Action_User')
 )
 
-
-
 class Event(models.Model):
     """Events by users or clubs."""
 
@@ -391,7 +418,7 @@ class Event(models.Model):
     type_of_action = models.CharField(max_length=1, choices=ACTION_CHOICES)
 
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
-    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE , related_name='events')
     meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
@@ -444,12 +471,13 @@ class Event(models.Model):
         return super(Event, self).save(**kwargs)
 
     class EventType(models.TextChoices):
-        JOIN = "joined"
-        WITHDRAW = "withdrew from"
-        FOLLOW =  "followed"
-        CREATE = "created"
-        REVIEW = "reviewed"
-        ADD = "added"
+        JOIN = " joined "
+        WITHDRAW = " withdrew from "
+        FOLLOW =  " followed "
+        CREATE = " created "
+        REVIEW = " reviewed "
+        ADD = " added "
+        SCHEDULE = " scheduled a meeting about "
         
     def get_actor(self):
         """Return the actor of a given event."""
@@ -470,4 +498,6 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
+    
+  
 

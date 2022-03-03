@@ -27,10 +27,9 @@ SECRET_KEY = 'django-insecure-y#z@-9$x!xugmhek!htjp(ahb0q=4dbtj0#9nrbxrv3cew!bsz
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'testserver']
 
 # ATTENTION!! this will be commented until the deployment. and the above segmented will be uncommented instead.
-# ALLOWED_HOSTS = ['localhost', ]
 # DEBUG = False
 
 # Application definition
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.humanize',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bookclub',
@@ -154,7 +154,7 @@ MESSAGE_TAGS = {
 }
 
 # Page lengths
-BOOKS_PER_PAGE = 99
+BOOKS_PER_PAGE = 48
 CLUBS_PER_PAGE = 99
 MEMBERS_PER_PAGE = 50
 

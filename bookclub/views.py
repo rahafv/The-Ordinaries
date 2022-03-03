@@ -1,14 +1,15 @@
+from datetime import datetime, timedelta
+from imaplib import _Authenticator
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, login_prohibited, generate_token, create_event
+from .helpers import delete_event, login_prohibited, generate_token, create_event, MeetingHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import User, Club, Book , Rating, Event, ACTION_CHOICES, ACTOR_CHOICES
-from django.contrib.auth.hashers import check_password
+from .models import Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -19,6 +20,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail 
 from system import settings
+from threading import Timer
 from django.core.paginator import Paginator
 
 @login_prohibited
@@ -27,7 +29,32 @@ def welcome(request):
 
 @login_required
 def home(request):
-     return render(request, 'home.html')
+    def events_created_at(event):
+        return event.created_at
+
+    current_user = request.user
+    authors = list(current_user.followees.all()) + [current_user]
+    clubs = list(User.objects.get(id=current_user.id).clubs.all())
+    user_events  = [] 
+    club_events = []
+    for author in authors:
+        user_events += list(Event.objects.filter(user=author))
+    final_user_events = user_events
+    final_user_events.sort(reverse = True , key = events_created_at)
+    first_twentyFive = final_user_events[0:25]
+ 
+    for club in clubs:
+        club_events += list(Event.objects.filter(club=club))
+
+    final_club_events = club_events
+    final_club_events.sort(reverse = True , key = events_created_at)
+    first_ten = final_club_events[0:10]
+
+    club_events_length = len(first_ten)
+  
+
+    return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
+   
 
 @login_prohibited
 def sign_up(request):
@@ -49,7 +76,7 @@ def send_activiation_email(request, user_id):
     if not user.email_verified:
         current_site = get_current_site(request)
         subject = 'Activate your account'
-        body = render_to_string('activate.html', {
+        body = render_to_string('emails/activate.html', {
             'user': user,
             'domain': current_site,
             'uid':urlsafe_base64_encode(force_bytes(user.pk)),
@@ -154,7 +181,7 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
-            create_event('U', 'C', Event.EventType.CREATE, club_owner, club)
+            create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=club)
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
@@ -175,7 +202,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, review_user, book=reviewed_book)
+            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
             return redirect('book_details', book_id=reviewed_book.id)
 
@@ -188,7 +215,7 @@ def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     is_applicant = club.is_applicant(current_user)
-    return render(request, 'club_page.html', {'club': club, 'meeting_type': club.get_meeting_type_display(),'club_type': club.get_club_type_display(), 'is_member': is_member, 'is_applicant': is_applicant})
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant})
 
 
 @login_required
@@ -266,8 +293,7 @@ def join_club(request, club_id):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page', club_id)
 
-
-    if(club.get_club_type_display() == "Private"):
+    if(club.club_type == "Private"):
         if not club.is_applicant(user):
             club.applicants.add(user)
             messages.add_message(request, messages.SUCCESS, "You have successfully applied!")
@@ -278,6 +304,7 @@ def join_club(request, club_id):
 
     club.members.add(user)
     create_event('U', 'C', Event.EventType.JOIN, user, club)
+    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -295,8 +322,8 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    delete_event('U', 'C', Event.EventType.JOIN, user, club)
-    create_event('U', 'C', Event.EventType.WITHDRAW, user, club)
+    delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
+    create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -371,7 +398,6 @@ def followers_list(request, user_id):
     follow_list = follow_pg.get_page(page_number)
     return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
     
-
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
@@ -392,7 +418,7 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        create_event('U', 'C', Event.EventType.JOIN, applicant, club)
+        create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         return redirect('applicants_list', club_id)
     else:
@@ -434,6 +460,93 @@ def edit_club_information(request, club_id):
     return render(request, 'edit_club_info.html', context)
 
 @login_required
+def schedule_meeting(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    if request.user == club.owner:
+        if club.members.count() > 1:
+            if request.method == 'POST':
+                form = MeetingForm(club, request.POST)
+
+                if form.is_valid():
+                    meeting = form.save()
+                    
+                    """send email invites"""
+                    MeetingHelper().send_email(request=request, 
+                        meeting=meeting, 
+                        subject='A New Meeting Has Been Scheduled', 
+                        letter='emails/meeting_invite.html', 
+                        all_mem=True
+                    )
+
+                    if meeting.chooser:
+                        """send email to member who has to choose a book"""
+                        MeetingHelper().send_email(request=request, 
+                            meeting=meeting, 
+                            subject='It Is Your Turn!', 
+                            letter='emails/chooser_reminder.html', 
+                            all_mem=False
+                        )
+                        deadline = timedelta(7).total_seconds() #0.00069444
+                        Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
+
+                    create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
+                    messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
+                    return redirect('club_page', club_id=club.id)
+            else:
+                form = MeetingForm(club)
+            return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
+        else:
+            messages.add_message(request, messages.ERROR, "There are no members!")
+            return redirect('club_page', club_id=club.id)
+    else:
+        return render(request, '404_page.html', status=404) 
+
+@login_required 
+def choice_book_list(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if request.user == meeting.chooser and not meeting.book:
+        read_books = meeting.club.books.all()
+        my_books =  Book.objects.all().exclude(id__in = read_books)
+        sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
+        return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
+    else:
+        return render(request, '404_page.html', status=404) 
+
+@login_required
+def search_book(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if request.method == 'GET' and request.user == meeting.chooser and not meeting.book:
+        searched = request.GET.get('searched', '')
+        books = Book.objects.filter(title__contains=searched)
+
+        pg = Paginator(books, settings.BOOKS_PER_PAGE)
+        page_number = request.GET.get('page')
+        books = pg.get_page(page_number)
+        return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'meeting_id':meeting_id})
+    else: 
+        return redirect('choice_book_list', meeting_id=meeting_id)
+
+@login_required
+def choose_book(request, book_id, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    if request.user == meeting.chooser and not meeting.book:
+        book = get_object_or_404(Book.objects, id=book_id)
+        meeting.assign_book(book)
+
+        """send email to member who has to choose a book"""
+        MeetingHelper().send_email(request=request, 
+            meeting=meeting, 
+            subject='A book has be chosen', 
+            letter='emails/book_confirmation.html', 
+            all_mem=True
+        )
+
+        messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
+        return redirect('club_page', club_id=meeting.club.id)
+    else:
+        return render(request, '404_page.html', status=404) 
+        
+@login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
@@ -442,7 +555,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
-        create_event('U', 'B', Event.EventType.ADD, user, book=book)
+        create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return redirect("book_details", book.id)
 
@@ -474,9 +587,9 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     else:
-        delete_event('U', 'AU', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return redirect('profile', followee.id)
 
@@ -544,5 +657,6 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
+
 
 

@@ -1,0 +1,55 @@
+{% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+{% block title %}Trending Now ..{% endblock %}
+{% block content %}
+
+<h1 class="fw-light center mt-5" style="text-align:center;">Choose a book</h1>
+<div class="row">
+    <div class="col-3"></div>
+    <div class="col-6 mt-3">
+        <form class="d-flex" method=GET action="{% url 'search_book' meeting_id %}">
+            {% csrf_token %}
+            <input class="fw-light center form-control" type="search" placeholder="looking for a specific book?" aria-label="Search" name="searched"> 
+            &emsp;
+            <button class="btn btn-outline-dark bi bi-search" type="submit" style="color: dark-grey;"></button>
+        </form>
+    </div>
+    <div class="col-3"></div>
+</div>
+
+{% if searched %}
+     {% if books %}
+        <div class="container">
+            <div class="row">
+                {% for book in books %}
+                    <div class="col-sm-6 col-md-3">
+                        {% include 'partials/book_card.html' with book=book %}
+                        <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <ul class="pagination justify-content-center">
+            {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
+        </ul>
+     {%else %}
+         <h2> no such information!</h2>
+     {% endif %}
+{%else %}
+    {% if rec_books%}
+        <div class="container">
+            <div class="row">
+                {% for book in rec_books %}
+                <div class="col-sm-6 col-md-3">
+                    {% include 'partials/book_card.html' with book=book %}
+                    <a href={% url "choose_book" book_id=book.id meeting_id=meeting_id %} class="btn btn-outline-dark bi bi-check-lg" style="margin-left:6em"  role="button" > Choose </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <h2 class="mt-5" style="text-align: center"> You forgot to search!</h2>
+    {% endif %}
+{% endif %}
+{% endblock %}
+
