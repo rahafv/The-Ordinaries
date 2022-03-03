@@ -43,7 +43,6 @@ class Command(BaseCommand):
         self.create_clubs()
         self.clubs = Club.objects.all()
         self.populate_clubs()
-        self.create_meetings()
         end = time.time()
         print("club: ", end - start)
 
@@ -166,20 +165,21 @@ class Command(BaseCommand):
 
             club.members.add(club.owner)
             create_event('U', 'C', Event.EventType.CREATE, user=club.owner, club=club)
+            
+            self.create_meeting(club, club.owner)
 
-    def create_meetings(self):
-        for club in self.clubs:
-            meeting = Meeting.objects.create(
-                title = 'Meeting 1',
-                club = club,
-                chooser = club.owner,
-                book = Book.objects.first(),
-                time = pytz.utc.localize(datetime.today()+timedelta(15)),
-                link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
+    def create_meeting(self, club, chooser):
+        meeting = Meeting.objects.create(
+            title = 'Meeting 1',
+            club = club,
+            chooser = chooser,
+            book = Book.objects.first(),
+            time = pytz.utc.localize(datetime.today()+timedelta(15)),
+            link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
 
-            )
+        )
 
-            create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
+        create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
 
     def create_books(self):
         MAX_BOOKS = 1000
