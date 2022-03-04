@@ -13,7 +13,23 @@
           "country": "usa",
           "created_at": "2020-08-18T02:23:49Z"
         }
-    }
+    }, 
+
+  {
+    "model": "bookclub.club",
+    "pk": 3,
+    "fields": {
+        "name": "club3",
+        "owner": 3,
+        "members": [],
+        "theme": "Fiction",
+        "meeting_type": "In-person", 
+        "club_type": "Private", 
+        "city": "nyc",
+        "country": "usa",
+        "created_at": "2020-08-20T02:23:49Z"
+      }
+  }
 ]
 
   

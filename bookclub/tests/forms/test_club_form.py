@@ -65,7 +65,7 @@ class ClubFormTestCase(TestCase):
         self.assertEqual(members_after_count, members_before_count)
         self.assertEqual(self.club.name, 'club2')
         self.assertEqual(self.club.theme, 'Drama')
-        self.assertEqual(self.club.meeting_type,Club.MeetingType.INPERSON )
+        self.assertEqual(self.club.meeting_type, Club.MeetingType.INPERSON)
         self.assertEqual(self.club.club_type, Club.ClubType.PUBLIC)
         self.assertEqual(self.club.city, "New York")
         self.assertEqual(self.club.country, "USA")

@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ["name", "theme", "owner", "meeting_type", "club_type"]
+    list_display = ["name", "theme", "owner"]
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -22,7 +22,7 @@ class RatingAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ["title", "club", "book", "time", "link", "notes"]
+    list_display = ["title", "club", "book", "time", "notes"]
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):

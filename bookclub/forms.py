@@ -1,14 +1,16 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
 from random import choices
 from tkinter import Widget
 from tkinter.tix import Select
+import random
 from typing import Any
 from typing_extensions import Required, Self
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Club, Book, Rating
+import pytz
+from .models import User, Club, Book, Rating, Meeting
 from django.contrib.auth import authenticate
 
 class SignUpForm(forms.ModelForm):
@@ -22,10 +24,10 @@ class SignUpForm(forms.ModelForm):
         widgets = { 'bio': forms.Textarea() }
 
 
-    DOB = forms.DateField(initial= None, 
+    DOB = forms.DateField(initial= None,
         label = 'Date of Birth',
         widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= False, 
+        required= False,
     )
 
     new_password = forms.CharField(
@@ -45,7 +47,7 @@ class SignUpForm(forms.ModelForm):
         super().clean()
 
         self.DOB = self.cleaned_data.get('DOB')
-        
+
         if not self.check_age(self.DOB):
             self.add_error('DOB', 'Please enter a valid date')
 
@@ -66,7 +68,7 @@ class SignUpForm(forms.ModelForm):
         try:
             today = date.today()
             age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-            return age 
+            return age
         except:
             age = None
 
@@ -94,18 +96,18 @@ class LogInForm(forms.Form):
 
 class CreateClubForm(forms.ModelForm):
     """Form to create or update club information."""
-    
+
     class Meta:
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme','club_type', 'meeting_type', 'city', 'country']
+        fields = ['name', 'theme', 'meeting_type', 'club_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
         labels = {'club_type': "Select Club Privacy Status"}
 
 class NewPasswordMixin(forms.Form):
     """Form mixing for new_password and password_confirmation fields."""
-    
+
     password = forms.CharField(label='Current password', widget=forms.PasswordInput())
     new_password = forms.CharField(
         label='Password',
@@ -117,7 +119,7 @@ class NewPasswordMixin(forms.Form):
             )]
     )
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
-    
+
     def clean(self):
         """Form mixing for new_password and password_confirmation fields."""
 
@@ -137,7 +139,7 @@ class PasswordForm(NewPasswordMixin):
 
     def __init__(self, user=None, **kwargs):
         """Construct new form instance with a user instance."""
-        
+
         super().__init__(**kwargs)
         self.user = user
 
@@ -162,23 +164,23 @@ class PasswordForm(NewPasswordMixin):
             self.user.save()
         return self.user
 
-class BookForm(forms.ModelForm): 
+class BookForm(forms.ModelForm):
     """Form enabling a user to create a book."""
 
     class Meta:
         """Form options."""
         model = Book
         fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
-        
-    def clean(self): 
+
+    def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
         if self.oldISBN:
             self.ISBN = self.oldISBN.replace('-', '').replace(' ', '')
-            if Book.objects.filter(ISBN=self.ISBN).exists(): 
+            if Book.objects.filter(ISBN=self.ISBN).exists():
                 self.add_error('ISBN', 'ISNB already exists')
 
     def save(self):
-        """Create a new user."""
+        """Create a new book."""
 
         super().save(commit=False)
 
@@ -199,18 +201,18 @@ class BookForm(forms.ModelForm):
 
 class UserForm(forms.ModelForm):
     """Form to update user profile."""
-    
+
     class Meta:
         """Form options."""
 
         model = User
         fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
-        widgets = { 'bio': forms.Textarea()} 
+        widgets = { 'bio': forms.Textarea()}
 
-    date_of_birth = forms.DateField(initial= None, 
+    date_of_birth = forms.DateField(initial= None,
         label = 'Date of Birth',
         widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= True, 
+        required= True,
     )
 
     def __init__(self, *args, **kwargs):
@@ -218,7 +220,7 @@ class UserForm(forms.ModelForm):
 
         self.log_in_user = kwargs.pop('user',None)
         super(UserForm, self).__init__(*args, **kwargs)
-            
+
 
 
     def clean(self):
@@ -227,7 +229,7 @@ class UserForm(forms.ModelForm):
         super().clean()
 
         self.date_of_birth = self.cleaned_data.get('date_of_birth')
-        
+
         if not self.check_age(self.date_of_birth):
             self.add_error('date_of_birth', 'Please enter a valid date')
 
@@ -238,55 +240,55 @@ class UserForm(forms.ModelForm):
             return self.calculate_age(date_of_birth) < 100 and self.calculate_age(date_of_birth) > 10
         except:
             return True
-    
+
     def calculate_age(self, dob):
         """Calculate the age from the given date input."""
         today = date.today()
         one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
         year_difference = today.year - dob.year
         age = year_difference - one_or_zero
-        
+
         return age
 
     def save(self):
         """Save user."""
-        super().save(commit=False) 
+        super().save(commit=False)
         birthdate= self.cleaned_data.get('date_of_birth')
-        new_age = self.calculate_age(birthdate)  
+        new_age = self.calculate_age(birthdate)
         self.log_in_user.set_age(new_age)
         return self.log_in_user
-      
+
 
 class ClubForm(forms.ModelForm):
     """Form to update club information."""
-    
+
     class Meta:
         """Form options."""
 
         model = Club
-        fields = ['name', 'theme','meeting_type', 'club_type','city','country']
+        fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
         labels = {'club_type': "Club Privacy Setting:"}
         exclude = ['owner']
 
 class EditRatingForm(forms.ModelForm):
     """Form to update club information."""
-    
+
     class Meta:
-        
+
         model = Rating
         fields = ['rating', 'review']
         widgets = {
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
-    
-    def calculate_rating(self, rating): 
+
+    def calculate_rating(self, rating):
         return rating*2
 
     def save(self , reviwer, reviewedBook):
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
-            rate = 0 
+            rate = 0
         review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
             rating=self.calculate_rating(rate),
             review=self.cleaned_data.get('review'),
@@ -296,24 +298,25 @@ class EditRatingForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
+    
     class Meta:
-        
+
         model = Rating
         fields = ['rating', 'review']
         widgets = {
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
-        
+
     def save(self, reviwer, reviewedBook):
-        """Create a new user."""
+        """Create a new rating."""
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
-            rate = 0 
+            rate = 0
         review = Rating.objects.create(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
+            rating = self.calculate_rating(rate),
+            review = self.cleaned_data.get('review'),
             book = reviewedBook,
             user = reviwer,
         )
@@ -367,3 +370,90 @@ class NameAndDateSortForm(forms.Form):
     
    
      
+class MeetingForm(forms.ModelForm):
+    """Form to update club information."""
+
+    class Meta:
+        """Form options."""
+
+        model = Meeting
+        fields = ['title', 'time', 'notes', 'link']
+        widgets = {
+            'time': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'notes': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+        exclude = ['club', 'book', 'member']
+
+    cont = forms.BooleanField(
+        label = "This meeting a continuation of a previous discussion",
+        required = False,
+        help_text = "checkbox",
+        label_suffix=""
+    )
+
+    def __init__(self, club, *args, **kwargs):
+        self.club = club
+        super(MeetingForm, self).__init__(*args, **kwargs)
+        
+    def clean(self):
+        super().clean()
+        if not self.cleaned_data.get('link'):
+            if self.club.meeting_type == Club.MeetingType.ONLINE:
+                self.add_error('link', "Provide a link to the meeting.")
+            else:
+                self.add_error('link', "Provide a link to the meeting location.")
+
+        is_cont = self.cleaned_data.get('cont')
+        if is_cont and self.club.meetings.count() == 0:
+            self.add_error('cont', "There are no previous meetings.")
+
+        time = self.cleaned_data.get('time')
+        self.check_date(time, is_cont)
+        self.check_meetings(time, is_cont)
+
+        return self.cleaned_data
+
+    def check_date(self, time, is_cont):
+        """Validate the time and check if it is appropriate."""
+        today = datetime.today()
+        start_week = today + timedelta(13)
+        try:
+            if not is_cont and time < pytz.utc.localize(start_week):
+                self.add_error('time', 'Date should be at least 2 weeks from today.')
+            else:
+                if time.day == today.day and time.month == today.month and time.year == today.year:
+                    self.add_error('time', 'Date cannot be today.')
+        except:
+            pass
+
+    def check_meetings(self, time, is_cont):
+        """Check if there are meetings in the same period."""
+        try:
+            meetings = Meeting.objects.filter(club_id=self.club.id)
+            if not is_cont:
+                for met in meetings:
+                    if met.time+timedelta(30) > time:
+                        self.add_error('time', 'Meetings should be at least a month apart.')
+                        break
+            else:
+                for met in meetings:
+                    if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
+                        self.add_error('time', 'There is a meeting on that day.')
+                        break
+        except:
+            pass
+
+    def save(self):
+        """Create a new meeting."""
+        super().save(commit=False)
+        meeting = Meeting.objects.create(
+            title = self.cleaned_data.get('title'),
+            club = self.club,
+            time = self.cleaned_data.get('time'),
+            notes = self.cleaned_data.get('notes'),
+            link = self.cleaned_data.get('link'),
+        )
+        if not self.cleaned_data.get('cont'):
+            meeting.assign_chooser()
+        return meeting
+        

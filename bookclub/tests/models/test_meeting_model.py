@@ -1,7 +1,7 @@
 """Unit tests for the Meeting model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Book, Club, Meeting
+from bookclub.models import Book, Meeting
 from datetime import datetime
 
 
@@ -19,8 +19,9 @@ class MeetingModelTestCase(TestCase):
     
     def setUp(self):
         self.meeting = Meeting.objects.get(id=1)
+        self.sec_meeting = Meeting.objects.get(id=4)
+        self.book = Book.objects.get(id=1)
     
-
     def test_valid_meeting(self):
         self._assert_meeting_is_valid()
 
@@ -57,6 +58,18 @@ class MeetingModelTestCase(TestCase):
         self.meeting.time = datetime.now()
         self._assert_meeting_is_valid()
 
+    def test_assign_chooser(self):
+        self.sec_meeting.assign_chooser()
+        self._assert_meeting_is_valid()
+
+    def test_assign_book(self):
+        self.sec_meeting.assign_book()
+        self._assert_meeting_is_valid()
+
+    def test_assign_book_with_input(self):
+        self.sec_meeting.assign_book(self.book)
+        self._assert_meeting_is_valid()
+        
     def _assert_meeting_is_valid(self):
         try:
             self.meeting.full_clean()
