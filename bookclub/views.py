@@ -593,20 +593,21 @@ def search_page(request):
 
 @login_required
 def show_sorted(request, searched, label):
-    if request.method=="GET":
-
+    if request.method == "GET":
         search_page_results = get_list_of_objects(searched=searched, label=label)
         category = search_page_results["category"]
         filtered_list = search_page_results["filtered_list"]
-
+        
         sortForm = ""
         if(category == "Clubs" or category == "Books"):
             sortForm = NameAndDateSortForm(request.GET or None)
         else:
             sortForm = UserSortForm(request.GET or None)
 
+        sort = ""
         if (sortForm.is_valid()):
             sort = sortForm.cleaned_data.get('sort')
+
             if(category == "Clubs"):
                 filtered_list = sort_clubs(sort, filtered_list)
             elif(category == "Books"):
@@ -618,6 +619,10 @@ def show_sorted(request, searched, label):
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
         return render(request, 'search_page.html', {'searched':searched,'label': label,  'category':category, 'form':sortForm, "filtered_list":filtered_list})
+
+    else:
+            return render(request, 'search_page.html', {})
+    
 
 
 @login_required

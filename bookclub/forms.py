@@ -359,7 +359,7 @@ class NameAndDateSortForm(forms.Form):
       required = False,
       choices=SORT_CHOICES,
       label='Sort by:',
-      initial = DESC_DATE,
+      initial = ASC_NAME,
       widget=forms.Select(),
     )
 

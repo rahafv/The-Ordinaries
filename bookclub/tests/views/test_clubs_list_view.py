@@ -2,10 +2,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.forms import NameAndDateSortForm
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 from system import settings
 
-class ClubsListTest(TestCase, LoginRedirectTester ,MenueTestMixin ):
+class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',

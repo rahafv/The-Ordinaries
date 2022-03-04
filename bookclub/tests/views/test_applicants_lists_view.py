@@ -2,9 +2,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.forms import UserSortForm
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
 
     fixtures=[
         'bookclub/tests/fixtures/other_club.json',

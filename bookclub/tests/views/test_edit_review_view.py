@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import EditRatingForm
 from bookclub.models import Rating
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the edit review view."""
 
     fixtures = [
