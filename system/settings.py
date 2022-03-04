@@ -155,8 +155,8 @@ MESSAGE_TAGS = {
 }
 
 # Page lengths
-BOOKS_PER_PAGE = 99
-CLUBS_PER_PAGE = 99
+BOOKS_PER_PAGE = 51
+CLUBS_PER_PAGE = 51
 MEMBERS_PER_PAGE = 50
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -5,16 +5,23 @@
 {% block content %}
 
 
-<h1 class="fw-light center" style="text-align: center; background-color:#74a5b4;">Clubs</h1>
+<h1 class="fw-light center" style="text-align: center; background-color:#64505a;">Clubs</h1>
 <div class="carousel-inner" style="top: -8px;">
   <div class="carousel-item active">
-    <img class="bd-placeholder-img" width="1400" height="600"  aria-hidden="true" focusable="false"> <rect width="100%" height="100%" fill="#5d486e"/> 
-    <image src="{% static '/images/clubs_page.png' %}" width="1400" height="620"  style = "position:relative; left:0px; bottom:30px;" /> </img>
-    <div class="container row py-lg-1" style = "position:relative; right:90px; bottom:180px;">
+    
+
+    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <rect width="100%" height="100%" fill="#faf3ee"/>
+      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
+
+    </svg>
+
+    
+    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
       <div class="carousel-caption">
           <div class="col-sm-6 col-md-3 col-lg-4">
-            <h1 style="color: #000000" class="fw-light center">Create Your Own Community!</h1>
-            <p><a class="btn btn-lg btn-outline-dark mt-2" href='{% url 'add_book' %}'>Create Club</a></p>
+            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
+            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
           </div>
       </div>
     </div>
@@ -23,7 +30,8 @@
 
 
 
-<div class="row py-lg-3">
+
+<div class="row mt-5">
     <div class="col mx-auto">
       
     </div>
@@ -32,7 +40,7 @@
   <div class="row">
     {% for club in clubs %}
       <div class="col-sm-6 col-md-3 col-lg-4">    
-        <img class="card-img" src="{% static '/images/2.png' %}" alt="Avatar" style="width:180px">
+        <img class="card-img" src="{% static '/images/3.png' %}" alt="Avatar" style="width:180px">
           <h2>{{club.name}}</h2>
           <p>{{club.theme}}</p>
           <p><a class="btn btn-outline-dark" href='{% url 'club_page' club.id %}'>View &raquo;</a></p>
@@ -44,13 +52,6 @@
       {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
     </ul>
   </div>
-</div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div class="row py-lg-5">
 </div>
 {% endblock %}
 
