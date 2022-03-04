@@ -394,9 +394,8 @@ class Meeting(models.Model):
         if not book_in:
             read_books = self.club.books.all()
             book_in = Book.objects.all().exclude(id__in = read_books).order_by("?")[0]
-        else:
-            book_in.add_club(self.club)
-        
+            
+        book_in.add_club(self.club)
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
