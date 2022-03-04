@@ -293,7 +293,7 @@ def join_club(request, club_id):
         messages.add_message(request, messages.ERROR, "Already a member of this club!")
         return redirect('club_page', club_id)
 
-    if(club.club_type == "Private"):
+    if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
             messages.add_message(request, messages.SUCCESS, "You have successfully applied!")

@@ -80,7 +80,32 @@
               <div class="card-body">
                 <div class="mb-3 pb-0">
                   {% if not user == club.owner and not is_member and not is_applicant%}
-                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button">Join club</a> 
+                  {% if user.city == club.city %}
+
+                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button" >Join club</a> 
+
+                  {% else %}
+                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal" >Join club</a> 
+
+                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Join {{club.name}}</h5>
+                        </div>
+                        <div class="modal-body text-muted">
+                          <small>This club is in a different City!</small>
+                        </div>
+                        <div class="modal-footer">
+                          <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-sm btn-outline-dark">Ok</a>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                 
+                  {% endif %}
+                 
                   {% elif is_applicant and not is_member %}
                   <b>Awaiting approval!</b>
                   {% endif %}
