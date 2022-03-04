@@ -25,7 +25,7 @@ class ClubModelTestCase(TestCase):
             self.club.full_clean()
 
     def test_club_created(self):
-        self.assertEqual(2, Club.objects.count())
+        self.assertEqual(3, Club.objects.count())
 
     def test_valid_club(self):
         self._assert_club_is_valid()
@@ -72,13 +72,11 @@ class ClubModelTestCase(TestCase):
 
     def test_club_meeting_type(self):
         self.club.meeting_type = self.club.MeetingType.INPERSON
-        self.assertEqual(self.club.meeting_type, "IP")
-        self.assertEqual(self.club.get_meeting_type_display(), "In-person")
+        self.assertEqual(self.club.meeting_type, "In-person")
 
     def test_club_type(self):
         self.club.club_type = self.club.ClubType.PUBLIC
         self.assertEqual(self.club.club_type, "Public")
-        self.assertEqual(self.club.get_club_type_display(), "Public")
     
     def test_city_may_be_blank(self):
         self.club.city = ''
@@ -121,5 +119,15 @@ class ClubModelTestCase(TestCase):
         self.club.add_member(nonMember)
         self.assertEqual(self.club.member_count(), count+1)
 
+    def test_change_ownership(self):
+        otherMember = self.club.members.get(id=3)
+        self.club.make_owner(otherMember)
+        self.assertEqual(self.club.owner, otherMember)
 
 
+    def test_member_addition_when_user_is_already_a_member(self):
+        nonMember = User.objects.get(id=4)
+        self.club.add_member(nonMember)
+        count = self.club.member_count()
+        self.club.add_member(nonMember)
+        self.assertEqual(self.club.member_count(), count)
