@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper,  sort_users, sort_books, sort_clubs
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -236,7 +236,7 @@ def book_details(request, book_id) :
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
     user = request.user
-    check_reader = book.is_reader(user);
+    check_reader = book.is_reader(user)
     reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
@@ -346,7 +346,8 @@ def books_list(request, club_id=None, user_id=None):
 
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
-        books_queryset = sort_books(sort, books_queryset)
+        sort_helper = SortHelper(sort, books_queryset)
+        books_queryset = sort_helper.sort_books()
 
     count = books_queryset.count()
     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
@@ -367,7 +368,8 @@ def clubs_list(request, user_id=None):
 
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
-        clubs_queryset = sort_clubs(sort, clubs_queryset)
+        sort_helper = SortHelper(sort, clubs_queryset)
+        clubs_queryset = sort_helper.sort_clubs()
 
     count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
@@ -386,7 +388,8 @@ def members_list(request, club_id):
     sort = ""
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
-        members_queryset = sort_users(sort, members_queryset)
+        sort_helper = SortHelper(sort, members_queryset)
+        members_queryset = sort_helper.sort_users()
 
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
@@ -436,7 +439,8 @@ def applicants_list(request, club_id):
         if form.is_valid():
             #get the value to sort by from the valid form 
             sort = form.cleaned_data.get('sort')
-            applicants_queryset = sort_users(sort,  applicants_queryset)
+            sort_helper = SortHelper(sort, applicants_queryset)
+            applicants_queryset = sort_helper.sort_users()
 
         applicants_pg = Paginator(applicants_queryset, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
@@ -693,13 +697,14 @@ def show_sorted(request, searched, label):
         sort = ""
         if (sortForm.is_valid()):
             sort = sortForm.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, filtered_list)
 
             if(category == "Clubs"):
-                filtered_list = sort_clubs(sort, filtered_list)
+                filtered_list = sort_helper.sort_clubs()
             elif(category == "Books"):
-                filtered_list = sort_books(sort, filtered_list)
+                filtered_list = sort_helper.sort_books()
             else:
-                filtered_list = sort_users(sort, filtered_list)
+                filtered_list = sort_helper.sort_users()
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')

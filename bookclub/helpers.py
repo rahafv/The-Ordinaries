@@ -77,33 +77,39 @@ class TokenGenerator(PasswordResetTokenGenerator):
 generate_token = TokenGenerator()
 
 
-def sort_users(sort_value, list_of_users):
-    if(sort_value == 'name_desc'):
-            return list_of_users.reverse()
-    else:
-        return list_of_users
+class SortHelper:
 
-def sort_books(sort, list_of_books):
-    if(sort == 'name_asc'):
-        return list_of_books.order_by(Lower('title').asc())
-    elif (sort == 'name_desc'):
-        return list_of_books.order_by(Lower('title').desc())
-    elif(sort == "date_asc"):
-        return list_of_books.order_by('year')
-    else:
-        return list_of_books.order_by(Lower('year').desc())
+    def __init__(self, sort_value, list_of_filtered_objects):
+        self.sort = sort_value
+        self.list_of_objects = list_of_filtered_objects
 
-def sort_clubs(sort, list_of_clubs):
-    if(sort == 'name_asc'):
-        return list_of_clubs.order_by(Lower('name').asc())
-    elif (sort == 'name_desc'):
-        return list_of_clubs.order_by(Lower('name').desc())
-    elif(sort == "date_asc"):
-        return list_of_clubs.order_by('created_at')
-    else:
-        return list_of_clubs.order_by('-created_at')
+    def sort_users(self):
+        if(self.sort == 'name_desc'):
+            return self.list_of_objects.reverse()
+        else:
+            return self.list_of_objects
 
- 
+    def sort_books(self):
+        if(self.sort == 'name_asc'):
+            return self.list_of_objects.order_by(Lower('title').asc())
+        elif (self.sort == 'name_desc'):
+            return self.list_of_objects.order_by(Lower('title').desc())
+        elif(self.sort == "date_asc"):
+            return self.list_of_objects.order_by('year')
+        else:
+            return self.list_of_objects.order_by(Lower('year').desc())
+
+    def sort_clubs(self):
+        if(self.sort == 'name_asc'):
+            return self.list_of_objects.order_by(Lower('name').asc())
+        elif (self.sort == 'name_desc'):
+            return self.list_of_objects.order_by(Lower('name').desc())
+        elif(self.sort == "date_asc"):
+            return self.list_of_objects.order_by('created_at')
+        else:
+            return self.list_of_objects.order_by('-created_at')
+
+
 def get_list_of_objects(searched, label):
 
     category = ''
