@@ -27,10 +27,10 @@
                                 <span class = "profile-statistics-item">{{user.age}}</span>
                             {% endif %}
 
-                        {% if user.city and user.country and user.region %}
-                            <span class="profile-statistics">Location:</span>
-                            <span class = "profile-statistics-item">{{user.location}}</span>
-                        {% endif %}
+                            {% if user.location %}
+                                <span class="profile-statistics">Location:</span>
+                                <span class = "profile-statistics-item">{{user.location}}</span>
+                            {% endif %}
                         </div>
                         <br/>
                         {% if user.bio %}

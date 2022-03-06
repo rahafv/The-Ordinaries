@@ -80,8 +80,13 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def location(self):
-        """Return full location."""
-        return f'{self.city}, {self.region},  {self.country}'
+        checked = [self.city, self.country, self.region]
+        location = []
+        for state in checked:
+            if state is not None:
+                location.append(state)
+
+        return ", ".join(location)
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""

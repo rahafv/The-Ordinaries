@@ -1,10 +1,6 @@
 from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
-from random import choices
-# from tkinter import Widget
-# from tkinter.tix import Select
-import random
 from typing import Any
 from typing_extensions import Required, Self
 from django import forms
