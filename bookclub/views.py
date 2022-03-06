@@ -660,28 +660,6 @@ def search_page(request):
         search_page_results = get_list_of_objects(searched=searched, label=label)
         category = search_page_results["category"]
         filtered_list = search_page_results["filtered_list"]
-
-        # if(category=="user-name"):
-        #     filtered_list = User.objects.filter(username__contains=searched)
-        #     category= "Users"
-        # elif(category=="user-location"):
-        #     filtered_list = User.objects.filter(country__contains=searched)
-        #     category= "Users"
-        # elif(category=="club-name"):
-        #     filtered_list = Club.objects.filter(name__contains=searched)
-        #     category= "Clubs"
-        # elif(category=="club-location"):
-        #     filtered_list = Club.objects.filter(country__contains=searched)
-        #     category= "Clubs"
-        # elif(category=="book-title"):
-        #     filtered_list = Book.objects.filter(title__contains=searched)
-        #     category= "Books"
-        # elif(category=="book-year"):
-        #     filtered_list = Book.objects.filter(year__contains=searched)
-        #     category= "Books"
-        # else:
-        #     filtered_list = Book.objects.filter(author__contains=searched)
-        #     category= "Books"
                         
         sortForm = ""
         if(category == "Clubs" or category == "Books"):
