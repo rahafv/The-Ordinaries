@@ -1,7 +1,6 @@
 from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
-import random
 from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
@@ -321,6 +320,51 @@ class RatingForm(forms.ModelForm):
     def calculate_rating(self, rating): 
         return rating*2
 
+class UserSortForm(forms.Form):
+    
+    ASCENDING = 'name_asc'
+    DESCENDING = 'name_desc'
+
+    SORT_CHOICES = [
+        (ASCENDING, "Name A-Z"),
+        (DESCENDING, "Name Z-A")
+    ]   
+    
+    sort = forms.ChoiceField(
+        required = False,
+        choices = SORT_CHOICES, 
+        initial = ASCENDING, 
+    )
+
+    widgets = {'sort': forms.Select()}       
+   
+   
+class NameAndDateSortForm(forms.Form):
+
+    ASC_DATE = "date_asc"
+    DESC_DATE = "date_desc"
+    ASC_NAME = 'name_asc'
+    DESC_NAME = 'name_desc'
+
+    SORT_CHOICES = [
+        (ASC_NAME, "Name A-Z"),
+        (DESC_NAME, "Name Z-A"),
+        (DESC_DATE, "Latest"),
+        (ASC_DATE, "Older"),
+    ]
+
+    sort = forms.ChoiceField(
+      required = False,
+      choices=SORT_CHOICES,
+      label='Sort by:',
+      initial = ASC_NAME,
+      widget=forms.Select(),
+    )
+
+    
+    
+   
+     
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
 
@@ -336,7 +380,7 @@ class MeetingForm(forms.ModelForm):
         exclude = ['club', 'book', 'member']
 
     cont = forms.BooleanField(
-        label = "This meeting a contiuation of a previous discussion",
+        label = "This meeting a continuation of a previous discussion",
         required = False,
         help_text = "checkbox",
         label_suffix=""

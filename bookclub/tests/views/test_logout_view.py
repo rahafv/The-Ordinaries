@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MessageTester,MenueTestMixin
+from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin
 
 
-class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTester,MenueTestMixin):
+class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Tests of the log out view."""
     
     fixtures = ['bookclub/tests/fixtures/default_user.json']

@@ -3,9 +3,9 @@ from urllib import response
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Event , Club , Book
-from bookclub.tests.helpers import LogInTester, LoginRedirectTester, reverse_with_next , MenueTestMixin
+from bookclub.tests.helpers import LogInTester, LoginRedirectTester, reverse_with_next , MenuTestMixin
 
-class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenueTestMixin):
+class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin):
     """Tests of the Home view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',

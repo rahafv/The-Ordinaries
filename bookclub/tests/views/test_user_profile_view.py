@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester,MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester,MenuTestMixin
 
-class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenueTestMixin):
+class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Tests of the looged in user's profile page view."""
 
     fixtures = [ 'bookclub/tests/fixtures/default_user.json',

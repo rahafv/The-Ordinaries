@@ -49,7 +49,7 @@ class MessageTester:
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0) 
 
-class MenueTestMixin(AssertHTMLMixin):
+class MenuTestMixin(AssertHTMLMixin):
     menu_urls = [
       reverse('password') ,
       reverse('profile') ,
