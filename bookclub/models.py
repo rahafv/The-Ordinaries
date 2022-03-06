@@ -12,7 +12,6 @@ from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 from tempfile import NamedTemporaryFile
-from django.utils import timezone
 
 class User(AbstractUser):
     """User model used for authentication."""

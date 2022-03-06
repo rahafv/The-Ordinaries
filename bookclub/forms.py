@@ -2,7 +2,6 @@ from datetime import date, datetime, timedelta
 from email.policy import default
 from pickle import FALSE
 from typing import Any
-from typing_extensions import Required, Self
 from django import forms
 from django.core.validators import RegexValidator
 import pytz
