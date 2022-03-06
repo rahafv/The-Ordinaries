@@ -22,6 +22,7 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+from django.utils.decorators import method_decorator
 
 @login_prohibited
 def welcome(request):
@@ -109,33 +110,45 @@ def activate_user(request, uidb64, token):
 
     return render(request, 'activate-fail.html', {'user': user})
 
-@login_prohibited
-def log_in(request):
-    if request.method == 'POST':
+class LogInView(FormView):
+    """View that handles log in."""
+
+    http_method_names = ['get', 'post']
+    
+    @method_decorator(login_prohibited)
+    def dispatch(self, request):
+        return super().dispatch(request)
+
+    def get(self, request):
+        """Display log in template."""
+        self.next = request.GET.get('next') or ''
+        return self.render()
+
+    def post(self, request):
+        """Handle log in attempt."""
         form = LogInForm(request.POST)
-        next = request.POST.get('next') or ''
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+        self.next = request.POST.get('next') or ''
+        user = form.get_user()
 
-            if user and not user.email_verified:
-                messages.add_message(request, messages.ERROR,
-                 "Email is not verified, please check your email inbox!")
-                return render(request, 'log_in.html', {'form': form, 'next': next, 'request': request, 'user': user})
+        if user and not user.email_verified:
+            messages.add_message(request, messages.ERROR,
+                "Email is not verified, please check your email inbox!")
+            return render(request, 'log_in.html', {'form': form, 'next': self.next, 'request': request, 'user': user})
 
-            if user:
-                login(request, user)
-                if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_book_list'
-                else:
-                    redirect_url = next or 'home'
-                return redirect(redirect_url)
+        if user:
+            login(request, user)
+            if len(user.books.all()) == 0:
+                redirect_url = self.next or 'initial_book_list'
+            else:
+                redirect_url = self.next or 'home'
+            return redirect(redirect_url)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-    else:
-        next = request.GET.get('next') or ''
-    form = LogInForm()
-    return render(request, 'log_in.html', {'form': form, 'next': next})
+        return self.render()
+
+    def render(self):
+        """Render log in template with blank log in form."""
+        form = LogInForm()
+        return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
 
 
 def handler404(request, exception):
