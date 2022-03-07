@@ -248,8 +248,11 @@ def book_details(request, book_id) :
     return render(request, "book_details.html", context)
 
 @login_required
-def show_profile_page(request, user_id = None):
+def show_profile_page(request, user_id=None, clubs = False):
+    print(f'{user_id}')
+
     user = get_object_or_404(User.objects, id=request.user.id)
+
     if user_id == request.user.id:
         return redirect('profile')
 
@@ -259,7 +262,23 @@ def show_profile_page(request, user_id = None):
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable})
+    if clubs == True:
+        clubs_queryset = user.clubs.all()
+        clubs_count = clubs_queryset.count()
+        clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+        page_number = request.GET.get('page')
+        clubs = clubs_pg.get_page(page_number)
+        return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'clubs':clubs, 'clubs_count':clubs_count,})
+
+    else:
+        books_queryset  = user.books.all()
+        books_count = books_queryset.count()
+        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+        page_number = request.GET.get('page')
+        books = books_pg.get_page(page_number)
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'books':books, 'books_count':books_count,})
+
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):
     """View to update logged-in user's profile."""
