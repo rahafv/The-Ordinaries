@@ -20,8 +20,8 @@
 
                 <div class="opacity-75 mb-2">
                     <span class = "profile-username">{{user.username}}</span>
-                    &emsp;
-                    {% if current_user == user%}
+                    {% if current_user == user %}
+                    <br/>
                         <span class = "profile-email">{{user.email}}</span>
                     {% endif %}
                 </div>
