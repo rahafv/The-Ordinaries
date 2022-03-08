@@ -3,6 +3,8 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+
+from bookclub.rec3 import Recommender2
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -616,9 +618,9 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = Recommender()
+    recommendations = Recommender2()
     
-    print(recommendations.get_recommendations(1, 5))
+    print(recommendations.get_recommendations(request.user.id, 5))
     # if request.method == 'GET':
     #     searched = request.GET.get('searched', '')
     #     category = request.GET.get('category', '')
