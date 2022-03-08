@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Meeting, User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
-class SearchPageViewTest(TestCase, LoginRedirectTester, MenueTestMixin):
+class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

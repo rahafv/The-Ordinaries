@@ -1,11 +1,13 @@
+from multiprocessing.sharedctypes import Value
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
+from bookclub.forms import UserSortForm
 from bookclub.tests.helpers import reverse_with_next
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from system import settings
 
-class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_club.json',
@@ -14,6 +16,7 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
     def setUp(self):
         self.user = User.objects.get(id=3)
         self.club = Club.objects.get(id=1)
+        self.form_input = {'sort': UserSortForm.ASCENDING}
         self.url = reverse('members_list', kwargs={'club_id': self.club.id})
 
     def test_user_list_url(self):
@@ -25,19 +28,54 @@ class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixi
     def test_get_club_members_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self.url = reverse('members_list', kwargs={'club_id': self.club.id})
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'members_list.html')
+        form= response.context['form']
+        self.assertTrue(isinstance(form, UserSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')        
         self.assert_menu(response)
 
     def test_get_members_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_members(settings.MEMBERS_PER_PAGE-1)
-        response = self.client.get(self.url)
+        response = self.client.get(self.url,self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'members_list.html')
+
+        form = response.context['form']
+        self.assertTrue(isinstance(form, UserSortForm))
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')
+
         self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
         for user_id in range(settings.MEMBERS_PER_PAGE-1):
+            self.assertContains(response, f'user{user_id}')
+            self.assertContains(response, f'First{user_id} Last{user_id}')
+
+        for member in self.club.members.all():
+            if member.id != self.user.id:
+                member_profile_url = reverse('profile', kwargs={ 'user_id': member.id })
+                self.assertContains(response, member_profile_url)
+        self.assert_menu(response)
+    
+    def test_get_members_list_with_descending_name_sort(self):
+        self.form_input['sort']= UserSortForm.DESCENDING
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_members(settings.MEMBERS_PER_PAGE-2)
+        response = self.client.get(self.url,self.form_input, follow = True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'members_list.html')
+
+        form = response.context['form']
+        self.assertTrue(isinstance(form, UserSortForm))
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')
+        self.assertEqual(len(response.context['members']), settings.MEMBERS_PER_PAGE)
+        length = len(response.context['members'])
+
+        for user_id in range(0,length-2):
             self.assertContains(response, f'user{user_id}')
             self.assertContains(response, f'First{user_id} Last{user_id}')
 

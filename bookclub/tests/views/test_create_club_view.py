@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import CreateClubForm
 from bookclub.models import Club, User, Event
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
-class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
+class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Test suite for the create club view."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]

@@ -9,7 +9,15 @@
         <div class="col-12">
            {% if searched and category %}
            <h1> You searched for {{searched}} in {{category}}</h1>
-                {% if filtered_list %}
+             {% if filtered_list %}
+                <div class = "col - 12">
+                     <form class="d-flex" method=GET action= "{% url 'show_sorted' searched=searched label=label %}" id = "sortForm" > 
+                          &emsp;
+                        {% include 'partials/bootstrap_form.html' with form=form %}
+                        <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
+                    </form>
+                </div>
+                <br/>
                     {% if category == "Users" %}
                     {%include 'partials/users_information_table.html' with Users=filtered_list %}
                     {% endif %}

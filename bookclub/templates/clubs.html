@@ -3,25 +3,41 @@
 {% load bootstrap_pagination %}
 {% block title %}Clubs {% endblock %}
 {% block content %}
-
-
-<h1 class="fw-light center" style="text-align: center; background-color:#64505a;">Clubs</h1>
-<div class="carousel-inner" style="top: -8px;">
-  <div class="carousel-item active">
+{% load humanize %}
     
-
-    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <rect width="100%" height="100%" fill="#faf3ee"/>
-      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
-
-    </svg>
-
+<div class="container">
+  {% if count == 0 %}
+    {% if general %}
+      <div style="text-align: center;   padding-top: 50px;">
+        <h4 class="lead "> There are no clubs, want to create one?</h4>
+        <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
+      </div>
+    {% else %}
+      <div style="text-align: center;   padding-top: 50px;">
+        <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
+        <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
+      </div>
+    {% endif %}
     
-    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
-      <div class="carousel-caption">
-          <div class="col-sm-6 col-md-3 col-lg-4">
-            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
-            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+  {% else %}
+    <div class = "col - 12">
+      {% if general %}
+        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
+      {% else %}
+        <form class = "d-flex" method = "GET" action = '{% url 'clubs_list' user.id %}'>
+      {% endif %}
+          {% csrf_token %}
+          {% include 'partials/bootstrap_form.html' with form=form %}
+          <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
+      </form>
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for club in clubs %}
+        <div class="col">
+          <div style="text-align: center;">
+            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
+            <p >{{ club.theme }}</p>
+            <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
           </div>
       </div>
     </div>

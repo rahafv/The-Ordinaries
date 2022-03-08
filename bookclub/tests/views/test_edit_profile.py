@@ -3,11 +3,11 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import UserForm
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from datetime import date 
 
 
-class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the profile view."""
 
     fixtures = [

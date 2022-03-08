@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import LogInForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenueTestMixin
+from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenuTestMixin
 
-class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
+class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json' , 
                 'bookclub/tests/fixtures/other_users.json' , 

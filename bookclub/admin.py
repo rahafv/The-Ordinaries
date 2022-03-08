@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ["username", "email", "first_name", "last_name"]
 
 @admin.register(Club)
-class UserAdmin(admin.ModelAdmin):
+class ClubAdmin(admin.ModelAdmin):
     list_display = ["name", "theme", "owner"]
 
 @admin.register(Book)

@@ -2,10 +2,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User 
 from bookclub.tests.helpers import reverse_with_next
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from system import settings
 
-class FollowersListTest(TestCase, LoginRedirectTester, MessageTester, MenueTestMixin):
+class FollowersListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
