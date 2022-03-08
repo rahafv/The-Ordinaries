@@ -1,10 +1,34 @@
 {% extends 'base_content.html' %}
 {% load static %}
 {% load bootstrap_pagination %}
-{% block title %}Clubs {% endblock %}
+{% block title %}Clubs{% endblock %}
 {% block content %}
 {% load humanize %}
     
+
+<h1 class="fw-light center" style="text-align: center; background-color:#64505a;">Clubs</h1>
+<div class="carousel-inner" style="top: -8px;">
+  <div class="carousel-item active">
+    
+
+    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <rect width="100%" height="100%" fill="#faf3ee"/>
+      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
+
+    </svg>
+
+    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+      <div class="carousel-caption">
+          <div class="col-sm-6 col-md-3 col-lg-4">
+            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
+            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+
 <div class="container">
   {% if count == 0 %}
     {% if general %}
@@ -33,28 +57,6 @@
     </div>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
       {% for club in clubs %}
-        <div class="col">
-          <div style="text-align: center;">
-            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
-            <p >{{ club.theme }}</p>
-            <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
-          </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-<div class="row mt-5">
-    <div class="col mx-auto">
-      
-    </div>
-</div>
-<div class="container marketing">
-  <div class="row">
-    {% for club in clubs %}
       <div class="col-sm-6 col-md-3 col-lg-4">    
         <img class="card-img" src="{% static '/images/3.png' %}" alt="Avatar" style="width:180px">
           <h2>{{club.name}}</h2>
@@ -64,16 +66,13 @@
       </div>
 
     {% endfor %}
+    </div>
+    
     <ul class="pagination justify-content-center">
       {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
     </ul>
-  </div>
+
+  {% endif %}
 </div>
 
-
-
 {% endblock %}
-
-
-
-
