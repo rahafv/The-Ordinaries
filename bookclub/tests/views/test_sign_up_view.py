@@ -4,10 +4,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import SignUpForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester , MenueTestMixin
+from bookclub.tests.helpers import LogInTester , MenuTestMixin
 from datetime import date 
 
-class SignUpViewTestCase(TestCase, LogInTester,MenueTestMixin):
+class SignUpViewTestCase(TestCase, LogInTester,MenuTestMixin):
     """Tests of the sign up view."""
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 

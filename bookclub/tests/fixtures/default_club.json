@@ -10,7 +10,8 @@
           "meeting_type": "Online",
           "club_type": "Public",
           "city":"london", 
-          "country":"uk"
+          "country":"uk",
+          "created_at":"2012-08-18T02:23:49Z"
         }
     }
 ]

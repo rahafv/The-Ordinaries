@@ -1,9 +1,9 @@
 """Tests for the welcome view."""
 from django.test import TestCase 
 from django.urls import reverse
-from bookclub.tests.helpers import MenueTestMixin
+from bookclub.tests.helpers import MenuTestMixin
 
-class WelcomeViewTestCase(TestCase,MenueTestMixin):
+class WelcomeViewTestCase(TestCase,MenuTestMixin):
 
     def setUp(self):
         self.url = reverse("welcome")

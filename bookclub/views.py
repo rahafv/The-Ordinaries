@@ -4,10 +4,10 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, login_prohibited, generate_token, create_event, MeetingHelper
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -18,10 +18,12 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.core.mail import send_mail 
+from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+from django.db.models.functions import Lower
+
 
 @login_prohibited
 def welcome(request):
@@ -35,14 +37,14 @@ def home(request):
     current_user = request.user
     authors = list(current_user.followees.all()) + [current_user]
     clubs = list(User.objects.get(id=current_user.id).clubs.all())
-    user_events  = [] 
+    user_events  = []
     club_events = []
     for author in authors:
         user_events += list(Event.objects.filter(user=author))
     final_user_events = user_events
     final_user_events.sort(reverse = True , key = events_created_at)
     first_twentyFive = final_user_events[0:25]
- 
+
     for club in clubs:
         club_events += list(Event.objects.filter(club=club))
 
@@ -51,10 +53,10 @@ def home(request):
     first_ten = final_club_events[0:10]
 
     club_events_length = len(first_ten)
-  
+
 
     return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
-   
+
 
 @login_prohibited
 def sign_up(request):
@@ -224,7 +226,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            return redirect('book_details', book_id=book.id) 
+            return redirect('book_details', book_id=book.id)
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -234,7 +236,7 @@ def book_details(request, book_id) :
     book = get_object_or_404(Book.objects, id=book_id)
     form = RatingForm()
     user = request.user
-    check_reader = book.is_reader(user);
+    check_reader = book.is_reader(user)
     reviews = book.ratings.all().exclude(review = "").exclude( user=request.user)
     rating = book.ratings.all().filter(user = request.user)
     if rating:
@@ -339,11 +341,19 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
+    form = NameAndDateSortForm(request.GET or None)
+    sort = ""
+
+    if form.is_valid():
+        sort = form.cleaned_data.get('sort')
+        sort_helper = SortHelper(sort, books_queryset)
+        books_queryset = sort_helper.sort_books()
+
     count = books_queryset.count()
     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
     page_number = request.GET.get('page')
     books = books_pg.get_page(page_number)
-    return render(request, 'books.html', {'books': books, 'general': general, 'count': count})
+    return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form':form})
 
 @login_required
 def clubs_list(request, user_id=None):
@@ -358,11 +368,19 @@ def clubs_list(request, user_id=None):
                 clubs_queryset = user.clubs.filter(owner=user)
                 return redirect('owned_clubs_list', user_id)
 
+    form = NameAndDateSortForm(request.GET or None)
+    sort = ""
+
+    if form.is_valid():
+        sort = form.cleaned_data.get('sort')
+        sort_helper = SortHelper(sort, clubs_queryset)
+        clubs_queryset = sort_helper.sort_clubs()
+
     count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'filtered':filtered})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form':form, 'filtered':filtered})
 
 
 def owned_clubs_list(request, user_id):
@@ -374,42 +392,43 @@ def owned_clubs_list(request, user_id):
         filtered = False
         return redirect('clubs_list', user_id)
 
-    count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-    page_number = request.GET.get('page')
-    clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'filtered':filtered})
-
-
-
 @login_required
 def members_list(request, club_id):
     current_user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
+    #form to display user sorting options
+    form = UserSortForm(request.GET or None)
+    sort = ""
+    if form.is_valid():
+        sort = form.cleaned_data.get('sort')
+        sort_helper = SortHelper(sort, members_queryset)
+        members_queryset = sort_helper.sort_users()
+
     # count = members_queryset.count()
     members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     members = members_pg.get_page(page_number)
     if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user })
+        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form':form})
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the members list" )
         return redirect('club_page', club_id)
-        
+
+
 @login_required
 def following_list(request, user_id):
     user = get_object_or_404(User.objects, id=user_id)
-    is_following = True 
-    list = user.followees.all() 
-    current_user = request.user 
+    is_following = True
+    list = user.followees.all()
+    current_user = request.user
 
     follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     follow_list = follow_pg.get_page(page_number)
     return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
-    
+
 @login_required
 def followers_list(request, user_id):
     user = get_object_or_404(User.objects, id=user_id)
@@ -421,18 +440,30 @@ def followers_list(request, user_id):
     page_number = request.GET.get('page')
     follow_list = follow_pg.get_page(page_number)
     return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user':current_user})
-    
+
 @login_required
 def applicants_list(request, club_id):
     current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id) 
-    applicants = club.applicants.all()
+    club = get_object_or_404(Club.objects, id=club_id)
+    applicants_queryset = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
-        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user })
+        #Form to display sorting options for Users
+        form = UserSortForm(request.GET or None)
+        sort = ""
+        if form.is_valid():
+            #get the value to sort by from the valid form
+            sort = form.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, applicants_queryset)
+            applicants_queryset = sort_helper.sort_users()
+
+        applicants_pg = Paginator(applicants_queryset, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        applicants = applicants_pg.get_page(page_number)
+        return render(request, 'applicants_list.html', {'applicants': applicants,'is_owner': is_owner, 'club': club, 'current_user': current_user, 'form': form})
     else:
         messages.add_message(request, messages.ERROR, "You cannot access the applicants list" )
-        return redirect('club_page', club_id) 
+        return redirect('club_page', club_id)
 
 @login_required
 def accept_applicant(request, club_id, user_id):
@@ -513,21 +544,21 @@ def schedule_meeting(request, club_id):
 
                 if form.is_valid():
                     meeting = form.save()
-                    
+
                     """send email invites"""
-                    MeetingHelper().send_email(request=request, 
-                        meeting=meeting, 
-                        subject='A New Meeting Has Been Scheduled', 
-                        letter='emails/meeting_invite.html', 
+                    MeetingHelper().send_email(request=request,
+                        meeting=meeting,
+                        subject='A New Meeting Has Been Scheduled',
+                        letter='emails/meeting_invite.html',
                         all_mem=True
                     )
 
                     if meeting.chooser:
                         """send email to member who has to choose a book"""
-                        MeetingHelper().send_email(request=request, 
-                            meeting=meeting, 
-                            subject='It Is Your Turn!', 
-                            letter='emails/chooser_reminder.html', 
+                        MeetingHelper().send_email(request=request,
+                            meeting=meeting,
+                            subject='It Is Your Turn!',
+                            letter='emails/chooser_reminder.html',
                             all_mem=False
                         )
                         deadline = timedelta(7).total_seconds() #0.00069444
@@ -543,9 +574,9 @@ def schedule_meeting(request, club_id):
             messages.add_message(request, messages.ERROR, "There are no members!")
             return redirect('club_page', club_id=club.id)
     else:
-        return render(request, '404_page.html', status=404) 
+        return render(request, '404_page.html', status=404)
 
-@login_required 
+@login_required
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
@@ -554,7 +585,7 @@ def choice_book_list(request, meeting_id):
         sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
         return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
     else:
-        return render(request, '404_page.html', status=404) 
+        return render(request, '404_page.html', status=404)
 
 @login_required
 def search_book(request, meeting_id):
@@ -567,7 +598,7 @@ def search_book(request, meeting_id):
         page_number = request.GET.get('page')
         books = pg.get_page(page_number)
         return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'meeting_id':meeting_id})
-    else: 
+    else:
         return redirect('choice_book_list', meeting_id=meeting_id)
 
 @login_required
@@ -578,18 +609,18 @@ def choose_book(request, book_id, meeting_id):
         meeting.assign_book(book)
 
         """send email to member who has to choose a book"""
-        MeetingHelper().send_email(request=request, 
-            meeting=meeting, 
-            subject='A book has be chosen', 
-            letter='emails/book_confirmation.html', 
+        MeetingHelper().send_email(request=request,
+            meeting=meeting,
+            subject='A book has be chosen',
+            letter='emails/book_confirmation.html',
             all_mem=True
         )
 
         messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
         return redirect('club_page', club_id=meeting.club.id)
     else:
-        return render(request, '404_page.html', status=404) 
-        
+        return render(request, '404_page.html', status=404)
+
 @login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
@@ -640,39 +671,65 @@ def follow_toggle(request, user_id):
 @login_required
 def search_page(request):
     if request.method == 'GET':
-        searched = request.GET.get('searched', '')
-        category = request.GET.get('category', '')
+        searched = request.GET.get('searched')
+        category = request.GET.get('category')
+        label= category
 
-        if(category=="user-name"):
-            filtered_list = User.objects.filter(username__contains=searched)
-            category= "Users"
-        elif(category=="user-location"):
-            filtered_list = User.objects.filter(country__contains=searched)
-            category= "Users"
-        elif(category=="club-name"):
-            filtered_list = Club.objects.filter(name__contains=searched)
-            category= "Clubs"
-        elif(category=="club-location"):
-            filtered_list = Club.objects.filter(country__contains=searched)
-            category= "Clubs"
-        elif(category=="book-title"):
-            filtered_list = Book.objects.filter(title__contains=searched)
-            category= "Books"
-        elif(category=="book-year"):
-            filtered_list = Book.objects.filter(year__contains=searched)
-            category= "Books"
+        #method in helpers to return a dictionary with a list of users, clubs or books searched
+        search_page_results = get_list_of_objects(searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+
+        sortForm = ""
+        if(category == "Clubs" or category == "Books"):
+            sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            filtered_list = Book.objects.filter(author__contains=searched)
-            category= "Books"
-
-
+            sortForm = UserSortForm(request.GET or None)
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
-        return render(request, 'search_page.html', {'searched':searched, 'category':category, "filtered_list":filtered_list})
-    else: 
-         return render(request, 'search_page.html', {})
+
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, 'label': label, "filtered_list":filtered_list, "form":sortForm})
+
+    else:
+        return render(request, 'search_page.html', {})
+
+
+@login_required
+def show_sorted(request, searched, label):
+    if request.method == "GET":
+        search_page_results = get_list_of_objects(searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+
+        sortForm = ""
+        if(category == "Clubs" or category == "Books"):
+            sortForm = NameAndDateSortForm(request.GET or None)
+        else:
+            sortForm = UserSortForm(request.GET or None)
+
+        sort = ""
+        if (sortForm.is_valid()):
+            sort = sortForm.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, filtered_list)
+
+            if(category == "Clubs"):
+                filtered_list = sort_helper.sort_clubs()
+            elif(category == "Books"):
+                filtered_list = sort_helper.sort_books()
+            else:
+                filtered_list = sort_helper.sort_users()
+
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        return render(request, 'search_page.html', {'searched':searched,'label': label,  'category':category, 'form':sortForm, "filtered_list":filtered_list})
+
+    else:
+            return render(request, 'search_page.html', {})
+
+
 
 @login_required
 def initial_book_list(request):
@@ -701,4 +758,3 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
-

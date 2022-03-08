@@ -176,6 +176,18 @@ class UserModelTestCase(TestCase):
     
     def test_location(self):
         self.assertTrue(self.user.location(), 'new york, NY, United states')
+    
+    def test_location_with_empty_country(self):
+        self.user.country = None
+        self.assertTrue(self.user.location(), 'new york, NY')
+
+    def test_location_with_empty_city(self):
+        self.user.city = None
+        self.assertTrue(self.user.location(), 'United states, NY')
+    
+    def test_location_with_empty_region(self):
+        self.user.region = None
+        self.assertTrue(self.user.location(), 'United states, NY')
 
     def test_user_gravatar(self):
         self.assertTrue(self.user.gravatar())
