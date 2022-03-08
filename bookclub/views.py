@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from imaplib import _Authenticator
+from logging import exception
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
@@ -23,6 +24,10 @@ from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
 from django.utils.decorators import method_decorator
+#from django.views.generic import ListView
+from django.views.generic.detail import DetailView
+from django.core.exceptions import ImproperlyConfigured
+
 
 @login_prohibited
 def welcome(request):
@@ -110,15 +115,39 @@ def activate_user(request, uidb64, token):
 
     return render(request, 'activate-fail.html', {'user': user})
 
-class LogInView(FormView):
+class LoginProhibitedMixin:
+    """Mixin that redirects when a user is logged in."""
+
+    redirect_when_logged_in_url = None
+
+    def dispatch(self, *args, **kwargs):
+        """Redirect when logged in, or dispatch as normal otherwise."""
+        if self.request.user.is_authenticated:
+            return self.handle_already_logged_in(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
+
+    def handle_already_logged_in(self, *args, **kwargs):
+        url = self.get_redirect_when_logged_in_url()
+        return redirect(url)
+
+    def get_redirect_when_logged_in_url(self):
+        """Returns the url to direct to when not logged in."""
+        if self.redirect_when_logged_in_url is None:
+            raise ImproperlyConfigured(
+                "LoginProhibitedMixin requires either a value for "
+                "'redirect_when_logged_in_url', or an implementation for "
+                "'get_redirect_when_logged_in_url"
+                ""
+            )
+        else:
+            return self.redirect_when_logged_in_url
+
+class LogInView(LoginProhibitedMixin, FormView):
     """View that handles log in."""
 
     http_method_names = ['get', 'post']
+    redirect_when_logged_in_url = 'home'
     
-    @method_decorator(login_prohibited)
-    def dispatch(self, request):
-        return super().dispatch(request)
-
     def get(self, request):
         """Display log in template."""
         self.next = request.GET.get('next') or ''
@@ -258,6 +287,7 @@ def book_details(request, book_id) :
         'reviews_count':reviews_count, 'user': user, 'reader': check_reader}
     return render(request, "book_details.html", context)
 
+
 @login_required
 def show_profile_page(request, user_id = None):
     user = get_object_or_404(User.objects, id=request.user.id)
@@ -371,6 +401,19 @@ def clubs_list(request, user_id=None):
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
     return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count})
+
+# class MembersListView(LoginRequiredMixin, ListView):
+#     """View that shows a list of members."""
+    
+#     model = User
+#     template_name = "members_list.html"
+#     context_object_name = "members"
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         #context['club'] = 
+#         context['current_user'] = self.request.user
+#         return context
 
 @login_required
 def members_list(request, club_id):
