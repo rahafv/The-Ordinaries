@@ -1,3 +1,4 @@
+from itertools import count
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import ValidationError
@@ -268,6 +269,14 @@ class Book(models.Model):
         related_name='books'
     )
 
+    readers_count = models.PositiveIntegerField(
+        default=0
+    )
+
+    average_rating = models.FloatField(
+        default=0
+    )
+
     class Meta:
         ordering = ['title']
 
@@ -277,12 +286,14 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
+            self.readers_count = self.readers_count + 1 
+            self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
 
-    def readers_count(self):
+    def update_readers_count(self):
         return self.readers.all().count()
 
     def add_club(self, club):
@@ -292,14 +303,6 @@ class Book(models.Model):
     def clubs_count(self):
         return self.clubs.all().count()
 
-    def average_rating(self):
-        sum = 0.0
-        if self.ratings.all().count() != 0:
-            for rating in self.ratings.all():
-                sum+= rating.rating
-            return (sum/self.ratings.all().count())
-        else:
-            return 0.0
 
 class Rating(models.Model):
     """rating model."""
