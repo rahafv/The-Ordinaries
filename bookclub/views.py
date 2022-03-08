@@ -392,6 +392,13 @@ def owned_clubs_list(request, user_id):
         filtered = False
         return redirect('clubs_list', user_id)
 
+    count = clubs_queryset.count()
+    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    page_number = request.GET.get('page')
+    clubs = clubs_pg.get_page(page_number)
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'filtered':filtered})
+
+
 @login_required
 def members_list(request, club_id):
     current_user = request.user
