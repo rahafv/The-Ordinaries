@@ -28,6 +28,19 @@
           </div>
         </div>
       {% endfor %}
+      {% if not general %}
+      <form method ='POST'>
+        {% csrf_token %}
+      <div class="form-check">
+        {% if filtered %}
+        <input type="submit" class="btn btn-primary mb-3" name="showall" value="Show all clubs">
+        {% else %}
+        <input type="submit" class="btn btn-primary mb-3" name="showowned" value="Show owned clubs">
+        {% endif %}
+        
+      </div>
+    </form>
+      {% endif %}
     </div>
     
     <ul class="pagination justify-content-center">

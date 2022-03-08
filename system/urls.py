@@ -63,6 +63,7 @@ urlpatterns = [
     #change URL format
     path('<int:user_id>/books/', views.books_list, name ='books_list'),
     path('<int:user_id>/clubs/', views.clubs_list, name ='clubs_list'),
+    path('<int:user_id>/clubs/owned/', views.owned_clubs_list, name ='owned_clubs_list'),
     path("club/<int:club_id>/members/", views.members_list, name='members_list'),
     path("club/<int:club_id>/applicants/", views.applicants_list, name='applicants_list'),
     path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),

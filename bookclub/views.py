@@ -348,16 +348,39 @@ def books_list(request, club_id=None, user_id=None):
 @login_required
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
+    user = get_object_or_404(User.objects, id=user_id)
     general = True
+    filtered = False
     if user_id:
-        clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+        if request.method == 'POST':
+                filtered = True
+                clubs_queryset = user.clubs.filter(owner=user)
+                return redirect('owned_clubs_list', user_id)
 
     count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'filtered':filtered})
+
+
+def owned_clubs_list(request, user_id):
+    user = get_object_or_404(User.objects, id=user_id)
+    clubs_queryset = user.clubs.filter(owner=user)
+    general = False
+    filtered = True
+    if request.method == 'POST':
+        filtered = False
+        return redirect('clubs_list', user_id)
+
+    count = clubs_queryset.count()
+    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    page_number = request.GET.get('page')
+    clubs = clubs_pg.get_page(page_number)
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'filtered':filtered})
+
+
 
 @login_required
 def members_list(request, club_id):
@@ -678,6 +701,4 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
-
-
 
