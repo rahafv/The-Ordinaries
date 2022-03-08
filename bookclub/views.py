@@ -358,10 +358,10 @@ def books_list(request, club_id=None, user_id=None):
 @login_required
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
-    user = get_object_or_404(User.objects, id=user_id)
     general = True
     filtered = False
     if user_id:
+        user = get_object_or_404(User.objects, id=user_id)
         general = False
         if request.method == 'POST':
                 filtered = True
