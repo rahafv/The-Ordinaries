@@ -1,5 +1,6 @@
+import math
 from .models import Rating, Book
-from surprise import KNNBasic
+from surprise import KNNBasic, PredictionImpossible
 from surprise import Dataset
 from surprise import Reader
 
@@ -17,25 +18,6 @@ import csv
 class Recommender:
     def __init__(self):
         self.trainset = self.load_dataset().build_full_trainset()
-
-    # def load_dataset(self):
-    #     ratings_path = os.path.abspath("book-review-dataset/BX-Book-Ratings.csv")
-    #     reader = Reader(line_format='user item rating ', sep=',', skip_lines=1)
-    #     ratings_dataset = Dataset.load_from_file(ratings_path, reader=reader)
-
-    #     # Lookup a movie's name with it's Movielens ID as key
-    #     books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
-    #     movieID_to_name = {}
-    #     with open(books_path, "r", encoding='latin-1') as csvfile:
-
-    #             movie_reader = csv.reader(csvfile)
-    #             next(movie_reader)
-    #             for row in movie_reader:
-    #                 movieID = int(row[0])
-    #                 movie_name = row[1]
-    #                 movieID_to_name[movieID] = movie_name
-    #     # Return both the dataset and lookup dict in tuple
-    #     return (ratings_dataset, movieID_to_name)
 
     def load_dataset(self):
         ratingObj = Rating.objects.all()
@@ -82,18 +64,6 @@ class Recommender:
 
         return candidates
 
-    # def getBookName(self, movieID):
-    #     if int(movieID) in self.bookID_to_name:
-    #         return self.bookID_to_name[int(movieID)]
-    #     else:
-    #         return ""
-
-    def getBookName(self, bookID):
-        try:
-            return Book.objects.all().get(id=bookID).title
-        except:
-            return None
-
     def get_recommendations(self, user_id, numOfRec):
         recommendations = []
         candidates = self.generateCandidates(user_id)
@@ -106,5 +76,44 @@ class Recommender:
                 break 
 
         return recommendations 
+
+    def getBookName(self, bookID):
+        try:
+            return Book.objects.all().get(id=bookID).title
+        except:
+            return None
+
+    def computeYearSimilarity(self, movie1, movie2, years):
+        diff = abs(years[movie1] - years[movie2])
+        sim = math.exp(-diff / 10.0)
+        return sim
+
+    def estimate(self, u, i):
+
+        if not (self.trainset.knows_user(u) and self.trainset.knows_item(i)):
+            raise PredictionImpossible('User and/or item is unkown.')
+        
+        # Build up similarity scores between this item and everything the user rated
+        neighbors = []
+        for rating in self.trainset.ur[u]:
+            yearSimilarity = self.similarities[i,rating[0]]
+            neighbors.append( (yearSimilarity, rating[1]) )
+        
+        # Extract the top-K most-similar ratings
+        k_neighbors = heapq.nlargest(self.k, neighbors, key=lambda t: t[0])
+        
+        # Compute average sim score of K neighbors weighted by user ratings
+        simTotal = weightedSum = 0
+        for (simScore, rating) in k_neighbors:
+            if (simScore > 0):
+                simTotal += simScore
+                weightedSum += simScore * rating
+            
+        if (simTotal == 0):
+            raise PredictionImpossible('No neighbors')
+
+        predictedRating = weightedSum / simTotal
+
+        return predictedRating
 
 print("-------------gggggggggggggggjgjgjgjgg----------")
