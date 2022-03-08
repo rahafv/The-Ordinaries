@@ -248,9 +248,48 @@ def book_details(request, book_id) :
     return render(request, "book_details.html", context)
 
 @login_required
-def show_profile_page(request, user_id=None, clubs = False):
+def show_profile_page(request, user_id=None, is_clubs = True):
     print(f'{user_id}')
+    print(f'{is_clubs}')
+    user = get_object_or_404(User.objects, id=request.user.id)
 
+    if user_id == request.user.id:
+        return redirect('profile')
+
+    if user_id:
+        user = get_object_or_404(User.objects, id=user_id)
+
+    following = request.user.is_following(user)
+    followable = (request.user != user)
+    
+    if(user_id is not None):
+        if is_clubs == True:
+            clubs_queryset = User.objects.get(id=user_id).clubs.all()
+            clubs_count = clubs_queryset.count()
+            clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+            page_number = request.GET.get('page')
+            clubs = clubs_pg.get_page(page_number)
+            print(f'{clubs_count}')
+
+            return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'clubs':clubs, 'clubs_count':clubs_count,'is_clubs':True})
+
+        else:
+            books_queryset  = User.objects.get(id=user_id).books.all()
+            books_count = books_queryset.count()
+            books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+            page_number = request.GET.get('page')
+            books = books_pg.get_page(page_number)
+            print(f'{books_count}')
+
+        return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'books':books, 'books_count':books_count,'is_clubs':False})
+
+    else:
+        return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable,})
+
+"""Attempt to add link to clubs_list"""
+@login_required
+def show_profile_page_clubs(request, user_id=None):
+    print(f'{user_id}')
     user = get_object_or_404(User.objects, id=request.user.id)
 
     if user_id == request.user.id:
@@ -262,22 +301,38 @@ def show_profile_page(request, user_id=None, clubs = False):
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    if clubs == True:
-        clubs_queryset = user.clubs.all()
-        clubs_count = clubs_queryset.count()
-        clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-        page_number = request.GET.get('page')
-        clubs = clubs_pg.get_page(page_number)
-        return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'clubs':clubs, 'clubs_count':clubs_count,})
+    clubs_queryset = user.clubs.all()
+    clubs_count = clubs_queryset.count()
+    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    page_number = request.GET.get('page')
+    clubs = clubs_pg.get_page(page_number)
+    print(f'{clubs_count}')
 
-    else:
-        books_queryset  = user.books.all()
-        books_count = books_queryset.count()
-        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-        page_number = request.GET.get('page')
-        books = books_pg.get_page(page_number)
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'clubs':clubs, 'clubs_count':clubs_count, 'is_clubs':True})
 
-    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'books':books, 'books_count':books_count,})
+"""Attempt to add link to reading_list"""
+@login_required
+def show_profile_page_reading_list(request, user_id=None):
+    print(f'{user_id}')
+    user = get_object_or_404(User.objects, id=request.user.id)
+
+    if user_id == request.user.id:
+        return redirect('profile')
+
+    if user_id:
+        user = get_object_or_404(User.objects, id=user_id)
+
+    following = request.user.is_following(user)
+    followable = (request.user != user)
+    
+    books_queryset  = user.books.all()
+    books_count = books_queryset.count()
+    books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+    page_number = request.GET.get('page')
+    books = books_pg.get_page(page_number)
+    print(f'{books_count}')
+
+    return render(request, 'profile_page.html', {'current_user': request.user ,'user': user, 'following': following, 'followable': followable, 'books':books, 'books_count':books_count,'is_clubs':False})
 
 
 class ProfileUpdateView(LoginRequiredMixin,UpdateView):

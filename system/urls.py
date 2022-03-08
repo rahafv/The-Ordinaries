@@ -39,7 +39,10 @@ urlpatterns = [
 
     path('profile/', views.show_profile_page , name='profile'),
     path('profile/<int:user_id>', views.show_profile_page , name='profile'),
-    path('profile/<int:user_id>/<str:clubs>', views.show_profile_page , name='profile'),
+    path('profile/<int:user_id>', views.show_profile_page_reading_list , name='profile_reading_list'),
+    path('profile/<int:user_id>/<is_clubs>', views.show_profile_page , name='profile'),
+    path('profile/<int:user_id>', views.show_profile_page_clubs , name='profile_clubs'),
+
 
 
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),

@@ -1,15 +1,16 @@
+{% load bootstrap_pagination %}
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-    {% for club in clubs %}
-      <div class="col">
-        <div style="text-align: center;">
-          <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
-          <p >{{ club.theme }}</p>
-          <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
-        </div>
+  {% for club in clubs %}
+    <div class="col">
+      <div style="text-align: center;">
+        <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ club.name }}</h2>
+        <p >{{ club.theme }}</p>
+        <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-secondary"> View</a>
       </div>
-    {% endfor %}
-  </div>
+    </div>
+  {% endfor %}
+</div>
   
-  <ul class="pagination justify-content-center">
-    {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
-  </ul>
+<ul class="pagination justify-content-center">
+  {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
+</ul>

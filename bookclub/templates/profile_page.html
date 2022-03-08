@@ -63,53 +63,47 @@
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-blue opacity-60"></div>
             <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent">
-                    <li class="nav-item">
+                <li class="nav-item">
+                    <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'profile' user_id=user.id  is_clubs=False %}'> Reading lists</a>
+                    <!-- <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a> -->
+
+                    <!-- Working link -->
                     <!-- <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'books_list' user.id %}' >Reading lists</a> -->
-                        <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'profile' user_id=user.id clubs=False%}'> Reading lists</a>
-                    </li>
-                    <li class="nav-item">
-                    <!-- <a class="nav-link text-white py-4 pr-3 " href = '{% url 'clubs_list' user.id %}'>Clubs</a> -->
-                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile' user_id=user.id  clubs=True%}'>Clubs</a>
-                    </li>
+                </li>
+                <li class="nav-item">
+                    <!-- Working link -->
+                    <!-- <a class="nav-link text-white py-4 pr-3 " href = '{% url 'clubs_list' user.id %}'>Clubs</a>
+
+                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a> -->
+                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile' user_id=user.id is_clubs=True %}'>Clubs</a>
+
+                </li>
             </ul>
         </div>
     </div>
     <div class = "row vh-100">
-        <div class = "col-12">
-            <div class="ui-bg-cover ui-bg-overlay-container text-white" style="background-color: red;">
-                <div class="ui-bg-overlay bg-dark opacity-50"></div>
+        <div class = "col-12" style="background-color: #faf3ee">
+            <div class="ui-bg-cover ui-bg-overlay-container text-white" >
+                <div class="ui-bg-overlay bg-light-pink opacity-50"></div>
                 <div class="container">
-                    {% if clubs is True %}
-                        {%  include 'partials/clubs_list.html' with clubs=clubs%}
-                    {% elif clubs is False %}
-                        {%  include 'partials/books_list.html' with books=books%}
+                    <br/>
+                    {% if is_clubs is True %}
+                        {% if clubs_count != 0 %}
+                            {% include 'partials/clubs_list.html' with clubs=clubs%}
+                        {% else %}
+                            <h2>No Clubs joined!</h2>
+                        {% endif %}
+                    {% elif is_clubs is False %}
+                        {% if books_count != 0  %}
+                            {%  include 'partials/books_list.html' with books=books%}
+                        {% else %}
+                            <h2> Reading list is empty!</h2>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-
-
-
-    <!-- <div class="ui-bg-overlay-container">
-      <div class="ui-bg-overlay bg-dark opacity-25"></div>
-      <ul class="nav nav-tabs tabs-alt justify-content-center border-transparent">
-        <li class="nav-item">
-          <a class="nav-link text-white py-4 active" href="javascript:void(0)">Posts</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white py-4" href="javascript:void(0)">Likes</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white py-4" href="javascript:void(0)">Followers</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white py-4" href="javascript:void(0)">Following</a>
-        </li>
-      </ul>
-    </div> -->
 </div>
   
 {% endblock %}
