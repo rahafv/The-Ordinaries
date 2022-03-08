@@ -78,7 +78,7 @@
             {% endif %}
             <div class="card text-center">
               <div class="card-body">
-                <div class="mb-3 pb-0">
+                <div class=" pb-0">
                   {% if not user == club.owner and not is_member and not is_applicant%}
                   <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button">Join club</a> 
                   {% elif is_applicant and not is_member %}
@@ -89,11 +89,11 @@
                   <div class="mb-3 pb-0">
                     <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
                   </div>
-                  {% if user == club.owner %}
-                  <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>
-                  {% endif %}
                 </div>
-                {% endif %}   
+                {% endif %}  
+                {% if user == club.owner %}
+                <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>
+               {% endif %} 
               </div>
             </div>
           </div>
