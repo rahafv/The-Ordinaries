@@ -204,14 +204,7 @@ def add_review(request, book_id):
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
-             
-            if reviewed_book.ratings.all().count() != 0:
-                for rating in reviewed_book.ratings.all():
-                    sum+= rating.rating
-                reviewed_book.average_rating = sum/reviewed_book.ratings.all().count()
-                reviewed_book.save()
-
-            print(reviewed_book.average_rating)
+            reviewed_book.calculate_average_rating() 
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters.")
@@ -665,8 +658,8 @@ def initial_book_list(request):
     already_selected_books = current_user.books.all()
     my_books =  Book.objects.all().exclude(id__in = already_selected_books)
     list_length = len(current_user.books.all())
-    sorted_books = my_books.order_by('readers_count', 'average_rating')[:8]
-    for book in list(my_books):
+    sorted_books = my_books.order_by('-readers_count', '-average_rating')[:8]
+    for book in list(sorted_books):
         print(book.title, book.average_rating)
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
 

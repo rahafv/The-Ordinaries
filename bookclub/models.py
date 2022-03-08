@@ -221,6 +221,7 @@ class Club(models.Model):
         self.owner = new_owner
         self.save()
 
+
 class Book(models.Model):
     """Book model."""
 
@@ -292,16 +293,26 @@ class Book(models.Model):
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-
-    def update_readers_count(self):
-        return self.readers.all().count()
+            self.readers_count = self.readers_count - 1 
+            self.save()
 
     def add_club(self, club):
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
+            self.readers_count = self.readers_count + self.club.members.all().count() 
+            self.save()
 
     def clubs_count(self):
         return self.clubs.all().count()
+
+    def calculate_average_rating(self):
+        if self.ratings.all().count() != 0:
+            sum = 0
+            for rating in self.ratings.all():
+                sum+= rating.rating
+            self.average_rating = sum/self.ratings.all().count()
+            self.save()
+            print(self.average_rating)
 
 
 class Rating(models.Model):
@@ -337,6 +348,14 @@ class Rating(models.Model):
 
     class Meta:
         unique_together = ['user', 'book']
+
+   
+
+    def save(self, *args, **kwargs):
+        self.book.calculate_average_rating()
+        super(Rating, self).save(*args, **kwargs)
+
+
 
 class Meeting(models.Model):
     """ The meeting model."""

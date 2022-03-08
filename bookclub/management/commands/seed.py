@@ -47,6 +47,7 @@ class Command(BaseCommand):
 
         start = time.time()
         self.create_ratings()
+        self.average()
         end = time.time()
         print("ratings: ", end - start)
         
@@ -266,3 +267,8 @@ class Command(BaseCommand):
 
             if ratings:
                 Rating.objects.bulk_create(ratings)
+
+    def average(self):
+        ratings=Rating.objects.all()
+        for rating in ratings:
+            rating.save()
