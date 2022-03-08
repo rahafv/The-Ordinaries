@@ -60,18 +60,50 @@ def home(request):
   
 
     return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
-   
 
-@login_prohibited
-def sign_up(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('send_verification', user_id=user.id)
-    else:
-        form = SignUpForm()
-    return render(request, 'sign_up.html', {'form': form})
+class LoginProhibitedMixin:
+    """Mixin that redirects when a user is logged in."""
+
+    redirect_when_logged_in_url = None
+
+    def dispatch(self, *args, **kwargs):
+        """Redirect when logged in, or dispatch as normal otherwise."""
+        if self.request.user.is_authenticated:
+            return self.handle_already_logged_in(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
+
+    def handle_already_logged_in(self, *args, **kwargs):
+        url = self.get_redirect_when_logged_in_url()
+        return redirect(url)
+
+    def get_redirect_when_logged_in_url(self):
+        """Returns the url to direct to when not logged in."""
+        if self.redirect_when_logged_in_url is None:
+            raise ImproperlyConfigured(
+                "LoginProhibitedMixin requires either a value for "
+                "'redirect_when_logged_in_url', or an implementation for "
+                "'get_redirect_when_logged_in_url"
+                ""
+            )
+        else:
+            return self.redirect_when_logged_in_url
+
+class SignUpView(LoginProhibitedMixin, FormView):
+    """View that signs up user."""
+
+    form_class = SignUpForm
+    template_name = "sign_up.html"
+    #how to use this here?
+    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    user = None
+
+    def form_valid(self, form):
+        self.user = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('send_verification', kwargs={'user_id':self.user.id})
+
 
 def send_activiation_email(request, user_id):
     try:

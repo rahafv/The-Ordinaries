@@ -30,7 +30,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('', views.welcome,  name='welcome'),
-    path('sign_up/', views.sign_up,  name='sign_up'),
+    path('sign_up/', views.SignUpView.as_view(),  name='sign_up'),
     path('send_verification/<int:user_id>', views.send_activiation_email,  name='send_verification'),
     path('activate_user/<uidb64>/<token>', views.activate_user,  name='activate'),
     path('log_in/', views.LogInView.as_view(), name='log_in'),
