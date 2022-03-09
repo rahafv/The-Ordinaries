@@ -273,48 +273,32 @@ def show_profile_page(request, user_id=None, is_clubs=False):
     if user_id == request.user.id:
         return redirect('profile')
 
-    if user_id:
-        user = get_object_or_404(User.objects, id=user_id)
-
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    items = ""
-    items_count = 0
-
-    if(user_id is not None):
-        if is_clubs:
-            clubs_queryset = User.objects.get(id=user_id).clubs.all()
-            clubs_count = clubs_queryset.count()
-            clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-            page_number = request.GET.get('page')
-            clubs = clubs_pg.get_page(page_number)
-            items = clubs
-            items_count = clubs_count
-
-        else:
-            books_queryset = User.objects.get(id=user_id).books.all()
-            books_count = books_queryset.count()
-            books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-            page_number = request.GET.get('page')
-            books = books_pg.get_page(page_number)
-            items = books
-            items_count = books_count
-
+    if user_id:
+        items = ""
+        items_count = 0
+        user = get_object_or_404(User.objects, id=user_id)
+        books_queryset = User.objects.get(id=user_id).books.all()
+        books_count = books_queryset.count()
+        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+        page_number = request.GET.get('page')
+        books = books_pg.get_page(page_number)
+        items = books
+        items_count = books_count
+        
         return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': items, 'items_count': items_count, 'is_clubs': is_clubs})
-
+       
     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, })
 
 
 """View to add link to clubs_list in user profile """
-
-
 @login_required
 def show_profile_page_clubs(request, user_id=None):
     user = get_object_or_404(User.objects, id=request.user.id)
 
-    if user_id:
-        user = get_object_or_404(User.objects, id=user_id)
+    user = get_object_or_404(User.objects, id=user_id)
 
     following = request.user.is_following(user)
     followable = (request.user != user)
@@ -329,14 +313,11 @@ def show_profile_page_clubs(request, user_id=None):
 
 
 """ View to add link to reading_list tto user profile """
-
-
 @login_required
-def show_profile_page_reading_list(request, user_id=None):
+def show_profile_page_reading_list(request, user_id):
     user = get_object_or_404(User.objects, id=request.user.id)
 
-    if user_id:
-        user = get_object_or_404(User.objects, id=user_id)
+    user = get_object_or_404(User.objects, id=user_id)
 
     following = request.user.is_following(user)
     followable = (request.user != user)
@@ -348,6 +329,7 @@ def show_profile_page_reading_list(request, user_id=None):
     books = books_pg.get_page(page_number)
 
     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': books, 'items_count': books_count, 'is_clubs': False})
+
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
