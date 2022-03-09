@@ -287,19 +287,19 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
-            self.readers_count = self.readers_count + 1 
+            self.readers_count = self.readers.count()
             self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-            self.readers_count = self.readers_count - 1 
+            self.readers_count = self.readers.count()
             self.save()
 
     def add_club(self, club):
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
-            self.readers_count = self.readers_count + self.club.members.all().count() 
+            self.readers_count = self.readers_count + club.members.all().count() 
             self.save()
 
     def clubs_count(self):
@@ -312,7 +312,6 @@ class Book(models.Model):
                 sum+= rating.rating
             self.average_rating = sum/self.ratings.all().count()
             self.save()
-            print(self.average_rating)
 
 
 class Rating(models.Model):
@@ -349,7 +348,6 @@ class Rating(models.Model):
     class Meta:
         unique_together = ['user', 'book']
 
-   
 
     def save(self, *args, **kwargs):
         self.book.calculate_average_rating()
@@ -445,6 +443,7 @@ class Event(models.Model):
 
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
     club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE , related_name='events')
+    
     meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
@@ -492,6 +491,7 @@ class Event(models.Model):
         if self.type_of_action == 'U' and not self.action_user:
             raise ValidationError('Action must be user')
 
+
     def save(self, **kwargs):
         self.clean()
         return super(Event, self).save(**kwargs)
@@ -505,6 +505,7 @@ class Event(models.Model):
         REVIEW = " reviewed "
         ADD = " added "
         SCHEDULE = " scheduled a meeting about "
+        TRANSFER = " ownership is transfered to "
         
     def get_actor(self):
         """Return the actor of a given event."""

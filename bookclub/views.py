@@ -51,7 +51,6 @@ def home(request):
 
     club_events_length = len(first_ten)
   
-
     return render(request, 'home.html', { 'user': current_user, 'user_events': first_twentyFive , 'club_events':first_ten , 'club_events_length':club_events_length})
    
 
@@ -457,6 +456,19 @@ def transfer_club_ownership(request, club_id):
             member = get_object_or_404(User.objects, id = int(selectedmember))
             club.make_owner(member)
             messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
+            create_event('C', 'O', Event.EventType.TRANSFER, club=club, action_user=member)
+            
+            current_site = get_current_site(request)
+            subject = club.name + ' Club updates'
+            body = render_to_string('emails/transfer.html', {
+            'owner': member,
+            'domain': current_site,
+            'club':club
+            })
+            email_from = settings.EMAIL_HOST_USER
+            email_to = club.members.values_list('email', flat=True)
+
+            send_mail(subject, body, email_from, email_to)
             return redirect('club_page', club_id = club.id)
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
@@ -529,7 +541,7 @@ def choice_book_list(request, meeting_id):
     if request.user == meeting.chooser and not meeting.book:
         read_books = meeting.club.books.all()
         my_books =  Book.objects.all().exclude(id__in = read_books)
-        sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
+        sorted_books = sorted(my_books, key=lambda b: (b.average_rating, b.readers_count), reverse=True)[0:24]
         return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
     else:
         return render(request, '404_page.html', status=404) 
@@ -659,8 +671,7 @@ def initial_book_list(request):
     my_books =  Book.objects.all().exclude(id__in = already_selected_books)
     list_length = len(current_user.books.all())
     sorted_books = my_books.order_by('-readers_count', '-average_rating')[:8]
-    for book in list(sorted_books):
-        print(book.title, book.average_rating)
+
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
 
 @login_required
@@ -668,6 +679,7 @@ def add_book_from_initial_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
     book.add_reader(user)
+
     return redirect("initial_book_list")
 
 
