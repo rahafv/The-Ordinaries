@@ -1,4 +1,5 @@
 {% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
 {% block title %}
 | Profile
 {% endblock %}
@@ -51,9 +52,9 @@
                     <span class="float">
                         {% if followable %}
                             {% if following %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary">Unfollow</a> 
+                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary"> Unfollow </a> 
                             {% else %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary" >Follow</a> 
+                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary"> Follow </a> 
                             {% endif %}
                         {% endif %}
                     </span>
@@ -64,19 +65,10 @@
             <div class="ui-bg-overlay bg-light-blue opacity-60"></div>
             <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent">
                 <li class="nav-item">
-                    <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'profile' user_id=user.id  is_clubs=False %}'> Reading lists</a>
-                    <!-- <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a> -->
-
-                    <!-- Working link -->
-                    <!-- <a class="nav-link text-white py-4 pr-3 active" href = '{% url 'books_list' user.id %}' >Reading lists</a> -->
+                    <a class="nav-link text-white py-4 pr-3" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
                 </li>
                 <li class="nav-item">
-                    <!-- Working link -->
-                    <!-- <a class="nav-link text-white py-4 pr-3 " href = '{% url 'clubs_list' user.id %}'>Clubs</a>
-
-                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a> -->
-                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile' user_id=user.id is_clubs=True %}'>Clubs</a>
-
+                    <a class="nav-link text-white py-4 pr-3 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
                 </li>
             </ul>
         </div>
@@ -88,14 +80,20 @@
                 <div class="container">
                     <br/>
                     {% if is_clubs is True %}
-                        {% if clubs_count != 0 %}
-                            {% include 'partials/clubs_list.html' with clubs=clubs%}
+                        {% if items_count != 0 %}
+                            {% include 'partials/clubs_list.html' with clubs=items %}
+                            <ul class="pagination justify-content-center">
+                                {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
+                            </ul>
                         {% else %}
                             <h2>No Clubs joined!</h2>
                         {% endif %}
                     {% elif is_clubs is False %}
-                        {% if books_count != 0  %}
-                            {%  include 'partials/books_list.html' with books=books%}
+                        {% if items_count != 0  %}
+                            {%  include 'partials/books_list.html' with books=items %}
+                            <ul class="pagination justify-content-center">
+                                {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
+                            </ul>
                         {% else %}
                             <h2> Reading list is empty!</h2>
                         {% endif %}
@@ -104,6 +102,5 @@
             </div>
         </div>
     </div>
-</div>
-  
+</div>  
 {% endblock %}

@@ -1,4 +1,3 @@
-{% load bootstrap_pagination %}
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
     {% for book in books %}
       <div class="col">
@@ -11,6 +10,3 @@
       </div>
     {% endfor %}
 </div>
-<ul class="pagination justify-content-center">
-  {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
-</ul>
