@@ -39,6 +39,17 @@
   -o-background-size: cover;
 }
 
+#profile-image {
+  /* background: url(images/profile.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+  filter: blur(1px);
+  -webkit-filter: blur(1px); */
+  display: inline-block;
+}
+
 .h-100 {
   min-height: 100vh;
   height: 100vh;
