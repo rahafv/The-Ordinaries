@@ -141,30 +141,6 @@ a:link {
   background-color: #324655;
 }
 
-/*
-Profile re-designed
-*/
-
-/* Background */
-
-/* .background {
-  /* background-image: url(images/profile.png); */
-  /* background-position: bottom;
-  background-repeat: no-repeat;
-  background-size: contain;
-  position:relative;
-  width: 100%;
-  /* min-height: 100vh; */
-  /* z-index:-0.5;
-}
-
-.blur {
-  background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
-  /* backdrop-filter: blur(10px); This be the blur */
-  /* min-height: 55vh; */
-/* }   */
-
-
 .name-and-edit {
   display:inline-flex;
   font-size:xx-large
@@ -250,13 +226,6 @@ Profile re-designed
   font-size: 19px;
 }
 
-/* .profile-bio {
-  font-size: 20px;
-  text-overflow: ellipsis;
-  font-weight: 500;
-  color: black;
-} */
-
 .profile-statistics {
   font-weight: 400;
   font-size: 20px;
@@ -309,54 +278,6 @@ Profile nav-bar
   margin-bottom: 20px;
 }
 
- /*
- * Profile
- 
-.profile-image {
-  width: 120px;
-  clear:both;
-  float:left;
-}
-
-.profile-text {
-  overflow:hidden;
-  padding-left:20px
-}
-
-h3.profile-title {
-  margin-left: 150px;
-  margin-right:1px;
-}
-
-.profile-username {
-  color: #777777;
-  font-weight: 300;
-  font-style: italic;
-  margin-left: 30px;
-  margin-right:1px
-}
-
-.profile-email {
-  display: block;
-  padding-right: 0px;
-  margin-left: 150px;
-}
-
-.profile-bio {
-  font-size: 1.1rem;
-}
-
-.profile-statistics {
-  color: #777777;
-  font-weight: 300;
-  display: block;
-}
-
-.profile-statistics-item {
-  display: block;
-  padding-right: 50px;
-}
-*/
 
 /*
  * Post

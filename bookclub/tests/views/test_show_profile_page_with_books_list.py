@@ -49,8 +49,9 @@ class ProfilePageWithReadingListViewTestsCase(TestCase, LoginRedirectTester,Menu
         self.assertNotContains(response, self.book2.author) 
         self.assertNotContains(response, self.book1.title)    
         self.assertNotContains(response, self.book1.author) 
-        # books_url = reverse('books_list')
-        # self.assertContains(response, books_url)
+        book3_url = reverse('book_details', kwargs={'book_id':self.book3.id})
+        self.assertContains(response, book3_url)
+        
           
 
     def test_get_user_profile_page_with_request_user_id(self):
@@ -84,7 +85,10 @@ class ProfilePageWithReadingListViewTestsCase(TestCase, LoginRedirectTester,Menu
         self.assertContains(response, self.book2.author)
         self.assertNotContains(response, self.book3.title)    
         self.assertNotContains(response, self.book3.author) 
-    
+        book2_url = reverse('book_details', kwargs={'book_id':self.book2.id})
+        self.assertContains(response, book2_url)
+        book1_url = reverse('book_details', kwargs={'book_id':self.book1.id})
+        self.assertContains(response, book1_url)
 
     def test_get_profile_page_with_reading_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
