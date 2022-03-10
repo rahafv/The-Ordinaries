@@ -49,10 +49,9 @@ class MeetingHelper:
 
     def get_email(self, meeting, all_mem):
         if all_mem:
-            invitees = []
-            for mem in meeting.club.members.all():
-                invitees.append(mem.email)
+            invitees = meeting.club.members.values_list('email', flat=True)
             return invitees
+
         else:
             return [meeting.chooser.email]
 

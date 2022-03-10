@@ -456,20 +456,32 @@ def transfer_club_ownership(request, club_id):
             member = get_object_or_404(User.objects, id = int(selectedmember))
             club.make_owner(member)
             messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
-            create_event('C', 'O', Event.EventType.TRANSFER, club=club, action_user=member)
+            create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
             
             current_site = get_current_site(request)
             subject = club.name + ' Club updates'
-            body = render_to_string('emails/transfer.html', {
+            email_from = settings.EMAIL_HOST_USER
+
+            members_email_body = render_to_string('emails/transfer.html', {
             'owner': member,
             'domain': current_site,
             'club':club
             })
-            email_from = settings.EMAIL_HOST_USER
-            email_to = club.members.values_list('email', flat=True)
 
-            send_mail(subject, body, email_from, email_to)
+            owner_email_body = render_to_string('emails/new_owner.html', {
+            'owner': member,
+            'domain': current_site,
+            'club':club
+            })
+
+            email_to_members = club.members.exclude(id=member.id).values_list('email', flat=True)
+            email_to_owner = [member.email]
+
+            send_mail(subject, members_email_body, email_from, email_to_members)
+            send_mail(subject, owner_email_body, email_from, email_to_owner)
+
             return redirect('club_page', club_id = club.id)
+
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
 @login_required

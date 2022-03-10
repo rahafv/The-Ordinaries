@@ -1,0 +1,12 @@
+{% autoescape off %}
+
+
+Hello {{owner.username}},
+
+The owner of the {{club.name}} has choose you to be the new owner of the club.
+You can now manage the club and hve more privliges like scheduling meetings.
+
+The Ordinaries Book Clubs,
+Club page: http://{{domain}}{% url 'club_page' club.id %}
+
+{% endautoescape %} 

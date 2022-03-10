@@ -287,13 +287,13 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
-            self.readers_count = self.readers.count()
+            self.readers_count = self.readers.count() + 1
             self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-            self.readers_count = self.readers.count()
+            self.readers_count = self.readers.count() - 1
             self.save()
 
     def add_club(self, club):
@@ -476,7 +476,7 @@ class Event(models.Model):
             raise ValidationError('Club cannot rate')
         if self.type_of_actor == 'C' and self.type_of_action == 'C':
             raise ValidationError('Club cannot create club')
-        if self.type_of_actor == 'C' and self.type_of_action == 'U':
+        if self.type_of_actor == 'C' and self.type_of_action == 'U' and self.message != self.EventType.TRANSFER:
             raise ValidationError('Club cannot join and withdraw from clubs')
 
         """ checks that the type of actor and the object are correct """
