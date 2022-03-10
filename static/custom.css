@@ -151,9 +151,10 @@ Profile re-designed
   background-image: url(images/profile.png);
   background-position: bottom;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   position:relative;
   width: 100%;
+  /* min-height: 100vh; */
   z-index:-0.5;
 }
 
