@@ -217,7 +217,15 @@ def club_page(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     is_applicant = club.is_applicant(current_user)
-    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant})
+    upcoming_meetings = club.get_upcoming_meetings()
+    try: 
+        upcoming_meeting = upcoming_meetings[0]
+    except:
+        upcoming_meeting=None
+
+    
+    
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting})
 
 
 @login_required
@@ -744,5 +752,28 @@ def delete_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
 
+@login_required
+def meetings_list(request, club_id):
+    user = get_object_or_404(User.objects, id=request.user.id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    
+    meetings = club.get_upcoming_meetings()
+    
+    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    meetings_list = meetings_pg.get_page(page_number)
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user })
+    
+@login_required
+def previous_meetings_list(request, club_id):
+    user = get_object_or_404(User.objects, id=request.user.id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    
+    meetings = club.get_previous_meetings()
+    
+    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    meetings_list = meetings_pg.get_page(page_number)
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user })
 
 
