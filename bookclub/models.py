@@ -287,13 +287,13 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
-            self.readers_count = self.readers.count() + 1
+            self.readers_count = self.readers_count + 1
             self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-            self.readers_count = self.readers.count() - 1
+            self.readers_count = self.readers_count - 1
             self.save()
 
     def add_club(self, club):

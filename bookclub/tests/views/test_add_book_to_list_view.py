@@ -34,6 +34,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenueTestMixin, M
     def test_successful_book_removal(self):
         self.client.login(username=self.user.username, password='Password123')
         self.book.add_reader(self.user)
+        self.book.refresh_from_db()
         count = self.book.readers_count
         response = self.client.get(self.url, follow=True)
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})

@@ -90,6 +90,7 @@ class BookModelTestCase(TestCase):
         nonReader = User.objects.get(id=1)
         count = self.book.readers_count
         self.book.add_reader(nonReader)
+        self.book.refresh_from_db()
         self.assertEqual(self.book.readers_count, count+1)
 
     def test_reader_addition_when_user_is_already_a_reader(self):
@@ -97,6 +98,7 @@ class BookModelTestCase(TestCase):
         self.book.add_reader(reader)
         count = self.book.readers_count
         self.book.add_reader(reader)
+        self.book.refresh_from_db()
         self.assertEqual(self.book.readers_count, count)
 
     def test_reader_deletion(self):
