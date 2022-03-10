@@ -92,21 +92,6 @@ ul.errorlist {
   margin: 0;
 }
 
-/* Background */
-
-.background {
-  background-image: url(images/profile.png);
-  background-position: bottom;
-  background-repeat: no-repeat;
-  background-size: cover;
-  width: 100%;
-}
-
-.blur {
-  background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
-  backdrop-filter: blur(9px); /* This be the blur*/
-  min-height: 60vh;
-}
 
 /*Links*/
 
@@ -132,6 +117,10 @@ a:link {
 }
 
 .bg-dark-purple{
+  background-color: #301934;
+}
+
+.bg-purple{
   background-color: #64505a;
 }
 
@@ -155,14 +144,44 @@ a:link {
 /*
 Profile re-designed
 */
+
+/* Background */
+
+.background {
+  background-image: url(images/profile.png);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position:relative;
+  width: 100%;
+  z-index:-0.5;
+}
+
+.blur {
+  background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
+  backdrop-filter: blur(10px); /* This be the blur*/
+  min-height: 55vh;
+}
+
+
 .name-and-edit {
   display:inline-flex;
+  font-size:xx-large
 }
 
 .edit-pencil{
   display: inline-flex;
   align-items: center;
   border: bottom 0px;
+  
+}
+
+.user-name{
+  text-align: center;
+  font-size:2.5vw;
+  padding-left:30px;
+  color: #301934
+  
 }
 
 .text-white {
@@ -222,6 +241,33 @@ Profile re-designed
   opacity: 0.6;
 }
 
+.profile-username {
+  font-size: 22px;
+}
+
+.profile-email {
+  font-size: 19px;
+}
+
+.profile-bio {
+  font-size: 20px;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: black;
+}
+
+.profile-statistics {
+  font-weight: 400;
+  font-size: 20px;
+  color: #301934
+}
+
+.profile-statistics-item {
+  font-size: 20px;
+  font-weight: 450;
+
+}
+
 /*
 Profile nav-bar 
 */
@@ -237,13 +283,10 @@ Profile nav-bar
   border-width: 0 ;
   border-radius: 0 ;
   background-color: transparent ;
+  font-size: 26px;
 }
 .nav-tabs .nav-link.active {
   border-bottom-color: #fff;
-}
-
-.bio-text{
-  text-overflow: ellipsis;
 }
 
 /*

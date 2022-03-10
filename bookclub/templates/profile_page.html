@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="ui-bg-cover ui-bg-overlay-container text-purple" style="background-color: #64505a">
-    <div class="ui-bg-overlay bg-dark-purple opacity-25"></div>
+    <div class="ui-bg-overlay bg-purple opacity-25"></div>
     <div class="row">
         <div class = "background">
             <div class = "blur">        
@@ -16,10 +16,10 @@
 
                         <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
                             <div class =  "text-center name-and-edit">
-                                <h3 class="font-weight-bold my-4">{{ user.full_name }}</h3>
+                                <h3 class=" user-name font-weight-bold my-4">{{ user.full_name }}</h3>
                                 &emsp;
                                 {% if current_user == user %}
-                                    <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"></a>
+                                    <a class = "edit-pencil  bi-pencil-square" href ="{% url 'edit_profile'%}"  ></a>
                                 {% endif %}
                             </div>
 
@@ -30,7 +30,7 @@
                                     <span class = "profile-email">{{user.email}}</span>
                                 {% endif %}
                             </div>
-                            <div class="opacity-60- mb-2"> 
+                            <div class="opacity-75 mb-2"> 
                                     {% if user.age %}
                                         <span class="profile-statistics">Age: </span>
                                         <span class = "profile-statistics-item">{{user.age}}</span>
@@ -41,23 +41,23 @@
                                         <span class = "profile-statistics-item">{{user.location}}</span>
                                     {% endif %}
                             </div>
-                            <div class="bio-text pt-2 pb-4 opacity-75 ">
+                            <div class="profile-bio pt-1 pb-4 opacity-75">
                                 {% if user.bio %}
-                                    <span >{{user.bio}}</span> 
+                                    <span>{{user.bio}}</span> 
                                 {% endif %}
                             </div>  
                         </div>
-                        <div class="text-center">
-                            <a href="{% url 'following_list' user_id=user.id %}"  class = "text-dark-purple"> {{ user.followee_count }}  <span class=" text-purple opacity-75">following</span></a>
+                        <div class="text-center pt-2 pb-1.7">
+                            <a href="{% url 'following_list' user_id=user.id %}"  class = "profile-statistics text-dark-purple"> {{ user.followee_count }}  <span class=" text-purple opacity-75">following</span></a>
                             &emsp;
-                            <a href="{% url 'followers_list' user_id=user.id %}" class = "text-dark-purple" > {{ user.follower_count }} <span class="text-purple opacity-75">followers</span></a>
+                            <a href="{% url 'followers_list' user_id=user.id %}" class = "profile-statistics text-dark-purple" > {{ user.follower_count }} <span class="text-purple opacity-75">followers</span></a>
                             &emsp;
                             <div class="float text-black d-inline-flex">
                                 {% if followable %}
                                     {% if following %}
-                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary bg-light-blue text-white"> Unfollow </a> 
+                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-secondary bg-light-blue text-white"> Unfollow </a> 
                                     {% else %}
-                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary bg-dark-blue opacity-75 text-white"> Follow </a> 
+                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-primary bg-dark-purple opacity-75 text-white"> Follow </a> 
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -87,20 +87,22 @@
                     {% if is_clubs is True %}
                         {% if items_count != 0 %}
                             {% include 'partials/clubs_list.html' with clubs=items %}
+                            <br/>
                             <ul class="pagination justify-content-center">
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2>No Clubs joined!</h2>
+                            <h2 style = "font-size:3vw mt-1">No Clubs joined!</h2>
                         {% endif %}
                     {% elif is_clubs is False %}
                         {% if items_count != 0  %}
                             {%  include 'partials/books_list.html' with books=items %}
+                            <br/>
                             <ul class="pagination justify-content-center">
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2> Reading list is empty!</h2>
+                            <h2 class = "pt-1" style = "font-size:2.5vw"> Reading list is empty!</h2>
                         {% endif %}
                     {% endif %}
                 </div>
