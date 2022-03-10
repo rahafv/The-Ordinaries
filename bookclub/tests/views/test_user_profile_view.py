@@ -47,7 +47,9 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertNotContains(response, self.user.username)    
         self.assertNotContains(response, self.user.full_name())
         self.assertContains(response, self.book.title)    
-        self.assertContains(response, self.book.author)     
+        self.assertContains(response, self.book.author)
+        book_url = reverse('book_details', kwargs={'book_id':self.book.id})
+        self.assertContains(response, book_url)     
 
     def test_get_user_profile_page_with_request_user_id(self):
         self.client.login(username=self.user.username, password='Password123')

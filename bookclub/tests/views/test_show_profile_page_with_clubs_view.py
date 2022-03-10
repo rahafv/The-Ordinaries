@@ -25,7 +25,6 @@ class ProfilePageWithClubsListViewTestsCase(TestCase, LoginRedirectTester,MenuTe
         self.url = reverse('profile_clubs', kwargs = {'user_id':self.user2.id})
        
     def test_profile_page_with_clubs_list_url(self):
-        # self.client.login(username = self.user.username, password = "Password123")
         self.assertEqual(self.url,'/profile/2/clubs')
 
     def test_get_valid_user_profile_page_with_club_list(self):
@@ -51,8 +50,10 @@ class ProfilePageWithClubsListViewTestsCase(TestCase, LoginRedirectTester,MenuTe
         self.assertContains(response, self.club2.theme) 
         self.assertContains(response, self.club1.name)    
         self.assertContains(response, self.club1.theme) 
-        # books_url = reverse('books_list')
-        # self.assertContains(response, books_url)
+        club1_url = reverse('club_page', kwargs={'club_id':self.club1.id})
+        self.assertContains(response, club1_url)
+        club2_url = reverse('club_page', kwargs={'club_id':self.club2.id})
+        self.assertContains(response, club2_url)
           
 
     def test_get_user_profile_page_with_request_user_id(self):
@@ -116,6 +117,8 @@ class ProfilePageWithClubsListViewTestsCase(TestCase, LoginRedirectTester,MenuTe
         self.assertNotContains(response, self.club2.theme) 
         self.assertContains(response, self.club1.name)    
         self.assertContains(response, self.club1.theme) 
+        club1_url = reverse('club_page', kwargs={'club_id':self.club1.id})
+        self.assertContains(response, club1_url)
 
     def test_get_profile_club_page_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

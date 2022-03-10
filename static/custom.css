@@ -6,38 +6,6 @@
   border-radius: 0px;
 }
 
-/* Colours */
-
-.bg-light-pink {
-  background-color: #dac3c3 ;
-}
-
-.bg-dark-purple{
-  background-color: #301934;
-}
-
-.bg-purple{
-  background-color: #64505a;
-}
-
-
-.bg-light-whitish {
-  background-color: #faf3ee;
-}
-
-.bg-light-blue{
-  background-color: #74a5b4;
-}
-
-.bg-blue{
-  background-color: #284664;
-}
-
-.bg-dark-blue{
-  background-color: #324655;
-}
-
-
 /*
  * Cover page
  */
@@ -62,101 +30,13 @@
   -o-background-size: cover;
 }
 
-/*
- * Login page
-*/
 #login-image {
-  background: url(images/undraw_Reading_time_re_phf7.png) no-repeat center center fixed;
+  background: url(images/login.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
   -o-background-size: cover;
-
 }
-
-.lower-mid-center {
-  top: 45%;
-  left: 60%;
-  transform: translateX(10%) translateY(20%);
-}
-
-.upper-mid-center {
-  top: 14%;
-  left: 60%;
-  transform: translateX(-10%) translateY(-50%);
-}
-
-/*
-*/
-body{
-  margin-top:20px;
-  background:#eee;
-}
-.container {
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 15px;
-  padding-left: 15px;
-  width: 100%;
-}
-
-@media (min-width: 576px) {
-  .container {
-      max-width: 540px;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-      max-width: 720px;
-  }
-}
-
-@media (min-width: 992px) {
-  .container {
-      max-width: 960px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container {
-      max-width: 1140px;
-  }
-}
-
-.card-columns .card {
-  margin-bottom: 0.75rem;
-}
-
-@media (min-width: 576px) {
-  .card-columns {
-      column-count: 3;
-      column-gap: 1.25rem;
-  }
-  .card-columns .card {
-      display: inline-block;
-      width: 100%;
-  }
-}
-.text-muted {
-  color: #9faecb !important;
-}
-
-p {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-.mb-3 {
-  margin-bottom: 1rem !important;
-}
-
-.input-group {
-  position: relative;
-  display: flex;
-  width: 100%;
-}
-
-/**/
 
 .h-100 {
   min-height: 100vh;
@@ -212,9 +92,7 @@ ul.errorlist {
 }
 
 
-/*
-  * Links
-*/
+/*Links*/
 
 /* selected link */
 a{
@@ -230,29 +108,37 @@ a:link {
   text-decoration: none;
 }
 
-/*  
-  * Profile re-designed
-*/
 
-/* Background */
+/* Colours */
 
-.background {
-  background-image: url(images/profile.png);
-  background-position: bottom;
-  background-repeat: no-repeat;
-  background-size: cover;
-  position:relative;
-  width: 100%;
-  /* min-height: 100vh; */
-  z-index:-0.5;
+.bg-light-pink {
+  background-color: #dac3c3 ;
 }
 
-.blur {
-  background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
-  backdrop-filter: blur(10px); /* This be the blur*/
-  min-height: 55vh;
+.bg-dark-purple{
+  background-color: #301934;
 }
 
+.bg-purple{
+  background-color: #64505a;
+}
+
+
+.bg-light-whitish {
+  background-color: #faf3ee;
+}
+
+.bg-light-blue{
+  background-color: #74a5b4;
+}
+
+.bg-blue{
+  background-color: #284664;
+}
+
+.bg-dark-blue{
+  background-color: #324655;
+}
 
 .name-and-edit {
   display:inline-flex;
@@ -268,9 +154,9 @@ a:link {
 
 .user-name{
   text-align: center;
-  font-size:2.5vw;
+  font-size: 40px;;
   padding-left:30px;
-  color: #301934
+  color: white
   
 }
 
@@ -339,28 +225,25 @@ a:link {
   font-size: 19px;
 }
 
-.profile-bio {
-  font-size: 20px;
-  text-overflow: ellipsis;
-  font-weight: 500;
-  color: black;
-}
-
 .profile-statistics {
   font-weight: 400;
   font-size: 20px;
-  color: #301934
+  color: white;
+  opacity: 0.75;
 }
 
 .profile-statistics-item {
   font-size: 20px;
   font-weight: 450;
-
 }
 
+.bio-text{
+  text-overflow: ellipsis;
+  font-size: 20px;
+}
 
 /*
-  * Profile nav-bar 
+Profile nav-bar 
 */
 .tabs-alt.nav-tabs .nav-link.active, .tabs-alt.nav-tabs .nav-link.active:hover, .tabs-alt.nav-tabs .nav-link.active:focus, .tabs-alt>.nav-tabs .nav-link.active, .tabs-alt>.nav-tabs .nav-link.active:hover, .tabs-alt>.nav-tabs .nav-link.active:focus {
   -webkit-box-shadow: 0 -2px 0 #324655 inset;
@@ -393,6 +276,7 @@ a:link {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
 
 /*
  * Post
@@ -693,8 +577,3 @@ label:hover ~ input:checked ~ label{
     font-size: 3.5rem;
   }
 }
-
-
-
-
-
