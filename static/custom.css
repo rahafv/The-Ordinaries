@@ -147,22 +147,22 @@ Profile re-designed
 
 /* Background */
 
-.background {
-  background-image: url(images/profile.png);
-  background-position: bottom;
+/* .background {
+  /* background-image: url(images/profile.png); */
+  /* background-position: bottom;
   background-repeat: no-repeat;
   background-size: contain;
   position:relative;
   width: 100%;
   /* min-height: 100vh; */
-  z-index:-0.5;
+  /* z-index:-0.5;
 }
 
 .blur {
   background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
-  backdrop-filter: blur(10px); /* This be the blur*/
-  min-height: 55vh;
-}
+  /* backdrop-filter: blur(10px); This be the blur */
+  /* min-height: 55vh; */
+/* }   */
 
 
 .name-and-edit {
@@ -179,9 +179,9 @@ Profile re-designed
 
 .user-name{
   text-align: center;
-  font-size:2.5vw;
+  font-size: 40px;;
   padding-left:30px;
-  color: #301934
+  color: white
   
 }
 
@@ -250,23 +250,28 @@ Profile re-designed
   font-size: 19px;
 }
 
-.profile-bio {
+/* .profile-bio {
   font-size: 20px;
   text-overflow: ellipsis;
   font-weight: 500;
   color: black;
-}
+} */
 
 .profile-statistics {
   font-weight: 400;
   font-size: 20px;
-  color: #301934
+  color: white;
+  opacity: 0.75;
 }
 
 .profile-statistics-item {
   font-size: 20px;
   font-weight: 450;
+}
 
+.bio-text{
+  text-overflow: ellipsis;
+  font-size: 20px;
 }
 
 /*
