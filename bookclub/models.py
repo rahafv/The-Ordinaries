@@ -1,4 +1,5 @@
 from itertools import count
+from pydoc import describe
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.forms import ValidationError
@@ -241,8 +242,14 @@ class Book(models.Model):
         blank=False
     )
 
-    publisher = models.CharField(
+    genre = models.CharField(
         max_length=100,
+        unique=False,
+        blank=True
+    )
+
+    describtion = models.CharField(
+        max_length=500,
         unique=False,
         blank=True
     )
@@ -251,14 +258,12 @@ class Book(models.Model):
         blank=True
     )
 
-    year = models.PositiveIntegerField(
-        default=datetime.datetime.now().year,
+    pages_num = models.PositiveIntegerField(
+        unique=False,
         blank=True,
-        validators=[
-            MaxValueValidator(datetime.datetime.now().year),
-            MinValueValidator(0)
-        ]
+        null=True
     )
+
 
     readers = models.ManyToManyField(
         User,

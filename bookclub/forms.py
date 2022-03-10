@@ -156,7 +156,7 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
+        fields = ['ISBN','title','author', 'genre', 'image_url', 'describtion']
 
     def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')

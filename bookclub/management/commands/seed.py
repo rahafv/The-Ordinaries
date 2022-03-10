@@ -1,3 +1,4 @@
+from pydoc import describe
 from django.core.management.base import BaseCommand
 from bookclub.models import User, Club, Book , Rating, Event, Meeting
 from faker import Faker
@@ -183,7 +184,7 @@ class Command(BaseCommand):
 
     def create_books(self):
         MAX_BOOKS = 1000
-        books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
+        books_path = os.path.abspath("book-review-dataset/books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = csv.reader(csv_file, delimiter=",")
             next(books_data)
@@ -193,11 +194,13 @@ class Command(BaseCommand):
             for col in books_data:
               
                 book = Book(
-                    ISBN = col[0],
-                    title = col[1],
-                    author = col[2],
-                    image_url = col[7],
-                    year= col[3]
+                    ISBN = col[4],
+                    title = col[6],
+                    author = col[0],
+                    genre = col[7],
+                    describtion = col[1],
+                    image_url = col[3],
+                    pages_num = col[5]
                 )
 
                 books.append(book)
