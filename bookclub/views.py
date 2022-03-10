@@ -273,13 +273,17 @@ def show_profile_page(request, user_id=None, is_clubs=False):
     if user_id == request.user.id:
         return redirect('profile')
 
+    if user_id:
+        user = get_object_or_404(User.objects, id=user_id)
+        
+
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    if user_id:
-        items = ""
-        items_count = 0
-        user = get_object_or_404(User.objects, id=user_id)
+    items = ""
+    items_count = 0
+
+    if user_id is not None:
         books_queryset = User.objects.get(id=user_id).books.all()
         books_count = books_queryset.count()
         books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
@@ -287,7 +291,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
         books = books_pg.get_page(page_number)
         items = books
         items_count = books_count
-        
+
         return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': items, 'items_count': items_count, 'is_clubs': is_clubs})
        
     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, })
@@ -329,7 +333,6 @@ def show_profile_page_reading_list(request, user_id):
     books = books_pg.get_page(page_number)
 
     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': books, 'items_count': books_count, 'is_clubs': False})
-
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):

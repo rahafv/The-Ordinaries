@@ -4,63 +4,68 @@
 | Profile
 {% endblock %}
 {% block content %}
-<div class="ui-bg-cover ui-bg-overlay-container text-white" style="background-color: #64505a">
+
+<div class="ui-bg-cover ui-bg-overlay-container text-purple" style="background-color: #64505a">
     <div class="ui-bg-overlay bg-dark-purple opacity-25"></div>
     <div class="row">
-        <div class="container">
-            <div class= "text-center py-5">
-                <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
+        <div class = "background">
+            <div class = "blur">        
+                <div class="container">
+                    <div class= "text-center py-3">
+                        <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
 
-                <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
-                    <div class =  "text-center name-and-edit">
-                        <h3 class="font-weight-bold my-4">{{ user.full_name }}</h3>
-                        &emsp;
-                        {% if current_user == user %}
-                            <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"></a>
-                        {% endif %}
-                    </div>
+                        <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
+                            <div class =  "text-center name-and-edit">
+                                <h3 class="font-weight-bold my-4">{{ user.full_name }}</h3>
+                                &emsp;
+                                {% if current_user == user %}
+                                    <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"></a>
+                                {% endif %}
+                            </div>
 
-                    <div class="opacity-75 mb-2">
-                        <span class = "profile-username">{{user.username}}</span>
-                        {% if current_user == user %}
-                        <br/>
-                            <span class = "profile-email">{{user.email}}</span>
-                        {% endif %}
-                    </div>
-                    <div class="opacity-60- mb-2"> 
-                            {% if user.age %}
-                                <span class="profile-statistics">Age: </span>
-                                <span class = "profile-statistics-item">{{user.age}}</span>
-                            {% endif %}
+                            <div class="opacity-75 mb-3">
+                                <span class = "profile-username">{{user.username}}</span>
+                                {% if current_user == user %}
+                                <br/>
+                                    <span class = "profile-email">{{user.email}}</span>
+                                {% endif %}
+                            </div>
+                            <div class="opacity-60- mb-2"> 
+                                    {% if user.age %}
+                                        <span class="profile-statistics">Age: </span>
+                                        <span class = "profile-statistics-item">{{user.age}}</span>
+                                    {% endif %}
+                                    &emsp;
+                                    {% if user.location %}
+                                        <span class="profile-statistics">Location:</span>
+                                        <span class = "profile-statistics-item">{{user.location}}</span>
+                                    {% endif %}
+                            </div>
+                            <div class="bio-text pt-2 pb-4 opacity-75 ">
+                                {% if user.bio %}
+                                    <span >{{user.bio}}</span> 
+                                {% endif %}
+                            </div>  
+                        </div>
+                        <div class="text-center">
+                            <a href="{% url 'following_list' user_id=user.id %}"  class = "text-dark-purple"> {{ user.followee_count }}  <span class=" text-purple opacity-75">following</span></a>
                             &emsp;
-                            {% if user.location %}
-                                <span class="profile-statistics">Location:</span>
-                                <span class = "profile-statistics-item">{{user.location}}</span>
-                            {% endif %}
-                    </div>
-                    <div class="bio-text pt-2 pb-4 opacity-75 ">
-                        {% if user.bio %}
-                            <span >{{user.bio}}</span> 
-                        {% endif %}
-                    </div>  
-                </div>
-                <div class="text-center">
-                    <a href="{% url 'following_list' user_id=user.id %}" class="d-inline-block text-white"> {{ user.followee_count }}  <span class="opacity-75">following</span></a>
-                    &emsp;
-                    <a href="{% url 'followers_list' user_id=user.id %}" class="d-inline-block text-white"> {{ user.follower_count }} <span class="opacity-75">followers</span></a>
-                    &emsp;
-                    <span class="float">
-                        {% if followable %}
-                            {% if following %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary"> Unfollow </a> 
-                            {% else %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary"> Follow </a> 
-                            {% endif %}
-                        {% endif %}
-                    </span>
-                </div>
-            </div> 
-        </div> 
+                            <a href="{% url 'followers_list' user_id=user.id %}" class = "text-dark-purple" > {{ user.follower_count }} <span class="text-purple opacity-75">followers</span></a>
+                            &emsp;
+                            <div class="float text-black d-inline-flex">
+                                {% if followable %}
+                                    {% if following %}
+                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary bg-light-blue text-white"> Unfollow </a> 
+                                    {% else %}
+                                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-primary bg-dark-blue opacity-75 text-white"> Follow </a> 
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div> 
+                </div> 
+            </div>
+        </div>
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
             <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent">

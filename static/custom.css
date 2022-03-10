@@ -39,17 +39,6 @@
   -o-background-size: cover;
 }
 
-#profile-image {
-  /* background: url(images/profile.png) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
-  -o-background-size: cover;
-  filter: blur(1px);
-  -webkit-filter: blur(1px); */
-  display: inline-block;
-}
-
 .h-100 {
   min-height: 100vh;
   height: 100vh;
@@ -102,6 +91,39 @@ ul.errorlist {
   padding: 0;
   margin: 0;
 }
+
+/* Background */
+
+.background {
+  background-image: url(images/profile.png);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+}
+
+.blur {
+  background: rgba(255, 255, 255, 0.2); /* Make sure this color has an opacity of less than 1 */
+  backdrop-filter: blur(9px); /* This be the blur*/
+  min-height: 60vh;
+}
+
+/*Links*/
+
+/* selected link */
+a{
+  color: rgb(47, 69, 98);
+}
+
+/* mouse over link */
+a:hover {
+  color:rgb(214, 196, 195);
+}
+
+a:link {
+  text-decoration: none;
+}
+
 
 /* Colours */
 
