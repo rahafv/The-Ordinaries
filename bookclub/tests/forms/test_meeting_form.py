@@ -16,11 +16,9 @@ class MeetingFormTestCase(TestCase):
         'bookclub/tests/fixtures/default_book.json',
         'bookclub/tests/fixtures/other_meeting.json']
 
-# "2022-1-05T02:15:12.356Z"
-
     def setUp(self):
         self.club = Club.objects.get(id=2)
-        self.sec_club = Club.objects.get(id=3)
+        self.sec_club = Club.objects.get(id=1)
         self.meeting = Meeting.objects.get(id=2)
         self.date = pytz.utc.localize(datetime.today()+timedelta(15))
 
@@ -33,7 +31,7 @@ class MeetingFormTestCase(TestCase):
         }
 
         self.sec_form_input = {
-            'title': 'meeting1',
+            'title': 'meeting2',
             'time': self.date,
             'notes': 'bring the book',
             'link': 'https://goo.gl/maps/DbTzHjUu8cP4zNjRA',
@@ -44,7 +42,7 @@ class MeetingFormTestCase(TestCase):
     def test_valid_meeting_form(self):
         form = MeetingForm(self.club, self.form_input)
         self.assertTrue(form.is_valid())
-        sec_form = MeetingForm(self.club, self.sec_form_input)
+        sec_form = MeetingForm(self.sec_club, self.sec_form_input)
         self.assertTrue(sec_form.is_valid())
 
     def test_form_has_correct_fields(self):
@@ -77,7 +75,7 @@ class MeetingFormTestCase(TestCase):
 
     def test_second_time_validation(self):
         self.sec_form_input["time"] = pytz.utc.localize(datetime.today())
-        form = MeetingForm(self.club, self.sec_form_input)
+        form = MeetingForm(self.sec_club, self.sec_form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_meeting_validation(self):
@@ -87,8 +85,14 @@ class MeetingFormTestCase(TestCase):
 
     def test_second_meeting_validation(self):
         self.sec_form_input["time"] = self.meeting.time
+        form = MeetingForm(self.sec_club, self.sec_form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_no_previous_meetings(self):
         form = MeetingForm(self.club, self.sec_form_input)
         self.assertFalse(form.is_valid())
+
+
 
     def test_form_saves_correctly(self):
         count_clubs_before = Meeting.objects.count()

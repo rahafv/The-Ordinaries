@@ -423,7 +423,7 @@ class MeetingForm(forms.ModelForm):
 
     def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same period."""
-        try:
+        if time:
             meetings = Meeting.objects.filter(club_id=self.club.id)
             if not is_cont:
                 for met in meetings:
@@ -435,8 +435,9 @@ class MeetingForm(forms.ModelForm):
                     if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
                         self.add_error('time', 'There is a meeting on that day.')
                         break
-        except:
+        else:
             pass
+
 
     def save(self):
         """Create a new meeting."""
