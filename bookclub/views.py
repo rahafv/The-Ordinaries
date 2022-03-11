@@ -213,10 +213,10 @@ def add_review(request, book_id):
 
 @login_required
 def club_page(request, club_id):
-    current_user = request.user
+    user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
-    is_member = club.is_member(current_user)
-    is_applicant = club.is_applicant(current_user)
+    is_member = club.is_member(user)
+    is_applicant = club.is_applicant(user)
     upcoming_meetings = club.get_upcoming_meetings()
     try: 
         upcoming_meeting = upcoming_meetings[0]
@@ -225,7 +225,7 @@ def club_page(request, club_id):
 
     
     
-    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting})
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
 
 
 @login_required

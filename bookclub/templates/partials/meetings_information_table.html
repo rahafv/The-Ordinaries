@@ -22,8 +22,7 @@
 
             <td> 
                 {% if meeting.book %}
-                        {{meeting.book}}
-                        <a href='{% url 'book_details' meeting.book.id %}' class="btn my-2 btn-outline-secondary"> {{meeting.book.title}}</a>
+                    <a href='{% url 'book_details' meeting.book.id %}' style = "color:black;"> {{meeting.book.title}}</a>
                 {% else %}
                     {%if user != meeting.chooser%}
                         <a> No book has been chosen yet.. </a> 

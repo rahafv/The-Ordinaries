@@ -71,20 +71,24 @@
                     <p>Title: {{ upcoming_meeting.title }}</p>
                     <p>Time: {{ upcoming_meeting.time }}</p>
                     {% if upcoming_meeting.book %}
-                        Book: {{upcoming_meeting.book}}
-                        <a href='{% url 'book_details' upcoming_meeting.book.id %}' class="btn my-2 btn-outline-secondary"> {{upcoming_meeting.book.title}}</a>
+                        Book Title : <a href='{% url 'book_details' upcoming_meeting.book.id %}' style = "color:black;"> {{upcoming_meeting.book.title}}</a>
+                        <div class="profile-img">
+                          <img src="{{ upcoming_meeting.book.image_url }}"  width="110" height="150" class="mt-1" />
+                      </div>
+                        
                     {% else %}
-                      {%if user != meeting.chooser%}
+                      {%if user != upcoming_meeting.chooser%}
                           <a> No book has been chosen yet.. </a> 
                       {% else %}
-                        <a href="{% url 'choice_book_list' meeting_id=meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
+                        <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
                     {% endif %} 
                     <p>Link: {{ upcoming_meeting.link }}</p>
                     <p>Notes: {{ upcoming_meeting.notes }}</p>
                   </div>
-                  <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark"> upcoming meetings </a> 
-                  <a href='{% url "previous_meetings_list" club.id %}' class="btn btn-outline-dark"> previous meetings </a> 
+                  
                 {% endif %}
+                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> upcoming meetings </a> 
+                <a href='{% url "previous_meetings_list" club.id %}' class="btn btn-outline-dark mt-2 mb-1"> previous meetings </a> 
                 {%else %}
                 <a> No meeting has been scheduled yet.. </a> 
                 {%endif%}
