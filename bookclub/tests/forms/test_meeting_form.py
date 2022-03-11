@@ -80,7 +80,7 @@ class MeetingFormTestCase(TestCase):
 
     def test_form_meeting_validation(self):
         self.form_input["time"] = self.meeting.time
-        form = MeetingForm(self.club, self.form_input)
+        form = MeetingForm(self.sec_club, self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_second_meeting_validation(self):
