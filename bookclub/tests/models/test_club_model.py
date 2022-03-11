@@ -77,6 +77,7 @@ class ClubModelTestCase(TestCase):
     def test_club_type(self):
         self.club.club_type = self.club.ClubType.PUBLIC
         self.assertEqual(self.club.club_type, "Public")
+        self.assertEqual("Public", self.club.get_club_type_display())
     
     def test_city_may_be_blank(self):
         self.club.city = ''
@@ -97,6 +98,7 @@ class ClubModelTestCase(TestCase):
     def test_country_may_be_blank(self):
         self.club.country = ''
         self._assert_club_is_valid()
+    
 
     def test_country_may_be_not_unique(self):
         self.club.country = self.other_club.country

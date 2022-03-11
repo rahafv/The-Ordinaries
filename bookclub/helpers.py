@@ -6,7 +6,9 @@ from django.core.mail import send_mail
 import six
 from system import settings
 from django.conf import settings
-from .models import Event
+from .models import Event, User, Club, Book
+from django.db.models.functions import Lower
+
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -72,3 +74,69 @@ class TokenGenerator(PasswordResetTokenGenerator):
 
     
 generate_token = TokenGenerator()
+
+
+class SortHelper:
+
+    def __init__(self, sort_value, list_of_filtered_objects):
+        self.sort = sort_value
+        self.list_of_objects = list_of_filtered_objects
+
+    def sort_users(self):
+        if(self.sort == 'name_desc'):
+            return self.list_of_objects.reverse()
+        else:
+            return self.list_of_objects
+
+    def sort_books(self):
+        if(self.sort == 'name_asc'):
+            return self.list_of_objects.order_by(Lower('title').asc())
+        elif (self.sort == 'name_desc'):
+            return self.list_of_objects.order_by(Lower('title').desc())
+        elif(self.sort == "date_asc"):
+            return self.list_of_objects.order_by('year')
+        else:
+            return self.list_of_objects.order_by(Lower('year').desc())
+
+    def sort_clubs(self):
+        if(self.sort == 'name_asc'):
+            return self.list_of_objects.order_by(Lower('name').asc())
+        elif (self.sort == 'name_desc'):
+            return self.list_of_objects.order_by(Lower('name').desc())
+        elif(self.sort == "date_asc"):
+            return self.list_of_objects.order_by('created_at')
+        else:
+            return self.list_of_objects.order_by('-created_at')
+
+
+def get_list_of_objects(searched, label):
+
+    category = ''
+    filtered_list = ""
+
+    if(label=="user-name"):
+        filtered_list = User.objects.filter(username__contains=searched)
+        category= "Users"
+    elif(label=="user-location"):
+        filtered_list = User.objects.filter(country__contains=searched)
+        category= "Users"
+    elif(label=="club-name"):
+        filtered_list = Club.objects.filter(name__contains=searched)
+        category= "Clubs"
+    elif(label=="club-location"):
+        filtered_list = Club.objects.filter(country__contains=searched)
+        category= "Clubs"
+    elif(label=="book-title"):
+        filtered_list = Book.objects.filter(title__contains=searched)
+        category= "Books"
+    elif(label=="book-year"):
+        filtered_list = Book.objects.filter(year__contains=searched)
+        category= "Books"
+    else:
+        filtered_list = Book.objects.filter(author__contains=searched)
+        category= "Books"
+    
+    return {
+        "category" : category, 
+        "filtered_list" : filtered_list}
+
