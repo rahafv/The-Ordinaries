@@ -264,7 +264,8 @@ class Book(models.Model):
     )
 
     image_url = models.URLField(
-        blank=True
+        blank=True,
+        default='https://i.imgur.com/f6LoJwT.jpg'
     )
 
     pages_num = models.PositiveIntegerField(

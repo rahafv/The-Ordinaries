@@ -41,14 +41,6 @@ class BookModelTestCase(TestCase):
         self.book.author = 'x' * 101
         self._assert_book_is_invalid()
 
-    def test_publisher_can_be_100_characters_long(self):
-        self.book.publisher = 'x' * 100
-        self._assert_book_is_valid()
-
-    def test_publisher_cannot_be_over_100_characters_long(self):
-        self.book.publisher = 'x' * 101
-        self._assert_book_is_invalid()
-
     def test_ISBN_must_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
         self.book.ISBN = second_book.ISBN
@@ -72,18 +64,18 @@ class BookModelTestCase(TestCase):
         self.book.author = second_book.author
         self._assert_book_is_valid()
 
-    def test_publisher_need_not_be_unique(self):
+    def test_genre_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
-        self.book.publisher = second_book.publisher
+        self.book.genre = second_book.genre
         self._assert_book_is_valid()
 
-    def test_year_need_not_be_unique(self):
+    def test_describtion_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
-        self.book.year = second_book.year
+        self.book.describtion = second_book.describtion
         self._assert_book_is_valid()
 
-    def test_year_may_be_blank(self):
-        self.book.year = None
+    def test_describtion_may_be_blank(self):
+        self.book.describtion = None
         self._assert_book_is_valid()
 
     def test_reader_addition(self):

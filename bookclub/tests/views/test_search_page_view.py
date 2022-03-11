@@ -117,15 +117,15 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertNotContains(response, "joe")
         self.assert_menu(response)
 
-    def test_search_books_with_year(self):
-        self._create_test_books()
-        self.client.login(username=self.user.username, password='Password123')
-        response = self.client.get(self.url,self.book_year_form_input)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
-        self.assertContains(response, "2020")
-        self.assertNotContains(response, "2000")
-        self.assert_menu(response)
+    # def test_search_books_with_year(self):
+    #     self._create_test_books()
+    #     self.client.login(username=self.user.username, password='Password123')
+    #     response = self.client.get(self.url,self.book_year_form_input)
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTemplateUsed(response, 'search_page.html')
+    #     self.assertContains(response, "2020")
+    #     self.assertNotContains(response, "2000")
+    #     self.assert_menu(response)
 
     def test_search_with_empty_str(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -182,17 +182,14 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
             if book_id < 3: 
                 title = 'uio'
                 author = 'James'
-                year = '2020'
             else: 
                 title = 'xyz'
                 author = 'joe'
-                year = '2000'
 
             Book.objects.create(
                 ISBN = isbn_num[book_id],
                 title =title,
                 author = author, 
-                year = year
             )
 
 

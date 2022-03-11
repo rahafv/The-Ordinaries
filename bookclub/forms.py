@@ -170,17 +170,13 @@ class BookForm(forms.ModelForm):
 
         super().save(commit=False)
 
-        self.image_url = self.cleaned_data.get('image_url')
-        if not self.image_url:
-            self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
-
         book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
-            publisher=self.cleaned_data.get('publisher'),
-            image_url=self.image_url,
-            year=self.cleaned_data.get('year'),
+            genre=self.cleaned_data.get('genre'),
+            image_url=self.cleaned_data.get('image_url'),
+            describtion=self.cleaned_data.get('describtion'),
         )
         return book
 
@@ -303,7 +299,7 @@ class RatingForm(forms.ModelForm):
     def calculate_rating(self, rating): 
         return rating*2
 
-class UserSortForm(forms.Form):
+class NameSortForm(forms.Form):
     
     ASCENDING = 'name_asc'
     DESCENDING = 'name_desc'

@@ -3,7 +3,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
+from .forms import NameAndDateSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  NameSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -341,7 +341,7 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
-    form = NameAndDateSortForm(request.GET or None)
+    form = NameSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
@@ -384,7 +384,7 @@ def members_list(request, club_id):
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
     #form to display user sorting options
-    form = UserSortForm(request.GET or None)
+    form = NameSortForm(request.GET or None)
     sort = ""
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
@@ -434,7 +434,7 @@ def applicants_list(request, club_id):
     is_owner = (club.owner == current_user)
     if (is_owner):
         #Form to display sorting options for Users
-        form = UserSortForm(request.GET or None)
+        form = NameSortForm(request.GET or None)
         sort = ""
         if form.is_valid():
             #get the value to sort by from the valid form 
@@ -691,10 +691,10 @@ def search_page(request):
         filtered_list = search_page_results["filtered_list"]
                         
         sortForm = ""
-        if(category == "Clubs" or category == "Books"):
+        if(category == "Clubs"):
             sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            sortForm = UserSortForm(request.GET or None)
+            sortForm = NameSortForm(request.GET or None)
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
@@ -714,10 +714,10 @@ def show_sorted(request, searched, label):
         filtered_list = search_page_results["filtered_list"]
         
         sortForm = ""
-        if(category == "Clubs" or category == "Books"):
+        if(category == "Clubs"):
             sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            sortForm = UserSortForm(request.GET or None)
+            sortForm = NameSortForm(request.GET or None)
 
         sort = ""
         if (sortForm.is_valid()):

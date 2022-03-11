@@ -91,22 +91,15 @@ class SortHelper:
     def sort_books(self):
         if(self.sort == 'name_asc'):
             return self.list_of_objects.order_by(Lower('title').asc())
-        elif (self.sort == 'name_desc'):
-            return self.list_of_objects.order_by(Lower('title').desc())
-        elif(self.sort == "date_asc"):
-            return self.list_of_objects.order_by('year')
         else:
-            return self.list_of_objects.order_by(Lower('year').desc())
+            return self.list_of_objects.order_by(Lower('title').desc())
 
     def sort_clubs(self):
         if(self.sort == 'name_asc'):
             return self.list_of_objects.order_by(Lower('name').asc())
-        elif (self.sort == 'name_desc'):
-            return self.list_of_objects.order_by(Lower('name').desc())
-        elif(self.sort == "date_asc"):
-            return self.list_of_objects.order_by('created_at')
         else:
-            return self.list_of_objects.order_by('-created_at')
+            return self.list_of_objects.order_by(Lower('name').desc())
+       
 
 
 def get_list_of_objects(searched, label):
@@ -128,9 +121,6 @@ def get_list_of_objects(searched, label):
         category= "Clubs"
     elif(label=="book-title"):
         filtered_list = Book.objects.filter(title__contains=searched)
-        category= "Books"
-    elif(label=="book-year"):
-        filtered_list = Book.objects.filter(year__contains=searched)
         category= "Books"
     else:
         filtered_list = Book.objects.filter(author__contains=searched)
