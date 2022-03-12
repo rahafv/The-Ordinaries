@@ -3,23 +3,37 @@
 {% block title %}Chat{% endblock %}
 {% block content %}
 
+<script>
+    $(document).ready(function(){
+    
+    setInterval(function(){
+        $.ajax({
+            type: 'GET',
+            url : "/getMessages/{{club.id}}",
+            success: function(response){
+                console.log(response);
+                $("#display").empty();
+                for (var key in response.chats) {
+                    var temp="<div class='container darker'><a>"+response.users[key]+"</a>"+response.chats[key].message+"<span class='time-left'>"+response.chats[key].created_at+"</span></div>";
+                    $("#display").append(temp);
+                }
+            },
+            error: function(response){
+                //alert('An error occured')
+            }
+        });
+    },1000);
+    })
+</script>
+
 <h1 class="fw-light center mt-5" style="text-align:center;">Chat</h1>
-<div class="container">
-    {% for chat in club.chats.all %}
-        <div class="chat-message right">
-            <div class="message">
-                <a class="message-author" href="#"> {{chat.user.first_name}} </a>
-                <span class="message-date">  {{chat.created_at}} </span>
-                <p class="message-content">
-                    {{chat.message}}
-                </p>
-            </div>
-        </div>
-    {% endfor %}
-    <form action="{% url 'chat_room' club.id %}" method="post">
+<div id="display">    
+</div>
+<div>
+    <form action='{% url "chat_room" club.id %}' method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
-        <input type="submit" class="btn btn-primary mb-3" value="send">
+        <input type="submit" value="Send" class="btn btn-lg btn-outline-dark">
     </form>
 </div>
 {% endblock %}

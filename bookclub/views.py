@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from imaplib import _Authenticator
-from django.http import Http404
+from django.http import Http404, HttpResponse, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Meeting, User, Club, Book , Rating, Event
+from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -758,23 +758,15 @@ def chat_room(request, club_id):
     form = MessageForm()
     return render(request, "chat_room.html", {"form": form, "club":club})
 
-# @login_required(login_url="/auth/login/")
-# def chat(request, app_id):
-#     if request.method == "POST":
-#         message = request.POST["message"]
-#         to_id = Application.objects.get(id=app_id).applicant_id
-#         ChatMessage(from_id=request.user.id, to_id=to_id, application_id=app_id, message=message).save()
-#         return HttpResponseRedirect(f"/chat/{app_id}/")
-#     else:
-#         app = Application.objects.get(id=app_id)
-#         messages = ChatMessage.objects.filter(application_id=app_id)
-#         job = Job.objects.get(id=app.job_id)
-#         profile1 = Profile.objects.get(user_id=app.applicant_id)
-#         profile2 = Profile.objects.get(id=job.profile)
-#         return render(request, "dashboard/chat.html", {
-#             "messages": messages,
-#             "app": app,
-#             "job": job,
-#             "profile1": profile1, # candidate
-#             "profile2": profile2 # employer
-#         })
+
+def getMessages(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+
+    chats = list(club.chats.all().values())
+    users = []
+    for key in chats:
+        user_id = key.get("user_id")
+        user = get_object_or_404(User.objects, id=user_id)
+        users.append(user.full_name())
+
+    return JsonResponse({"chats":chats, "users":users})
