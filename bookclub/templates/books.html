@@ -40,6 +40,7 @@
     </div>
   </div>
  {% endif %}
+ 
 
 <div class="container">
   {% if count == 0 %}
@@ -67,17 +68,13 @@
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
       </form>
     </div>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-      {% for book in books %}
-        <div class="col">
-          <div style="text-align: center;">
-            <img src= "{{ book.image_url }}"  width="220" height="300" class=" image-thumbnail mb-3" />
-            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
-            <p >{{ book.author }}</p>
-            <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary">View</a>
+    <div class="row">
+       {% for book in books %}
+          <div class="col-sm-6 col-md-3">
+            {% include 'partials/book_card.html' with book=book %}
+            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
     </div>
     <ul class="pagination justify-content-center">
       {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
