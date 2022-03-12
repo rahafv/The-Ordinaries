@@ -4,7 +4,7 @@ from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
+from .forms import MessageForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -745,4 +745,36 @@ def delete_club(request, club_id):
     return redirect('home')
 
 
+@login_required
+def chat_room(request, club_id):
+    club = get_object_or_404(Club.objects, id=club_id)
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            form.instance.club = club
+            form.instance.user = request.user
+            form.save()
+    
+    form = MessageForm()
+    return render(request, "chat_room.html", {"form": form, "club":club})
 
+# @login_required(login_url="/auth/login/")
+# def chat(request, app_id):
+#     if request.method == "POST":
+#         message = request.POST["message"]
+#         to_id = Application.objects.get(id=app_id).applicant_id
+#         ChatMessage(from_id=request.user.id, to_id=to_id, application_id=app_id, message=message).save()
+#         return HttpResponseRedirect(f"/chat/{app_id}/")
+#     else:
+#         app = Application.objects.get(id=app_id)
+#         messages = ChatMessage.objects.filter(application_id=app_id)
+#         job = Job.objects.get(id=app.job_id)
+#         profile1 = Profile.objects.get(user_id=app.applicant_id)
+#         profile2 = Profile.objects.get(id=job.profile)
+#         return render(request, "dashboard/chat.html", {
+#             "messages": messages,
+#             "app": app,
+#             "job": job,
+#             "profile1": profile1, # candidate
+#             "profile2": profile2 # employer
+#         })

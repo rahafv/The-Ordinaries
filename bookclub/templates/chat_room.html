@@ -1,0 +1,25 @@
+{% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+
+<h1 class="fw-light center mt-5" style="text-align:center;">Chat</h1>
+<div class="container">
+    {% for message in club.messages.all %}
+        <div class="chat-message right">
+            <div class="message">
+                <a class="message-author" href="#"> {{message.user.first_name}} </a>
+                <span class="message-date">  {{message.created_at}} </span>
+                <p class="message-content">
+                    {{message.message}}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+    <form action="{% url 'chat_room' club.id %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" class="btn btn-primary mb-3" value="send">
+    </form>
+</div>
+{% endblock %}

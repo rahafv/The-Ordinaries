@@ -5,7 +5,7 @@ from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 import pytz
-from .models import Message, User, Club, Book, Rating, Meeting
+from .models import Chat, User, Club, Book, Rating, Meeting
 from django.contrib.auth import authenticate
 
 class SignUpForm(forms.ModelForm):
@@ -458,7 +458,7 @@ class MessageForm(forms.ModelForm):
     class Meta:
         """Form options."""
 
-        model = Message
+        model = Chat
         fields = ['message']
-        exclude = ['club', 'user']
+        widgets = {'message': forms.Textarea(attrs={'cols': 10, 'rows': 2}),}
         

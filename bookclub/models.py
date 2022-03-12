@@ -515,7 +515,7 @@ class Event(models.Model):
         else:
             return self.rating.book.title
 
-class Message(models.Model):
+class Chat(models.Model):
     
     club = models.ForeignKey(
         Club,
@@ -529,7 +529,7 @@ class Message(models.Model):
         related_name='messages'
     )
 
-    message = models.CharField(
+    message = models.TextField(
         max_length=250,
         blank=False
     )
@@ -544,6 +544,6 @@ class Message(models.Model):
     def clean(self):
         super().clean()
 
-        """ checks that the user is a member of the club """
-        if not self.user in self.club.members:
-            raise ValidationError('User must be a member of the club')
+        # """ checks that the user is a member of the club """
+        # if not self.user in self.club.members:
+        #     raise ValidationError('User must be a member of the club')
