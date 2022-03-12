@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import MessageForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -748,15 +748,9 @@ def delete_club(request, club_id):
 @login_required
 def chat_room(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    if request.method == "POST":
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            form.instance.club = club
-            form.instance.user = request.user
-            form.save()
-    
-    form = MessageForm()
-    return render(request, "chat_room.html", {"form": form, "club":club})
+    user = request.user
+
+    return render(request, "chat_room.html", {"user": user, "club":club})
 
 
 def getMessages(request, club_id):
@@ -770,3 +764,16 @@ def getMessages(request, club_id):
         users.append(user.full_name())
 
     return JsonResponse({"chats":chats, "users":users})
+
+def send(request):
+    message = request.POST['message']
+    username = request.POST['username']
+    club_id = request.POST['club_id']
+
+    club = get_object_or_404(Club.objects, id=club_id)
+    user = get_object_or_404(User.objects, username=username)
+
+    new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+    new_chat_msg.save()
+
+    return HttpResponse('Message sent succfully')

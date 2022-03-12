@@ -29,11 +29,36 @@
 <h1 class="fw-light center mt-5" style="text-align:center;">Chat</h1>
 <div id="display">    
 </div>
+
 <div>
-    <form action='{% url "chat_room" club.id %}' method="post">
+    <form id="post-form">
         {% csrf_token %}
-        {% include 'partials/bootstrap_form.html' with form=form %}
-        <input type="submit" value="Send" class="btn btn-lg btn-outline-dark">
+        <input type="hidden" name="username" id="username" value="{{user.username}}"/>
+        <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+        <input type="text" name="message" id="message" width="100px" />
+        <input type="submit" value="Send">
     </form>
 </div>
+
+<script type="text/javascript">
+    $(document).on('submit','#post-form',function(e){
+      e.preventDefault();
+  
+      $.ajax({
+        type:'POST',
+        url:'/send',
+        data:{
+            username:$('#username').val(),
+            club_id:$('#club_id').val(),
+            message:$('#message').val(),
+          csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+           // alert(data)
+        }
+      });
+      document.getElementById('message').value = ''
+    });
+  </script>
+
 {% endblock %}

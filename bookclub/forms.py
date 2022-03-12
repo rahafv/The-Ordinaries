@@ -451,14 +451,3 @@ class MeetingForm(forms.ModelForm):
         if not self.cleaned_data.get('cont'):
             meeting.assign_chooser()
         return meeting
-
-class MessageForm(forms.ModelForm):
-    """Form to update club information."""
-
-    class Meta:
-        """Form options."""
-
-        model = Chat
-        fields = ['message']
-        widgets = {'message': forms.Textarea(attrs={'cols': 10, 'rows': 2}),}
-        
