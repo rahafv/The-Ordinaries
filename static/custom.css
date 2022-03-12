@@ -31,7 +31,7 @@
 }
 
 #login-image {
-  background: url(images/Untitled_Artwork.jpg) no-repeat center center fixed;
+  background: url(images/Untitled_Artwork.jpg) no-repeat center center fixed;/**/
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -46,6 +46,55 @@
 .vcenter-item{
   display: flex;
   align-items: center;
+}
+
+
+/* 
+* Sign up page
+*/
+body {
+  margin-top: 20px;
+  background: #f6f9fc;
+}
+.account-block {
+  padding: 0;
+  background-image: url(images/undraw_Bookshelves_re_lxoy.png);
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+  height: 100%;
+  position: relative;
+}
+.account-block .overlay {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.account-block .account-testimonial {
+  text-align: center;
+  color: #fff;
+  position: absolute;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
+}
+.text-theme {
+  color: #5369f8 !important;
+}
+.btn-theme {
+  background-color: #5369f8;
+  border-color: #5369f8;
+  color: #fff;
 }
 
 /*
