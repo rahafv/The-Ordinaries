@@ -143,22 +143,21 @@ a:link {
 
 .name-and-edit {
   display:inline-flex;
-  font-size:xx-large
 }
 
 .edit-pencil{
   display: inline-flex;
   align-items: center;
   border: bottom 0px;
-  
+  font-size: 25px;
 }
 
 .user-name{
+  font-weight: bold;
   text-align: center;
-  font-size: 40px;;
+  font-size: 32px;
   padding-left:30px;
   color: white
-  
 }
 
 .text-white {
@@ -218,29 +217,18 @@ a:link {
   opacity: 0.6;
 }
 
-.profile-username {
-  font-size: 22px;
-}
-
-.profile-email {
-  font-size: 19px;
-}
-
 .profile-statistics {
-  font-weight: 400;
-  font-size: 20px;
+  font-weight: 300;
   color: white;
   opacity: 0.75;
 }
 
 .profile-statistics-item {
-  font-size: 20px;
-  font-weight: 450;
+  font-weight: 400;
 }
 
 .bio-text{
   text-overflow: ellipsis;
-  font-size: 20px;
 }
 
 /*
@@ -258,7 +246,6 @@ Profile nav-bar
   border-width: 0 ;
   border-radius: 0 ;
   background-color: transparent ;
-  font-size: 26px;
 }
 .nav-tabs .nav-link.active {
   border-bottom-color: #fff;

@@ -14,10 +14,10 @@
 
                 <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
                     <div class =  "text-center name-and-edit">
-                        <h3 class=" user-name font-weight-bold my-4">{{ user.full_name }}</h3>
+                        <h3 class= "my-4 user-name">{{ user.full_name }}</h3>
                         &emsp;
                         {% if current_user == user %}
-                            <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"  ></a>
+                            <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"></a>
                         {% endif %}
 
                     </div>
@@ -88,7 +88,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2 style = "font-size:3vw mt-1">No Clubs joined!</h2>
+                            <h2 style = "font-size:2.5vw mt-1">No Clubs joined!</h2>
                         {% endif %}
                     {% elif is_clubs is False %}
                         {% if items_count != 0  %}
