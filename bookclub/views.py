@@ -675,7 +675,7 @@ def search_page(request):
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
 
-        return render(request, 'search_page.html', {'searched':searched, 'category':category, 'label': label, "filtered_list":filtered_list, "form":sortForm})
+        return render(request, 'search_page.html', {'searched':searched, 'category':category, 'label': label, "filtered_list":filtered_list, "form":sortForm, 'current_user':request.user})
    
     else:   
         return render(request, 'search_page.html', {})
