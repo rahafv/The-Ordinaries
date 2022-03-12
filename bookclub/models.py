@@ -514,3 +514,36 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
+
+class Message(models.Model):
+    
+    club = models.ForeignKey(
+        Club,
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
+
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
+
+    message = models.CharField(
+        max_length=250,
+        blank=False
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = ['created_at']
+
+    def clean(self):
+        super().clean()
+
+        """ checks that the user is a member of the club """
+        if not self.user in self.club.members:
+            raise ValidationError('User must be a member of the club')
