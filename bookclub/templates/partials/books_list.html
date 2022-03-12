@@ -2,7 +2,7 @@
   {% for book in books %}
     <div class="col-sm-6 col-md-3">
          {% include "partials/book_card.html" with book=book %}
-        <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary" style = "font-size: 23px">View</a>
+        <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-dark" style = "font-size: 23px">View &raquo;</a>
     </div>
   {% endfor %}
 </div>
