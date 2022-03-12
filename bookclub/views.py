@@ -739,8 +739,6 @@ def show_sorted(request, searched, label):
     else:
             return render(request, 'search_page.html', {})
     
-
-
 @login_required
 def initial_book_list(request):
     current_user = request.user
@@ -758,7 +756,6 @@ def add_book_from_initial_list(request, book_id):
     book.add_reader(user)
 
     return redirect("initial_book_list")
-
 
 @login_required
 def delete_club(request, club_id):
