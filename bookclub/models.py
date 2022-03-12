@@ -520,13 +520,12 @@ class Chat(models.Model):
     club = models.ForeignKey(
         Club,
         on_delete=models.CASCADE,
-        related_name='messages'
+        related_name='chats'
     )
 
     user = models.ForeignKey(
         User, 
         on_delete=models.CASCADE,
-        related_name='messages'
     )
 
     message = models.TextField(

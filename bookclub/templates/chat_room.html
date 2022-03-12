@@ -5,13 +5,13 @@
 
 <h1 class="fw-light center mt-5" style="text-align:center;">Chat</h1>
 <div class="container">
-    {% for message in club.messages.all %}
+    {% for chat in club.chats.all %}
         <div class="chat-message right">
             <div class="message">
-                <a class="message-author" href="#"> {{message.user.first_name}} </a>
-                <span class="message-date">  {{message.created_at}} </span>
+                <a class="message-author" href="#"> {{chat.user.first_name}} </a>
+                <span class="message-date">  {{chat.created_at}} </span>
                 <p class="message-content">
-                    {{message.message}}
+                    {{chat.message}}
                 </p>
             </div>
         </div>
