@@ -1,4 +1,6 @@
+from email.mime import image
 from pydoc import describe
+from tabnanny import check
 from django.core.management.base import BaseCommand
 from bookclub.models import User, Club, Book , Rating, Event, Meeting
 from faker import Faker
@@ -48,7 +50,7 @@ class Command(BaseCommand):
 
         start = time.time()
         self.create_ratings()
-        self.average()
+        self.calculat_average()
         end = time.time()
         print("ratings: ", end - start)
         
@@ -193,13 +195,15 @@ class Command(BaseCommand):
 
             for col in books_data:
               
+                image_url = self.check_blank_image(col[3])
+
                 book = Book(
                     ISBN = col[4],
                     title = col[6],
                     author = col[0],
                     genre = col[7],
                     describtion = col[1],
-                    image_url = col[3],
+                    image_url = image_url,
                     pages_num = col[5]
                 )
 
@@ -271,7 +275,12 @@ class Command(BaseCommand):
             if ratings:
                 Rating.objects.bulk_create(ratings)
 
-    def average(self):
+    def calculat_average(self):
         ratings=Rating.objects.all()
         for rating in ratings:
             rating.save()
+
+    def check_blank_image(self, image_url):
+        if image_url == '':
+            return 'https://i.imgur.com/f6LoJwT.jpg'
+        return image_url
