@@ -1,4 +1,4 @@
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3">
+<!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3">
     {% for book in books %}
       <div class="col">
         <div style="text-align: center;">
@@ -9,4 +9,13 @@
         </div>
       </div>
     {% endfor %}
+</div> -->
+
+<div class="row row-cols-1 row-cols-sm-6 row-cols-md-3">
+  {% for book in books %}
+    <div class="col-sm-6 col-md-3">
+         {% include "partials/book_card.html" with book=book %}
+        <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary" style = "font-size: 23px">View</a>
+    </div>
+  {% endfor %}
 </div>

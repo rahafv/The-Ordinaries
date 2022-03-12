@@ -64,12 +64,12 @@
         </div> 
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
-            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent">
+            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent pe-3">
                 <li class="nav-item">
-                    <a class="nav-link text-white py-3 pr-2" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
+                    <a class="nav-link text-white py-3" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white py-3 pr-2 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
+                    <a class="nav-link text-white py-3 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
                 </li>
             </ul>
         </div>
@@ -78,8 +78,7 @@
         <div class = "col-12">
             <div class=" ui-bg-cover ui-bg-overlay-container text-black" >
                 <div class="ui-bg-overlay bg-light-whitish opacity-75"></div>
-                <div class="container text-center">
-                    <br/>
+                <div class="container text-center mt-3">
                     {% if is_clubs is True %}
                         {% if items_count != 0 %}
                             {% include 'partials/clubs_list.html' with clubs=items %}
@@ -88,7 +87,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2 style = "font-size:3vw mt-1">No Clubs joined!</h2>
+                            <h2 style = "font-size:3vw mt-2">No Clubs joined!</h2>
                         {% endif %}
                     {% elif is_clubs is False %}
                         {% if items_count != 0  %}
@@ -98,7 +97,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2 class = "pt-1" style = "font-size:2.5vw"> Reading list is empty!</h2>
+                            <h2 class = "mt-2" style = "font-size:2.5vw"> Reading list is empty!</h2>
                         {% endif %}
                     {% endif %}
                 </div>
