@@ -4,7 +4,7 @@
         <div style="text-align: center;">
           <h2 style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; " >{{ club.name }}</h2>
           <p>{{ club.theme }}</p>
-          <a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-dark" > View &raquo;</a>
+          <p><a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-dark">View &raquo;</a></p>
         </div>
       </div>
     {% endfor %}
