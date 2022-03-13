@@ -528,7 +528,7 @@ class Chat(models.Model):
         on_delete=models.CASCADE,
     )
 
-    message = models.TextField(
+    message = models.CharField(
         max_length=250,
         blank=False
     )

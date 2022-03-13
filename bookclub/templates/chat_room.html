@@ -1,5 +1,6 @@
 {% extends 'base_content.html' %}
 {% load bootstrap_pagination %}
+{% load humanize %}
 {% block title %}Chat{% endblock %}
 {% block content %}
 
@@ -14,29 +15,32 @@
                 console.log(response);
                 $("#display").empty();
                 for (var key in response.chats) {
-                    var temp="<div class='container darker'><a>"+response.users[key]+"</a>"+response.chats[key].message+"<span class='time-left'>"+response.chats[key].created_at+"</span></div>";
+                    if(response.username != response.users[key]) {
+                        var temp="<div id=rcorners1 class='container darker text-white mb-2'><b>"+response.users[key]+"</b>"+
+                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.chats[key].created_at+"</span><p>"+
+                            response.chats[key].message+"</p></div>";                    }
+                    else {
+                        var temp="<div id=rcorners2 class='container darker text-white mb-2'><b>"+response.users[key]+"</b>"+
+                            "<span class='time-left' > &nbsp;&middot;&nbsp;"+response.chats[key].created_at+"</span><p>"+
+                            response.chats[key].message+"</p></div>";
+                    }
                     $("#display").append(temp);
                 }
-            },
-            error: function(response){
-                //alert('An error occured')
             }
         });
     },1000);
     })
 </script>
 
-<h1 class="fw-light center mt-5" style="text-align:center;">Chat</h1>
-<div id="display">    
-</div>
-
-<div>
-    <form id="post-form">
+<h1 class="fw-light center mt-4 mb-5" style="text-align:center;">{{club.name}} Chat Room</h1>
+<div id="display" class="col-8"></div>
+<div class="col-8 mb-6">
+    <form id="post-form" class="form-inline">
         {% csrf_token %}
-        <input type="hidden" name="username" id="username" value="{{user.username}}"/>
-        <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
-        <input type="text" name="message" id="message" width="100px" />
-        <input type="submit" value="Send">
+            <input type="hidden" name="username" id="username" value="{{user.username}}"/>
+            <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+            <input type="text" name="message" id="message" class="form-control" style="margin-left:12em"/>
+        <input type="submit" class="btn btn-dark" value="Send">
     </form>
 </div>
 

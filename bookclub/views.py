@@ -763,7 +763,7 @@ def getMessages(request, club_id):
         user = get_object_or_404(User.objects, id=user_id)
         users.append(user.full_name())
 
-    return JsonResponse({"chats":chats, "users":users})
+    return JsonResponse({"chats":chats, "users":users, "username":request.user.full_name()})
 
 def send(request):
     message = request.POST['message']

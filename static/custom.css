@@ -454,3 +454,29 @@ label:hover ~ input:checked ~ label{
   }
 }
 
+#rcorners1 {
+  border-radius: 25px;
+  padding: 20px; 
+  width: 500px;
+  height: 100px; 
+  margin-right: 20em; 
+  background-color: DimGrey; 
+}
+
+#rcorners2 {
+  border-radius: 25px;
+  padding: 20px; 
+  width: 500px;
+  height: 100px;  
+  text-align: right; 
+  margin-left: 19.5em; 
+  background-color: DarkSlateGray;
+}
+
+#display {
+  border-top: 5px solid black;
+  border-left: 5px solid black;
+  border-right: 5px solid black;
+  margin-left: 12em; 
+  padding: 10px;
+}
