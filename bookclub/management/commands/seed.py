@@ -1,6 +1,3 @@
-from email.mime import image
-from pydoc import describe
-from tabnanny import check
 from django.core.management.base import BaseCommand
 from bookclub.models import User, Club, Book , Rating, Event, Meeting
 from faker import Faker

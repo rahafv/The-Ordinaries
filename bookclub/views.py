@@ -858,7 +858,7 @@ def initial_book_list(request):
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     list_length = len(current_user.books.all())
-    sorted_books = my_books.order_by('-average_rating')[:8]
+    sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
 
 @login_required
