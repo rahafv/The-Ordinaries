@@ -64,20 +64,12 @@
         </div> 
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
-<<<<<<< HEAD
-            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent pe-3">
-=======
-            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent pe-4">
->>>>>>> 0e97d12f09a33feacc776cc4b551fd7bf978c2b2
+            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent me-4">
                 <li class="nav-item">
                     <a class="nav-link text-white py-3" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
                 </li>
                 <li class="nav-item">
-<<<<<<< HEAD
-                    <a class="nav-link text-white py-3 " href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
-=======
                     <a class="nav-link text-white py-3" href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
->>>>>>> 0e97d12f09a33feacc776cc4b551fd7bf978c2b2
                 </li>
             </ul>
         </div>
@@ -95,11 +87,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-<<<<<<< HEAD
-                            <h2 style = "font-size:3vw mt-2">No Clubs joined!</h2>
-=======
                             <h2 style = "font-size:2.5vw mt-1">No Clubs joined!</h2>
->>>>>>> 0e97d12f09a33feacc776cc4b551fd7bf978c2b2
                         {% endif %}
                     {% elif is_clubs is False %}
                         {% if items_count != 0  %}
