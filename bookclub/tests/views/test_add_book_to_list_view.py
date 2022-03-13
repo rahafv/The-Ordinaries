@@ -20,8 +20,8 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
         count = self.book.readers_count
         events_before_count = Event.objects.count() 
         self.client.login(username=self.user.username, password='Password123')
-        response = self.client.get(self.url, follow=True)
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})
+        response = self.client.get(self.url, HTTP_REFERER=target_url, follow=True)
         self.assertTemplateUsed(response, 'book_details.html')
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
@@ -36,8 +36,8 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
         self.book.add_reader(self.user)
         self.book.refresh_from_db()
         count = self.book.readers_count
-        response = self.client.get(self.url, follow=True)
         target_url = reverse("book_details", kwargs={"book_id": self.book.id})
+        response = self.client.get(self.url, HTTP_REFERER=target_url, follow=True)
         self.assertTemplateUsed(response, 'book_details.html')
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)

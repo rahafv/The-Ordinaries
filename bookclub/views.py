@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -642,7 +642,8 @@ def add_book_to_list(request, book_id):
         book.add_reader(user)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
-    return redirect("book_details", book.id)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+
 
 @login_required
 def edit_review(request, review_id ):
@@ -676,7 +677,8 @@ def follow_toggle(request, user_id):
     else:
         delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
     current_user.toggle_follow(followee)
-    return redirect('profile', followee.id)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+
 
 @login_required
 def search_page(request):
@@ -748,14 +750,6 @@ def initial_book_list(request):
     sorted_books = my_books.order_by('-readers_count', '-average_rating')[:8]
 
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
-
-@login_required
-def add_book_from_initial_list(request, book_id):
-    book = get_object_or_404(Book.objects, id=book_id)
-    user = request.user
-    book.add_reader(user)
-
-    return redirect("initial_book_list")
 
 @login_required
 def delete_club(request, club_id):
