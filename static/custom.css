@@ -46,7 +46,7 @@
 }
 
 #welcome-image {
-  background: url(images/welcome.png) no-repeat center center fixed;
+  background: url(images/signuptest.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -137,7 +137,7 @@ p.cover-text {
   padding-left: 50px;
   padding-right: 50px;
   padding-bottom: 30px;
-  border-radius: 15%;
+  border-radius: 10%;
 }
 
 .cover-card-block {
