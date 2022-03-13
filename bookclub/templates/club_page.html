@@ -87,8 +87,7 @@
                   </div>
                   
                 {% endif %}
-                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> upcoming meetings </a> 
-                <a href='{% url "previous_meetings_list" club.id %}' class="btn btn-outline-dark mt-2 mb-1"> previous meetings </a> 
+                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a> 
                 {%else %}
                 <a> No meeting has been scheduled yet.. </a> 
                 {%endif%}

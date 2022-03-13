@@ -757,23 +757,25 @@ def meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)
     club = get_object_or_404(Club.objects, id=club_id)
     
+    
     meetings = club.get_upcoming_meetings()
     
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
-    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user })
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'club':club })
     
 @login_required
 def previous_meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)
     club = get_object_or_404(Club.objects, id=club_id)
+    is_previous = True
     
     meetings = club.get_previous_meetings()
     
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
-    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user })
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
 
 
