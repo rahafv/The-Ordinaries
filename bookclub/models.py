@@ -225,10 +225,16 @@ class Club(models.Model):
     def get_club_type_display(self):
         return self.club_type
 
-
     def make_owner(self, new_owner):
         self.owner = new_owner
         self.save()
+
+    def getLastMessage(self):
+        messages = self.chats.all()
+        if messages:
+            return messages[len(messages)-1]
+        else:
+            return ""
 
 class Book(models.Model):
     """Book model."""

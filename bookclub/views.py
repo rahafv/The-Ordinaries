@@ -23,6 +23,7 @@ from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
+import humanize
 
 
 @login_prohibited
@@ -755,6 +756,15 @@ def chat_room(request, club_id):
 
 def getMessages(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
+    user = request.user
+
+    clubs = user.clubs.all()
+    messages = []
+    for c in clubs:
+        m = c.getLastMessage()
+        if m != "":
+            prettyDate = humanize.naturaltime(m.created_at.replace(tzinfo=None))
+            messages.append({"name":m.user.first_name, "message":m.message, "time":prettyDate})
 
     chats = list(club.chats.all().values())
     users = []
@@ -763,7 +773,7 @@ def getMessages(request, club_id):
         user = get_object_or_404(User.objects, id=user_id)
         users.append(user.full_name())
 
-    return JsonResponse({"chats":chats, "users":users, "username":request.user.full_name()})
+    return JsonResponse({"chats":chats, "users":users, "username":user.full_name(), "messages":messages})
 
 def send(request):
     message = request.POST['message']
