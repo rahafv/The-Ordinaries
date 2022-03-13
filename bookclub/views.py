@@ -646,27 +646,25 @@ def add_book_to_list(request, book_id):
 
 
 @login_required
-def edit_review(request, review_id ):
-    review =get_object_or_404(Rating.objects , id=review_id)
-    reviewed_book = get_object_or_404(Book.objects, id=review.book_id)
+def edit_review(request, review_id):
+    review = get_object_or_404(Rating.objects, id=review_id)
     review_user = request.user
-    if (review_user == review.user):
-        if(request.method == "POST"):
+    if review_user == review.user:
+        if request.method == "POST":
             form = EditRatingForm(data = request.POST, instance=review)
-            if (form.is_valid()):
-                form.instance.user = review_user
-                form.instance.book = reviewed_book
-                form.save(review_user, reviewed_book)
+            if form.is_valid():
+                form.save(review_user, review.book)
                 messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
                 return redirect('book_details', book_id= review.book.id)
             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
             form = EditRatingForm(instance = review)
+        
+        return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
+
     else:
         return render(request, '404_page.html', status=404)
-        #return redirect('handler404')
 
-    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
 @login_required
 def follow_toggle(request, user_id):
@@ -747,8 +745,7 @@ def initial_book_list(request):
     already_selected_books = current_user.books.all()
     my_books =  Book.objects.all().exclude(id__in = already_selected_books)
     list_length = len(current_user.books.all())
-    sorted_books = my_books.order_by('-readers_count', '-average_rating')[:8]
-
+    sorted_books = my_books.order_by('-average_rating')[:8]
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
 
 @login_required

@@ -300,19 +300,21 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
-            self.readers_count = self.readers_count + 1
+            self.readers_count = self.readers.count()
             self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-            self.readers_count = self.readers_count - 1
+            self.readers_count = self.readers.count()
             self.save()
 
     def add_club(self, club):
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
-            self.readers_count = self.readers_count + club.members.all().count() 
+            for member in club.members.all():
+                self.add_reader(member)
+
             self.save()
 
     def clubs_count(self):
@@ -363,9 +365,8 @@ class Rating(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.book.calculate_average_rating()
         super(Rating, self).save(*args, **kwargs)
-
+        self.book.calculate_average_rating()
 
 
 class Meeting(models.Model):

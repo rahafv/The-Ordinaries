@@ -251,9 +251,7 @@ class EditRatingForm(forms.ModelForm):
 
         model = Rating
         fields = ['rating', 'review']
-        widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
-        }
+
 
     def calculate_rating(self, rating):
         return rating*2
@@ -263,12 +261,11 @@ class EditRatingForm(forms.ModelForm):
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0
-        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
-        )
-        return review
-
+        review_obj = Rating.objects.get(user=reviwer , book=reviewedBook)
+        review_obj.rating=self.calculate_rating(rate)
+        review_obj.review=self.cleaned_data.get('review')
+        review_obj.save()    
+         
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
@@ -340,10 +337,7 @@ class NameAndDateSortForm(forms.Form):
       widget=forms.Select(),
     )
 
-    
-    
-   
-     
+ 
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
 
