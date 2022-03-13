@@ -62,7 +62,7 @@
 }
 
 #login-image {
-  background: url(images/Untitled_Artwork.jpg) no-repeat center center fixed;
+  background: url(images/login.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -89,7 +89,7 @@ body {
 }
 .account-block {
     padding: 0;
-    background-image: url(images/gradient2.jpg);
+    background-image: url(images/signupgradient.jpg);
     background-repeat: no-repeat;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -112,7 +112,7 @@ body {
 }
 .text-theme {
     color: #64505a !important;
-    opacity: 1;
+    font-size: 32px;
 }
 
 /*
