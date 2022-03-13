@@ -120,30 +120,35 @@ body {
  */
 h1.cover-heading {
   font-size: 4rem;
+  text-align: left;
 }
 
 h2.cover-heading {
   font-size: 2rem;
+  margin-left: 20px;
 }
 
 p.cover-text {
   font-size: 1.3rem;
 }
 
+.flex-target {
+  align-self: flex-start;
+}
+
 .cover-card {
   background-color: rgba(245, 245, 245, 0.6);
-  max-width: 30rem;
-  padding-top: 30px;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 30px;
-  border-radius: 10%;
+  max-width: 25rem;
+  padding: 30px 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-left: -20px;
+  
 }
 
 .cover-card-block {
-  opacity: 10
+  opacity: 10;
 }
-
 
 /*
  * forms
