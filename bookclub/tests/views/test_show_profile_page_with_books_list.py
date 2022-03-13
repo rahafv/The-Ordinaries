@@ -90,5 +90,12 @@ class ProfilePageWithReadingListViewTestsCase(TestCase, LoginRedirectTester,Menu
         book1_url = reverse('book_details', kwargs={'book_id':self.book1.id})
         self.assertContains(response, book1_url)
 
+    def test_get_user_profile_page_readinglist_with_invalid_user_id(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.url = reverse('profile_reading_list', kwargs={'user_id': 0})
+        response = self.client.get(self.url, follow=True)
+        self.assertEquals(response.status_code, 404)
+        self.assertTemplateUsed(response, '404_page.html')
+
     def test_get_profile_page_with_reading_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

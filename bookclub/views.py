@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from imaplib import _Authenticator
 from django.http import Http404
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm, EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
 from django.contrib import messages
@@ -307,6 +307,7 @@ def show_profile_page_clubs(request, user_id=None):
     following = request.user.is_following(user)
     followable = (request.user != user)
 
+    # clubs_queryset = get_list_or_404(Club, owner = user )
     clubs_queryset = user.clubs.all()
     clubs_count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)

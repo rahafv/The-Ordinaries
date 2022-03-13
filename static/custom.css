@@ -159,6 +159,72 @@ ul.errorlist {
 }
 
 
+/*
+* 404 page not found
+*/
+
+body{margin-top:20px;}
+.cover-background {
+    background-image: url(images/gradient5.jpg);
+    position: relative ;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    overflow: hidden ;
+    background-position: center;
+    background-repeat: no-repeat ;
+}
+.p-0 {
+    padding: 0!important;
+}
+section {
+    padding: 100px 0;
+    overflow: hidden;
+    background: #fff;
+}
+
+.error-page {
+    background-color: #BABABA4A;
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(234,234,235,0.2);
+    padding: 60px 20px;
+    bottom: 4rem;
+    right: 0;
+    left: 0;
+    top: 0;
+}
+.text-center {
+    text-align: center;
+}
+.error-page h1 {
+    font-size: 200px;
+    line-height: 1;
+    font-weight: 600;
+}
+.text-secondary {
+    color: #15395A !important;
+}
+.mb-4 {
+    margin-bottom: 1.5rem!important;
+}
+
+
+#cover{
+    background: url(images/undraw_Page_not_found_re_e9o6.png);
+    position: relative ;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    overflow: hidden ;
+    background-position: center;
+    background-repeat: no-repeat ;
+}
+
+
+
 /*Links*/
 
 /* selected link */
