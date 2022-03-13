@@ -67,22 +67,11 @@
     </div>
 
     
-  <div class="container marketing">
-    <div class="row">
-      {% for club in clubs %}
-        <div class="col-sm-6 col-md-3 col-lg-4">    
-          <img class="card-img" src="{% static '/images/3.png' %}" alt="Avatar" style="width:180px">
-            <h2>{{club.name}}</h2>
-            <p>{{club.theme}}</p>
-            <p><a class="btn btn-outline-dark" href='{% url 'club_page' club.id %}'>View &raquo;</a></p>
-        </div>
-      {% endfor %}
-      <ul class="pagination justify-content-center">
-        {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
-      </ul>
-    </div>
-  </div>
 
+    {% include 'partials/clubs_list.html' with clubs=clubs %}
+  <ul class="pagination justify-content-center">
+    {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
+  </ul>
   {% endif %}
 </div>
 

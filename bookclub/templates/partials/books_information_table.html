@@ -14,9 +14,9 @@
                         <tbody>
                             {% for book in Books %}
                                 <tr>
-                                    <td  style="width: 50%;">
-                                        <img  src="{{ book.image_url }}" >
-                                        <a style="display: -webkit-box; max-width: 500px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; color: black; font-size: 18px;  text-decoration: none;" href='{% url 'book_details' book.id %}'  >{{book.title}}</a>
+                                    <td  style="width: 50%;" >
+                                        <img  src="{{ book.image_url }}" style="height:80px; width:65px;">
+                                        <a style="display: -webkit-box; max-width: 500px; webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; color: black; font-size: 18px;  text-decoration: none;" href='{% url 'book_details' book.id %}'  >{{book.title}}</a>
                                         <span style="width: 180px;  font-style: italic; font-size: 15px;"class="user-link">{{book.author}}</span>
                                     </td>
                                     <td  style="width: 40%; ">

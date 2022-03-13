@@ -40,7 +40,7 @@
           </button>
           <div class="collapse" id="owner">
             <div class="card card-body mb-3 pb-0">
-              <p>{{ club.owner.full_name }}</p>
+              <b class= "mr-1"> <a href= {% url 'profile' club.owner.id  %}> {{club.owner.full_name}} </a></b>
               <p>{{ club.owner.email }}</p>
               <p>{{ club.owner.bio }}</p>
             </div>

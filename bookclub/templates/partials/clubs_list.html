@@ -1,11 +1,14 @@
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3">
+{%load static%}
+<div class="container marketing mt-4">
+  <div class="row">
     {% for club in clubs %}
-      <div class="col">
-        <div style="text-align: center;">
-          <h2 style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; " >{{ club.name }}</h2>
-          <p>{{ club.theme }}</p>
-          <p><a href='{% url 'club_page' club.id %}' class="btn my-2 btn-outline-dark">View &raquo;</a></p>
-        </div>
+      <div class="col-sm-6 col-md-3 col-lg-4">    
+        <img class="card-img" src="{% static '/images/3.png' %}" alt="Avatar" style="width:180px">
+          <h2>{{club.name}}</h2>
+          <p>{{club.theme}}</p>
+          <p><a class="btn btn-outline-dark" href='{% url 'club_page' club.id %}'>View &raquo;</a></p>
       </div>
     {% endfor %}
+    </ul>
+  </div>
 </div>

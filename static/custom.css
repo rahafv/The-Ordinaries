@@ -97,12 +97,12 @@ ul.errorlist {
 
 /* selected link */
 a{
-  color: rgb(47, 69, 98);
+  color: rgb(0, 0, 0);
 }
 
 /* mouse over link */
 a:hover {
-  color:rgb(214, 196, 195);
+  color:rgb(196, 170, 169);
 }
 
 a:link {
