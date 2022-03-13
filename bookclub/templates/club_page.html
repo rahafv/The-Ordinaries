@@ -83,7 +83,7 @@
                       {% else %}
                         <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
                     {% endif %} 
-                    <p>Link: {{ upcoming_meeting.link }}</p>
+                    <p class="mt-2"> Link: <a href={{ upcoming_meeting.link }} > meeting link </a></p>
                     <p>Notes: {{ upcoming_meeting.notes }}</p>
                   </div>
                   
