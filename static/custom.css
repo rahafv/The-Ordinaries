@@ -84,7 +84,6 @@
 * Sign up page
 */
 body {
-    /* margin-top: 20px; */
     background: #f6f9fc;
 }
 .account-block {
@@ -115,9 +114,65 @@ body {
     font-size: 32px;
 }
 
+/* welcome animation*/
+.slide-left {
+  width: 300%;
+  /* overflow: hidden; */
+  margin-left: 200px;
+  max-width: 700px
+}
+
+.slide-left h2 {
+  animation: 2s slide-left 0s forwards;
+    transform:translateX(110%);
+}
+
+.slide-left p {
+  animation: 2s slide-left 0s forwards;
+    transform:translateX(120%);
+}
+
+@keyframes slide-left {
+  to {
+    transform:translateX(-54%);
+  }
+}
+
+.slide-up {
+  height: 300%;
+  margin-top: 15px;
+  max-height:20px
+}
+
+.slide-up a {
+  animation: 1.5s slide-up 0s forwards;
+  transform:translateY(1000%);
+}
+
+@keyframes slide-up {
+  to {
+    transform:translateY(-10%);
+  }
+}   
+
 /*
  * Cover page
  */
+
+.fadein{
+    animation: fadein 2s linear forwards;
+    -webkit-animation: fadein 2s linear forwards;
+ }
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 10; }
+}
+  
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 10; }
+}
+
 h1.cover-heading {
   font-size: 4rem;
   text-align: left;
@@ -142,8 +197,6 @@ p.cover-text {
   padding: 27px 20px;
   border-radius: 12px;
   text-align: center;
-  margin-left: -20px;
-  
 }
 
 .cover-card-block {
