@@ -120,5 +120,12 @@ class ProfilePageWithClubsListViewTestsCase(TestCase, LoginRedirectTester,MenuTe
         club1_url = reverse('club_page', kwargs={'club_id':self.club1.id})
         self.assertContains(response, club1_url)
 
+    def test_get_user_profile_page_clubs_with_invalid_user_id(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.url = reverse('profile_clubs', kwargs={'user_id': 0})
+        response = self.client.get(self.url, follow=True)
+        self.assertEquals(response.status_code, 404)
+        self.assertTemplateUsed(response, '404_page.html') 
+
     def test_get_profile_club_page_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

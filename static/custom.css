@@ -1,115 +1,3 @@
-/*
- * Alerts
- */
-
-.alert {
-  border-radius: 0px;
-}
-
-
-/*
- * Cover page
- */
-
-.content {
-  padding-top: 10px;
-}
-
-#welcome-image {
-  background: url(images/welcome.png) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
-  -o-background-size: cover;
-}
-
-#home-image {
-  background: url(images/home.png) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
-  -o-background-size: cover;
-}
-
-#login-image {
-  background: url(images/log_in.png) no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  background-size: cover;
-  -o-background-size: cover;
-}
-
-.h-100 {
-  min-height: 100vh;
-  height: 100vh;
-}
-
-.vcenter-item{
-    display: flex;
-    align-items: center;
-}
-
-/*
- * Cover page
- */
-h1.cover-heading {
-  font-size: 4rem;
-}
-
-h2.cover-heading {
-  font-size: 2rem;
-}
-
-p.cover-text {
-  font-size: 1.3rem;
-}
-
-.cover-card {
-  background-color: rgba(245, 245, 245, 0.6);
-  max-width: 30rem;
-  padding-top: 30px;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 30px;
-  border-radius: 15%;
-}
-
-.cover-card-block {
-  opacity: 10
-}
-
-
-/*
- * forms
- */
-.nolabel label {
-  display: none;
-}
-
-ul.errorlist {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-
-/*Links*/
-
-/* selected link */
-a{
-  color: rgb(0, 0, 0);
-}
-
-/* mouse over link */
-a:hover {
-  color:rgb(196, 170, 169);
-}
-
-a:link {
-  text-decoration: none;
-}
-
-
 /* Colours */
 
 .bg-light-pink {
@@ -140,6 +28,268 @@ a:link {
 .bg-dark-blue{
   background-color: #324655;
 }
+
+/*
+ * Alerts
+ */
+
+ .alert {
+  border-radius: 0px;
+}
+
+/*
+  * Welcome page
+*/
+
+.card-welcome {
+  background-color: rgba(245, 245, 245, 0.6);
+  max-width: 25rem;
+  border: none;
+  opacity: 0.25;
+}
+
+/* 
+* Welcome animation
+*/
+
+.slide-left {
+  width: 300%;
+  margin-left: 100px;
+  max-width: 300px
+}
+
+.slide-left {
+  animation: 2s slide-left 0s forwards;
+    transform:translateX(110%);
+}
+
+@keyframes slide-left {
+  to {
+    transform:translateX(-30%);
+  }
+}
+
+.slide-up {
+  height: 300%;
+  margin-top: 15px;
+  max-height:20px
+}
+
+.slide-up a {
+  animation: 1.5s slide-up 0s forwards;
+  transform:translateY(1000%);
+}
+
+@keyframes slide-up {
+  to {
+    transform:translateY(-10%);
+  }
+}   
+
+
+/*
+ * Cover page
+ */
+
+.content {
+  padding-top: 10px;
+}
+
+#welcome-image {
+  background: url(images/signuptest.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+#home-image {
+  background: url(images/home.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+#login-image {
+  background: url(images/login.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+.h-100 {
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.vcenter-item{
+  display: flex;
+  align-items: center;
+}
+
+
+/* 
+* Sign up page
+*/
+body {
+    background: #f6f9fc;
+}
+.account-block {
+    padding: 0;
+    background-image: url(images/signupgradient.jpg);
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    color: #fff; 
+    height: 100%;
+    position: relative;
+}
+
+.account-block .account-testimonial {
+    text-align: center;
+    color: #fff;
+    position: absolute;
+    margin: 0 auto;
+    padding: 0 1.75rem;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
+}
+.text-theme {
+    color: #64505a !important;
+    font-size: 32px;
+}
+
+/*
+ * Cover page
+ */
+
+.fadein{
+    animation: fadein 2s linear forwards;
+    -webkit-animation: fadein 2s linear forwards;
+ }
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+  
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+h1.cover-heading {
+  font-size: 4rem;
+  text-align: start;
+}
+
+h2.cover-heading {
+  font-size: 2rem;
+  margin-left: 0px;
+}
+
+p.cover-text {
+  font-size: 1.3rem;
+}
+
+.cover-card {
+  background-color: rgba(245, 245, 245, 0.6);
+  max-width: 25rem;
+  padding: 27px 20px;
+  border-radius: 12px;
+  text-align:start;
+}
+
+.cover-card-block {
+  opacity: 10;
+}
+
+/*
+ * forms
+ */
+.nolabel label {
+  display: none;
+}
+
+ul.errorlist {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+/*
+* 404 page not found
+*/
+
+.cover-background {
+    background-image: url(images/gradient5.jpg);
+    position: relative ;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    overflow: hidden ;
+    background-position: center;
+    background-repeat: no-repeat ;
+}
+.p-0 {
+    padding: 0!important;
+}
+section {
+    padding: 100px 0;
+    overflow: hidden;
+    background: #fff;
+}
+
+.error-page {
+    background-color: #BABABA4A;
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(234,234,235,0.2);
+    padding: 60px 20px;
+    bottom: 4rem;
+    right: 0;
+    left: 0;
+    top: 0;
+}
+.text-center {
+    text-align: center;
+}
+.error-page h1 {
+    font-size: 200px;
+    line-height: 1;
+    font-weight: 600;
+}
+.text-secondary {
+    color: #15395A !important;
+}
+.mb-4 {
+    margin-bottom: 1.5rem!important;
+}
+
+
+
+/*Links*/
+
+/* selected link */
+a{
+  color: rgb(47, 69, 98);
+}
+
+/* mouse over link */
+a:hover {
+  color:rgb(214, 196, 195);
+}
+
+a:link {
+  text-decoration: none;
+}
+
 
 .name-and-edit {
   display:inline-flex;
@@ -247,6 +397,7 @@ Profile nav-bar
   border-radius: 0 ;
   background-color: transparent ;
 }
+
 .nav-tabs .nav-link.active {
   border-bottom-color: #fff;
 }
