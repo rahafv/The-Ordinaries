@@ -6,6 +6,8 @@ from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+import pytz
+
 class User(AbstractUser):
     """User model used for authentication."""
 
@@ -229,6 +231,19 @@ class Club(models.Model):
         self.owner = new_owner
         self.save()
 
+    def get_upcoming_meetings(self):
+        upcoming_meetings = []
+        for meeting in self.meetings.all():
+            if meeting.time >= pytz.utc.localize(datetime.datetime.now()):
+                upcoming_meetings.append(meeting)
+        return upcoming_meetings
+
+    def get_previous_meetings(self):
+        previous_meetings = []
+        for meeting in self.meetings.all():
+            if meeting.time < pytz.utc.localize(datetime.datetime.now()):
+                previous_meetings.append(meeting)
+        return previous_meetings
 
 class Book(models.Model):
     """Book model."""
@@ -415,6 +430,10 @@ class Meeting(models.Model):
         max_length=1000,
         blank=True
     )
+
+    class Meta:
+        ordering = ['time']
+
 
     def assign_chooser(self):
         members = self.club.members

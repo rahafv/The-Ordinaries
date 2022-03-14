@@ -372,10 +372,8 @@ class MeetingForm(forms.ModelForm):
                 self.add_error('link', "Provide a link to the meeting location.")
 
         is_cont = self.cleaned_data.get('cont')
-        if is_cont and self.club.meetings.count() == 0:
-            self.add_error('cont', "There are no previous meetings.")
-
         time = self.cleaned_data.get('time')
+
         self.check_date(time, is_cont)
         self.check_meetings(time, is_cont)
 
@@ -396,20 +394,21 @@ class MeetingForm(forms.ModelForm):
 
     def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same period."""
-        try:
+        if time:
             meetings = Meeting.objects.filter(club_id=self.club.id)
-            if not is_cont:
-                for met in meetings:
+            for met in meetings:
+                if not is_cont:
                     if met.time+timedelta(30) > time:
                         self.add_error('time', 'Meetings should be at least a month apart.')
                         break
-            else:
-                for met in meetings:
+                else:
                     if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
                         self.add_error('time', 'There is a meeting on that day.')
                         break
-        except:
-            pass
+            if meetings.count() == 0 :
+                if is_cont:
+                    self.add_error('cont', "There are no previous meetings.")
+
 
     def save(self):
         """Create a new meeting."""

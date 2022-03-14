@@ -61,6 +61,38 @@
                 <a href='{% url "members_list" club.id %}' class="btn btn-outline-dark"> Member List</a>  
               </div>
             </div>
+            <div class="card text-center">
+              <div class="card-body">
+                
+
+                <h4 class="mb-3">Upcoming meeting:</h4>
+                  <div class="card card-body mb-3 pb-0">
+                    {%if upcoming_meeting %}
+                    <p>Title: {{ upcoming_meeting.title }}</p>
+                    <p>Time: {{ upcoming_meeting.time }}</p>
+                    {% if upcoming_meeting.book %}
+                        Book Title : <a href='{% url 'book_details' upcoming_meeting.book.id %}' style = "color:black;"> {{upcoming_meeting.book.title}}</a>
+                        <div class="profile-img">
+                          <img src="{{ upcoming_meeting.book.image_url }}"  width="110" height="150" class="mt-1" />
+                      </div>
+                        
+                    {% else %}
+                      Book:
+                      {%if user != upcoming_meeting.chooser%}
+                          <a> No book has been chosen yet.. </a> 
+                      {% else %}
+                        <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
+                    {% endif %} 
+                    <p class="mt-2"> Link: <a href={{ upcoming_meeting.link }} > meeting link </a></p>
+                    <p>Notes: {{ upcoming_meeting.notes }}</p>
+                  </div>
+                  
+                {% endif %}
+                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a> 
+                {%else %}
+                <a> No meeting has been scheduled yet.. </a> 
+                {%endif%}
+          </div>
             {%endif%}
             {% if user == club.owner %}
               {% if club.club_type == "Private"%}
