@@ -61,5 +61,11 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertContains(response, self.user.username)    
         self.assertContains(response, self.user.full_name()) 
 
+    def test_get_user_profile_with_invalid_id(self):
+        self.client.login(username=self.user.username, password='Password123')
+        url = reverse('profile', kwargs={'user_id': self.user.id+99999})
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+
     def test_get_profile_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
