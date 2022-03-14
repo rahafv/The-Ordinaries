@@ -181,6 +181,34 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertContains(response, "James")
         self.assertNotContains(response, "joe") 
         self.assert_menu(response) 
+
+    def test_sort_books_with_title_asc_by_rating(self):
+        self._create_test_books()
+        self.client.login(username=self.user.username, password='Password123')
+        self.books_sort_form_input["sort"] = BooksSortForm.ASC_RATING
+        target_url = reverse('show_sorted', kwargs={"searched": self.book_title_form_input['searched'], "label": self.book_title_form_input["category"]})
+        response = self.client.get(target_url,self.books_sort_form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'search_page.html')
+        form= response.context['form']
+        self.assertTrue(isinstance(form, BooksSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'rating_asc')
+        self.assert_menu(response) 
+
+    def test_sort_books_with_title_desc_by_rating(self):
+        self._create_test_books()
+        self.client.login(username=self.user.username, password='Password123')
+        self.books_sort_form_input["sort"] = BooksSortForm.DESC_RATING
+        target_url = reverse('show_sorted', kwargs={"searched": self.book_title_form_input['searched'], "label": self.book_title_form_input["category"]})
+        response = self.client.get(target_url,self.books_sort_form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'search_page.html')
+        form= response.context['form']
+        self.assertTrue(isinstance(form, BooksSortForm)) 
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'rating_desc')
+        self.assert_menu(response) 
     
     def test_post_search_sort_with_empty_str(self):
         self.client.login(username=self.user.username, password='Password123')
