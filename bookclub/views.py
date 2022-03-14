@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
-from imaplib import _Authenticator
-from django.http import Http404
+from datetime import timedelta
+from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm, EditRatingForm, MeetingForm,  UserSortForm, NameAndDateSortForm
+from .forms import NameAndDateSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  NameSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -56,7 +55,6 @@ def home(request):
     club_events_length = len(first_ten)
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length})
-
 
 @login_prohibited
 def sign_up(request):
@@ -216,10 +214,11 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW,
-                         user=review_user, book=reviewed_book)
-            messages.add_message(request, messages.SUCCESS,
-                                 "you successfully submitted the review.")
+            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
+            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+
+            reviewed_book.calculate_average_rating() 
+
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR,
@@ -229,11 +228,19 @@ def add_review(request, book_id):
 
 @login_required
 def club_page(request, club_id):
-    current_user = request.user
+    user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
-    is_member = club.is_member(current_user)
-    is_applicant = club.is_applicant(current_user)
-    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant})
+    is_member = club.is_member(user)
+    is_applicant = club.is_applicant(user)
+    upcoming_meetings = club.get_upcoming_meetings()
+    try: 
+        upcoming_meeting = upcoming_meetings[0]
+    except:
+        upcoming_meeting=None
+
+    
+    
+    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
 
 
 @login_required
@@ -373,7 +380,7 @@ def join_club(request, club_id):
                              "Already a member of this club!")
         return redirect('club_page', club_id)
 
-    if(club.club_type == "Private"):
+    if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
             messages.add_message(request, messages.SUCCESS,
@@ -424,7 +431,7 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
-    form = NameAndDateSortForm(request.GET or None)
+    form = NameSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
@@ -468,8 +475,8 @@ def members_list(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
-    # form to display user sorting options
-    form = UserSortForm(request.GET or None)
+    #form to display user sorting options
+    form = NameSortForm(request.GET or None)
     sort = ""
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
@@ -521,8 +528,9 @@ def applicants_list(request, club_id):
     applicants_queryset = club.applicants.all()
     is_owner = (club.owner == current_user)
     if (is_owner):
-        # Form to display sorting options for Users
-        form = UserSortForm(request.GET or None)
+        #Form to display sorting options for Users
+        form = NameSortForm(request.GET or None)
+
         sort = ""
         if form.is_valid():
             # get the value to sort by from the valid form
@@ -591,10 +599,35 @@ def transfer_club_ownership(request, club_id):
         if selectedmember != '':
             member = get_object_or_404(User.objects, id=int(selectedmember))
             club.make_owner(member)
-            messages.add_message(request, messages.SUCCESS,
-                                 "Ownership transferred!")
-            return redirect('club_page', club_id=club.id)
-    return render(request, 'transfer_ownership.html', {'club': club, 'user': user, 'memberlist': memberlist})
+
+            messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
+            create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
+            
+            current_site = get_current_site(request)
+            subject = club.name + ' Club updates'
+            email_from = settings.EMAIL_HOST_USER
+
+            members_email_body = render_to_string('emails/transfer.html', {
+            'owner': member,
+            'domain': current_site,
+            'club':club
+            })
+
+            owner_email_body = render_to_string('emails/new_owner.html', {
+            'owner': member,
+            'domain': current_site,
+            'club':club
+            })
+
+            email_to_members = club.members.exclude(id=member.id).values_list('email', flat=True)
+            email_to_owner = [member.email]
+
+            send_mail(subject, members_email_body, email_from, email_to_members)
+            send_mail(subject, owner_email_body, email_from, email_to_owner)
+
+            return redirect('club_page', club_id = club.id)
+
+    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
 
 @login_required
@@ -672,10 +705,9 @@ def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
         read_books = meeting.club.books.all()
-        my_books = Book.objects.all().exclude(id__in=read_books)
-        sorted_books = sorted(my_books, key=lambda b: (
-            b.average_rating(), b.readers_count()), reverse=True)[0:24]
-        return render(request, 'choice_book_list.html', {'rec_books': sorted_books, 'meeting_id': meeting.id})
+        my_books =  Book.objects.all().exclude(id__in = read_books)
+        sorted_books = sorted(my_books, key=lambda b: (b.average_rating, b.readers_count), reverse=True)[0:24]
+        return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
     else:
         return render(request, '404_page.html', status=404)
 
@@ -728,34 +760,29 @@ def add_book_to_list(request, book_id):
         book.add_reader(user)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
-    return redirect("book_details", book.id)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+
 
 
 @login_required
 def edit_review(request, review_id):
     review = get_object_or_404(Rating.objects, id=review_id)
-    reviewed_book = get_object_or_404(Book.objects, id=review.book_id)
     review_user = request.user
-    if (review_user == review.user):
-        if(request.method == "POST"):
-            form = EditRatingForm(data=request.POST, instance=review)
-            if (form.is_valid()):
-                form.instance.user = review_user
-                form.instance.book = reviewed_book
-                form.save(review_user, reviewed_book)
-                messages.add_message(
-                    request, messages.SUCCESS, "Successfully updated your review!")
-                return redirect('book_details', book_id=review.book.id)
-            messages.add_message(request, messages.ERROR,
-                                 "Review cannot be over 250 characters!")
+    if review_user == review.user:
+        if request.method == "POST":
+            form = EditRatingForm(data = request.POST, instance=review)
+            if form.is_valid():
+                form.save(review_user, review.book)
+                messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+                return redirect('book_details', book_id= review.book.id)
+            messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
-            form = EditRatingForm(instance=review)
+            form = EditRatingForm(instance = review)
+        
+        return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
+
     else:
         return render(request, '404_page.html', status=404)
-        # return redirect('handler404')
-
-    return render(request, 'edit_review.html', {'form': form, 'review_id': review.id})
-
 
 @login_required
 def follow_toggle(request, user_id):
@@ -768,8 +795,7 @@ def follow_toggle(request, user_id):
         delete_event('U', 'U', Event.EventType.FOLLOW,
                      current_user, action_user=followee)
     current_user.toggle_follow(followee)
-    return redirect('profile', followee.id)
-
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 @login_required
 def search_page(request):
@@ -785,10 +811,10 @@ def search_page(request):
         filtered_list = search_page_results["filtered_list"]
 
         sortForm = ""
-        if(category == "Clubs" or category == "Books"):
+        if(category == "Clubs"):
             sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            sortForm = UserSortForm(request.GET or None)
+            sortForm = NameSortForm(request.GET or None)
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
@@ -809,10 +835,10 @@ def show_sorted(request, searched, label):
         filtered_list = search_page_results["filtered_list"]
 
         sortForm = ""
-        if(category == "Clubs" or category == "Books"):
+        if(category == "Clubs"):
             sortForm = NameAndDateSortForm(request.GET or None)
         else:
-            sortForm = UserSortForm(request.GET or None)
+            sortForm = NameSortForm(request.GET or None)
 
         sort = ""
         if (sortForm.is_valid()):
@@ -834,25 +860,14 @@ def show_sorted(request, searched, label):
     else:
         return render(request, 'search_page.html', {})
 
-
 @login_required
 def initial_book_list(request):
     current_user = request.user
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     list_length = len(current_user.books.all())
-    sorted_books = sorted(my_books, key=lambda b: (
-        b.average_rating(), b.readers_count()), reverse=True)[0:8]
-    return render(request, 'initial_book_list.html', {'my_books': sorted_books, 'user': current_user, 'list_length': list_length})
-
-
-@login_required
-def add_book_from_initial_list(request, book_id):
-    book = get_object_or_404(Book.objects, id=book_id)
-    user = request.user
-    book.add_reader(user)
-    return redirect("initial_book_list")
-
+    sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
 
 @login_required
 def delete_club(request, club_id):
@@ -865,3 +880,32 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
+
+
+@login_required
+def meetings_list(request, club_id):
+    user = get_object_or_404(User.objects, id=request.user.id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    
+    
+    meetings = club.get_upcoming_meetings()
+    
+    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    meetings_list = meetings_pg.get_page(page_number)
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'club':club })
+    
+@login_required
+def previous_meetings_list(request, club_id):
+    user = get_object_or_404(User.objects, id=request.user.id)
+    club = get_object_or_404(Club.objects, id=club_id)
+    is_previous = True
+    
+    meetings = club.get_previous_meetings()
+    
+    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
+    page_number = request.GET.get('page')
+    meetings_list = meetings_pg.get_page(page_number)
+    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
+
+

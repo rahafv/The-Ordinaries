@@ -75,17 +75,14 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
             if book_id < 3: 
                 title = 'uio'
                 author = 'James'
-                year = '2020'
             else: 
                 title = 'xyz'
                 author = 'joe'
-                year = '2000'
 
             Book.objects.create(
                 ISBN = isbn_num[book_id],
                 title =title,
                 author = author, 
-                year = year
             )
 
 

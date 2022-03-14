@@ -41,14 +41,6 @@ class BookModelTestCase(TestCase):
         self.book.author = 'x' * 101
         self._assert_book_is_invalid()
 
-    def test_publisher_can_be_100_characters_long(self):
-        self.book.publisher = 'x' * 100
-        self._assert_book_is_valid()
-
-    def test_publisher_cannot_be_over_100_characters_long(self):
-        self.book.publisher = 'x' * 101
-        self._assert_book_is_invalid()
-
     def test_ISBN_must_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
         self.book.ISBN = second_book.ISBN
@@ -72,45 +64,47 @@ class BookModelTestCase(TestCase):
         self.book.author = second_book.author
         self._assert_book_is_valid()
 
-    def test_publisher_need_not_be_unique(self):
+    def test_genre_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
-        self.book.publisher = second_book.publisher
+        self.book.genre = second_book.genre
         self._assert_book_is_valid()
 
-    def test_year_need_not_be_unique(self):
+    def test_describtion_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
-        self.book.year = second_book.year
+        self.book.describtion = second_book.describtion
         self._assert_book_is_valid()
 
-    def test_year_may_be_blank(self):
-        self.book.year = None
+    def test_describtion_may_be_blank(self):
+        self.book.describtion = None
         self._assert_book_is_valid()
 
     def test_reader_addition(self):
         nonReader = User.objects.get(id=1)
-        count = self.book.readers_count()
+        count = self.book.readers_count
         self.book.add_reader(nonReader)
-        self.assertEqual(self.book.readers_count(), count+1)
+        self.book.refresh_from_db()
+        self.assertEqual(self.book.readers_count, count+1)
 
     def test_reader_addition_when_user_is_already_a_reader(self):
         reader = User.objects.get(id=1)
         self.book.add_reader(reader)
-        count = self.book.readers_count()
+        count = self.book.readers_count
         self.book.add_reader(reader)
-        self.assertEqual(self.book.readers_count(), count)
+        self.book.refresh_from_db()
+        self.assertEqual(self.book.readers_count, count)
 
     def test_reader_deletion(self):
         reader = User.objects.get(id=1)
         self.book.add_reader(reader)
-        count = self.book.readers_count()
+        count = self.book.readers_count
         self.book.remove_reader(reader)
-        self.assertEqual(self.book.readers_count(), count-1)
+        self.assertEqual(self.book.readers_count, count-1)
 
     def test_reader_deletion_when_user_is_not_a_reader(self):
         nonReader = User.objects.get(id=1)
-        count = self.book.readers_count()
+        count = self.book.readers_count
         self.book.remove_reader(nonReader)
-        self.assertEqual(self.book.readers_count(), count)
+        self.assertEqual(self.book.readers_count, count)
 
     def test_club_addition(self):
         club = Club.objects.get(id=1)
@@ -127,9 +121,17 @@ class BookModelTestCase(TestCase):
 
     def test_average_rating(self):
         book = Book.objects.get(id=2)
-        rating1 = Rating.objects.get(id=2).rating
-        rating2 = Rating.objects.get(id=2).rating
-        self.assertEqual(book.average_rating(), ((rating1+rating2)/2))
+        rating1 = Rating.objects.get(id=2)
+        rating2 = Rating.objects.get(id=2)
+
+        rating1.save()
+        rating2.save()
+
+        book.refresh_from_db()
+        rating1 = rating1.rating
+        rating2 = rating2.rating
+
+        self.assertEqual(book.average_rating, ((rating1+rating2)/2))
 
     def _assert_book_is_valid(self):
         try:

@@ -16,7 +16,7 @@ class NameAndDateSortFormTestCase(TestCase):
         self.club = Club.objects.get(id = 1)
         self.member = User.objects.get(id = 1)
         self.form_input = {
-            'sort':NameAndDateSortForm.DESC_DATE,
+            'sort':NameAndDateSortForm.DESC_NAME,
         }
     
     def test_form_has_necessary_fields(self):
@@ -36,11 +36,7 @@ class NameAndDateSortFormTestCase(TestCase):
         self.form_input['sort'] = NameAndDateSortForm.ASC_NAME
         form = NameAndDateSortForm(self.form_input)
         self.assertTrue(form.is_valid())
-    
-    def test_valid_sort_form_with_updated_updated_date_sort_field_desc(self):
-        self.form_input['sort'] = NameAndDateSortForm.ASC_DATE
-        form = NameAndDateSortForm(self.form_input)
-        self.assertTrue(form.is_valid())
+
 
 
 
