@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Ordinaries{% endblock %}
 {% block body %}
-<div id = "welcome-image">
+<!-- <div id = "welcome-image">
   <div class="container vh-100">
     <div class="row h-100">
       <div class="col-10 my-auto">
@@ -25,5 +25,72 @@
       </div>
     </div>
   </div>
+</div> -->
+
+
+<div id = "welcome-image" class = "bg obj-fit-cover">
+  <br>
+  <br>
+  <div class="container vh-100 ms-2">
+      <div class="row h-100 ">
+          <div class="col-lg-5 col-md-6 col-ms-12 justify-content-center">
+              <!-- <div class="card-group mb-0"> -->
+                  <div class="card-welcome py-5 fadein ">
+                      <div class="card-body text-center">
+                        <div class = "slide-left">
+                          <h2 class="cover-heading">Welcome!</h2>
+                          <p class="cover-text text-overflow: elipsis; text-muted"> Become part of the ordinaries' family</p>
+                        </div>                        
+                        <p class="pe-3 py-4 slide-up">
+                          <a href='{% url 'sign_up' %}' class="btn btn-lg btn btn-outline-light bg-purple">
+                            Sign up
+                          </a>
+                          <a href='{% url 'log_in' %}' class="btn btn-lg btn-outline-light bg-purple ">
+                            Log in 
+                          </a>
+                        </p>
+                      </div>
+                  </div>
+            <!-- </div> -->
+        </div>
+    </div>
+  </div>
+  <br/>
+  <br/>
 </div>
+<!-- <div id = "welcome-image" class = "bg obj-fit-cover">
+  <br>
+  <br>
+  <div class="container vh-100 ms-2">
+      <div class="row h-100">
+          <div class="col-lg-5 col-md-7 col-ms-12">
+            <div class="card__welcome justify-content-center">
+                <div class="card__welcome__overlay text-center text-overflow:elipsis">
+                  <div class="card__welcome__header bg-light-pink fadein opacity-60">
+                    <div class="card__welcome__header-text">
+                      <div class = "slide-left">
+                        <h2 class="text-white">Welcome!</h2>
+                        <p class="cover-text"> Become part of the ordinaries' family</p>
+                      </div>  
+                      <p class= "pe-2 slide-up">
+                        <a href='{% url 'sign_up' %}' class="btn btn-lg btn btn-outline-light bg-purple">
+                          Sign up
+                        </a>
+                        <a href='{% url 'log_in' %}' class="btn btn-lg btn-outline-light bg-purple ">
+                          Log in 
+                        </a>
+                      </p>  
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <br/>
+    </div> -->
+
 {% endblock %}
+
+
