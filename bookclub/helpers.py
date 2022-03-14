@@ -86,8 +86,12 @@ class SortHelper:
     def sort_books(self):
         if(self.sort == 'name_asc'):
             return self.list_of_objects.order_by(Lower('title').asc())
-        else:
+        elif (self.sort == 'name_desc'):
             return self.list_of_objects.order_by(Lower('title').desc())
+        elif (self.sort == 'rating_asc'):
+            return self.list_of_objects.order_by('average_rating')
+        else :
+            return self.list_of_objects.order_by('-average_rating')
 
     def sort_clubs(self):
         if(self.sort == 'name_asc'):

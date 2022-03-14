@@ -296,7 +296,7 @@ class RatingForm(forms.ModelForm):
     def calculate_rating(self, rating): 
         return rating*2
 
-class NameSortForm(forms.Form):
+class UsersSortForm(forms.Form):
     
     ASCENDING = 'name_asc'
     DESCENDING = 'name_desc'
@@ -315,7 +315,7 @@ class NameSortForm(forms.Form):
     widgets = {'sort': forms.Select()}       
    
    
-class NameAndDateSortForm(forms.Form):
+class ClubsSortForm(forms.Form):
 
     ASC_DATE = "date_asc"
     DESC_DATE = "date_desc"
@@ -326,7 +326,35 @@ class NameAndDateSortForm(forms.Form):
         (ASC_NAME, "Name A-Z"),
         (DESC_NAME, "Name Z-A"),
         (DESC_DATE, "Latest"),
-        (ASC_DATE, "Older"),
+        (ASC_DATE, "Oldest"),
+    ]
+
+    sort = forms.ChoiceField(
+      required = False,
+      choices=SORT_CHOICES,
+      label='Sort by:',
+      initial = ASC_NAME,
+      widget=forms.Select(),
+    )
+
+   
+class BooksSortForm(forms.Form):
+
+    ASC_DATE = "date_asc"
+    DESC_DATE = "date_desc"
+    ASC_NAME = 'name_asc'
+    DESC_NAME = 'name_desc'
+    ASC_RATING = 'rating_asc'
+    DESC_RATING = 'rating_desc'
+
+    SORT_CHOICES = [
+        (ASC_NAME, "Name A-Z"),
+        (DESC_NAME, "Name Z-A"),
+        (DESC_DATE, "Latest"),
+        (ASC_DATE, "Oldest"),
+        (DESC_RATING, "High rating"),
+        (ASC_RATING, "Low rating"),
+       
     ]
 
     sort = forms.ChoiceField(

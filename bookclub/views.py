@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import NameAndDateSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  NameSortForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -431,7 +431,7 @@ def books_list(request, club_id=None, user_id=None):
         books_queryset = User.objects.get(id=user_id).books.all()
         general = False
 
-    form = NameSortForm(request.GET or None)
+    form = BooksSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
@@ -454,7 +454,7 @@ def clubs_list(request, user_id=None):
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
 
-    form = NameAndDateSortForm(request.GET or None)
+    form = ClubsSortForm(request.GET or None)
     sort = ""
 
     if form.is_valid():
@@ -476,7 +476,7 @@ def members_list(request, club_id):
     is_member = club.is_member(current_user)
     members_queryset = club.members.all()
     #form to display user sorting options
-    form = NameSortForm(request.GET or None)
+    form = UsersSortForm(request.GET or None)
     sort = ""
     if form.is_valid():
         sort = form.cleaned_data.get('sort')
@@ -529,7 +529,7 @@ def applicants_list(request, club_id):
     is_owner = (club.owner == current_user)
     if (is_owner):
         #Form to display sorting options for Users
-        form = NameSortForm(request.GET or None)
+        form = UsersSortForm(request.GET or None)
 
         sort = ""
         if form.is_valid():
@@ -812,9 +812,11 @@ def search_page(request):
 
         sortForm = ""
         if(category == "Clubs"):
-            sortForm = NameAndDateSortForm(request.GET or None)
+            sortForm = ClubsSortForm(request.GET or None)
+        elif(category == "Books"):
+            sortForm = BooksSortForm(request.GET or None)
         else:
-            sortForm = NameSortForm(request.GET or None)
+            sortForm = UsersSortForm(request.GET or None)
 
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
@@ -836,9 +838,11 @@ def show_sorted(request, searched, label):
 
         sortForm = ""
         if(category == "Clubs"):
-            sortForm = NameAndDateSortForm(request.GET or None)
+            sortForm = ClubsSortForm(request.GET or None)
+        elif(category == "Books"):
+            sortForm = BooksSortForm(request.GET or None)
         else:
-            sortForm = NameSortForm(request.GET or None)
+            sortForm = UsersSortForm(request.GET or None)
 
         sort = ""
         if (sortForm.is_valid()):

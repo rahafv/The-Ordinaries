@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.forms import NameAndDateSortForm
+from bookclub.forms import ClubsSortForm
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 from system import settings
 
@@ -20,7 +20,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self.num_of_clubs = Club.objects.count()
         self.url = reverse('clubs_list')
         self.form_input = {
-            'sort':NameAndDateSortForm.DESC_DATE,
+            'sort':ClubsSortForm.DESC_DATE,
         }
         
     def test_clubs_list_url(self):
@@ -44,7 +44,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         clubs_url = reverse('clubs_list')
         self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
         self.assert_menu(response)
@@ -62,13 +62,13 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
         self.assert_menu(response)
     
     def test_get_clubs_list_descending_date(self):
-        self.form_input['sort'] = NameAndDateSortForm.DESC_DATE
+        self.form_input['sort'] = ClubsSortForm.DESC_DATE
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
@@ -81,13 +81,13 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_desc')   
         self.assert_menu(response)
 
     def test_get_clubs_list_ascending_date(self):
-        self.form_input['sort'] = NameAndDateSortForm.ASC_DATE
+        self.form_input['sort'] = ClubsSortForm.ASC_DATE
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
@@ -100,14 +100,14 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'date_asc')   
         self.assert_menu(response)
 
 
     def test_get_clubs_list_ascending_name(self):
-        self.form_input['sort'] = NameAndDateSortForm.ASC_NAME
+        self.form_input['sort'] = ClubsSortForm.ASC_NAME
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
@@ -120,13 +120,13 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')   
         self.assert_menu(response)
     
     def test_get_clubs_list_descending_name(self):
-        self.form_input['sort'] = NameAndDateSortForm.DESC_NAME
+        self.form_input['sort'] = ClubsSortForm.DESC_NAME
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
@@ -139,7 +139,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
             clubs_url = reverse('clubs_list')
             self.assertContains(response, clubs_url)
         form= response.context['form']
-        self.assertTrue(isinstance(form, NameAndDateSortForm)) 
+        self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')   
         self.assert_menu(response)
