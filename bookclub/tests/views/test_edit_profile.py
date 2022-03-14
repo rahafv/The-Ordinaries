@@ -23,7 +23,7 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin
             'first_name': 'John2',
             'last_name': 'Doe2',
             'email':'johndoe2@example.org',
-            'date_of_birth': date(2000, 1, 5),
+            'DOB': date(2000, 1, 5),
             'bio': 'New bio',
             'city':'Berlin',
             'region':'Berlin',
@@ -46,30 +46,6 @@ class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin
     def test_unsuccessful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['username'] = ''
-        before_count = User.objects.count()
-        response = self.client.post(self.url, self.form_input)
-        after_count = User.objects.count()
-        self.assertEqual(after_count, before_count)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
-        form = response.context['form']
-        self.assertTrue(isinstance(form, UserForm))
-        self.assertTrue(form.is_bound)
-        self.user.refresh_from_db()
-        self.assertEqual(self.user.username, 'johndoe')
-        self.assertEqual(self.user.first_name, 'John')
-        self.assertEqual(self.user.last_name, 'Doe')
-        self.assertEqual(self.user.email, 'johndoe@example.org')
-        self.assertEqual(self.user.age, 19)
-        self.assertEqual(self.user.city, 'new york')
-        self.assertEqual(self.user.region, 'NY')
-        self.assertEqual(self.user.country, 'United states')
-        self.assertEqual(self.user.bio, "Hello, this is John Doe.")
-        self.assert_menu(response)
-
-    def test_unsuccessful_profile_update_due_to_empty_date_of_birth(self):
-        self.client.login(username=self.user.username, password='Password123')
-        self.form_input['date_of_birth'] = ''
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input)
         after_count = User.objects.count()

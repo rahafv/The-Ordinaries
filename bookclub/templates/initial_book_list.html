@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Trending Now ..{% endblock %}
 {% block body %}
+{% include 'partials/messages.html' %}
 
 <div class="row py-lg-5">
     <div class="col mx-auto">
       <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
          <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
-         <p class="lead text-muted text-center"> You need to add at least one book in your list</p>
+         <p class="lead text-muted text-center"> You need to add 3 books to your list to Continue</p>
     </div>
 </div>
 <div class="container">
@@ -14,7 +15,7 @@
         {% for book in my_books %}
             <div class="col-sm-6 col-md-3">
                 {% include 'partials/book_card.html' with book=book %}
-                <a href={% url "add_book_from_initial_list" book_id=book.id %} class="btn btn-outline-dark bi bi-plus-lg" style="margin-left:6em"  role="button" > Add </a>
+                <a href={% url "add_book_to_list" book_id=book.id %} class="btn btn-outline-dark bi bi-plus-lg" style="margin-left:6em"  role="button" > Add </a>
             </div>
         {% endfor %}
     </div>
@@ -26,7 +27,7 @@
 <br>
 <div class="row py-lg-5">
     <div class="col-lg-6 col-md-8 mx-auto text-center">
-        {%if list_length == 0 %}
+        {%if list_length < 3 %}
             <a href={% url 'home' %} class="btn btn-outline-dark mb-3 disabled" role="button" aria-disabled="true">Continue</a>
         {% else %}
             <a href={% url 'home' %} class="btn btn-outline-dark mb-3 " role="button" >Continue</a>

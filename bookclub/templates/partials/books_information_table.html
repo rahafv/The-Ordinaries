@@ -3,14 +3,14 @@
     <tr style="background-color: white">
         <th class="th-sm">Name</th>
         <th class="th-sm">Author</th>
-        <th class="th-sm">Year</th>
+        <th class="th-sm">Genre</th>
     </tr>
     </thead>
         {% for book in Books %}
             <tr style="background-color: white">
                 <td> <a href='{% url 'book_details' book.id %}'  style="color: black" > {{ book.title }}</a>  </td>
                 <td> <p>{{book.author}}</p> </td>
-                <td> <p>{{ book.year }}</p> </td>
+                <td> <p>{{ book.genre }}</p> </td>
             </tr>
         {% endfor %}
 </table>

@@ -1,0 +1,47 @@
+
+<table class="table table-bordered" id="followTable">
+<thead>
+<tr style="background-color: white">
+    <th class="th-sm">Title</th>
+    <th class="th-sm">Time</th>
+    <th class="th-sm">Book</th>
+    <th class="th-sm">link</th>
+    <th class="th-sm">Notes</th>
+</tr>
+</thead>
+    {% for meeting in meetings_list %}
+        <tr style="background-color: white">
+            
+            <td> 
+                {{ meeting.title }} 
+            </td>
+            
+            <td> 
+                <a>{{meeting.time}}</a> 
+            </td>
+
+            <td> 
+                {% if meeting.book %}
+                    <a href='{% url 'book_details' meeting.book.id %}' style = "color:black;"> {{meeting.book.title}}</a>
+                {% else %}
+                    {%if user != meeting.chooser%}
+                        <a> No book has been chosen yet.. </a> 
+                    {% else %}
+                        <a href="{% url 'choice_book_list' meeting_id=meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
+                    {% endif %} 
+                {% endif %}
+            </td>
+
+            <td> 
+                <a href={{meeting.link}}>{{meeting.link}}</a>
+            </td>
+
+            <td> 
+                <p>{{meeting.notes}}</p> 
+               
+            </td>
+            
+        </tr>
+    {% endfor %}
+</table>
+          

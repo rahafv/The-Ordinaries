@@ -4,11 +4,9 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail 
 import six
-from system import settings
 from django.conf import settings
 from .models import Event, User, Club, Book
 from django.db.models.functions import Lower
-
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -51,10 +49,9 @@ class MeetingHelper:
 
     def get_email(self, meeting, all_mem):
         if all_mem:
-            invitees = []
-            for mem in meeting.club.members.all():
-                invitees.append(mem.email)
+            invitees = meeting.club.members.values_list('email', flat=True)
             return invitees
+
         else:
             return [meeting.chooser.email]
 
@@ -71,11 +68,8 @@ class TokenGenerator(PasswordResetTokenGenerator):
 
     def _make_hash_value(self, user, timestamp):
         return (six.text_type(user.pk) + six.text_type(timestamp) + six.text_type(user.email_verified))
-
-
     
 generate_token = TokenGenerator()
-
 
 class SortHelper:
 
@@ -92,12 +86,8 @@ class SortHelper:
     def sort_books(self):
         if(self.sort == 'name_asc'):
             return self.list_of_objects.order_by(Lower('title').asc())
-        elif (self.sort == 'name_desc'):
-            return self.list_of_objects.order_by(Lower('title').desc())
-        elif(self.sort == "date_asc"):
-            return self.list_of_objects.order_by('year')
         else:
-            return self.list_of_objects.order_by(Lower('year').desc())
+            return self.list_of_objects.order_by(Lower('title').desc())
 
     def sort_clubs(self):
         if(self.sort == 'name_asc'):
@@ -108,7 +98,6 @@ class SortHelper:
             return self.list_of_objects.order_by('created_at')
         else:
             return self.list_of_objects.order_by('-created_at')
-
 
 def get_list_of_objects(searched, label):
 
@@ -130,8 +119,8 @@ def get_list_of_objects(searched, label):
     elif(label=="book-title"):
         filtered_list = Book.objects.filter(title__contains=searched)
         category= "Books"
-    elif(label=="book-year"):
-        filtered_list = Book.objects.filter(year__contains=searched)
+    elif(label=="book-genre"):
+        filtered_list = Book.objects.filter(genre__contains=searched)
         category= "Books"
     else:
         filtered_list = Book.objects.filter(author__contains=searched)
@@ -140,4 +129,3 @@ def get_list_of_objects(searched, label):
     return {
         "category" : category, 
         "filtered_list" : filtered_list}
-
