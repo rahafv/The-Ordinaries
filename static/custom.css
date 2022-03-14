@@ -84,7 +84,7 @@
 * Sign up page
 */
 body {
-    margin-top: 20px;
+    /* margin-top: 20px; */
     background: #f6f9fc;
 }
 .account-block {
@@ -168,7 +168,6 @@ ul.errorlist {
 * 404 page not found
 */
 
-body{margin-top:20px;}
 .cover-background {
     background-image: url(images/gradient5.jpg);
     position: relative ;
@@ -213,19 +212,6 @@ section {
 }
 .mb-4 {
     margin-bottom: 1.5rem!important;
-}
-
-
-#cover{
-    background: url(images/undraw_Page_not_found_re_e9o6.png);
-    position: relative ;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: cover;
-    overflow: hidden ;
-    background-position: center;
-    background-repeat: no-repeat ;
 }
 
 
