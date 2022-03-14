@@ -24,7 +24,7 @@
               <i><small>Instead, you can transfer ownership to a member of your club!</small></i>
             </div>
             <div class="modal-footer">
-              <a href="#" class="btn btn-sm btn btn-secondary">Transfer ownership</a>
+              <a href="{% url 'transfer_ownership' club_id=club_id %}" class="btn btn-sm btn btn-secondary">Transfer ownership</a>
               <a href="{% url 'delete_club' club_id=club_id %}" class="btn btn-sm btn-outline-danger">Yes, delete</a>
             </div>
           </div>

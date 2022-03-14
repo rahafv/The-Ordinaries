@@ -1,7 +1,4 @@
 from datetime import date, datetime, timedelta
-from email.policy import default
-from pickle import FALSE
-from typing import Any
 from django import forms
 from django.core.validators import RegexValidator
 import pytz
@@ -15,15 +12,8 @@ class SignUpForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'city', 'region', 'country', 'bio']
-        widgets = { 'bio': forms.Textarea() }
-
-
-    DOB = forms.DateField(initial= None,
-        label = 'Date of Birth',
-        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= False,
-    )
+        fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
+        widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'}) }
 
     new_password = forms.CharField(
         label='Password',
@@ -75,6 +65,7 @@ class SignUpForm(forms.ModelForm):
             self.cleaned_data.get('username'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'),
+            DOB=self.cleaned_data.get('DOB'),
             age = self.calculate_age(self.DOB),
             email=self.cleaned_data.get('email'),
             city=self.cleaned_data.get('city'),
@@ -143,10 +134,11 @@ class PasswordForm(NewPasswordMixin):
 
         super().clean()
         password = self.cleaned_data.get('password')
-        if self.user is not None:
+        if self.user:
             user = authenticate(username=self.user.username, password=password)
         else:
             user = None
+
         if user is None:
             self.add_error('password', "Password is invalid")
 
@@ -154,9 +146,8 @@ class PasswordForm(NewPasswordMixin):
         """Save the user's new password."""
 
         new_password = self.cleaned_data['new_password']
-        if self.user is not None:
-            self.user.set_password(new_password)
-            self.user.save()
+        self.user.set_password(new_password)
+        self.user.save()
         return self.user
 
 class BookForm(forms.ModelForm):
@@ -165,7 +156,7 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
+        fields = ['ISBN','title','author', 'genre', 'image_url', 'describtion']
 
     def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
@@ -179,17 +170,13 @@ class BookForm(forms.ModelForm):
 
         super().save(commit=False)
 
-        self.image_url = self.cleaned_data.get('image_url')
-        if not self.image_url:
-            self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
-
         book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
-            publisher=self.cleaned_data.get('publisher'),
-            image_url=self.image_url,
-            year=self.cleaned_data.get('year'),
+            genre=self.cleaned_data.get('genre'),
+            image_url=self.cleaned_data.get('image_url'),
+            describtion=self.cleaned_data.get('describtion'),
         )
         return book
 
@@ -201,14 +188,8 @@ class UserForm(forms.ModelForm):
         """Form options."""
 
         model = User
-        fields = ['username', 'first_name', 'last_name','email', 'city', 'region','country','bio']
-        widgets = { 'bio': forms.Textarea()}
-
-    date_of_birth = forms.DateField(initial= None,
-        label = 'Date of Birth',
-        widget= forms.widgets.DateInput(attrs={'type': 'date'}),
-        required= True,
-    )
+        fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
+        widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'})}
 
     def __init__(self, *args, **kwargs):
         """ Grants access to the request object so that the date of birth can be changed"""
@@ -217,38 +198,36 @@ class UserForm(forms.ModelForm):
         super(UserForm, self).__init__(*args, **kwargs)
 
 
-
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
         super().clean()
 
-        self.date_of_birth = self.cleaned_data.get('date_of_birth')
+        self.DOB = self.cleaned_data.get('DOB')
 
-        if not self.check_age(self.date_of_birth):
-            self.add_error('date_of_birth', 'Please enter a valid date')
+        if not self.check_age(self.DOB):
+            self.add_error('DOB', 'Please enter a valid date')
 
-
-    def check_age(self, date_of_birth):
+    def check_age(self, dob):
         """Validate the age and check if it is an acceptable age."""
         try:
-            return self.calculate_age(date_of_birth) < 100 and self.calculate_age(date_of_birth) > 10
+            return self.calculate_age(dob) < 100 and self.calculate_age(dob) > 10
         except:
             return True
 
     def calculate_age(self, dob):
         """Calculate the age from the given date input."""
-        today = date.today()
-        one_or_zero = ((today.month, today.day) < (dob.month, dob.day))
-        year_difference = today.year - dob.year
-        age = year_difference - one_or_zero
-
-        return age
+        try:
+            today = date.today()
+            age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+            return age
+        except:
+            age = None
 
     def save(self):
         """Save user."""
         super().save(commit=False)
-        birthdate= self.cleaned_data.get('date_of_birth')
+        birthdate= self.cleaned_data.get('DOB')
         new_age = self.calculate_age(birthdate)
         self.log_in_user.set_age(new_age)
         return self.log_in_user
@@ -272,9 +251,7 @@ class EditRatingForm(forms.ModelForm):
 
         model = Rating
         fields = ['rating', 'review']
-        widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
-        }
+
 
     def calculate_rating(self, rating):
         return rating*2
@@ -284,12 +261,11 @@ class EditRatingForm(forms.ModelForm):
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0
-        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
-        )
-        return review
-
+        review_obj = Rating.objects.get(user=reviwer , book=reviewedBook)
+        review_obj.rating=self.calculate_rating(rate)
+        review_obj.review=self.cleaned_data.get('review')
+        review_obj.save()    
+         
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
@@ -320,7 +296,7 @@ class RatingForm(forms.ModelForm):
     def calculate_rating(self, rating): 
         return rating*2
 
-class UserSortForm(forms.Form):
+class NameSortForm(forms.Form):
     
     ASCENDING = 'name_asc'
     DESCENDING = 'name_desc'
@@ -361,10 +337,7 @@ class NameAndDateSortForm(forms.Form):
       widget=forms.Select(),
     )
 
-    
-    
-   
-     
+ 
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
 

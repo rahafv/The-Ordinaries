@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.forms import UserSortForm
+from bookclub.forms import NameSortForm
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
@@ -14,7 +14,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
     def setUp(self):
         self.user = User.objects.get(id=3)
         self.club = Club.objects.get(id=2)
-        self.form_input = {'sort': UserSortForm.ASCENDING}
+        self.form_input = {'sort': NameSortForm.ASCENDING}
         self.url = reverse('applicants_list', kwargs={'club_id': self.club.id})
 
     def test_applicants_list_url(self):
@@ -30,7 +30,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'applicants_list.html')
         form= response.context['form']
-        self.assertTrue(isinstance(form, UserSortForm))  
+        self.assertTrue(isinstance(form, NameSortForm))  
         self.assert_menu(response)
 
     def test_get_applicants_list(self):
@@ -40,7 +40,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'applicants_list.html')
         form = response.context['form']
-        self.assertTrue(isinstance(form, UserSortForm))
+        self.assertTrue(isinstance(form, NameSortForm))
         self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')
 
         self.assertEqual(len(response.context['applicants']), 15)
@@ -66,7 +66,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assert_menu(response)
 
     def test_get_applicants_list_in_descending_order(self):
-        self.form_input['sort']= UserSortForm.DESCENDING
+        self.form_input['sort']= NameSortForm.DESCENDING
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_applicants(15)
         response = self.client.get(self.url, self.form_input, follow=True)
@@ -74,7 +74,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assertTemplateUsed(response, 'applicants_list.html')
 
         form = response.context['form']
-        self.assertTrue(isinstance(form, UserSortForm))
+        self.assertTrue(isinstance(form, NameSortForm))
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')
         
