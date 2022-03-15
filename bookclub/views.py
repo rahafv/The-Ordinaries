@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import NameAndDateSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm,  NameSortForm
 from django.contrib import messages
