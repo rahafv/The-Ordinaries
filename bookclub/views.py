@@ -747,10 +747,20 @@ def delete_club(request, club_id):
 
 
 @login_required
-def chat_room(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
+def chat_room(request, club_id=None):
     user = request.user
-
+    if club_id:
+        club = get_object_or_404(Club.objects, id=club_id)
+        if not user in club.members.all():
+            return render(request, '404_page.html', status=404) 
+    else:
+        clubs = user.clubs.all()
+        if clubs:
+            club = clubs[0]
+        else:
+            messages.add_message(request, messages.WARNING, "You do not have any chats! Join clubs and be part of a community.")
+            return redirect('clubs_list')
+    
     return render(request, "chat_room.html", {"user": user, "club":club})
 
 
@@ -774,7 +784,7 @@ def getMessages(request, club_id):
         prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
         modifiedItems.append({"name": user.full_name(), "time":prettyDate})
 
-    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "username":user.full_name(), "messages":messages})
+    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":user.id, "messages":messages})
 
 def send(request):
     message = request.POST['message']

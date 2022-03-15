@@ -11,6 +11,12 @@
           style="font-size: 1.8rem; color: grey;"></a>
         </span>
       {% endif %}
+      {% if is_member %}
+        <span>
+          <a href='{% url "chat_room" club_id=club.id %}' class="bi bi-chat-left-dots"
+          style="font-size: 1.4rem; color: black;"> Chat Room</a>
+        </span>
+      {% endif %}
       <div class="row mt-5">
         <div class="col-5">
           <h4 class="mb-3">Theme:</h4>

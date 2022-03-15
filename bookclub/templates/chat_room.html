@@ -3,6 +3,7 @@
 {% load humanize %}
 {% block title %}Chat{% endblock %}
 {% block content %}
+
 <script>
     $(document).ready(function(){
     setInterval(function(){
@@ -14,7 +15,7 @@
                 $("#display").empty();
 
                 for (var key in response.chats) {
-                    if(response.username != response.modifiedItems[key].name) {
+                    if(response.user_id != response.chats[key].user_id) {
                         var temp="<div id=rcorners1 class='container darker text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
                             "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
                             response.chats[key].message+"</p></div>";                    }
@@ -31,7 +32,6 @@
     })
 </script>
 
-<div>
 <div class="row rounded-lg overflow-hidden" style="margin:0px;">
 
     <div class="col-3 px-0">
@@ -81,7 +81,6 @@
         </div>
     </div>
 </div>    
-</div>
 
 <script type="text/javascript">
     $(document).on('submit','#post-form',function(e){
@@ -102,6 +101,6 @@
       });
       document.getElementById('message').value = ''
     });
-  </script>
+</script>
 
 {% endblock %}
