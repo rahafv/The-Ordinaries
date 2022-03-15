@@ -10,8 +10,8 @@
       <form action="{% url 'create_club' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
-        <button onclick="history.back()" class="btn btn-lg btn-outline-dark">Cancel</button>
         <input type="submit" class="btn btn-lg btn-outline-dark" value="Create club">
+        <button onclick="history.back()" class="btn btn-lg btn-outline-dark">Cancel</button>
       </form>
     </div>
   </div>
