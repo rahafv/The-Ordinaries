@@ -1,5 +1,6 @@
 import math
-from .models import Rating, Book
+from bookclub.models import Rating, Book
+from bookclub.recommender.evaluator.Evaluator import Evaluator
 from surprise import KNNBasic, PredictionImpossible
 from surprise import Dataset
 from surprise import Reader
@@ -12,8 +13,6 @@ import heapq
 
 import os
 import csv
-
-
 
 class Recommender:
     def __init__(self):
@@ -83,37 +82,3 @@ class Recommender:
         except:
             return None
 
-    def computeYearSimilarity(self, movie1, movie2, years):
-        diff = abs(years[movie1] - years[movie2])
-        sim = math.exp(-diff / 10.0)
-        return sim
-
-    def estimate(self, u, i):
-
-        if not (self.trainset.knows_user(u) and self.trainset.knows_item(i)):
-            raise PredictionImpossible('User and/or item is unkown.')
-        
-        # Build up similarity scores between this item and everything the user rated
-        neighbors = []
-        for rating in self.trainset.ur[u]:
-            yearSimilarity = self.similarities[i,rating[0]]
-            neighbors.append( (yearSimilarity, rating[1]) )
-        
-        # Extract the top-K most-similar ratings
-        k_neighbors = heapq.nlargest(self.k, neighbors, key=lambda t: t[0])
-        
-        # Compute average sim score of K neighbors weighted by user ratings
-        simTotal = weightedSum = 0
-        for (simScore, rating) in k_neighbors:
-            if (simScore > 0):
-                simTotal += simScore
-                weightedSum += simScore * rating
-            
-        if (simTotal == 0):
-            raise PredictionImpossible('No neighbors')
-
-        predictedRating = weightedSum / simTotal
-
-        return predictedRating
-
-print("-------------gggggggggggggggjgjgjgjgg----------")

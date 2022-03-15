@@ -3,13 +3,12 @@ from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
-from bookclub.rec3 import Recommender2
-from bookclub.rec_by_genre import ContentRec
+
+from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
-from .rec import Recommender
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse
@@ -24,7 +23,6 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
 
 
 @login_prohibited
@@ -810,8 +808,8 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = ContentRec()
-    print(recommendations.get_recommendations(request.user.id, 5))
+    recommendations = RecModelsBakeOff()
+    recommendations.evaluate()
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
     #     category = request.GET.get('category')

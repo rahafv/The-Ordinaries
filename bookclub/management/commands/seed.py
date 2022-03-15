@@ -217,7 +217,7 @@ class Command(BaseCommand):
                 
 
     def create_ratings(self):
-        MAX_RATINGS = 1000
+        MAX_RATINGS = 10000
   
         books = Book.objects.all()
         book_ids = list(books.values_list('id', flat=True))

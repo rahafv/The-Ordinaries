@@ -2,8 +2,10 @@ from collections import defaultdict
 import heapq
 from operator import itemgetter
 import pandas as pd
-from surprise import AlgoBase, Dataset, Reader
+from bookclub.recommender.evaluator.Evaluator import Evaluator
+from surprise import AlgoBase, Dataset, NormalPredictor, PredictionImpossible, Reader
 import math
+import random
 import numpy as np
 
 from bookclub.models import Book, User
@@ -49,6 +51,11 @@ class ContentRec:
             except:
                 continue
 
+        user = User.objects.get(id=user_id)
+        for book in user.books.all():
+            id = self.trainset.to_inner_iid(book.id)
+            candidates.pop(id)
+
         return candidates
 
     def get_recommendations(self, user_id, numOfRec):
@@ -63,6 +70,24 @@ class ContentRec:
                 break 
 
         return recommendations 
+
+    
+    def test(self, user_id):
+     
+        evaluator = Evaluator(self.load_dataset())
+
+        contentKNN = ContentKNNAlgorithm()
+        evaluator.AddAlgorithm(contentKNN, "ContentKNN")
+
+        # Just make random recommendations
+        np.random.seed(0)
+        random.seed(0)
+        Random = NormalPredictor()
+        evaluator.AddAlgorithm(Random, "Random")
+
+        evaluator.Evaluate(True)
+
+        evaluator.SampleTopNRecs()
 
     
     def getBookName(self, bookID):
@@ -148,3 +173,31 @@ class ContentKNNAlgorithm(AlgoBase):
             genres[book_id] = bitfield            
         
         return genres
+
+    def estimate(self, u, i):
+
+        if not (self.trainset.knows_user(u) and self.trainset.knows_item(i)):
+            raise PredictionImpossible('User and/or item is unkown.')
+        
+        # Build up similarity scores between this item and everything the user rated
+        neighbors = []
+        for rating in self.trainset.ur[u]:
+            genreSimilarity = self.similarities[i,rating[0]]
+            neighbors.append( (genreSimilarity, rating[1]) )
+        
+        # Extract the top-K most-similar ratings
+        k_neighbors = heapq.nlargest(self.k, neighbors, key=lambda t: t[0])
+        
+        # Compute average sim score of K neighbors weighted by user ratings
+        simTotal = weightedSum = 0
+        for (simScore, rating) in k_neighbors:
+            if (simScore > 0):
+                simTotal += simScore
+                weightedSum += simScore * rating
+            
+        if (simTotal == 0):
+            raise PredictionImpossible('No neighbors')
+
+        predictedRating = weightedSum / simTotal
+
+        return predictedRating
