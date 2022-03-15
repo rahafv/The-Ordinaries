@@ -6,7 +6,7 @@ Created on Thu May  3 11:11:13 2018
 """
 
 from .Evaluator import Evaluator
-from bookclub.recommender.rec import Recommender
+from bookclub.recommender.rec import ContentKNNAlgorithm, Recommender
 from surprise import KNNBasic, SVD
 from surprise import NormalPredictor
 
@@ -39,6 +39,10 @@ class RecModelsBakeOff:
         # Item-based KNN
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
+
+        # Item-based KNN
+        genre = ContentKNNAlgorithm()
+        evaluator.AddAlgorithm(genre, "genre similarity")
 
         # SVD
         svd = SVD()

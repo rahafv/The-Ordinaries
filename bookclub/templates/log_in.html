@@ -15,7 +15,7 @@
                             <h1>Login</h1>
                             <p class="text-muted">Sign In to your account</p>
                             <div class="input-group mb-3">
-                                <form action="{% url 'log_in' %}" method="post">
+                                <form action="{% url 'log_in' %}" method="POST">
                                     {% csrf_token %}
                                     {% include 'partials/bootstrap_form.html' with form=form %}
                                     <input type="hidden" name="next" value="{{ next }}">

@@ -4,6 +4,8 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
 
+from bookclub.recommender.rec import Recommender
+
 from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
@@ -808,8 +810,8 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = RecModelsBakeOff()
-    recommendations.evaluate()
+    recommendations = Recommender()
+    print(recommendations.get_recommendations(request.user.id, 5))
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
     #     category = request.GET.get('category')
