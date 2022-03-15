@@ -262,6 +262,7 @@ def add_book(request):
 @login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
+    numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
     check_reader = book.is_reader(user)
@@ -273,7 +274,7 @@ def book_details(request, book_id):
         review="").exclude(user=request.user).count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader}
+               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
     return render(request, "book_details.html", context)
 
 
