@@ -7,8 +7,7 @@
 
 <div class="ui-bg-cover ui-bg-overlay-container text-white" style="background-color: #64505a">
     <div class="ui-bg-overlay bg-dark-purple opacity-25"></div>
-    <div class="row">
-        <div class="container">
+    <div class="row" style="margin:0px">
             <div class= "text-center py-3">
                 <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
 
@@ -61,7 +60,6 @@
                     </div> 
                 </div> 
             </div> 
-        </div> 
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
             <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent me-4">
@@ -74,9 +72,9 @@
             </ul>
         </div>
     </div>
-    <div style="background-color: #eceae8 ">
+    <div style="background-color: #eceae8">
         <div class = "col-12">
-            <div class=" ui-bg-cover ui-bg-overlay-container text-black" >
+            <div class=" ui-bg-cover ui-bg-overlay-container text-black">
                 <div class="ui-bg-overlay bg-light-whitish opacity-75"></div>
                 <div class="container text-center">
                     {% if is_clubs is True %}
