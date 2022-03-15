@@ -1,4 +1,5 @@
-from bookclub.helpers import create_event, SortHelper
+from bookclub.forms import NameSortForm, NameAndDateSortForm
+from bookclub.helpers import create_event, get_list_of_objects, SortHelper
 from bookclub.models import User, Book, Event
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
