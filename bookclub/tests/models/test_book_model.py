@@ -132,6 +132,13 @@ class BookModelTestCase(TestCase):
         rating2 = rating2.rating
 
         self.assertEqual(book.average_rating, ((rating1+rating2)/2))
+    
+    def test_average_rating_when_no_ratings(self):
+        book = Book.objects.get(id=3)
+        book.calculate_average_rating()
+        book.refresh_from_db()
+
+        self.assertEqual(book.average_rating, 0)
 
     def _assert_book_is_valid(self):
         try:
