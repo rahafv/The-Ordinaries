@@ -5,9 +5,9 @@ from django.urls import reverse
 from bookclub.tests.helpers import reverse_with_next
 from bookclub.forms import PasswordForm
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester,MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester,MenuTestMixin
 
-class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the password view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']

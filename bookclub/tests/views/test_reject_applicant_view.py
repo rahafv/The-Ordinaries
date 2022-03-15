@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class RejectApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class RejectApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the join club view."""
 
     fixtures = [

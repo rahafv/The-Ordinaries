@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Meeting, User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
-class SearchPageViewTest(TestCase, LoginRedirectTester, MenueTestMixin):
+class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 
@@ -75,17 +75,14 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenueTestMixin):
             if book_id < 3: 
                 title = 'uio'
                 author = 'James'
-                year = '2020'
             else: 
                 title = 'xyz'
                 author = 'joe'
-                year = '2000'
 
             Book.objects.create(
                 ISBN = isbn_num[book_id],
                 title =title,
                 author = author, 
-                year = year
             )
 
 

@@ -1,9 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.forms import UsersSortForm
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
 
     fixtures=[
         'bookclub/tests/fixtures/other_club.json',
@@ -13,6 +14,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
     def setUp(self):
         self.user = User.objects.get(id=3)
         self.club = Club.objects.get(id=2)
+        self.form_input = {'sort': UsersSortForm.ASCENDING}
         self.url = reverse('applicants_list', kwargs={'club_id': self.club.id})
 
     def test_applicants_list_url(self):
@@ -27,14 +29,55 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenueTestM
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'applicants_list.html')
+        form= response.context['form']
+        self.assertTrue(isinstance(form, UsersSortForm))  
         self.assert_menu(response)
 
     def test_get_applicants_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_applicants(15)
-        response = self.client.get(self.url)
+        response = self.client.get(self.url,self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'applicants_list.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, UsersSortForm))
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')
+
+        self.assertEqual(len(response.context['applicants']), 15)
+        for user_id in range(15):
+            self.assertContains(response, f'user{user_id}')
+            self.assertContains(response, f'First{user_id} Last{user_id}')
+
+        for applicant in self.club.applicants.all():
+            if applicant.id != self.user.id:
+                applicant_profile_url = reverse('profile', kwargs={'user_id': applicant.id })
+                self.assertContains(response, applicant_profile_url)
+        
+        for applicant in self.club.applicants.all():
+            if applicant.id != self.user.id:
+                accept_applicant = reverse('accept_applicant', kwargs={'club_id': self.club.id, 'user_id': applicant.id })
+                self.assertContains(response, accept_applicant)
+        
+        for applicant in self.club.applicants.all():
+            if applicant.id != self.user.id:
+                reject_applicant = reverse('reject_applicant', kwargs={'club_id': self.club.id, 'user_id': applicant.id })
+                self.assertContains(response, reject_applicant)
+
+        self.assert_menu(response)
+
+    def test_get_applicants_list_in_descending_order(self):
+        self.form_input['sort']= UsersSortForm.DESCENDING
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_applicants(15)
+        response = self.client.get(self.url, self.form_input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'applicants_list.html')
+
+        form = response.context['form']
+        self.assertTrue(isinstance(form, UsersSortForm))
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')
+        
         self.assertEqual(len(response.context['applicants']), 15)
         for user_id in range(15):
             self.assertContains(response, f'user{user_id}')

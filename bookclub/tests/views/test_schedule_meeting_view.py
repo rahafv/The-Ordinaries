@@ -4,10 +4,10 @@ from django.urls import reverse
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
 from bookclub.models import Book, Meeting, User, Club, Event
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin, MessageTester
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 import pytz
 
-class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenueTestMixin, MessageTester):
+class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

@@ -49,6 +49,8 @@ class Command(BaseCommand):
         self.create_ratings()
         end = time.time()
         print("ratings: ", end - start)
+
+        self.calculate_average()
         
         print("total time: ", end - initial_start)
 
@@ -182,7 +184,7 @@ class Command(BaseCommand):
 
     def create_books(self):
         MAX_BOOKS = 1000
-        books_path = os.path.abspath("book-review-dataset/BX_Books.csv")
+        books_path = os.path.abspath("book-review-dataset/books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = csv.reader(csv_file, delimiter=",")
             next(books_data)
@@ -191,12 +193,16 @@ class Command(BaseCommand):
 
             for col in books_data:
               
+                image_url = self.check_blank_image(col[3])
+
                 book = Book(
-                    ISBN = col[0],
-                    title = col[1],
-                    author = col[2],
-                    image_url = col[7],
-                    year= col[3]
+                    ISBN = col[4],
+                    title = col[6],
+                    author = col[0],
+                    genre = col[7],
+                    describtion = col[1],
+                    image_url = image_url,
+                    pages_num = col[5]
                 )
 
                 books.append(book)
@@ -212,57 +218,59 @@ class Command(BaseCommand):
 
     def create_ratings(self):
         MAX_RATINGS = 1000
-        ratings_path = os.path.abspath("book-review-dataset/BX-Book-Ratings.csv")
-       
-        with open(ratings_path, "r", encoding='latin-1') as csv_file:
-            ratings_data = csv.reader(csv_file, delimiter=",")
-            next(ratings_data)
+  
+        books = Book.objects.all()
+        book_ids = list(books.values_list('id', flat=True))
 
-            books = Book.objects.all()
-            book_ids = list(books.values_list('id', flat=True))
+        pairs = []
+        ratings = []
 
-            pairs = []
-            ratings = []
+        for col in range(MAX_RATINGS):
+            user_id = random.randint(0, self.users.count()-1)
+            book_id = random.randint(0, books.count()-1)
 
-            for col in ratings_data:
-                user_id = random.randint(0, self.users.count()-1)
-                book_id = random.randint(0, books.count()-1)
+            user = self.users.get(id = self.user_ids[user_id])
+            book = books.get(id = book_ids[book_id])
 
-                user = self.users.get(id = self.user_ids[user_id])
-                book = books.get(id = book_ids[book_id])
+            REVIEW_PROBABILITY = 0.6
+            if random.random() < REVIEW_PROBABILITY:
+                review = 'it was fine'
+            else:
+                review = 'the book was okay'
 
-                REVIEW_PROBABILITY = 0.6
-                if random.random() < REVIEW_PROBABILITY:
-                    review = 'it was fine'
-                else:
-                    review = 'the book was okay'
+            rating = random.randint(0,10)
 
-                pair = (user, book)
+            pair = (user, book)
 
-                if not pair in pairs: 
+            if not pair in pairs: 
 
-                    rating = Rating(
-                        user = user, 
-                        book = book, 
-                        rating = col[2],
-                        review = review,
-                    )
+                rating = Rating(
+                    user = user, 
+                    book = book, 
+                    rating = rating,
+                    review = review,
+                )
 
-                    user.books.add(book)
+                book.add_reader(user)
 
-                    create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
-                    create_event('U', 'B', Event.EventType.REVIEW, user=user, book=book)
+                create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
+                create_event('U', 'B', Event.EventType.REVIEW, user=user, book=book)
 
-                    pairs.append(pair)
-                    ratings.append(rating)
+                pairs.append(pair)
+                ratings.append(rating)
 
-                else: 
-                    continue
+            else: 
+                continue
 
-                if len(ratings) > MAX_RATINGS:
-                    Rating.objects.bulk_create(ratings)
-                    ratings = []
-                    break
+        Rating.objects.bulk_create(ratings)
 
-            if ratings:
-                Rating.objects.bulk_create(ratings)
+
+    def calculate_average(self):
+        ratings=Rating.objects.all()
+        for rating in ratings:
+            rating.save()
+
+    def check_blank_image(self, image_url):
+        if image_url == '':
+            return 'https://i.imgur.com/f6LoJwT.jpg'
+        return image_url

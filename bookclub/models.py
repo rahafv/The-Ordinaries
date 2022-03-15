@@ -5,6 +5,7 @@ from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
+import pytz
 
 class User(AbstractUser):
     """User model used for authentication."""
@@ -79,8 +80,13 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def location(self):
-        """Return full location."""
-        return f'{self.city}, {self.region},  {self.country}'
+        checked = [self.city, self.country, self.region]
+        location = []
+        for state in checked:
+            if state is not None:
+                location.append(state)
+
+        return ", ".join(location)
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
@@ -185,6 +191,10 @@ class Club(models.Model):
         blank=True
     )
 
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
     class Meta:
         ordering = ['name']
 
@@ -220,6 +230,20 @@ class Club(models.Model):
         self.owner = new_owner
         self.save()
 
+    def get_upcoming_meetings(self):
+        upcoming_meetings = []
+        for meeting in self.meetings.all():
+            if meeting.time >= pytz.utc.localize(datetime.datetime.now()):
+                upcoming_meetings.append(meeting)
+        return upcoming_meetings
+
+    def get_previous_meetings(self):
+        previous_meetings = []
+        for meeting in self.meetings.all():
+            if meeting.time < pytz.utc.localize(datetime.datetime.now()):
+                previous_meetings.append(meeting)
+        return previous_meetings
+
 class Book(models.Model):
     """Book model."""
 
@@ -239,24 +263,29 @@ class Book(models.Model):
         blank=False
     )
 
-    publisher = models.CharField(
+    genre = models.CharField(
         max_length=100,
         unique=False,
         blank=True
     )
 
-    image_url = models.URLField(
+    describtion = models.CharField(
+        max_length=500,
+        unique=False,
         blank=True
     )
 
-    year = models.PositiveIntegerField(
-        default=datetime.datetime.now().year,
+    image_url = models.URLField(
         blank=True,
-        validators=[
-            MaxValueValidator(datetime.datetime.now().year),
-            MinValueValidator(0)
-        ]
+        default='https://i.imgur.com/f6LoJwT.jpg'
     )
+
+    pages_num = models.PositiveIntegerField(
+        unique=False,
+        blank=True,
+        null=True
+    )
+
 
     readers = models.ManyToManyField(
         User,
@@ -268,6 +297,14 @@ class Book(models.Model):
         related_name='books'
     )
 
+    readers_count = models.PositiveIntegerField(
+        default=0
+    )
+
+    average_rating = models.FloatField(
+        default=0
+    )
+
     class Meta:
         ordering = ['title']
 
@@ -277,29 +314,34 @@ class Book(models.Model):
     def add_reader(self, reader):
         if not self.is_reader(reader):
             self.readers.add(reader)
+            self.readers_count = self.readers.count()
+            self.save()
 
     def remove_reader(self, reader):
         if self.is_reader(reader):
             self.readers.remove(reader)
-
-    def readers_count(self):
-        return self.readers.all().count()
+            self.readers_count = self.readers.count()
+            self.save()
 
     def add_club(self, club):
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
+            for member in club.members.all():
+                self.add_reader(member)
+
+            self.save()
 
     def clubs_count(self):
         return self.clubs.all().count()
 
-    def average_rating(self):
-        sum = 0.0
+    def calculate_average_rating(self):
         if self.ratings.all().count() != 0:
+            sum = 0
             for rating in self.ratings.all():
                 sum+= rating.rating
-            return (sum/self.ratings.all().count())
-        else:
-            return 0.0
+            self.average_rating = sum/self.ratings.all().count()
+            self.save()
+
 
 class Rating(models.Model):
     """rating model."""
@@ -334,6 +376,12 @@ class Rating(models.Model):
 
     class Meta:
         unique_together = ['user', 'book']
+
+
+    def save(self, *args, **kwargs):
+        super(Rating, self).save(*args, **kwargs)
+        self.book.calculate_average_rating()
+
 
 class Meeting(models.Model):
     """ The meeting model."""
@@ -382,6 +430,10 @@ class Meeting(models.Model):
         blank=True
     )
 
+    class Meta:
+        ordering = ['time']
+
+
     def assign_chooser(self):
         members = self.club.members
         meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
@@ -423,6 +475,7 @@ class Event(models.Model):
 
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
     club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE , related_name='events')
+    
     meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
     rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
@@ -455,7 +508,7 @@ class Event(models.Model):
             raise ValidationError('Club cannot rate')
         if self.type_of_actor == 'C' and self.type_of_action == 'C':
             raise ValidationError('Club cannot create club')
-        if self.type_of_actor == 'C' and self.type_of_action == 'U':
+        if self.type_of_actor == 'C' and self.type_of_action == 'U' and self.message != self.EventType.TRANSFER:
             raise ValidationError('Club cannot join and withdraw from clubs')
 
         """ checks that the type of actor and the object are correct """
@@ -470,6 +523,7 @@ class Event(models.Model):
         if self.type_of_action == 'U' and not self.action_user:
             raise ValidationError('Action must be user')
 
+
     def save(self, **kwargs):
         self.clean()
         return super(Event, self).save(**kwargs)
@@ -483,6 +537,7 @@ class Event(models.Model):
         REVIEW = " reviewed "
         ADD = " added "
         SCHEDULE = " scheduled a meeting about "
+        TRANSFER = " ownership is transfered to "
         
     def get_actor(self):
         """Return the actor of a given event."""

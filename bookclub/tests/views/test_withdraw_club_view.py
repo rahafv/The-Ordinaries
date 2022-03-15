@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club, Event
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 
-class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',

@@ -1,3 +1,5 @@
+import profile
+from django import http
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club, Event
@@ -26,12 +28,12 @@ class ShowUserTest(TestCase):
         self.user.toggle_follow(self.followee)
         user_followers_before = self.user.follower_count()
         followee_followers_before = self.followee.follower_count()
-        response = self.client.get(self.url, follow=True)
+        response_url = reverse('profile', kwargs={'user_id': self.followee.id})
+        response = self.client.get(self.url, HTTP_REFERER=response_url, follow=True)
         user_followers_after = self.user.follower_count()
         followee_followers_after = self.followee.follower_count()
         self.assertEqual(user_followers_before, user_followers_after)
         self.assertEqual(followee_followers_before, followee_followers_after+1)
-        response_url = reverse('profile', kwargs={'user_id': self.followee.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile_page.html')
        
@@ -41,13 +43,13 @@ class ShowUserTest(TestCase):
         user_followers_before = self.user.follower_count()
         followee_followers_before = self.followee.follower_count()
         events_before_count = Event.objects.count()
-        response = self.client.get(self.url, follow=True)
+        response_url = reverse('profile', kwargs={'user_id': self.followee.id})
+        response = self.client.get(self.url, HTTP_REFERER=response_url, follow=True)
         user_followers_after = self.user.follower_count()
         followee_followers_after = self.followee.follower_count()
         self.assertEqual(user_followers_before, user_followers_after)
         self.assertEqual(followee_followers_before+1, followee_followers_after)
         self.assertEqual(events_before_count + 1, Event.objects.count())
-        response_url = reverse('profile', kwargs={'user_id': self.followee.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile_page.html')
 

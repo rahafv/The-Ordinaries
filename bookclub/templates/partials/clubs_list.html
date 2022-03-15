@@ -1,0 +1,13 @@
+{%load static%}
+<div class="container marketing">
+  <div class="row">
+    {% for club in clubs %}
+      <div class="col-sm-6 col-md-3 col-lg-4">    
+        <img class="card-img" src="{% static '/images/3.png' %}" alt="Avatar" style="width:180px">
+          <h2>{{club.name}}</h2>
+          <p>{{club.theme}}</p>
+          <p><a class="btn btn-outline-dark" href='{% url 'club_page' club.id %}'>View &raquo;</a></p>
+      </div>
+    {% endfor %}
+  </div>
+</div>

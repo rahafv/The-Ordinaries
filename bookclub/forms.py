@@ -156,7 +156,7 @@ class BookForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Book
-        fields = ['ISBN','title','author', 'publisher', 'image_url', 'year']
+        fields = ['ISBN','title','author', 'genre', 'image_url', 'describtion']
 
     def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
@@ -170,17 +170,13 @@ class BookForm(forms.ModelForm):
 
         super().save(commit=False)
 
-        self.image_url = self.cleaned_data.get('image_url')
-        if not self.image_url:
-            self.image_url = 'https://i.imgur.com/f6LoJwT.jpg'
-
         book = Book.objects.create(
             ISBN=self.cleaned_data.get('ISBN'),
             title=self.cleaned_data.get('title'),
             author=self.cleaned_data.get('author'),
-            publisher=self.cleaned_data.get('publisher'),
-            image_url=self.image_url,
-            year=self.cleaned_data.get('year'),
+            genre=self.cleaned_data.get('genre'),
+            image_url=self.cleaned_data.get('image_url'),
+            describtion=self.cleaned_data.get('describtion'),
         )
         return book
 
@@ -255,9 +251,7 @@ class EditRatingForm(forms.ModelForm):
 
         model = Rating
         fields = ['rating', 'review']
-        widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
-        }
+
 
     def calculate_rating(self, rating):
         return rating*2
@@ -267,12 +261,11 @@ class EditRatingForm(forms.ModelForm):
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0
-        review = Rating.objects.filter(user = reviwer , book =reviewedBook).update(
-            rating=self.calculate_rating(rate),
-            review=self.cleaned_data.get('review'),
-        )
-        return review
-
+        review_obj = Rating.objects.get(user=reviwer , book=reviewedBook)
+        review_obj.rating=self.calculate_rating(rate)
+        review_obj.review=self.cleaned_data.get('review')
+        review_obj.save()    
+         
 
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
@@ -303,6 +296,72 @@ class RatingForm(forms.ModelForm):
     def calculate_rating(self, rating): 
         return rating*2
 
+class UsersSortForm(forms.Form):
+    
+    ASCENDING = 'name_asc'
+    DESCENDING = 'name_desc'
+
+    SORT_CHOICES = [
+        (ASCENDING, "Name A-Z"),
+        (DESCENDING, "Name Z-A")
+    ]   
+    
+    sort = forms.ChoiceField(
+        required = False,
+        choices = SORT_CHOICES, 
+        initial = ASCENDING, 
+    )
+
+    widgets = {'sort': forms.Select()}       
+   
+   
+class ClubsSortForm(forms.Form):
+
+    ASC_DATE = "date_asc"
+    DESC_DATE = "date_desc"
+    ASC_NAME = 'name_asc'
+    DESC_NAME = 'name_desc'
+
+    SORT_CHOICES = [
+        (ASC_NAME, "Name A-Z"),
+        (DESC_NAME, "Name Z-A"),
+        (DESC_DATE, "Latest"),
+        (ASC_DATE, "Oldest"),
+    ]
+
+    sort = forms.ChoiceField(
+      required = False,
+      choices=SORT_CHOICES,
+      label='Sort by:',
+      initial = ASC_NAME,
+      widget=forms.Select(),
+    )
+
+   
+class BooksSortForm(forms.Form):
+
+    ASC_NAME = 'name_asc'
+    DESC_NAME = 'name_desc'
+    ASC_RATING = 'rating_asc'
+    DESC_RATING = 'rating_desc'
+
+    SORT_CHOICES = [
+        (ASC_NAME, "Name A-Z"),
+        (DESC_NAME, "Name Z-A"),
+        (DESC_RATING, "High rating"),
+        (ASC_RATING, "Low rating"),
+       
+    ]
+
+    sort = forms.ChoiceField(
+      required = False,
+      choices=SORT_CHOICES,
+      label='Sort by:',
+      initial = ASC_NAME,
+      widget=forms.Select(),
+    )
+
+ 
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
 
@@ -318,7 +377,7 @@ class MeetingForm(forms.ModelForm):
         exclude = ['club', 'book', 'member']
 
     cont = forms.BooleanField(
-        label = "This meeting a contiuation of a previous discussion",
+        label = "This meeting a continuation of a previous discussion",
         required = False,
         help_text = "checkbox",
         label_suffix=""
@@ -337,10 +396,8 @@ class MeetingForm(forms.ModelForm):
                 self.add_error('link', "Provide a link to the meeting location.")
 
         is_cont = self.cleaned_data.get('cont')
-        if is_cont and self.club.meetings.count() == 0:
-            self.add_error('cont', "There are no previous meetings.")
-
         time = self.cleaned_data.get('time')
+
         self.check_date(time, is_cont)
         self.check_meetings(time, is_cont)
 
@@ -361,20 +418,21 @@ class MeetingForm(forms.ModelForm):
 
     def check_meetings(self, time, is_cont):
         """Check if there are meetings in the same period."""
-        try:
+        if time:
             meetings = Meeting.objects.filter(club_id=self.club.id)
-            if not is_cont:
-                for met in meetings:
+            for met in meetings:
+                if not is_cont:
                     if met.time+timedelta(30) > time:
                         self.add_error('time', 'Meetings should be at least a month apart.')
                         break
-            else:
-                for met in meetings:
+                else:
                     if met.time.day == time.day and met.time.month == time.month and met.time.year == time.year:
                         self.add_error('time', 'There is a meeting on that day.')
                         break
-        except:
-            pass
+            if meetings.count() == 0 :
+                if is_cont:
+                    self.add_error('cont', "There are no previous meetings.")
+
 
     def save(self):
         """Create a new meeting."""
