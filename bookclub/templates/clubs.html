@@ -56,7 +56,37 @@
     {% endif %}
     
   {% else %}
-    <div class = "col - 12">
+  <div style="float: right;">
+    {% if general %}
+    <form class="d-flex" method=GET action="{% url 'clubs_list'%}">
+      {% else %}
+      <form class="d-flex" method=GET action="{% url 'clubs_list' user.id%}">
+        {% endif %}
+        
+        <select id="privacy" name="privacy" size="3" style="overflow:auto;  Border: none;">
+          <option selected value="all">All</option>
+          <option value="public">public</option>
+          <option value="private">private</option>
+        </select>
+        
+
+        {% comment %} <fieldset  id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
+          <div>
+            <input type="checkbox" value="owned">
+            <label for="coding">Show owned clubs only</label>
+          </div>
+        </fieldset> {% endcomment %}
+
+        <select id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
+          <option selected value="all">All</option>
+          <option value="owned">Owned</option>
+        </select>
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button class="btn btn-outline-light bi bi-search mt-1" type="submit" style="color: light-grey; height: 35px"></button>
+    </form>
+  </div>
+    {% comment %} <div class = "col - 12">
+
       {% if general %}
         <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
       {% else %}
@@ -65,8 +95,11 @@
           {% csrf_token %}
           {% include 'partials/bootstrap_form.html' with form=form %}
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
+
+          
       </form>
-    </div>
+      
+    </div> {% endcomment %}
 
     
 

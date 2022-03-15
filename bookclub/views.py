@@ -457,8 +457,11 @@ def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True
     if user_id:
+        user= get_object_or_404(User.objects, id=user_id)
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+    else: 
+        user= request.user
 
     form = ClubsSortForm(request.GET or None)
     sort = ""
@@ -468,8 +471,22 @@ def clubs_list(request, user_id=None):
         sort_helper = SortHelper(sort, clubs_queryset)
         clubs_queryset = sort_helper.sort_clubs()
 
-    count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    privacy= request.GET.get('privacy')
+    if privacy=='public': 
+        clubsSet = clubs_queryset.filter(club_type='Public')
+    elif privacy=='private': 
+        clubsSet = clubs_queryset.filter(club_type='Private')
+    else:
+        clubsSet = clubs_queryset.all()
+
+    ownership= request.GET.get('ownership')
+    if ownership=='owned': 
+        clubsSet = clubsSet.filter(owner=user)
+    
+
+
+    count = clubsSet.count()
+    clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
     return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form})
@@ -917,5 +934,7 @@ def previous_meetings_list(request, club_id):
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
+
+
 
 
