@@ -12,89 +12,76 @@
             success: function(response){
                 console.log(response);
                 $("#display").empty();
-             
+
                 for (var key in response.chats) {
-                    if(response.username != response.users[key]) {
-                        var temp="<div id=rcorners1 class='container darker text-white mb-2'><b>"+response.users[key]+"</b>"+
-                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.chats[key].created_at+"</span><p>"+
+                    if(response.username != response.modifiedItems[key].name) {
+                        var temp="<div id=rcorners1 class='container darker text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
+                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
                             response.chats[key].message+"</p></div>";                    }
                     else {
-                        var temp="<div id=rcorners2 class='container darker text-white mb-2'><b>"+response.users[key]+"</b>"+
-                            "<span class='time-left' > &nbsp;&middot;&nbsp;"+response.chats[key].created_at+"</span><p>"+
+                        var temp="<div id=rcorners2 class='container darker text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
+                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
                             response.chats[key].message+"</p></div>";
                     }
-                    var m = response.messages[key].name+ ": " + response.messages[key].message
-                    var t = response.messages[key].time   
                     $("#display").append(temp);
                 }
-                $("#clubMessage").empty();
-                $("#clubMessageTime").empty();
-                for (var key in response.messages) {
-                    var m = response.messages[key].name+ ": " + response.messages[key].message
-                    var t = response.messages[key].time   
-                }
-                $("#clubMessage").append(m);
-                $("#clubMessageTime").append(t);
             }
         });
     },1000);
     })
-
 </script>
 
+<div>
+<div class="row rounded-lg overflow-hidden" style="margin:0px;">
 
-<div class="container py-5 ">  
-  
-    <div class="row rounded-lg overflow-hidden">
-
-        <div class="col-5 px-0">
+    <div class="col-3 px-0">
         <div class="bg-white">
-  
-          <div class="bg-gray px-4 py-2 bg-light">
-            <p class="h5 mb-0 py-1">Chats</p>
-          </div>
-  
-          <div class="messages-box">
-            <div class="list-group rounded-0 " style="max-height:500px; overflow:scroll;">
 
-                {% for userClub in user.clubs.all %}
-                <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
-                    <div class="media"><i class="bi bi-people-fill"></i>
-                    <div class="media-body ml-4">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h6 class="mb-0">{{userClub.name}}</h6><small class="small font-weight-bold"><div id="clubMessageTime" class="scroll"></div></small>
-                        </div>
-                        <p class="font-italic text-muted mb-0 text-small"><div id="clubMessage" class="scroll"></div></p>
-                        {% comment %} <p class="font-italic text-muted mb-0 text-small">{{userClub.members.count}} members</div></p> {% endcomment %}
-
-                    </div>
-                    </div>
-                </a>
-              {% endfor %}
+            <div class="bg-gray px-4 py-2 bg-dark text-white">
+                <p class="h5 mb-0 py-1">Chats</p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chat -->
-      <div class="col-7 px-0">
-        <div class="px-4 py-5 chat-box bg-white">
-
-            <b>{{club.name}} chat room</b>
-            <div id="display" class="scroll"></div>
-  
-        <form id="post-form" class="bg-light input-group">
-            {% csrf_token %}
-            <input type="hidden" name="username" id="username" value="{{user.username}}"/>
-            <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
-            <input type="text" placeholder="Type a message"  name="message" id="message" class="form-control" style="width: 750"/>
-            <button id="button-addon2" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
-        </form>
-  
-      </div>
-    </div>
-  </div>
     
+            <div class="messages-box">
+                <div class="list-group rounded-0 " style="max-height:500px; overflow:scroll; overflow-x:hidden">
+                    {% for userClub in user.clubs.all %}
+                        <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
+                            <div class="media">
+                                <div class="media-body ">
+                                    <i class="bi bi-people-fill"></i>
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="mb-0">{{userClub.name}}</h6>
+                                        <i class="font-italic text-muted mb-0 text-small">{{userClub.members.count}} members </i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Box-->
+    <div class="col-9 px-0" >
+        <div class="chat-box bg-white borders">
+
+            <div class="bg-gray px-4 py-2 bg-dark text-white">
+                <p class="mb-0 py-1"><b>{{club.name}} chat room</b></p>
+            </div>
+            
+            <div id="display" class="scroll"></div>
+
+            <form id="post-form" class="bg-light input-group">
+                {% csrf_token %}
+                <input type="hidden" name="username" id="username" value="{{user.username}}"/>
+                <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+                <input type="text" placeholder="Type a message"  name="message" id="message" class="form-control" style="width: 750"/>
+                <button id="button-addon2" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane" style="color:black"></i></button>
+            </form>
+        </div>
+    </div>
+</div>    
+</div>
 
 <script type="text/javascript">
     $(document).on('submit','#post-form',function(e){

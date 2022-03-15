@@ -764,26 +764,29 @@ def getMessages(request, club_id):
         m = c.getLastMessage()
         if m != "":
             prettyDate = humanize.naturaltime(m.created_at.replace(tzinfo=None))
-            messages.append({"name":m.user.first_name, "message":m.message, "time":prettyDate})
+            messages.append({"name":m.user.first_name, "message":m.message, "time":prettyDate, "clubName":c.name})
 
     chats = list(club.chats.all().values())
-    users = []
+    modifiedItems = []
     for key in chats:
         user_id = key.get("user_id")
         user = get_object_or_404(User.objects, id=user_id)
-        users.append(user.full_name())
+        prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+        modifiedItems.append({"name": user.full_name(), "time":prettyDate})
 
-    return JsonResponse({"chats":chats, "users":users, "username":user.full_name(), "messages":messages})
+    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "username":user.full_name(), "messages":messages})
 
 def send(request):
     message = request.POST['message']
-    username = request.POST['username']
-    club_id = request.POST['club_id']
+    
+    if message.strip():
+        username = request.POST['username']
+        club_id = request.POST['club_id']
 
-    club = get_object_or_404(Club.objects, id=club_id)
-    user = get_object_or_404(User.objects, username=username)
+        club = get_object_or_404(Club.objects, id=club_id)
+        user = get_object_or_404(User.objects, username=username)
 
-    new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
-    new_chat_msg.save()
+        new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+        new_chat_msg.save()
 
     return HttpResponse('Message sent succfully')

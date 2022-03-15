@@ -459,7 +459,7 @@ label:hover ~ input:checked ~ label{
   padding: 20px; 
   width: 400px;
   height: relative; 
-  margin-right: 20em; 
+  margin-right: 31em; 
   background-color: DimGrey; 
   word-wrap:break-word;
 }
@@ -470,42 +470,21 @@ label:hover ~ input:checked ~ label{
   width: 400px;
   height: relative;  
   text-align: right; 
-  margin-left: 18em; 
+  margin-left: 31em; 
   background-color: DarkSlateGray;
   word-wrap:break-word;
 }
 
 #display {
-  height: 436px;
-  padding: 10px;
+  height: 459px;
+  padding: 6px;
 }
 
-#chatBox {
-  border-radius: 5px;
-  border-top: 2px solid black;
-  border-left: 2px solid black;
-  border-right: 2px solid black;
+.borders {
+  border: 2px solid;
 }
 
 .scroll {
   height: 100%;
   overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-#clubMessage {
-  color: grey; 
-  font-style: italic; 
-  display: -webkit-box; 
-  max-width: 300px; 
-  -webkit-line-clamp: 1; 
-  -webkit-box-orient: vertical; 
-  overflow: hidden;
-}
-
-#chats{
-  height: 528px;
-  outline-style: solid; 
-  border-radius: 5px; 
-  padding: 0px; 
 }
