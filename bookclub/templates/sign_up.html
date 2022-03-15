@@ -1,25 +1,49 @@
 {% extends 'base_content.html' %}
-{% block title %}Sign up{% endblock %}
-{% block content %}
-<div id = "login-image">
-<div class="container">
-    <div class="row d-flex justify-content-center">
-        <div class="col-xs-12 col-lg-6 col-xl-4">
-            <h1 class="text-center sticky-top mt-5 mb-5">Sign up</h1>
-        </div>
-        <div class="col-xs-12 col-lg-6 col-xl-8">
-            <form action="{% url 'sign_up' %}" method="post">
-                {% csrf_token %}
-                {% include 'partials/bootstrap_form.html' with form=form %}
-                <input type="submit" class="btn btn-primary mb-3" value="Sign up">
-                <div class="log-in-alternate">
-                    <h5 class="log-in-alternate-heading">
-                      Already have an account? Click <a href={% url 'log_in' %}>here</a> to log in.
-                    </h5>
-                  </div>
-            </form>
+{% block title %}
+| Sign up
+{% endblock %}
+{% block content %} 
+<br/>
+<br/>
+<br/>
+<div id="main-wrapper" class="container overflow-hidden">
+    <div class="row overflow-hidden d-flex justify-content-center">
+        <div class="col-xl-12">
+            <div class="card border-0">
+                <div class="card-body p-0">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-8 col-md-7 cold-sm-10 pt-4 pt-sm-3">
+                            <div class="p-5">
+                                <div class="mb-5">
+                                    <h3 class="h4 font-weight-bold text-theme">Sign up</h3>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 justify-content-center">
+                                    <form action="{% url 'sign_up' %}" method="post">
+                                        {% csrf_token %}
+                                        {% include 'partials/bootstrap_form.html' with form=form %}
+                                        <input type="submit" class="btn btn btn-outline-secondary bg-purple mb-3 text-white" value="Sign up">
+                                        <div class="log-in-alternate">
+                                            <h5 class="log-in-alternate-heading">
+                                              Already have an account? Click <a href={% url 'log_in' %}>here</a> to log in.
+                                            </h5>
+                                          </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-5 col-sm-2 d-lg-inline-block overflow-hidden">
+                            <div class="account-block rounded-right">
+                                <div class="overlay rounded-right"></div>
+                                <div class="account-testimonial">
+                                    <h4 class="text-white mb-4 sticky-top mt-5 mb-5" >"There is more treasure in books than in all the pirate’s loot on Treasure Island."</h4> 
+                                    <p class = "sticky-top">- Walt Disney</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
+ </div>
 {% endblock %}

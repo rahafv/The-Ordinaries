@@ -16,15 +16,15 @@ class BookFormTestCase(TestCase):
             'ISBN': '0195153448',
             'title':'Classical',
             'author': 'Mark',
-            'publisher': 'Oxford',
-            'year': 2002,
+            'genre': 'Classics,European Literature,Czech Literature',
+            'describtion': 'describtion',
         }
         self.wrong_form_input= {
             'ISBN': '0195153448',
             'title':'other book',
             'author': 'Mark',
-            'publisher': 'Oxford',
-            'year': 2013,
+            'genre': 'Classics,European Literature,Czech Literature',
+            'describtion': 'describtion',
         }
 
     
@@ -37,8 +37,8 @@ class BookFormTestCase(TestCase):
         self.assertIn('ISBN', form.fields)
         self.assertIn('title', form.fields)
         self.assertIn('author', form.fields)
-        self.assertIn('publisher', form.fields)
-        self.assertIn('year', form.fields)
+        self.assertIn('genre', form.fields)
+        self.assertIn('describtion', form.fields)
 
     def test_club_form_must_save_correctly(self):
         form = BookForm(data=self.form_input)
@@ -49,13 +49,20 @@ class BookFormTestCase(TestCase):
         book = Book.objects.get(ISBN = '0195153448')
         self.assertEqual(book.title, 'Classical')
         self.assertEqual(book.author, 'Mark')
-        self.assertEqual(book.publisher, 'Oxford')
-        self.assertEqual(book.year, 2002)
+        self.assertEqual(book.genre, 'Classics,European Literature,Czech Literature')
+        self.assertEqual(book.describtion, 'describtion')
 
     def test_isbn_should_be_unique(self): 
         self.form_input["ISBN"] = "0002005018"
         form = BookForm(self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_image_can_be_blank(self): 
+        self.form_input["image_url"] = None
+        form = BookForm(self.form_input)
+        self.assertTrue(form.is_valid())
+
+
 
 
     

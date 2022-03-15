@@ -1,9 +1,46 @@
 {% extends 'base_content.html' %}
+{% load static %}
 {% load bootstrap_pagination %}
-{% block title %}Clubs{% endblock %}
+{% block title %}
+| Clubs
+{% endblock %}
 {% block content %}
 {% load humanize %}
-    
+
+{% if general %}
+<h1 class="fw-light center bg-purple" style="text-align: center;">Clubs</h1>
+<div class="carousel-inner" style="top: -8px;">
+  <div class="carousel-item active">
+
+
+    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <rect width="100%" height="100%" fill="#faf3ee"/>
+      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
+
+    </svg>
+
+    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+      <div class="carousel-caption">
+          <div class="col-sm-6 col-md-3 col-lg-4">
+            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
+            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+  <div class="container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <p class="lead text-muted" style="text-align: center">Explore the diverse and various clubs of The Ordinaries. A new adventure begins here!</p>
+      </div>
+    </div>
+  </div>
+ {% endif %}
+
+
 <div class="container">
   {% if count == 0 %}
     {% if general %}
@@ -17,11 +54,11 @@
         <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
       </div>
     {% endif %}
-    
+
   {% else %}
     <div class = "col - 12">
       {% if general %}
-        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
+        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' >
       {% else %}
         <form class = "d-flex" method = "GET" action = '{% url 'clubs_list' user.id %}'>
       {% endif %}
@@ -49,16 +86,17 @@
         {% else %}
         <input type="submit" class="btn btn-primary mb-3" name="showowned" value="Show owned clubs">
         {% endif %}
-        
+
       </div>
     </form>
       {% endif %}
     </div>
-    
-    <ul class="pagination justify-content-center">
-      {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
-    </ul>
 
+
+    {% include 'partials/clubs_list.html' with clubs=clubs %}
+  <ul class="pagination justify-content-center">
+    {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
+  </ul>
   {% endif %}
 </div>
 

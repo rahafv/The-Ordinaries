@@ -32,7 +32,7 @@
           <h4 class="mb-3">Country:</h4>
           <div class="card card-body mb-3 pb-0">
             <p>{{ club.country }}</p>
-          </div>    
+          </div>
           <hr></hr>
           <button class="btn btn-dark btn-lg mb-3  text-center" type="button btn-block" data-bs-toggle="collapse"
             data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
@@ -40,7 +40,7 @@
           </button>
           <div class="collapse" id="owner">
             <div class="card card-body mb-3 pb-0">
-              <p>{{ club.owner.full_name }}</p>
+              <b class= "mr-1"> <a href= {% url 'profile' club.owner.id  %}> {{club.owner.full_name}} </a></b>
               <p>{{ club.owner.email }}</p>
               <p>{{ club.owner.bio }}</p>
             </div>
@@ -58,21 +58,53 @@
             {% if is_member %}
             <div class="card text-center">
               <div class="card-body">
-                <a href='{% url "members_list" club.id %}' class="btn btn-outline-dark"> Member List</a>  
+                <a href='{% url "members_list" club.id %}' class="btn btn-outline-dark"> Member List</a>
               </div>
             </div>
+            <div class="card text-center">
+              <div class="card-body">
+
+
+                <h4 class="mb-3">Upcoming meeting:</h4>
+                  <div class="card card-body mb-3 pb-0">
+                    {%if upcoming_meeting %}
+                    <p>Title: {{ upcoming_meeting.title }}</p>
+                    <p>Time: {{ upcoming_meeting.time }}</p>
+                    {% if upcoming_meeting.book %}
+                        Book Title : <a href='{% url 'book_details' upcoming_meeting.book.id %}' style = "color:black;"> {{upcoming_meeting.book.title}}</a>
+                        <div class="profile-img">
+                          <img src="{{ upcoming_meeting.book.image_url }}"  width="110" height="150" class="mt-1" />
+                      </div>
+
+                    {% else %}
+                      Book:
+                      {%if user != upcoming_meeting.chooser%}
+                          <a> No book has been chosen yet.. </a>
+                      {% else %}
+                        <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
+                    {% endif %}
+                    <p class="mt-2"> Link: <a href={{ upcoming_meeting.link }} > meeting link </a></p>
+                    <p>Notes: {{ upcoming_meeting.notes }}</p>
+                  </div>
+
+                {% endif %}
+                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a>
+                {%else %}
+                <a> No meeting has been scheduled yet.. </a>
+                {%endif%}
+          </div>
             {%endif%}
             {% if user == club.owner %}
               {% if club.club_type == "Private"%}
                 <div class="card text-center">
                   <div class="card-body">
-                    <a href="{% url "applicants_list" club.id %}" class="btn btn-outline-dark"> Applicant List</a>  
+                    <a href="{% url "applicants_list" club.id %}" class="btn btn-outline-dark"> Applicant List</a>
                   </div>
                 </div>
               {% endif %}
               <div class="card text-center">
                 <div class="card-body">
-                  <a href="{% url 'schedule_meeting' club_id=club.id %}" class="btn btn-outline-dark"> Schedule a meeting </a>  
+                  <a href="{% url 'schedule_meeting' club_id=club.id %}" class="btn btn-outline-dark"> Schedule a meeting </a>
                 </div>
               </div>
             {% endif %}
@@ -80,7 +112,32 @@
               <div class="card-body">
                 <div class=" pb-0">
                   {% if not user == club.owner and not is_member and not is_applicant%}
-                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button">Join club</a> 
+                  {% if user.city == club.city %}
+
+                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button" >Join club</a>
+
+                  {% else %}
+                  <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-outline-success" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal" >Join club</a>
+
+                  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Join {{club.name}}</h5>
+                        </div>
+                        <div class="modal-body text-muted">
+                          <small>This club is in a different City!</small>
+                        </div>
+                        <div class="modal-footer">
+                          <a href="{% url 'join_club' club_id=club.id %}" class="btn btn-sm btn-outline-dark">Ok</a>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {% endif %}
+
                   {% elif is_applicant and not is_member %}
                   <b>Awaiting approval!</b>
                   {% endif %}
@@ -90,10 +147,10 @@
                     <a href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">Withdraw from club</a>
                   </div>
                 </div>
-                {% endif %}  
+                {% endif %}
                 {% if user == club.owner %}
                 <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>
-               {% endif %} 
+               {% endif %}
               </div>
             </div>
           </div>

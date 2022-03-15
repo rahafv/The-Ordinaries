@@ -6,8 +6,8 @@
         "ISBN": "0002005018",
         "title": "Clara Callan",
         "author": "Richard Bruce Wright",
-        "publisher": "HarperFlamingo Canada",
-        "year": "2001",
+        "genre": "Classics,European Literature,Czech Literature",
+        "describtion": "describtion",
         "readers": [], 
         "clubs": []
       }
@@ -20,8 +20,8 @@
       "ISBN": "1111111111",
       "title": "Test Book",
       "author": "Ghaliah",
-      "publisher": "Kings college",
-      "year": "2001",
+      "genre": "Classics,European Literature,Czech Literature",
+      "describtion": "describtion",
       "readers": [3], 
       "clubs": []
     }

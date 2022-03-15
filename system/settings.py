@@ -155,7 +155,7 @@ MESSAGE_TAGS = {
 
 # Page lengths
 BOOKS_PER_PAGE = 48
-CLUBS_PER_PAGE = 99
+CLUBS_PER_PAGE = 48
 MEMBERS_PER_PAGE = 50
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -164,3 +164,5 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'Ordinariesbookclubs@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ordinaries123@'
+
+
