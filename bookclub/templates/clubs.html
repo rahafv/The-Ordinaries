@@ -58,32 +58,43 @@
   {% else %}
   <div style="float: right;">
     {% if general %}
-    <form class="d-flex" method=GET action="{% url 'clubs_list'%}">
-      {% else %}
-      <form class="d-flex" method=GET action="{% url 'clubs_list' user.id%}">
-        {% endif %}
-        
-        <select id="privacy" name="privacy" size="3" style="overflow:auto;  Border: none;">
-          <option selected value="all">All</option>
-          <option value="public">public</option>
-          <option value="private">private</option>
-        </select>
-        
 
-        {% comment %} <fieldset  id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
-          <div>
-            <input type="checkbox" value="owned">
-            <label for="coding">Show owned clubs only</label>
-          </div>
-        </fieldset> {% endcomment %}
+    
+    <div class="position-sticky" style="top: 100rem;">
+      <div class="p-1 mb-3 bg-light-blue rounded">
+        <h4 class="fst-italic">Filters:</h4>
+          <form method=GET action="{% url 'clubs_list'%}">
+            {% else %}
+            <form method=GET action="{% url 'clubs_list' user.id%}">
+              {% endif %}
+              <div style="text-align:right;">
+              <select id="privacy" name="privacy" size="3" style="overflow:auto;  Border: none;">
+                <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
+                <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
+                <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
+              </select>
+            </div>
 
-        <select id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
-          <option selected value="all">All</option>
-          <option value="owned">Owned</option>
-        </select>
-        {% include 'partials/bootstrap_form.html' with form=form %}
-        <button class="btn btn-outline-light bi bi-search mt-1" type="submit" style="color: light-grey; height: 35px"></button>
-    </form>
+
+            
+
+            <div style="text-align:right;">
+              <select id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
+                <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
+                <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
+              </select>
+            </div>
+              {% include 'partials/bootstrap_form.html' with form=form %}
+              <br>
+              <button class="btn btn-outline-light bi bi-search mt-1" type="submit" style="color: light-grey; height: 35px; text-align:right;"> Filter </button>
+          </form>
+      </div>
+    </div>
+    
+
+    
+
+
   </div>
     {% comment %} <div class = "col - 12">
 
