@@ -181,7 +181,15 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self.assertFalse(page_obj.has_next())
         self.assert_menu(response)
 
-
+    def test_post_request(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.club.add_member(self.user)
+        self.other_club.add_member(self.user)
+        response = self.client.post(self.url, follow=True) #{'showowned':''}
+        response_url = reverse('owned_clubs_list', kwargs={"user_id": 1})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assert_menu(response)
+        
     def _create_test_clubs(self, club_count=10):
         for club_id in range(club_count):
             Club.objects.create(owner = self.user,
