@@ -17,7 +17,7 @@
                                 </td>
                                 <td style="width: 20%; text-align:center">
                                     {% if user != current_user %}
-                                        {% if current_user in user.followers.all  %}
+                                        {% if user in current_user.followees.all  %}
                                             <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary text-white" style="width:90px">Unfollow</a> 
                                         {% else %}
                                             <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary text-white bg-light-blue"  style="width:90px;">Follow</a> 

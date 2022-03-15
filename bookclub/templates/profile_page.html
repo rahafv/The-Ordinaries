@@ -72,7 +72,7 @@
             </ul>
         </div>
     </div>
-    <div style="background-color: #eceae8">
+    <div style="background-color: #eceae8; padding-top:20px">
         <div class = "col-12">
             <div class=" ui-bg-cover ui-bg-overlay-container text-black">
                 <div class="ui-bg-overlay bg-light-whitish opacity-75"></div>
@@ -85,7 +85,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2 style = "font-size:2.5vw mt-1">No Clubs joined!</h2>
+                            <h2 style = "font-size:2.5vw">No Clubs joined!</h2>
                         {% endif %}
                     {% elif is_clubs is False %}
                         {% if items_count != 0  %}
@@ -95,7 +95,7 @@
                                 {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
                             </ul>
                         {% else %}
-                            <h2 class = "mt-2" style = "font-size:2.5vw"> Reading list is empty!</h2>
+                            <h2 style = "font-size:2.5vw"> Reading list is empty!</h2>
                         {% endif %}
                     {% endif %}
                 </div>

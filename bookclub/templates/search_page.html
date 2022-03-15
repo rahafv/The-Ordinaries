@@ -21,7 +21,7 @@
                 </div>
                 <br/>
                     {% if category == "Users" %}
-                    {%include 'partials/users_information_table.html' with Users=filtered_list %}
+                    {%include 'partials/users_information_table.html' with Users=filtered_list current_user=current_user %}
                     {% endif %}
 
                     {% if category == "Clubs" %}

@@ -57,7 +57,7 @@
     {% endif %}
             
   {% else %}
-    <div class = "col - 12">
+    <div class = "col-12">
       {% if general %}
         <form class="d-flex" method=GET action='{% url 'books_list' %}'> 
       {% else %}
@@ -76,7 +76,7 @@
           </div>
         {% endfor %}
     </div>
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center mt-5">
       {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
     </ul>
   {% endif %}
