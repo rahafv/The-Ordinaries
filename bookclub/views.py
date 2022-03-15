@@ -4,7 +4,8 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
 from bookclub.rec3 import Recommender2
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
+from bookclub.rec_by_genre import ContentRec
+from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
@@ -809,33 +810,35 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    if request.method == 'GET':
-        searched = request.GET.get('searched')
-        category = request.GET.get('category')
-        label = category
+    recommendations = ContentRec()
+    print(recommendations.get_recommendations(request.user.id, 5))
+    # if request.method == 'GET':
+    #     searched = request.GET.get('searched')
+    #     category = request.GET.get('category')
+    #     label = category
 
-        # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
-        category = search_page_results["category"]
-        filtered_list = search_page_results["filtered_list"]
+    #     # method in helpers to return a dictionary with a list of users, clubs or books searched
+    #     search_page_results = get_list_of_objects(
+    #         searched=searched, label=label)
+    #     category = search_page_results["category"]
+    #     filtered_list = search_page_results["filtered_list"]
 
-        sortForm = ""
-        if(category == "Clubs"):
-            sortForm = ClubsSortForm(request.GET or None)
-        elif(category == "Books"):
-            sortForm = BooksSortForm(request.GET or None)
-        else:
-            sortForm = UsersSortForm(request.GET or None)
+    #     sortForm = ""
+    #     if(category == "Clubs"):
+    #         sortForm = ClubsSortForm(request.GET or None)
+    #     elif(category == "Books"):
+    #         sortForm = BooksSortForm(request.GET or None)
+    #     else:
+    #         sortForm = UsersSortForm(request.GET or None)
 
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
-        current_user=request.user
-        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
+    #     pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+    #     page_number = request.GET.get('page')
+    #     filtered_list = pg.get_page(page_number)
+    #     current_user=request.user
+    #     return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
-    else:
-        return render(request, 'search_page.html', {})
+    # else:
+    return render(request, 'search_page.html', {})
 
 
 @login_required
