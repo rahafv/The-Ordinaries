@@ -96,24 +96,6 @@
 
 
   </div>
-    {% comment %} <div class = "col - 12">
-
-      {% if general %}
-        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
-      {% else %}
-        <form class = "d-flex" method = "GET" action = '{% url 'clubs_list' user.id %}'>
-      {% endif %}
-          {% csrf_token %}
-          {% include 'partials/bootstrap_form.html' with form=form %}
-          <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
-
-          
-      </form>
-      
-    </div> {% endcomment %}
-
-    
-
     {% include 'partials/clubs_list.html' with clubs=clubs %}
   <ul class="pagination justify-content-center">
     {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
