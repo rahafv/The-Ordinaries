@@ -7,7 +7,7 @@
         <h2 class="d-flex justify-content-center mb-5">{{ book.title }} </h2>
         <span class="float-left">
           {% if reader %}
-          <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill"
+          <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill"
           style="font-size: 1.8rem; color: green;"></a>
           {% else %}
           <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-plus"
@@ -17,7 +17,19 @@
         <div class="row">
           <div class="col-4">
             <div class="row mt-5">
-              <h5>Average Rating: ({{book.average_rating}})</h5>
+              <h5><div class="fw-light center">
+              
+                <i class="fa fa-star{% if book.average_rating < 1%}-o{% elif book.average_rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                <i class="fa fa-star{% if book.average_rating < 3%}-o{% elif book.average_rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                <i class="fa fa-star{% if book.average_rating < 5%}-o{% elif book.average_rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                <i class="fa fa-star{% if book.average_rating < 7%}-o{% elif book.average_rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                <i class="fa fa-star{% if book.average_rating < 9%}-o{% elif book.average_rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+            {%if numberOfRatings%}
+            <span>({{book.average_rating}}/10.0)</span>
+            {%else%} 
+                <span>( - /10.0)</span>
+            {%endif%}
+        </div></h5>
               <div>
                 <img src= "{{ book.image_url }}" class=" image-thumbnail mb-3" width="330" height="460" />
               </div>

@@ -1,10 +1,12 @@
 {% extends 'base_content.html' %}
 {% load bootstrap_pagination %}
-{% block title %} Results {% endblock %}
+{% block title %}
+| Results 
+{% endblock %}
 {% block content %}
 
 
-<div class="container">
+<div class="container mt-4">
     <div class="row">
         <div class="col-12">
            {% if searched and category %}
@@ -19,7 +21,7 @@
                 </div>
                 <br/>
                     {% if category == "Users" %}
-                    {%include 'partials/users_information_table.html' with Users=filtered_list %}
+                    {%include 'partials/users_information_table.html' with Users=filtered_list current_user=current_user %}
                     {% endif %}
 
                     {% if category == "Clubs" %}

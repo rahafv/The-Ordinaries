@@ -5,7 +5,6 @@ from libgravatar import Gravatar
 from isbn_field import ISBNField
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
-
 import pytz
 
 class User(AbstractUser):

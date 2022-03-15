@@ -14,7 +14,7 @@
 
 
 .bg-light-whitish {
-  background-color: #faf3ee;
+  background-color: #eceae8;
 }
 
 .bg-light-blue{
@@ -508,7 +508,7 @@ label:hover ~ input:checked ~ label{
     overflow: hidden;
     margin-bottom:10px;
     box-shadow:0px 2px 3px #222;
-    top:150px;
+    top:60px;
 }
 
 .profile-card:hover .profile-img img
@@ -572,7 +572,7 @@ label:hover ~ input:checked ~ label{
 }
 
 .profile-card .profile-content:hover{
-    background-color: rgba(136, 153, 253, 0.466);
+    background-color: rgba(60, 105, 151, 0.644);
 }
 
 .profile-card .profile-content .title{
@@ -716,3 +716,109 @@ label:hover ~ input:checked ~ label{
     font-size: 3.5rem;
   }
 }
+
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: #eceae8;
+  color: #25211e;
+}
+
+header {
+  position: relative;
+  margin: 100px 0 25px 0;
+  font-size: 2.3em;
+  text-align: center;
+  letter-spacing: 7px;
+}
+
+#form {
+  position: relative;
+  width: 500px;
+  margin: 50px auto 100px auto;
+}
+
+input:hover {
+  background: #b3aca7;
+  color: #e2dedb;
+}
+
+textarea {
+  width: 470px;
+  max-width: 470px;
+  height: 110px;
+  max-height: 110px;
+  padding: 15px;
+  
+  background: transparent;
+  outline: none;
+  
+  color: #574c40;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.875em;
+  
+  border: solid 1px #b3aca7;
+  
+  transition: all 0.3s ease-in-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+}
+
+textarea:hover {
+  background: #b3aca7;
+  color: #e2dedb;
+}
+
+#submit:hover {
+  color: #e2dedb;
+}
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+
+
+/* LISTS TABLE */
+.user-list tbody td > img {
+    position: relative;
+	max-width: 50px;
+	float: left;
+	margin-right: 15px;
+}
+.user-list tbody td .user-link {
+	display: block;
+	font-size: 1.25em;
+	padding-top: 3px;
+	margin-left: 60px;
+}
+
+
+/* TABLES */
+.table {
+    border-collapse: separate;
+}
+
+

@@ -1,19 +1,46 @@
 {% extends 'base_content.html' %}
+{% load static %}
 {% load bootstrap_pagination %}
-{% block title %}Books{% endblock %}
+{% block title %}
+| Books
+{% endblock %}
 {% block content %}
   
+
 {% if general %}
+<h1 class="fw-light center bg-purple" style="text-align: center;">Books</h1>
+<div class="carousel-inner" style="top: -8px;">
+  <div class="carousel-item active">
+    
+
+    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <rect width="100%" height="120%" fill="#faf3ee"/>
+      <image width="100%" height="100%"  xlink:href="{% static '/images/book_page4.png' %}"  />
+
+    </svg>
+
+    
+    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+      <div class="carousel-caption">
+          <div class="col-sm-6 col-md-3 col-lg-4">
+            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Add your favourite books.</h1>
+            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'add_book' %}'>Add Book</a></p>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <div class="container">
     <div class="row py-lg-5">
       <div class="col-lg-6 col-md-8 mx-auto">
-        <h1 class="fw-light center" style="text-align: center;">Books</h1>
-        <!-- TODO: Change paragrph here -->
-        <p class="lead text-muted">Explore The ordinaries’s ever-expanding collection of book categories and genres. Find your next great book to read with friends!</p>
+        <p class="lead text-muted" style="text-align: center">Explore The ordinaries’s ever-expanding collection of book of different categories and genres. Find your next great adventure!</p>
       </div>
     </div>
   </div>
  {% endif %}
+ 
 
 <div class="container">
   {% if count == 0 %}
@@ -30,7 +57,7 @@
     {% endif %}
             
   {% else %}
-    <div class = "col - 12">
+    <div class = "col-12">
       {% if general %}
         <form class="d-flex" method=GET action='{% url 'books_list' %}'> 
       {% else %}
@@ -41,25 +68,21 @@
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
       </form>
     </div>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-      {% for book in books %}
-        <div class="col">
-          <div style="text-align: center;">
-            <img src= "{{ book.image_url }}"  width="220" height="300" class=" image-thumbnail mb-3" />
-            <h2 style="overflow: hidden;white-space: nowrap; text-overflow: ellipsis;">{{ book.title }}</h2>
-            <p >{{ book.author }}</p>
-            <a href='{% url 'book_details' book.id %}' class="btn my-2 btn-outline-secondary">View</a>
+    <div class="row">
+       {% for book in books %}
+          <div class="col-sm-6 col-md-3">
+            {% include 'partials/book_card.html' with book=book %}
+            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
     </div>
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center mt-5">
       {% bootstrap_paginate books show_prev_next="false"  show_first_last="true" range=5  %}
     </ul>
   {% endif %}
 </div>
 
- 
+
 {% endblock %}
 
 

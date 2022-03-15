@@ -54,7 +54,11 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length})
+    already_selected_books = current_user.books.all()
+    my_books = Book.objects.all().exclude(id__in=already_selected_books)
+    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+
+    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited
 def sign_up(request):
@@ -258,6 +262,7 @@ def add_book(request):
 @login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
+    numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
     check_reader = book.is_reader(user)
@@ -269,7 +274,7 @@ def book_details(request, book_id):
         review="").exclude(user=request.user).count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader}
+               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
     return render(request, "book_details.html", context)
 
 
@@ -820,8 +825,8 @@ def search_page(request):
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
-
-        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm})
+        current_user=request.user
+        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
     else:
         return render(request, 'search_page.html', {})
