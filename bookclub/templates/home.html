@@ -1,24 +1,33 @@
 {% extends 'base_content.html' %}
-{% block title %}Home{% endblock %}
+{% load static %}
+{% block title %}
+| Home
+{% endblock %}
 {% block content %} 
     
+
   <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
-    <div class="carousel-inner">
+    <h1 class="fw-light bg-purple center" style="text-align: center;">Welcome {{user.first_name}}</h1>
+    <div class="carousel-inner" style="top: -8px;">
       <div class="carousel-item active">
-        <svg class="bd-placeholder-img" width="1350" height="550"  xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"> <rect width="100%" height="100%" fill="#5d486e"/> <image xlink:href= "https://res.cloudinary.com/blavity/image/upload/g_center,w_auto,q_auto:best,g_south_east,x_0/v1571430220/jovm0nfjyzidky9yeg2j" width="1350" height="550" /> </svg>
-        <div class="container">
+        <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <rect width="100%" height="100%" fill="#faf3ee"/>
+          <image width="100%" height="100%"  xlink:href="{% static '/images/welcome_page.png' %}"  />
+    
+        </svg>
+          <div class="container">
           <div class="carousel-caption">
           </div>
         </div>
       </div>
 
       <div class="carousel-item">
-        <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#5d486e"/></svg>
+        <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#64505a"/></svg>
         <div class="container">
           <div class="carousel-caption">
             <h1>Add your favourite books here!</h1>
@@ -29,7 +38,7 @@
       </div>
 
       <div class="carousel-item">
-        <svg class="bd-placeholder-img" width="100%" height="100%"  xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">  <rect width="100%" height="100%" fill="#5d486e"/>  </svg>
+        <svg class="bd-placeholder-img" width="100%" height="100%"  xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">  <rect width="100%" height="100%" fill="#dac3c3"/>  </svg>
         <div class="container">
           <div class="carousel-caption">
             <h1> Be a book club leader now!</h1>
@@ -38,7 +47,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
@@ -55,27 +63,15 @@
   <div class="container marketing">
 
     <div class="row">
+      {%for book in books%}
       <div class="col-lg-4">
-        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>
+        <img width="140" height="200"  src="{{ book.image_url }}"</img>
 
-        <h2>Heading</h2>
-        <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
+        <p class="mt-4"style=" display: -webkit-box; max-width: 350px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 25px;">{{book.title}}</p>
+        <p style=" display: -webkit-box; max-width: 300px; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;">{{book.describtion}}</p>
+        <p><a class="btn btn-dark" href='{% url 'book_details' book.id %}'>View details &raquo;</a></p>
       </div>
-      <div class="col-lg-4">
-        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>
-
-        <h2>Heading</h2>
-        <p>Another exciting bit of representative placeholder content. This time, we've moved on to the second column.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>
-      <div class="col-lg-4">
-        <svg class="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text></svg>
-
-        <h2>Heading</h2>
-        <p>And lastly this, the third column of representative placeholder content.</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>
+      {%endfor%}
     </div>
 
 
@@ -90,10 +86,9 @@
       </div>
       <div class="col-md-4">
         <div class="position-sticky" style="top: 10rem;">
-          <div class="p-4 mb-3 bg-light rounded">
+          <div class="p-4 mb-3 bg-light-blue rounded">
             <h4 class="fst-italic">Club Updates</h4>
             {% include 'partials/events_as_list.html' with club_events=club_events%}
-            
           </div>
         </div>
       </div>
@@ -107,8 +102,4 @@
   </div>
 
 
-  <footer class="container">
-    <p class="float-end"><a style = "color: purple" href="#">Back to top </a></p>
-    <p>&copy; 2022 The Ordinaries, Inc. &middot; </p>
-  </footer>
 {% endblock %}

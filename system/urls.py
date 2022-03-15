@@ -39,6 +39,9 @@ urlpatterns = [
 
     path('profile/', views.show_profile_page , name='profile'),
     path('profile/<int:user_id>', views.show_profile_page , name='profile'),
+    path('profile/<int:user_id>/reading_list', views.show_profile_page_reading_list, name='profile_reading_list'),
+    path('profile/<int:user_id>/clubs', views.show_profile_page_clubs, name='profile_clubs'),
+    path('profile/<int:user_id>/<is_clubs>', views.show_profile_page , name='profile'),
 
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
@@ -51,8 +54,6 @@ urlpatterns = [
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
     path('initial_book_list/', views.initial_book_list, name ='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
-
-    path('initial_book_list/<int:book_id>/add_book/', views.add_book_from_initial_list, name ='add_book_from_initial_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name ='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name ='withdraw_club'),
@@ -80,11 +81,13 @@ urlpatterns = [
     path('meeting/<int:meeting_id>/search/', views.search_book, name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
    
-    path('club/<int:club_id>/chat_room/', views.chat_room, name='chat_room'),
     path('chat_room/', views.chat_room, name='chat_room'),
+    path('club/<int:club_id>/chat_room/', views.chat_room, name='chat_room'),
     path('getMessages/<int:club_id>/', views.getMessages, name='getMessages'),
     path('send', views.send, name='send'),
 
+    path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),
+    path("club/<int:club_id>/previous_meetings/", views.previous_meetings_list, name='previous_meetings_list'),
 ]
 
 handler404 = 'bookclub.views.handler404'

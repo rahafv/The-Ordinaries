@@ -1,18 +1,20 @@
 {% extends 'base_content.html' %}
-{% block title %}Create club{% endblock %}
+{% block title %}
+| Create club
+{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="row d-flex justify-content-center">
-        <div class="col-xs-12 col-lg-6 col-xl-4">
-            <h1 class="text-center sticky-top mt-5 mb-5">Create club</h1>
-        </div>
-        <div class="col-xs-12 col-lg-6 col-xl-8">
-            <form action="{% url 'create_club' %}" method="post">
-                {% csrf_token %}
-                {% include 'partials/bootstrap_form.html' with form=form %}
-                <input type="submit" class="btn btn-primary mb-3" value="Create">
-            </form>
-        </div>
+  <div class="row">
+    <div class="col-12">
+      <h1 style="text-align:center;" class="mt-3">Create club</h1>
+      <form action="{% url 'create_club' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" class="btn btn-lg btn-outline-dark" value="Create club">
+        <button onclick="history.back()" class="btn btn-lg btn-outline-dark">Cancel</button>
+      </form>
     </div>
+  </div>
 </div>
 {% endblock %}
+

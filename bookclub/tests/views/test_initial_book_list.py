@@ -38,8 +38,6 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         for book_id in range(8):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
-        books_url = reverse('initial_book_list')
-        self.assertContains(response, books_url)
     
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

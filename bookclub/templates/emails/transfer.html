@@ -1,0 +1,9 @@
+{% autoescape off %}
+Dear members of the {{club.name}},
+
+The ownership of {{club.name}} was transfered to {{owner.username}}.
+
+The Ordinaries Book Clubs,
+Club page: http://{{domain}}{% url 'club_page' club.id %}
+
+{% endautoescape %} 
