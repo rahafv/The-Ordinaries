@@ -340,8 +340,6 @@ class ClubsSortForm(forms.Form):
    
 class BooksSortForm(forms.Form):
 
-    ASC_DATE = "date_asc"
-    DESC_DATE = "date_desc"
     ASC_NAME = 'name_asc'
     DESC_NAME = 'name_desc'
     ASC_RATING = 'rating_asc'
@@ -350,8 +348,6 @@ class BooksSortForm(forms.Form):
     SORT_CHOICES = [
         (ASC_NAME, "Name A-Z"),
         (DESC_NAME, "Name Z-A"),
-        (DESC_DATE, "Latest"),
-        (ASC_DATE, "Oldest"),
         (DESC_RATING, "High rating"),
         (ASC_RATING, "Low rating"),
        
