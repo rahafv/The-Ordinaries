@@ -936,18 +936,20 @@ def chat_room(request, club_id=None):
 
 @login_required
 def getMessages(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
-    current_user = request.user
+    if request.method == "GET":
+        club = get_object_or_404(Club.objects, id=club_id)
+        current_user = request.user
+        
+        chats = list(club.chats.all().values())
+        modifiedItems = []
+        for key in chats:
+            user_id = key.get("user_id")
+            user = get_object_or_404(User.objects, id=user_id)
+            prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+            modifiedItems.append({"name": user.full_name(), "time":prettyDate})
 
-    chats = list(club.chats.all().values())
-    modifiedItems = []
-    for key in chats:
-        user_id = key.get("user_id")
-        user = get_object_or_404(User.objects, id=user_id)
-        prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
-        modifiedItems.append({"name": user.full_name(), "time":prettyDate})
-
-    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+        return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+    return render(request, '404_page.html', status=404) 
 
 @login_required
 def send(request):

@@ -9,7 +9,7 @@
     setInterval(function(){
         $.ajax({
             type: 'GET',
-            url : "club/{{club.id}}/getMessages",
+            url : "/getMessages/{{club.id}}/",
             success: function(response){
                 console.log(response);
                 $("#display").empty();
@@ -20,7 +20,7 @@
                             "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
                             response.chats[key].message+"</p></div>";                    }
                     else {
-                        var temp="<div id=rcorners2 class='container darker text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
+                        var temp="<div id=rcorners2 class='container darker bg-dark-blue text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
                             "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
                             response.chats[key].message+"</p></div>";
                     }
@@ -37,7 +37,7 @@
     <div class="col-3 px-0">
         <div class="bg-white">
 
-            <div class="bg-gray px-4 py-2 bg-dark text-white">
+            <div class="bg-gray px-4 py-2 bg-purple text-white">
                 <p class="h5 mb-0 py-1">Chats</p>
             </div>
     
@@ -65,7 +65,7 @@
     <div class="col-9 px-0" >
         <div class="chat-box bg-white borders">
 
-            <div class="bg-gray px-4 py-2 bg-dark text-white">
+            <div class="bg-gray px-4 py-2 bg-purple text-white">
                 <p class="mb-0 py-1"><b>{{club.name}} chat room</b></p>
             </div>
             

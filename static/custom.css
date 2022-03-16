@@ -815,7 +815,6 @@ textarea:hover {
   height: relative;  
   text-align: right; 
   margin-left: 31em; 
-  background-color: DarkSlateGray;
   word-wrap:break-word;
 }
 
@@ -825,6 +824,7 @@ textarea:hover {
 }
 
 .borders {
+  border-top: 0px !important;
   border: 2px solid;
 }
 

@@ -19,7 +19,7 @@ class GetMessagesTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTeste
         self.url = reverse("getMessages", kwargs={'club_id': self.club.id})
 
     def test_get_messages_url(self):
-        self.assertEqual(self.url, f'/club/{self.club.id}/getMessages/')
+        self.assertEqual(self.url, f'/getMessages/{self.club.id}/')
 
     def test_get_messages_get(self):
         self.client.login(username=self.user.username, password="Password123")
