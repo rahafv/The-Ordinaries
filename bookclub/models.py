@@ -269,7 +269,7 @@ class Book(models.Model):
         blank=True
     )
 
-    describtion = models.CharField(
+    description = models.CharField(
         max_length=500,
         unique=False,
         blank=True
