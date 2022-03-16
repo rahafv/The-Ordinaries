@@ -947,16 +947,18 @@ def getMessages(request, club_id):
 
 @login_required
 def send(request):
-    message = request.POST['message']
-    
-    if message.strip():
-        username = request.POST['username']
-        club_id = request.POST['club_id']
+    if request.method == "POST":
+        message = request.POST['message']
+        
+        if message.strip():
+            username = request.POST['username']
+            club_id = request.POST['club_id']
 
-        club = get_object_or_404(Club.objects, id=club_id)
-        user = get_object_or_404(User.objects, username=username)
+            club = get_object_or_404(Club.objects, id=club_id)
+            user = get_object_or_404(User.objects, username=username)
 
-        new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
-        new_chat_msg.save()
+            new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+            new_chat_msg.save()
 
-    return HttpResponse('Message sent succfully')
+        return HttpResponse('Message sent successfully')
+    return render(request, '404_page.html', status=404) 
