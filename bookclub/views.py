@@ -925,7 +925,7 @@ def chat_room(request, club_id=None):
         if clubs:
             club = clubs[0]
         else:
-            messages.add_message(request, messages.WARNING, "You do not have any chats! Join clubs and be part of a community.")
+            messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
             return redirect('clubs_list')
     
     return render(request, "chat_room.html", {"user": user, "club":club})
