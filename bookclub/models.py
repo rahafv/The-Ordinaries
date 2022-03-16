@@ -244,13 +244,6 @@ class Club(models.Model):
                 previous_meetings.append(meeting)
         return previous_meetings
 
-    def getLastMessage(self):
-        messages = self.chats.all()
-        if messages:
-            return messages[len(messages)-1]
-        else:
-            return ""
-
 class Book(models.Model):
     """Book model."""
 
@@ -580,12 +573,15 @@ class Chat(models.Model):
     )
 
     message = models.CharField(
-        max_length=250,
-        blank=False
+        max_length=500,
+        blank=False,
+        null=False
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
+        blank=False,
+        null =False
     )
 
     class Meta:
@@ -594,6 +590,6 @@ class Chat(models.Model):
     def clean(self):
         super().clean()
 
-        # """ checks that the user is a member of the club """
-        # if not self.user in self.club.members:
-        #     raise ValidationError('User must be a member of the club')
+        """ checks that the user is a member of the club """
+        if not self.user in self.club.members.all():
+            raise ValidationError('User must be a member of the club')

@@ -933,15 +933,7 @@ def chat_room(request, club_id=None):
 @login_required
 def getMessages(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
-    user = request.user
-
-    clubs = user.clubs.all()
-    messages = []
-    for c in clubs:
-        m = c.getLastMessage()
-        if m != "":
-            prettyDate = humanize.naturaltime(m.created_at.replace(tzinfo=None))
-            messages.append({"name":m.user.first_name, "message":m.message, "time":prettyDate, "clubName":c.name})
+    current_user = request.user
 
     chats = list(club.chats.all().values())
     modifiedItems = []
@@ -951,7 +943,7 @@ def getMessages(request, club_id):
         prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
         modifiedItems.append({"name": user.full_name(), "time":prettyDate})
 
-    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":user.id, "messages":messages})
+    return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
 
 @login_required
 def send(request):
