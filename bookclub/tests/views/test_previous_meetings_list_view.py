@@ -3,9 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 import pytz
 from bookclub.models import User, Club, Meeting, Book
-from bookclub.forms import NameAndDateSortForm
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
-from system import settings
 
 class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
 
