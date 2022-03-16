@@ -30,6 +30,13 @@
         });
     },1000);
     })
+
+   const scrollSmoothToBottom = (id) => {
+    const element = $(`#${id}`);
+    element.animate({
+       scrollTop: element.prop("scrollHeight")
+    }, 1000);
+ }
 </script>
 
 <div class="row rounded-lg overflow-hidden" style="margin:0px;">
@@ -37,12 +44,12 @@
     <div class="col-3 px-0">
         <div class="bg-white">
 
-            <div class="bg-gray px-4 py-2 bg-purple text-white">
+            <div class="px-4 py-2 bg-purple text-white">
                 <p class="h5 mb-0 py-1">Chats</p>
             </div>
     
             <div class="messages-box">
-                <div class="list-group rounded-0 " style="max-height:500px; overflow:scroll; overflow-x:hidden">
+                <div class="list-group rounded-0 scroll" style="max-height:500px;">
                     {% for userClub in user.clubs.all %}
                         <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
                             <div class="media">
@@ -65,8 +72,9 @@
     <div class="col-9 px-0" >
         <div class="chat-box bg-white borders">
 
-            <div class="bg-gray px-4 py-2 bg-purple text-white">
-                <p class="mb-0 py-1"><b>{{club.name}} chat room</b></p>
+            <div class="px-4 py-2 bg-purple text-white d-flex justify-content-between">
+                <b class="mb-0 py-1">{{club.name}} chat room</b>
+                <button class="bg-purple" onClick="scrollSmoothToBottom('display')" style="border:none; text-align:right">Back to bottom &#9660;</button> 
             </div>
             
             <div id="display" class="scroll d-flex flex-column-reverse"></div>
@@ -96,7 +104,7 @@
           csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
         },
         success: function(data){
-           // alert(data)
+            scrollSmoothToBottom('display')
         }
       });
       document.getElementById('message').value = ''

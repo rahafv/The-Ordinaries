@@ -936,11 +936,11 @@ def chat_room(request, club_id=None):
 
 @login_required
 def getMessages(request, club_id):
-    if request.method == "GET":
+    if request.is_ajax():
         club = get_object_or_404(Club.objects, id=club_id)
         current_user = request.user
         
-        chats = list(club.chats.all().values())
+        chats = list(club.chats.all().values())[:200]
         modifiedItems = []
         for key in chats:
             user_id = key.get("user_id")

@@ -585,7 +585,7 @@ class Chat(models.Model):
     )
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['-created_at']
 
     def clean(self):
         super().clean()

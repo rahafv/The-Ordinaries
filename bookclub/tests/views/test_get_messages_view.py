@@ -21,10 +21,17 @@ class GetMessagesTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTeste
     def test_get_messages_url(self):
         self.assertEqual(self.url, f'/getMessages/{self.club.id}/')
 
-    def test_get_messages_get(self):
+    def test_get_messages_by_ajax(self):
         self.client.login(username=self.user.username, password="Password123")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, **{'HTTP_X_REQUESTED_WITH': 
+        'XMLHttpRequest'}, follow=True)
         self.assertEqual(response.status_code, 200)
+
+    def test_get_messages_by_users(self):
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, '404_page.html')
 
     def test_get_get_messages_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
