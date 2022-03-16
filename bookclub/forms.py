@@ -395,7 +395,7 @@ class MeetingForm(forms.ModelForm):
         exclude = ['club', 'book', 'member']
 
     cont = forms.BooleanField(
-        label = "This meeting a continuation of a previous discussion",
+        label = "This meeting is a continuation of a previous discussion",
         required = False,
         help_text = "checkbox",
         label_suffix=""
@@ -404,9 +404,7 @@ class MeetingForm(forms.ModelForm):
     def __init__(self, club, *args, **kwargs):
         self.club = club
         super(MeetingForm, self).__init__(*args, **kwargs)
-        self.fields['link'].widget.attrs['placeholder'] = 'Book link/ Meeting link/ Location link'
-        self.fields['title'].widget.attrs['placeholder'] = 'Meeting title'
-        self.fields['notes'].widget.attrs['placeholder'] = 'Meeting notes'
+        self.fields['link'].widget.attrs['placeholder'] = 'Online Meeting Link or Meeting Location Link'
         
     def clean(self):
         super().clean()
