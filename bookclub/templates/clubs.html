@@ -44,58 +44,54 @@
 <div class="container">
   {% if count == 0 %}
     {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
-        <h4 class="lead "> There are no clubs, want to create one?</h4>
-        <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
-      </div>
+      {%if filtered%}
+        <div style="text-align: center;">
+          <h4 class="lead "> There are no matches. </h4>
+          <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
+        </div>
+      {%else%}
+        <div style="text-align: center;   padding-top: 50px;">
+          <h4 class="lead "> There are no clubs, want to create one?</h4>
+          <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-dark">Create club</a>
+        </div>
+      {%endif%}
     {% else %}
       <div style="text-align: center;   padding-top: 50px;">
         <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
-        <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
+        <a href='/clubs'  class="btn my-2 btn-outline-dark">More clubs</a>
       </div>
     {% endif %}
     
   {% else %}
   <div style="float: right;">
     {% if general %}
-
-    
-    <div class="position-sticky" style="top: 100rem;">
-      <div class="p-1 mb-3 bg-light-blue rounded">
-        <h4 class="fst-italic">Filters:</h4>
-          <form method=GET action="{% url 'clubs_list'%}">
-            {% else %}
-            <form method=GET action="{% url 'clubs_list' user.id%}">
-              {% endif %}
-              <div style="text-align:right;">
-              <select id="privacy" name="privacy" size="3" style="overflow:auto;  Border: none;">
-                <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
-                <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
-                <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
-              </select>
-            </div>
-
-
-            
-
-            <div style="text-align:right;">
-              <select id="ownership" name="ownership" size="2" style="overflow:auto;  Border: none;">
-                <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
-                <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
-              </select>
-            </div>
-              {% include 'partials/bootstrap_form.html' with form=form %}
-              <br>
-              <button class="btn btn-outline-light bi bi-search mt-1" type="submit" style="color: light-grey; height: 35px; text-align:right;"> Filter </button>
-          </form>
+    <form method=GET action="{% url 'clubs_list'%}">
+      {% else %}
+      <form method=GET action="{% url 'clubs_list' user.id%}">
+        {% endif %}
+        <div style="text-align:left;">
+        Privacy:
+        <select id="privacy" name="privacy" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
+          <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
+          <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
+        </select>
       </div>
-    </div>
-    
-
-    
-
-
+      <div style="text-align:left;">
+        Ownership:
+        <select id="ownership" name="ownership" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
+          <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
+        </select>
+      </div>
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Filter </button>
+    </form>
   </div>
+
+
+    
+
     {% include 'partials/clubs_list.html' with clubs=clubs %}
   <ul class="pagination justify-content-center">
     {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}

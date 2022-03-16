@@ -456,6 +456,7 @@ def books_list(request, club_id=None, user_id=None):
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True
+    filtered=False
     if user_id:
         user= get_object_or_404(User.objects, id=user_id)
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
@@ -474,14 +475,17 @@ def clubs_list(request, user_id=None):
     privacy= request.GET.get('privacy')
     if privacy=='public': 
         clubsSet = clubs_queryset.filter(club_type='Public')
+        filtered=True
     elif privacy=='private': 
         clubsSet = clubs_queryset.filter(club_type='Private')
+        filtered=True
     else:
         clubsSet = clubs_queryset.all()
 
     ownership= request.GET.get('ownership')
     if ownership=='owned': 
         clubsSet = clubsSet.filter(owner=user)
+        filtered=True
     
 
 
@@ -489,7 +493,7 @@ def clubs_list(request, user_id=None):
     clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership })
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership, 'filtered':filtered })
 
 
 @login_required
