@@ -83,5 +83,5 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
         self.assertFalse(self.club.is_member(self.user))
 
   
-    def test_accept_applicant_view_redirects_when_not_logged_in(self):
+    def test_add_to_list_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

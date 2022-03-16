@@ -67,8 +67,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "book_details.html")
 
-    def test_get_add_book_redirects_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()
+
 
     def test_post_add_book_redirects_when_not_logged_in(self):
         self.assert_post_redirects_when_not_logged_in()

@@ -29,34 +29,39 @@ def welcome(request):
     return render(request, 'welcome.html')
 
 
-@login_required
 def home(request):
     def events_created_at(event):
         return event.created_at
 
     current_user = request.user
-    authors = list(current_user.followees.all()) + [current_user]
-    clubs = list(User.objects.get(id=current_user.id).clubs.all())
-    user_events = []
-    club_events = []
-    for author in authors:
-        user_events += list(Event.objects.filter(user=author))
-    final_user_events = user_events
-    final_user_events.sort(reverse=True, key=events_created_at)
-    first_twentyFive = final_user_events[0:25]
+    if current_user.is_authenticated:
+        authors = list(current_user.followees.all()) + [current_user]
+        clubs = list(User.objects.get(id=current_user.id).clubs.all())
+        user_events = []
+        club_events = []
+        for author in authors:
+            user_events += list(Event.objects.filter(user=author))
+        final_user_events = user_events
+        final_user_events.sort(reverse=True, key=events_created_at)
+        first_twentyFive = final_user_events[0:25]
 
-    for club in clubs:
-        club_events += list(Event.objects.filter(club=club))
+        for club in clubs:
+            club_events += list(Event.objects.filter(club=club))
 
-    final_club_events = club_events
-    final_club_events.sort(reverse=True, key=events_created_at)
-    first_ten = final_club_events[0:10]
+        final_club_events = club_events
+        final_club_events.sort(reverse=True, key=events_created_at)
+        first_ten = final_club_events[0:10]
 
-    club_events_length = len(first_ten)
+        club_events_length = len(first_ten)
 
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+        already_selected_books = current_user.books.all()
+        my_books = Book.objects.all().exclude(id__in=already_selected_books)
+        top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3] #change to recommended books
+    else: 
+        first_twentyFive = []
+        first_ten=[]
+        club_events_length=0
+        top_rated_books=  Book.objects.all().order_by('-average_rating','-readers_count')[:3]
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
@@ -156,7 +161,7 @@ def handler404(request, exception):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "You've been logged out.")
-    return redirect('welcome')
+    return redirect('home')
 
 
 class PasswordView(LoginRequiredMixin, FormView):
@@ -230,7 +235,6 @@ def add_review(request, book_id):
     return render(request, 'book_details.html', {'book': reviewed_book})
 
 
-@login_required
 def club_page(request, club_id):
     user = request.user
     club = get_object_or_404(Club.objects, id=club_id)
@@ -259,19 +263,30 @@ def add_book(request):
     return render(request, "add_book.html", {"form": form})
 
 
-@login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
     check_reader = book.is_reader(user)
-    reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
-    rating = book.ratings.all().filter(user=request.user)
+    if user.is_authenticated:
+        reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
+        rating = book.ratings.all().filter(user=request.user)
+        reviews_count = book.ratings.all().exclude(
+        review="").exclude(user=request.user).count()
+    else: 
+        reviews = book.ratings.all()
+        rating =[]
+        reviews_count = book.ratings.all().exclude(
+        review="").count()
+        
     if rating:
         rating = rating[0]
-    reviews_count = book.ratings.all().exclude(
-        review="").exclude(user=request.user).count()
+    
+
+    
+
+
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
@@ -426,7 +441,6 @@ def withdraw_club(request, club_id):
     return redirect('club_page', club_id)
 
 
-@login_required
 def books_list(request, club_id=None, user_id=None):
     books_queryset = Book.objects.all()
     general = True
@@ -452,7 +466,6 @@ def books_list(request, club_id=None, user_id=None):
     return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
 
 
-@login_required
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True

@@ -20,8 +20,6 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
     def test_applicants_list_url(self):
          self.assertEqual(self.url, f"/club/{self.club.id}/applicants/")
 
-    def test_get_applicants_page_redirects_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()
 
     def test_get_club_applicants_list(self):
         self.client.login(username=self.user.username, password='Password123')
@@ -120,3 +118,6 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
                 bio=f'Bio {user_id}',
             )
             self.club.add_applicant(user)
+
+    def test_add_to_list_redirects_when_not_logged_in(self):
+        self.assert_redirects_when_not_logged_in()
