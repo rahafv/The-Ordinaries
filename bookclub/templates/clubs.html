@@ -49,17 +49,24 @@
           <h4 class="lead "> There are no matches. </h4>
           <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
         </div>
-      {%else%}
+      {% else %}
         <div style="text-align: center;   padding-top: 50px;">
           <h4 class="lead "> There are no clubs, want to create one?</h4>
           <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-dark">Create club</a>
         </div>
       {%endif%}
     {% else %}
+      {%if filtered%}
+      <div style="text-align: center; ">
+        <h4 class="lead mt-5 "> There are no matches. </h4>
+        <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
+      </div>
+      {% else %}
       <div style="text-align: center;   padding-top: 50px;">
         <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
         <a href='/clubs'  class="btn my-2 btn-outline-dark">More clubs</a>
       </div>
+      {% endif %}
     {% endif %}
     
   {% else %}

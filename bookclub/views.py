@@ -840,6 +840,7 @@ def search_page(request):
         sortForm = ""
         if(category == "Clubs"):
             sortForm = ClubsSortForm(request.GET or None)
+            
         elif(category == "Books"):
             sortForm = BooksSortForm(request.GET or None)
         else:
