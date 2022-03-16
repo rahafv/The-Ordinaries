@@ -1,12 +1,7 @@
-from datetime import datetime, timedelta
-from email import message
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.urls import reverse
-from bookclub.forms import MeetingForm
-from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Chat, Meeting, User, Club, Event
+from bookclub.models import Chat, User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
-import pytz
 
 class SendTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
 

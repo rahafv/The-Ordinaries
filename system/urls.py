@@ -83,7 +83,7 @@ urlpatterns = [
    
     path('chat_room/', views.chat_room, name='chat_room'),
     path('club/<int:club_id>/chat_room/', views.chat_room, name='chat_room'),
-    path('getMessages/<int:club_id>/', views.getMessages, name='getMessages'),
+    path('club/<int:club_id>/getMessages/', views.getMessages, name='getMessages'),
     path('send', views.send, name='send'),
 
     path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),

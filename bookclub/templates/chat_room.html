@@ -9,7 +9,7 @@
     setInterval(function(){
         $.ajax({
             type: 'GET',
-            url : "/getMessages/{{club.id}}",
+            url : "club/{{club.id}}/getMessages",
             success: function(response){
                 console.log(response);
                 $("#display").empty();
