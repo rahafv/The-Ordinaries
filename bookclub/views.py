@@ -24,11 +24,6 @@ from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 
 
-@login_prohibited
-def welcome(request):
-    return render(request, 'welcome.html')
-
-
 def home(request):
     def events_created_at(event):
         return event.created_at

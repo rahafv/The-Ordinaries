@@ -65,8 +65,5 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
 
         self.assert_menu(response)
 
-    def test_get_add_book_redirects_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()
-      
     def test_post_add_book_redirects_when_not_logged_in(self):
         self.assert_post_redirects_when_not_logged_in()

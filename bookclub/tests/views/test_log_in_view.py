@@ -31,7 +31,6 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertFalse(form.is_bound)
         self.assertFalse(next)
         self.assert_no_message(response)
-        self.assert_no_menu(response)
 
     def test_get_log_in_with_redirect(self):
         destination_url = reverse('home')
@@ -45,7 +44,6 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertFalse(form.is_bound)
         self.assertEqual(next, destination_url)
         self.assert_no_message(response)
-        self.assert_no_menu(response)
 
     def test_get_log_in_redirects_when_logged_in(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -64,7 +62,6 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
         self.assert_error_message(response)
-        self.assert_no_menu(response)
 
     def test_log_in_with_blank_username(self):
         form_input = { 'username': '', 'password': 'Password123' }
@@ -76,7 +73,6 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
         self.assert_error_message(response)
-        self.assert_no_menu(response)
 
     def test_log_in_with_blank_password(self):
         form_input = { 'username': 'johndoe', 'password': '' }
@@ -88,7 +84,6 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertFalse(form.is_bound)
         self.assertFalse(self._is_logged_in())
         self.assert_error_message(response)
-        self.assert_no_menu(response)
 
     def test_unverified_log_in(self):
         self.user.email_verified = False
@@ -141,4 +136,3 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         response = self.client.post(self.url, form_input)
         next = response.context['next']
         self.assertEqual(next, redirect_url)
-        self.assert_no_menu(response)
