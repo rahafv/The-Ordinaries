@@ -6,6 +6,7 @@
 {% include 'partials/messages.html' %}
 
 <div class="container">
+
 <div class="row py-md-5">
     <div class="col mx-auto">
       <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
@@ -14,13 +15,22 @@
     </div>
 </div>
     <div class="row">
+        {% if genres %}
+            <p class="lead text-center"> Genres:</p>
+
+            {% for genre in genres %}
+                <p class="lead text-muted text-center">{{genre}}</p>
+            {% endfor %}
+        {% endif %}
+        
         {% if my_books.count == 0 %}
         <div class=" text-center">
-            <p class="lead text-muted text-center">try different genres</p>
-            <a href={% url "initial_genres" %} class="btn " role="button" > back </a>
+            <p class="lead text-muted text-center">Try different genres</p>
+            <a href={% url "initial_genres" %} class="btn " role="button" >back</a>
         </div>
 
         {% else %}
+        
         {% for book in my_books %}
             <div class="col-sm-6 col-md-3">
                 {% include 'partials/book_card.html' with book=book %}

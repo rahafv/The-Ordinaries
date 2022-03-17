@@ -5,31 +5,31 @@
 {% block body %}
 {% include 'partials/messages.html' %}
 
+
 <div class="container">
 
     <div class="row py-md-5">
         <div class="col mx-auto">
           <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
              <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
-             <p class="lead text-muted text-center"> You need to add 3 books to your list to Continue</p>
         </div>
     </div>
- 
-        
+    <p class="lead text-muted text-center"> Choose your favourtie genres</p>
+    <div class="text-center">
+        <div class="col-sm-8 mx-auto">
+
         <form method=GET action="{% url 'initial_book_list'%}">
-            <div class="row ">
-
+                  
             {% for genre in genres %}
-            <div class="col-3">
-
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="genre" value={{genre}}>
-                    <label class="form-check-label" >{{genre}}</label> 
-                </div>
-            </div>
-
+                <label id="genre-label" style="font-size: 20px">
+                    <input type="checkbox" name="genre" value={{genre}}>
+                    <span class="y">{{genre}}</span>
+                    <span class="n">{{genre}}</span>
+                  </label>
             {% endfor %}
         </div>
+    </div>
+            <br>
             <div class="text-center">
             {% include 'partials/bootstrap_form.html' with form=form %}
             <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Continue </button>

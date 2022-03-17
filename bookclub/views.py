@@ -900,7 +900,7 @@ def initial_book_list(request):
 
 
     list_length = len(current_user.books.all())
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length})
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length, 'genres':genres})
 
 @login_required
 def delete_club(request, club_id):
