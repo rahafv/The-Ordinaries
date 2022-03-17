@@ -918,4 +918,17 @@ def previous_meetings_list(request, club_id):
     meetings_list = meetings_pg.get_page(page_number)
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
 
+@login_required
+def cancel_meeting(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    club = get_object_or_404(Club.objects, id=meeting.club.id)
+    user = request.user
 
+    if (user == club.owner ):
+        meeting.delete()
+        messages.add_message(request, messages.SUCCESS, "You deleted the meeting successfully!")
+        return redirect('meetings_list', club.id)
+    else:
+        messages.add_message(request, messages.ERROR, "Must be owner to delete a meeting!")
+        return redirect('meetings_list', club.id)
+    

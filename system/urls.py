@@ -82,6 +82,7 @@ urlpatterns = [
     path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
     path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),
     path("club/<int:club_id>/previous_meetings/", views.previous_meetings_list, name='previous_meetings_list'),
+    path('cancel_meeting/<int:meeting_id>', views.cancel_meeting, name='cancel_meeting'),
 ]
 
 handler404 = 'bookclub.views.handler404'
