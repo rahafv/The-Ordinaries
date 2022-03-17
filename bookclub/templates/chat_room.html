@@ -16,13 +16,13 @@
 
                 for (var key in response.chats) {
                     if(response.user_id != response.chats[key].user_id) {
-                        var temp="<div id=rcorners1 class='container darker text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
-                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
-                            response.chats[key].message+"</p></div>";                    }
+                        var temp="<div class='row justify-content-start'><div id=rcorners1 class='text-white mb-1'><b>"+response.modifiedItems[key].name+"</b><p>"+
+                            response.chats[key].message+"</p><span>"+
+                            response.modifiedItems[key].time+"</span></div></div>";                    }
                     else {
-                        var temp="<div id=rcorners2 class='container darker bg-dark-blue text-white mb-2'><b>"+response.modifiedItems[key].name+"</b>"+
-                            "<span class='time-left'> &nbsp;&middot;&nbsp;"+response.modifiedItems[key].time+"</span><p>"+
-                            response.chats[key].message+"</p></div>";
+                        var temp="<div class='row justify-content-end'><div id=rcorners2 class='bg-dark-blue text-white mb-1'><div style='text-align:left !important'><p>"+
+                            response.chats[key].message+"</p></div><span class='time-left'>"+
+                                response.modifiedItems[key].time+"</span></div></div>";
                     }
                     $("#display").append(temp);
                 }
@@ -47,9 +47,17 @@
             <div class="px-4 py-2 bg-purple text-white">
                 <p class="h5 mb-0 py-1">Chats</p>
             </div>
+
+            <div>
+                <form id="search-form" class="d-flex" method=POST>
+                    {% csrf_token %}
+                    <input class="fw-light center form-control" type="search" placeholder="search for chats..." aria-label="Search" name="searched" id="searched"> 
+                    <button type="submit" class="btn btn-link"> <i class="fa fa-search" style="color:black"></i></button>
+                </form>
+            </div>
     
             <div class="messages-box">
-                <div class="list-group rounded-0 scroll" style="max-height:500px;">
+                <div class="list-group rounded-0 scroll" style="max-height:100vh;">
                     {% for userClub in user.clubs.all %}
                         <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
                             <div class="media">
@@ -74,7 +82,7 @@
 
             <div class="px-4 py-2 bg-purple text-white d-flex justify-content-between">
                 <b class="mb-0 py-1">{{club.name}} chat room</b>
-                <button class="bg-purple" onClick="scrollSmoothToBottom('display')" style="border:none; text-align:right">Back to bottom &#9660;</button> 
+                <button class="bg-purple btn btn-sm btn-outline-dark bi bi-caret-down-fill" onClick="scrollSmoothToBottom('display')"></button> 
             </div>
             
             <div id="display" class="scroll d-flex flex-column-reverse"></div>
@@ -109,6 +117,7 @@
       });
       document.getElementById('message').value = ''
     });
+
 </script>
 
 {% endblock %}

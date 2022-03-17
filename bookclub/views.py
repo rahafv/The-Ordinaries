@@ -968,3 +968,19 @@ def send(request):
 
         return HttpResponse('Message sent successfully')
     return render(request, '404_page.html', status=404) 
+
+@login_required
+def getClubs(request):
+    if request.is_ajax():
+        current_user = request.user
+        
+        chats = list(current_user.clubs.values())
+        modifiedItems = []
+        for key in chats:
+            user_id = key.get("club_id")
+            user = get_object_or_404(User.objects, id=user_id)
+            prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+            modifiedItems.append({"name": user.full_name(), "time":prettyDate})
+
+        return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+    return render(request, '404_page.html', status=404) 

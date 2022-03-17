@@ -800,10 +800,10 @@ textarea:hover {
 
 #rcorners1 {
   border-radius: 25px;
-  padding: 20px; 
-  width: 400px;
+  padding: 15px; 
+  width: auto;
+  max-width: 350px;
   height: relative; 
-  margin-right: 31em; 
   background-color: DimGrey; 
   word-wrap:break-word;
 }
@@ -811,16 +811,17 @@ textarea:hover {
 #rcorners2 {
   border-radius: 25px;
   padding: 20px; 
-  width: 400px;
+  width: auto;
+  max-width: 350px;
   height: relative;  
   text-align: right; 
-  margin-left: 31em; 
   word-wrap:break-word;
 }
 
 #display {
-  height: 459px;
-  padding: 6px;
+  height: 100vh;
+  padding-top: 10px !important;
+  padding: 30px;
 }
 
 .borders {
