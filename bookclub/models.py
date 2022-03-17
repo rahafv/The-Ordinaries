@@ -333,6 +333,7 @@ class Book(models.Model):
 
     def clubs_count(self):
         return self.clubs.all().count()
+     
 
     def calculate_average_rating(self):
         if self.ratings.all().count() != 0:
