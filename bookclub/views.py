@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
+from bookclub.management.excel import Excel
 
 from bookclub.recommender.rec import Recommender
 
@@ -812,6 +813,7 @@ def follow_toggle(request, user_id):
 def search_page(request):
     recommendations = Recommender()
     print(recommendations.get_recommendations(request.user.id, 5))
+    
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
     #     category = request.GET.get('category')

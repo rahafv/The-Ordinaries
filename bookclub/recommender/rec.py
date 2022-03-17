@@ -6,6 +6,8 @@ from bookclub.recommender.evaluator.Evaluator import Evaluator
 from surprise import AlgoBase, KNNBasic, PredictionImpossible
 from surprise import Dataset
 from surprise import Reader
+from surprise import SVD
+from surprise.model_selection import cross_validate
 
 import pandas as pd
 
@@ -19,6 +21,7 @@ import csv
 class Recommender:
     def __init__(self):
         self.trainset = self.load_dataset().build_full_trainset()
+        self.dataset = self.load_dataset()
 
     def load_dataset(self):
         ratingObj = Rating.objects.all()
