@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import reduce
 import math
 from django.shortcuts import redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -10,7 +11,7 @@ from django.conf import settings
 from .models import Event, Rating, User, Club, Book
 from django.db.models.functions import Lower
 from bookclub.recommender.rec import Recommender
-from collections import ChainMap
+from collections import ChainMap, Counter
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -41,9 +42,9 @@ def delete_event(type_of_actor, type_of_action, message, user=None, club=None, m
     event.delete()
 
 class MeetingHelper:
-    def assign_rand_book(self, meeting, request=None):
+    def assign_rand_book(self, meeting, book, request=None):
         if not meeting.book and request:
-            meeting.assign_book()
+            meeting.assign_book(book)
             self.send_email(request=request, 
                 meeting=meeting, 
                 subject='A book has be chosen', 
@@ -236,3 +237,19 @@ class RecommendationHelper:
             books.append(Book.objects.get(id=rec_id))
         
         return books
+
+    def get_club_recommendations(self, num_of_rec, club_id):
+        club = Club.objects.get(id=club_id)
+        members = club.members.order_by("?") #Fix later
+        books = club.books.all() #remove from recommendations
+
+        recommendations =  []
+        for mem in members:
+            recommendations.append(self.get_recommendations(num_of_rec, mem.id))
+
+        all_recommendations = reduce(lambda z, y :z + y, recommendations)
+        counter = Counter(all_recommendations)
+        counter_list = counter.most_common(num_of_rec)
+        final_recommendations = [ seq[0] for seq in counter_list ]
+        return final_recommendations
+

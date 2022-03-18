@@ -690,9 +690,10 @@ def schedule_meeting(request, club_id):
                                                    letter='emails/chooser_reminder.html',
                                                    all_mem=False
                                                    )
+                        rec_book = RecommendationHelper().get_club_recommendations(1, meeting.club.id)[0]
                         deadline = timedelta(7).total_seconds()  # 0.00069444
                         Timer(deadline, MeetingHelper().assign_rand_book,
-                              [meeting, request]).start()
+                              [meeting, rec_book, request]).start()
 
                     create_event('C', 'M', Event.EventType.SCHEDULE,
                                  club=club, meeting=meeting)
@@ -714,10 +715,8 @@ def schedule_meeting(request, club_id):
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
-        read_books = meeting.club.books.all()
-        my_books =  Book.objects.all().exclude(id__in = read_books)
-        sorted_books = sorted(my_books, key=lambda b: (b.average_rating, b.readers_count), reverse=True)[0:24]
-        return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
+        rec_books = RecommendationHelper().get_club_recommendations(8, meeting.club.id)
+        return render(request, 'choice_book_list.html', {'rec_books':rec_books, 'meeting_id':meeting.id})
     else:
         return render(request, '404_page.html', status=404)
 
@@ -812,8 +811,14 @@ def follow_toggle(request, user_id):
 @login_required
 def search_page(request):
     recommendations = RecommendationHelper()
-    print(recommendations.get_recommendations(5, request.user.id, 876))
-    
+    print("----------------------------------------------------------------------------------------------")
+    print("reema: ", recommendations.get_recommendations(5, request.user.id))
+    print("----------------------------------------------------------------------------------------------")
+    print("luois: ", recommendations.get_recommendations(5, 1))
+    print("----------------------------------------------------------------------------------------------")
+    print("club: ", recommendations.get_club_recommendations(5, 102))
+    print("----------------------------------------------------------------------------------------------")
+
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
     #     category = request.GET.get('category')
