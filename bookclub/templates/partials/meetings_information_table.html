@@ -42,12 +42,13 @@
                                         <p>{{meeting.notes}}</p> 
                                        
                                     </td>
+                                    
                                     {%if user == meeting.club.owner %}
                                     {%if not is_previous  %}
-
+                                    
                                     <td>
                                         <button type="button" class="btn btn-lg btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Cancel</button>
-                                    
+                                
                                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                       <div class="modal-dialog">
                                         <div class="modal-content">
