@@ -5,17 +5,19 @@
 {% block body %}
 {% include 'partials/messages.html' %}
 
+<div style="background-color:black; height:100vh">
 
 <div class="container">
     <div class="row py-md-5">
         <div class="col mx-auto">
-          <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
-             <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
+          <h1 class="fw-light center text-white" style="text-align: center;">Genres </h1>
+          <p class="lead text-center " style="color:white;"> Tell us what genres you enjoy to help us give you insightful recommendations </p>
         </div>
     </div>
 
-    <p class="lead text-muted text-center"> Select your favourtie genres</p>
-    <div class="col-sm-8 mx-auto text-center">
+    <div class="col-sm-8 mx-auto text-center text-white">
+        <p class="lead text-center " style="color:white;"> Select your favourtie </p>
+
         <form method=GET action="{% url 'initial_book_list'%}">
             {% for genre in genres %}
                 <label id="genre-label" style="font-size: 20px">
@@ -29,10 +31,12 @@
 
             <div class="text-center">
                 {% include 'partials/bootstrap_form.html' with form=form %}
-                <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Continue </button>
+                <button class="btn btn-outline-light" type="submit" style="align:center;  "> Continue </button>
             </div>
         </form>
 </div>
+</div>
+
 
 {% endblock %}
 

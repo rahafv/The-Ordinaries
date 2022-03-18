@@ -888,10 +888,7 @@ def initial_book_list(request):
         for genre in genres:
             my_books = my_books.filter(genre__contains=genre)
 
-        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-
-    else:
-        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+    sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
 
     list_length = len(current_user.books.all())
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length, 'genres':genres})
