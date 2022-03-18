@@ -53,7 +53,7 @@ urlpatterns = [
     path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
     
-    path('initial_genres/', views.initial_genres, name ='initial_genres'),
+    path('initial_book_list/genres', views.initial_genres, name ='initial_genres'),
     path('initial_book_list/', views.initial_book_list, name ='initial_book_list'),
 
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),

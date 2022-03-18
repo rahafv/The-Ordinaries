@@ -874,13 +874,8 @@ def show_sorted(request, searched, label):
 def initial_genres(request):
     genres = getGenres()
     sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:30]
-    
-    genre = request.GET.get('genre')
-    if genre: 
-        pass
 
-    return render(request, 'initial_genres.html', {'genres':sorted_genres })
-
+    return render(request, 'initial_genres.html', {'genres':sorted_genres})
 
 @login_required
 def initial_book_list(request):
@@ -897,7 +892,6 @@ def initial_book_list(request):
 
     else:
         sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-
 
     list_length = len(current_user.books.all())
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length, 'genres':genres})

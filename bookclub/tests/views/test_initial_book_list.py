@@ -24,7 +24,8 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
             Book.objects.create(
                 ISBN = isbn_num[ctr],
                 title = f'book{book_id} title',
-                author = f'book{book_id} author'
+                author = f'book{book_id} author',
+                genre = f'book{book_id} genre'
             )
             ctr+=1
 
@@ -38,6 +39,18 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         for book_id in range(8):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
+
+    
+    def test_display_books_on_page_filtered_by_genre(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.create_test_books(10)
+        self.form_input = {'genre':'book2 author'}
+        response = self.client.get(self.url, self.form_input)
+        num_of_public_clubs = Book.objects.filter(genre__contains='book2 author').count()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'initial_book_list.html')
+        self.assertEqual(len(response.context['my_books']),num_of_public_clubs)
+
     
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
