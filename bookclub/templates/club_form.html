@@ -1,0 +1,36 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Edit Club Information
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Edit profile</h1>
+      <form action='{% url 'edit_club' club_id=club_id %}' method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" value="Update" class="btn btn-lg btn-outline-dark">
+        <button type="button" class="btn btn-lg btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete</button>
+      </form>
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Are you sure you want to delete {{club.name}}?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-muted">
+              <i><small>Instead, you can transfer ownership to a member of your club!</small></i>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-sm btn btn-secondary">Transfer ownership</a>
+              <a href="{% url 'delete_club' club_id=club_id %}" class="btn btn-sm btn-outline-danger">Yes, delete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -58,8 +58,6 @@ class UserFormTestCase(TestCase):
         form = UserForm(self.form_input)
         self.assertFalse(form.is_valid())
 
-
-
     def test_form_must_save_correctly(self):
         form = UserForm(instance=self.user, data=self.form_input, user = self.user)
         before_count = User.objects.count()

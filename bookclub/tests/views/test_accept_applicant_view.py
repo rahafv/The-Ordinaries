@@ -1,11 +1,11 @@
-"""Tests of the join club view."""
+"""Tests of the accept applicant view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
 
 class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
-    """Test suite for the join club view."""
+    """Test suite for the accept applicant view."""
 
     fixtures = [
         'bookclub/tests/fixtures/default_user.json',

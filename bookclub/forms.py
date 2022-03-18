@@ -265,16 +265,16 @@ class UserForm(forms.ModelForm):
         return self.log_in_user
 
 
-class ClubForm(forms.ModelForm):
-    """Form to update club information."""
+# class ClubForm(forms.ModelForm):
+#     """Form to update club information."""
 
-    class Meta:
-        """Form options."""
+#     class Meta:
+#         """Form options."""
 
-        model = Club
-        fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
-        labels = {'club_type': "Club Privacy Setting:"}
-        exclude = ['owner']
+#         model = Club
+#         fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
+#         labels = {'club_type': "Club Privacy Setting:"}
+#         exclude = ['owner']
 
 class EditRatingForm(forms.ModelForm):
     """Form to update club information."""
@@ -417,4 +417,13 @@ class MeetingForm(forms.ModelForm):
         if not self.cleaned_data.get('cont'):
             meeting.assign_chooser()
         return meeting
-        
+
+#because we are inheriting from Form, it comes with built in security check
+#prevents the user from manually changing the code on the browser before submitting the form
+class TransferOwnershipForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        club_id = kwargs.pop("club_id")
+        user_id = kwargs.pop("user_id")
+        super().__init__(*args, **kwargs)
+        self.fields["new_owner"] = forms.ModelChoiceField(queryset=Club.objects.get(id=club_id).members.all().exclude(id=user_id), label="Please select a new owner")
+        self.fields["confirm"] = forms.BooleanField(label="Please confirm by checking this box", widget=forms.CheckboxInput(attrs={"class": "form-check-input"}))
