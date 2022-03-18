@@ -23,6 +23,7 @@ from threading import Timer
 from django.core.paginator import Paginator
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
+from django.utils.decorators import method_decorator
 
 @login_prohibited
 def welcome(request):
@@ -266,6 +267,7 @@ class BookDetailsView(DetailView, FormMixin):
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
     
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
         
