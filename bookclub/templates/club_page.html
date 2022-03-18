@@ -50,9 +50,21 @@
         </div>
         <div class="col-5">
           <div class="col-7">
-            <!-- UPCOMMING MEETINGS ACCESSIBLE IF MEMBER AND OTHER MEMBER ACCESSIBLE FUNCTIONS -->
-            {% if is_member %}
+            <div class="card text-center">
+              <div class="card-body">
+                <a href="books/" class="btn btn-outline-dark">Book List</a>
+              </div>
+            </div>
             
+            {% if is_member %}
+              <!-- Meeting list dispaly -->
+              <div class="card text-center">
+                <div class="card-body">
+                  <a href='{% url "members_list" club.id %}' class="btn btn-outline-dark"> Member List</a>  
+                </div>
+              </div>
+
+            <!-- UPCOMMING MEETINGS ACCESSIBLE IF MEMBER AND OTHER MEMBER ACCESSIBLE FUNCTIONS -->
             <div class="card text-center">
               <div class="card-body">
                
@@ -91,6 +103,21 @@
                     {%endif%}
                     </div>
             {%endif%}
+
+            {% if user == club.owner %}
+              {% if club.club_type == "Private"%}
+                <div class="card text-center">
+                  <div class="card-body">
+                    <a href="{% url "applicants_list" club.id %}" class="btn btn-outline-dark"> Applicant List</a>  
+                  </div>
+                </div>
+              {% endif %}
+              <div class="card text-center">
+                <div class="card-body">
+                  <a href="{% url 'schedule_meeting' club_id=club.id %}" class="btn btn-outline-dark"> Schedule a meeting </a>  
+                </div>
+              </div>
+            {% endif %}
   
               <div class="card text-center">
                 <div class="card-body">
@@ -126,6 +153,9 @@
                         <b>Awaiting approval!</b>
                     {% endif %}
                   </div>
+                  {% if user == club.owner %}
+                  <a href="transfer_ownership/" class="btn btn-outline-danger">Transfer Ownership</a>
+                  {% endif %}
                 </div>
               </div>
             </div>
