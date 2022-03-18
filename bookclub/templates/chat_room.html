@@ -47,14 +47,6 @@
             <div class="px-4 py-2 bg-purple text-white">
                 <p class="h5 mb-0 py-1">Chats</p>
             </div>
-
-            <div>
-                <form id="search-form" class="d-flex" method=POST>
-                    {% csrf_token %}
-                    <input class="fw-light center form-control" type="search" placeholder="search for chats..." aria-label="Search" name="searched" id="searched"> 
-                    <button type="submit" class="btn btn-link"> <i class="fa fa-search" style="color:black"></i></button>
-                </form>
-            </div>
     
             <div class="messages-box">
                 <div class="list-group rounded-0 scroll" style="max-height:100vh;">
