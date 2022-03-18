@@ -217,7 +217,7 @@ class Command(BaseCommand):
                 
 
     def create_ratings(self):
-        MAX_RATINGS = 100000
+        MAX_RATINGS = 10000
 
         ratings_path = os.path.abspath("book-review-dataset/ratings.csv")
         with open(ratings_path, "r", encoding='latin-1') as csv_file:

@@ -43,7 +43,7 @@ class Recommender:
         return data
 
     def generateCandidates(self, user_id, k=20):
-        similarity_matrix = ContentKNNAlgorithm().fit(self.trainset).compute_similarities()
+        similarity_matrix = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False}).fit(self.trainset).compute_similarities()
 
         user_iid = self.trainset.to_inner_uid(user_id)
         user_ratings = self.trainset.ur[user_iid]
@@ -58,18 +58,23 @@ class Recommender:
             except:
                 continue
 
-        return candidates
+        watched = {}
+        for itemID, rating in self.trainset.ur[user_iid]:
+            watched[itemID] = 1
+
+        return candidates, watched
 
     def get_recommendations(self, user_id, numOfRec):
         recommendations = []
-        candidates = self.generateCandidates(user_id)
+        candidates, watched = self.generateCandidates(user_id)
 
         position = 0
         for itemID, rating_sum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-            recommendations.append(self.getBookName(self.trainset.to_raw_iid(itemID)))
-            position += 1
-            if (position > numOfRec): 
-                break 
+            if not itemID in watched:
+                recommendations.append(self.trainset.to_raw_iid(itemID))
+                position += 1
+                if (position > numOfRec): 
+                    break 
 
         return recommendations 
 

@@ -1,3 +1,5 @@
+from collections import defaultdict
+import math
 from django.shortcuts import redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
@@ -5,8 +7,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail 
 import six
 from django.conf import settings
-from .models import Event, User, Club, Book
+from .models import Event, Rating, User, Club, Book
 from django.db.models.functions import Lower
+from bookclub.recommender.rec import Recommender
+from collections import ChainMap
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -133,3 +137,102 @@ def get_list_of_objects(searched, label):
     return {
         "category" : category, 
         "filtered_list" : filtered_list}
+
+class RecommendationHelper:
+    def get_recommendations(self, num_of_rec, user_id, book_id=None):
+        recommendations = []
+        if not book_id:
+            if Rating.objects.filter(user_id=user_id):
+                recommender = Recommender()
+                recommendations = recommender.get_recommendations(user_id, num_of_rec)
+                
+            else:
+                recommendations = self.get_genre_recommendations(user_id)[:num_of_rec]
+        
+        else:
+            recommendations = list(self.get_book_recommendations(user_id, book_id).keys())[:num_of_rec]
+            
+        return self.get_books(recommendations)
+
+    def get_book_recommendations(self, user_id, book_id):
+        book = Book.objects.get(id=book_id)
+        user = User.objects.get(id=user_id)
+        books = user.books.all()
+        all_books = Book.objects.all().exclude(id__in=books).exclude(id=book.id)
+
+        genres = self.getGenres()
+        similarity = {}    
+        for b in all_books:
+            num = self.computeGenreSimilarity(book.id, b.id, genres)
+            if num > 0:
+                similarity[b.id] = num
+
+        sorted_similarity = dict(sorted(similarity.items(), reverse=True, key=lambda item: item[1]))
+        return sorted_similarity
+
+    def get_genre_recommendations(self, user_id):
+        user = User.objects.get(id=user_id)
+        books = user.books.all()
+
+        similarity = []   
+        for book in books:
+            sim = self.get_book_recommendations(user_id, book.id)
+            similarity.append(sim)
+        
+        similarity = ChainMap(*similarity)
+        sorted_similarity = sorted(similarity, reverse=True, key=similarity.get)
+        return sorted_similarity
+
+    def computeGenreSimilarity(self, book1, book2, genres):
+        genres1 = genres[book1]
+        genres2 = genres[book2]
+        sumxx, sumxy, sumyy = 0, 0, 0
+        for i in range(len(genres1)):
+            x = genres1[i]
+            y = genres2[i]
+            sumxx += x * x
+            sumyy += y * y
+            sumxy += x * y
+        
+        if sumxx*sumyy == 0:
+            return 0
+
+        return sumxy/math.sqrt(sumxx*sumyy)
+
+    def getGenres(self):
+        genres = defaultdict(list)
+        genreIDs = {}
+        maxGenreID = 0
+        books = Book.objects.all()
+        
+        for book in books:
+            book_id = book.id
+            genreList = book.genre.split(',')
+            genreIDList = []
+            
+            for genre in genreList:
+                if genre in genreIDs:
+                    genreID = genreIDs[genre]
+                else:
+                    genreID = maxGenreID
+                    genreIDs[genre] = genreID
+                    maxGenreID += 1
+                genreIDList.append(genreID)
+            
+            genres[book_id] = genreIDList
+        
+        # Convert integer-encoded genre lists to bitfields that we can treat as vectors
+        for (book_id, genreIDList) in genres.items():
+            bitfield = [0] * maxGenreID
+            for genreID in genreIDList:
+                bitfield[genreID] = 1
+            genres[book_id] = bitfield            
+        
+        return genres
+
+    def get_books(self, recommendations):
+        books = []
+        for rec_id in recommendations:
+            books.append(Book.objects.get(id=rec_id))
+        
+        return books

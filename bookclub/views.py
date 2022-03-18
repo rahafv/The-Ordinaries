@@ -11,7 +11,7 @@ from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
+from .helpers import RecommendationHelper, delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse
@@ -811,8 +811,8 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = Recommender()
-    print(recommendations.get_recommendations(request.user.id, 5))
+    recommendations = RecommendationHelper()
+    print(recommendations.get_recommendations(5, request.user.id, 876))
     
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
