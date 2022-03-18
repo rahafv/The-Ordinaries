@@ -22,6 +22,7 @@ from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
+from notifications.signals import notify
 
 
 @login_prohibited
@@ -53,6 +54,8 @@ def home(request):
     first_ten = final_club_events[0:10]
 
     club_events_length = len(first_ten)
+
+  
 
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
@@ -797,9 +800,11 @@ def follow_toggle(request, user_id):
     if(not current_user.is_following(followee)):
         create_event('U', 'U', Event.EventType.FOLLOW,
                      current_user, action_user=followee)
+        notify.send(current_user, recipient=followee, verb='followed you', action_object=followee )
     else:
         delete_event('U', 'U', Event.EventType.FOLLOW,
                      current_user, action_user=followee)
+        notify.send(current_user, recipient=followee, verb='unfollowed you')
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 

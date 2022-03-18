@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from bookclub import views
 from django.conf.urls import url , handler404
 from django.conf import settings
 from django.views.static import serve
+import notifications.urls
 
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
         {'document_root': settings.MEDIA_ROOT}),
     url(r'^static/(?P<path>.*)$', serve,
         {'document_root': settings.STATIC_ROOT}),
+    url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
 
 
     path('admin/', admin.site.urls),
