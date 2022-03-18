@@ -136,7 +136,7 @@ def log_in(request):
             if user:
                 login(request, user)
                 if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_book_list'
+                    redirect_url = next or 'initial_genres'
                 else:
                     redirect_url = next or 'home'
                 return redirect(redirect_url)
