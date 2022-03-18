@@ -7,36 +7,31 @@
 
 
 <div class="container">
-
     <div class="row py-md-5">
         <div class="col mx-auto">
           <h1 class="fw-light center" style="text-align: center;">Trending now ...</h1>
              <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
         </div>
     </div>
-    <p class="lead text-muted text-center"> Choose your favourtie genres</p>
-    <div class="text-center">
-        <div class="col-sm-8 mx-auto">
 
+    <p class="lead text-muted text-center"> Select your favourtie genres</p>
+    <div class="col-sm-8 mx-auto text-center">
         <form method=GET action="{% url 'initial_book_list'%}">
-                  
             {% for genre in genres %}
                 <label id="genre-label" style="font-size: 20px">
                     <input type="checkbox" name="genre" value={{genre}}>
                     <span class="y">{{genre}}</span>
                     <span class="n">{{genre}}</span>
-                  </label>
+                </label>
             {% endfor %}
-        </div>
     </div>
             <br>
+
             <div class="text-center">
-            {% include 'partials/bootstrap_form.html' with form=form %}
-            <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Continue </button>
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Continue </button>
             </div>
         </form>
-
-    </div>
 </div>
 
 {% endblock %}

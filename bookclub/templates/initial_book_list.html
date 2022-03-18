@@ -13,16 +13,15 @@
          <p class="lead text-muted text-center"> Tell us what titles you enjoy to help us give you insightful recommendations!</p>
          <p class="lead text-muted text-center"> You need to add 3 books to your list to Continue</p>
     </div>
-    {% comment %} {% if genres %}
+</div>
+<div class="row py-md-5">
+    {% if genres %}
     <p class="lead text-center"> <b>Selected genres: </b> 
        {% for genre in genres %}
            {{genre}} 
        {% endfor %}
    </p>
-   {% endif %} {% endcomment %}
-</div>
-<div class="row py-md-5">
-        
+   {% endif %}
         {% if my_books.count == 0 %}
         <div class=" text-center">
             <p class="lead text-muted text-center">Try different genres</p>
