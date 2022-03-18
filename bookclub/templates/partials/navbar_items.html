@@ -41,7 +41,11 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 {% for notification in  request.user.notifications.unread %}
                 <div>
-                <a id="notiBla" href='{% url 'profile'  notification.actor.id %}' onclick="readMessage()" >{{ notification.actor }} </a> {{notification.verb}} 
+                <a id="notiBla" href='{% url 'profile'  notification.actor.id %}' onclick="readMessage()">{{ notification.actor }}</a>
+                {{notification.verb}} 
+                {%if notification.action_object%} <a href='{% url 'club_page'  notification.action_object.id %}'>
+                         {{notification.action_object.name}}</a> {%endif%}
+
                   </div>
                   <div class="dropdown-divider"></div>
               {% endfor %}

@@ -392,6 +392,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
+            notify.send(user, recipient=club.owner, verb='applied to your club')
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
@@ -568,6 +569,7 @@ def accept_applicant(request, club_id, user_id):
         club.applicants.remove(applicant)
         create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
+        notify.send(current_user, recipient=applicant, verb='accepted you into ', action_object=club )
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -583,6 +585,7 @@ def reject_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.applicants.remove(applicant)
         messages.add_message(request, messages.WARNING, "Applicant rejected!")
+        notify.send(current_user, recipient=applicant, verb='rejected you from ', action_object=club)
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -800,7 +803,7 @@ def follow_toggle(request, user_id):
     if(not current_user.is_following(followee)):
         create_event('U', 'U', Event.EventType.FOLLOW,
                      current_user, action_user=followee)
-        notify.send(current_user, recipient=followee, verb='followed you', action_object=followee )
+        notify.send(current_user, recipient=followee, verb='followed you' )
     else:
         delete_event('U', 'U', Event.EventType.FOLLOW,
                      current_user, action_user=followee)
