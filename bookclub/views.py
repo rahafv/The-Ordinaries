@@ -21,8 +21,8 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
-
+from django.views.generic import DetailView, FormView, ListView, UpdateView
+from django.views.generic.edit import FormMixin
 
 @login_prohibited
 def welcome(request):
@@ -259,23 +259,51 @@ def add_book(request):
     return render(request, "add_book.html", {"form": form})
 
 
-@login_required
-def book_details(request, book_id):
-    book = get_object_or_404(Book.objects, id=book_id)
-    numberOfRatings=book.ratings.all().count()
-    form = RatingForm()
-    user = request.user
-    check_reader = book.is_reader(user)
-    reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
-    rating = book.ratings.all().filter(user=request.user)
-    if rating:
-        rating = rating[0]
-    reviews_count = book.ratings.all().exclude(
-        review="").exclude(user=request.user).count()
-    context = {'book': book, 'form': form,
-               'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
-    return render(request, "book_details.html", context)
+class BookDetailsView(DetailView, FormMixin):
+    model = Book
+    template_name = 'book_details.html'
+    context_object_name = 'book'
+    form_class = RatingForm
+    pk_url_kwarg = 'book_id'
+    
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+        
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        user = self.request.user
+        book = self.get_object()
+        rating = book.ratings.all().filter(user=user)
+        if rating:
+            rating = rating[0]
+        
+        context['book'] = book
+        context['form'] = RatingForm()
+        context['rating'] = rating
+        context['reviews'] = book.ratings.all().exclude(review='').exclude(user=user)
+        context['reviews_count'] = book.ratings.all().exclude(review='').exclude(user=user).count()
+        context['reader'] = book.is_reader(user)
+        context['numberOfRatings'] = book.ratings.all().count()
+        return context
+
+
+# @login_required
+# def book_details(request, book_id):
+#     book = get_object_or_404(Book.objects, id=book_id)
+#     numberOfRatings=book.ratings.all().count()
+#     form = RatingForm()
+#     user = request.user
+#     check_reader = book.is_reader(user)
+#     reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
+#     rating = book.ratings.all().filter(user=request.user)
+#     if rating:
+#         rating = rating[0]
+#     reviews_count = book.ratings.all().exclude(
+#         review="").exclude(user=request.user).count()
+#     context = {'book': book, 'form': form,
+#                'rating': rating, 'reviews': reviews,
+#                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
+#     return render(request, "book_details.html", context)
 
 
 @login_required
