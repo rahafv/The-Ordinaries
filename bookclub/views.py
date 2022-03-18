@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse
@@ -23,6 +23,8 @@ from threading import Timer
 from django.core.paginator import Paginator
 from django.db.models.functions import Lower
 from notifications.signals import notify
+from notifications.utils import slug2id
+from notifications.models import Notification
 
 
 @login_prohibited
@@ -392,7 +394,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
-            notify.send(user, recipient=club.owner, verb='applied to your club')
+            notify.send(user, recipient=club.owner, verb='applied to your club', action_object=club )
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
@@ -926,4 +928,12 @@ def previous_meetings_list(request, club_id):
     meetings_list = meetings_pg.get_page(page_number)
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
 
+
+@login_required
+def mark_as_read(request, slug=None):
+    notification_id = slug2id(slug)
+    notification = get_object_or_404(
+        Notification, recipient=request.user, id=notification_id)
+    notification.mark_as_read()
+    return get_appropriate_redirect(notification)
 

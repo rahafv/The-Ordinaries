@@ -7,6 +7,8 @@ import six
 from django.conf import settings
 from .models import Event, User, Club, Book
 from django.db.models.functions import Lower
+import re
+
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -133,3 +135,26 @@ def get_list_of_objects(searched, label):
     return {
         "category" : category, 
         "filtered_list" : filtered_list}
+
+
+def get_appropriate_redirect(notification):
+
+    action_name = notification.verb
+
+
+    if action_name == "applied to your club":
+        return redirect('applicants_list', club_id=notification.action_object.id)
+
+    elif action_name == "accepted you into":
+        return redirect('club_page', club_id=notification.action_object.id)
+
+    elif action_name == "rejected you from":
+        return redirect('club_page', club_id=notification.action_object.id)
+
+    elif action_name == "followed you":
+        return redirect('profile', user_id=notification.actor.id)
+
+    elif action_name == "unfollowed you" or action_name == "Leave":
+        return redirect('profile', user_id=notification.actor.id)
+    else:
+        raise BaseException
