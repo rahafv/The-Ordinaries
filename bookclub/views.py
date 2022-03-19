@@ -266,6 +266,8 @@ def add_book(request):
 @login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
+    recommendations = RecommendationHelper()
+    recs = recommendations.get_recommendations(4, request.user.id, book.id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
@@ -278,7 +280,7 @@ def book_details(request, book_id):
         review="").exclude(user=request.user).count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
+               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings, 'recs':recs}
     return render(request, "book_details.html", context)
 
 
@@ -770,8 +772,6 @@ def add_book_to_list(request, book_id):
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
-
-
 
 @login_required
 def edit_review(request, review_id):
