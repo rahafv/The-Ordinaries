@@ -2,9 +2,6 @@
 {% block title %}{{ club.name }}{% endblock %}
 {% block content %}
 
-
-
-
 <div class="container mt-5">
   <div class="row">
       <div class="col-lg-4 pb-5 mx-0">
@@ -41,51 +38,6 @@
                     <a class="list-group-item" href='{% url "members_list" club.id %}'> 
                     <i class="fe-icon-user text-muted"></i>Member List</a>  
                   {% endif %}
-                  
-                  {% if is_member %}
-                  <div class="list-group-item">
-                    <h4  class="mb-3">Upcoming meeting:</h4>
-                    <div class="card card-body  pb-0">
-                      <!-- UPCOMMING MEETING WITH SELECTED BOOK -->
-                      {%if upcoming_meeting %}
-                        <p>Title: {{ upcoming_meeting.title }}</p>
-                        <p>Time: {{ upcoming_meeting.time }}</p>
-
-                        {% if upcoming_meeting.book %}
-                            Book Title : 
-                            <a href='{% url 'book_details' upcoming_meeting.book.id %}' style = "color:black;"> 
-                              {{upcoming_meeting.book.title}}
-                            </a>
-                            <div class="profile-img">
-                              <img src="{{ upcoming_meeting.book.image_url }}"  width="110" height="150" class="mt-2 mb-3"/>
-                            </div>
-                            <!-- UPCOMING MEETING WITHOUT A SELECTED BOOK YET -->
-
-                        {% else %}
-                            <!--BOOK CHOOSING LINK FOR MEMBER WHOSE TURN IT IS -->
-                            Book:
-                            {%if user != upcoming_meeting.chooser%}
-                                <a> No book has been chosen yet.. </a> 
-
-                            {% else %}
-                              <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> 
-                                Choose book
-                              </a>
-
-                            {% endif %} 
-                            <!-- NOTES FOR THE MEETING-->
-                            <p class="mt-2"> Link: <a href= "{{upcoming_meeting.link}}"> meeting link </a></p>
-                            <p>Notes: {{ upcoming_meeting.notes }}</p>
-                        {% endif %}
-
-                      {%else %}
-                        <a class = "mb-3"> No meeting has been scheduled yet.. </a> 
-                      {%endif%}
-                    </div>
-                        <a class="list-group-item" href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a>
-                  </div>
-                  {% endif %}
-
                 
                   <!--APPLICANTS LIST BUTTON-->
                   {% if user == club.owner %}
@@ -211,12 +163,12 @@
           </div>
         </div>
         <hr></hr>
-        <div class="row">
+        <div class="w-100"></div>
             {% if is_member %}
               <div class="list-group-item">
                 <h4  class="mb-3">Upcoming meeting:</h4>
                 <div class="card card-body  pb-0">
-                  <div class = 'row'>
+                  <div class = "row justify-content-around">
 
                       <!-- UPCOMING MEETING WITH SELECTED BOOK -->
                       {%if upcoming_meeting %}
@@ -261,14 +213,12 @@
                 </div>
               </div>
               <a class="list-group-item" href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a>
-
             {% endif %}
-        </div>
       </div>
-      
-      
   </div>
 </div>
 
+<br/>
+</br>
 
 {% endblock %}
