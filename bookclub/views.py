@@ -927,6 +927,14 @@ def cancel_meeting(request, meeting_id):
     if (user == club.owner ):
         meeting.delete()
         messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
+
+        """send email invites"""
+        MeetingHelper().send_email(request=request, 
+                                    meeting=meeting,
+                                    subject='A meeting has been cancelled ',
+                                    letter='emails/meeting_cancelation_email.html',
+                                    all_mem=True)
+
         return redirect('meetings_list', club.id)
     else:
         messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
