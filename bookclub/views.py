@@ -23,12 +23,10 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.utils.decorators import method_decorator
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import  DetailView, SingleObjectMixin
 from django.views.generic.base import TemplateView
-from django.views.generic.list import MultipleObjectMixin
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -389,7 +387,7 @@ class ProfileUpdateView(LoginRequiredMixin,UpdateView):
         messages.add_message(self.request, messages.SUCCESS, "Profile updated!")
         return reverse('profile')
 
-#It does not render any html at all, it is just data processing
+
 """Enable user to join a club."""
 @login_required
 def join_club(request, club_id):
@@ -416,7 +414,7 @@ def join_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
-#It does not render any html at all, it is just data processing
+
 """Enable a user to withdraw from a club."""
 @login_required
 def withdraw_club(request, club_id):
@@ -679,7 +677,7 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         """Return URL to redirect the user to after valid form handling."""
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
-#has security risk of being able to transfer ownership to non-member manually from google chrome because we are not using django form which automatcally validates the data
+
 @login_required
 def transfer_club_ownership(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -700,7 +698,7 @@ def transfer_club_ownership(request, club_id):
             return redirect('club_page', club_id = club.id)
     return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
 
-#UpdateView generates the form automatically
+
 class EditClubInformationView(LoginRequiredMixin, UpdateView):
     """View that handles club information change requests."""
     model = Club
@@ -764,7 +762,7 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
     def form_valid(self, form):
         """Process valid form."""
         meeting = form.save()
-        #send email invites#
+        #send email invites
         MeetingHelper().send_email(request=self.request, 
             meeting=meeting, 
             subject='A New Meeting Has Been Scheduled', 
@@ -783,53 +781,10 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
             deadline = timedelta(7).total_seconds() #0.00069444
             Timer(deadline, MeetingHelper().assign_rand_book, [meeting, self.request]).start()
 
-        #club = get_object_or_404(Club.objects, id=self.club_id)
         create_event('C', 'M', Event.EventType.SCHEDULE, club=self.club, meeting=meeting)
         messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")
         return redirect('club_page', club_id=self.club_id)
 
-
-# @login_required
-# def schedule_meeting(request, club_id):
-#     club = get_object_or_404(Club.objects, id=club_id)
-#     if request.user == club.owner:
-#         if club.members.count() > 1:
-#             if request.method == 'POST':
-#                 form = MeetingForm(club, request.POST)
-
-#                 if form.is_valid():
-#                     meeting = form.save()
-                    
-#                     """send email invites"""
-#                     MeetingHelper().send_email(request=request, 
-#                         meeting=meeting, 
-#                         subject='A New Meeting Has Been Scheduled', 
-#                         letter='emails/meeting_invite.html', 
-#                         all_mem=True
-#                     )
-
-#                     if meeting.chooser:
-#                         """send email to member who has to choose a book"""
-#                         MeetingHelper().send_email(request=request, 
-#                             meeting=meeting, 
-#                             subject='It Is Your Turn!', 
-#                             letter='emails/chooser_reminder.html', 
-#                             all_mem=False
-#                         )
-#                         deadline = timedelta(7).total_seconds() #0.00069444
-#                         Timer(deadline, MeetingHelper().assign_rand_book, [meeting, request]).start()
-
-#                     create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
-#                     messages.add_message(request, messages.SUCCESS, "Meeting has been scheduled!")
-#                     return redirect('club_page', club_id=club.id)
-#             else:
-#                 form = MeetingForm(club)
-#             return render(request, 'schedule_meeting.html', {'form': form, 'club_id':club.id})
-#         else:
-#             messages.add_message(request, messages.ERROR, "There are no members!")
-#             return redirect('club_page', club_id=club.id)
-#     else:
-#         return render(request, '404_page.html', status=404) 
 
 class ChoiceBookListView(LoginRequiredMixin, TemplateView):
     template_name = "choice_book_list.html"
@@ -846,17 +801,6 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
         else:
             raise Http404
         
-
-# @login_required 
-# def choice_book_list(request, meeting_id):
-#     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-#     if request.user == meeting.chooser and not meeting.book:
-#         read_books = meeting.club.books.all()
-#         my_books =  Book.objects.all().exclude(id__in = read_books)
-#         sorted_books = sorted(my_books, key=lambda b: (b.average_rating(), b.readers_count()), reverse=True)[0:24]
-#         return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
-#     else:
-#         return render(request, '404_page.html', status=404) 
 
 class SearchBookView(LoginRequiredMixin, ListView):
     template_name = "choice_book_list.html"
@@ -884,25 +828,7 @@ class SearchBookView(LoginRequiredMixin, ListView):
             context["meeting_id"] = self.meeting_id
             return context
         else:
-            raise Http404
-    
-
-# @login_required
-# def search_book(request, meeting_id):
-#     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-#     if request.method == 'GET' and request.user == meeting.chooser and not meeting.book:
-#         searched = request.GET.get('searched', '')
-#         books = Book.objects.filter(title__contains=searched)
-
-#         pg = Paginator(books, settings.BOOKS_PER_PAGE)
-#         page_number = request.GET.get('page')
-#         books = pg.get_page(page_number)
-#         return render(request, 'choice_book_list.html', {'searched':searched, "books":books, 'meeting_id':meeting_id})
-#     else: 
-#         return redirect('choice_book_list', meeting_id=meeting_id)
-
-
-#does not have anything to load, data processing only
+            raise Http404   
  
 
 @login_required
@@ -957,7 +883,6 @@ def edit_review(request, review_id ):
             form = EditRatingForm(instance = review)
     else:
         return render(request, '404_page.html', status=404)
-        #return redirect('handler404')
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
@@ -1025,7 +950,6 @@ def add_book_from_initial_list(request, book_id):
     book.add_reader(user)
     return redirect("initial_book_list")
 
-#This is only redirects
 """Enables an owner to delete their club."""
 @login_required
 def delete_club(request, club_id):

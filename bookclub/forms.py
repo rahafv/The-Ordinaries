@@ -418,8 +418,6 @@ class MeetingForm(forms.ModelForm):
             meeting.assign_chooser()
         return meeting
 
-#because we are inheriting from Form, it comes with built in security check
-#prevents the user from manually changing the code on the browser before submitting the form
 class TransferOwnershipForm(forms.Form):
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop("club_id")
