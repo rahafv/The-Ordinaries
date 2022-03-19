@@ -10,31 +10,18 @@ background-color: #fff;
 box-shadow: 0 12px 20px 1px rgba(64, 64, 64, .09);
 }
 .club-details-card .club-details-card-cover {
-position: relative;
-background-color: #284664;
-width: 100%;
-height: 100px;
-background-position: center;
-background-repeat: no-repeat;
-background-size: cover;
+  position: relative;
+  background-image: url(images/clubPageCover.png);
+  width: 100%;
+  height: 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
 }
-/* .club-details-card .club-details-card-cover::after {
-display: block;
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-content: '';
-opacity: 0.5;
-} */
-
-/* .club-details-card .club-details-card-cover > .btn {
-position: absolute;
-top: 12px;
-right: 12px;
-padding: 0 10px;
-} */
 
 .club-details-card .club-details-card-profile {
 display: table;
@@ -81,33 +68,21 @@ padding-left: 15px;
 .list-group-item.active:not(.disabled) {
   border-color: #e7e7e7;
   background: #fff;
-  color: #ac32e4;
+  color: #284664;
   cursor: default;
   pointer-events: none;
 }
 
 
-
-/* .list-group-item.active {
-  z-index: 2;
-  color: #fff;
-  background-color: #007bff;
-  border-color: #007bff;
-} */
-
-
-
 .list-group-item {
   padding-top: 16px;
   padding-bottom: 16px;
-  -webkit-transition: all .3s;
-  transition: all .3s;
-  border: 1px solid #e7e7e7 !important;
-  border-radius: 0 !important;
+  border: 1px solid #ddd;
+  border-radius: 2px;
   color: #404040;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: .08em;
+  letter-spacing: .4px;
   text-transform: uppercase;
   text-decoration: none;
 }
@@ -122,7 +97,7 @@ padding-left: 15px;
 } */
 
 .list-group-item.active:not(.disabled)::before {
-  background-color: #ac32e4;
+  background-color: #284664;
 }
 
 .list-group-item::before {
@@ -136,102 +111,15 @@ padding-left: 15px;
   content: '';
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-.book-nav{
-  margin-top:3rem;   
-}
-
-.book-info{
-  margin-top: 10rem;
-}
-
-.book-heading img {
-  margin-top: -20px;
-}
-p.genre-overflow{
-  overflow-wrap: break-word;
-  
-}
-.bio-graph-heading {
-  background: #284664;
+.club-panel{
+  background-color: #284664;
+  padding: 10px 20px 10px 20px;
   color: #fff;
-  padding: 40px 10px 30px 19px;
-  border-radius: 10px 10px 0px 0px;
-  -webkit-border-radius: 10px 10px 0 0;
-  font-size: 16px;
-  font-weight: 300;
-}
-.bio-row {
-  width: 50%;
-  float: left;
-  display: inline-flex;
-}
-.centered {
-  justify-content: space-evenly;
-}
-.bio-row h4{
-  font-size: 20px;
-}
-.bio-graph-info {
-  color: #25211e;
 }
 
-.bio-graph-info h4 {
-  font-size: 2rem;
-  font-weight: 200;
-}
 
-.bio-chart{
-  float: left;
-  width: 40%;
-  border: #284664;
-  margin-left: 30px;
-  margin-right: -30px;
-}
 
-.bio-desk{
-  float: left;
-  width: 40%;
-  border: #284664;
-  padding: 0px 0px;
-}
 
-.canvas-statistics{
-  background: #284664;
-  color: #fff;
-  padding: 0px 0px;
-  border-radius: 4px 4px 0px 0px;
-  -webkit-border-radius: 4px 4px 0 0;
-}
-
-.count-canvas{
-  width: 54px; 
-  height: 33px; 
-  position: absolute; 
-  vertical-align: middle; 
-  margin-top: 33px; 
-  margin-left: -77px; 
-  border: 0px; 
-  font-weight: bold; 
-  font-style: normal; 
-  font-variant: normal; 
-  font-stretch: normal; 
-  font-size: 20px; 
-  line-height: normal; 
-  -webkit-appearance: none; 
-  background: none;
-}
 
 
 /* Colours */
@@ -379,7 +267,7 @@ body {
 }
 .account-block {
     padding: 0;
-    background-image: url(images/signupgradient.jpg);
+    background-image: url(images/signupgradient.jpeg);
     background-repeat: no-repeat;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -518,6 +406,93 @@ section {
     margin-bottom: 1.5rem!important;
 }
 
+/*
+* BOOK PAGE
+*/
+.book-nav{
+  margin-top:3rem;   
+}
+
+.book-info{
+  margin-top: 10rem;
+}
+
+.book-heading img {
+  margin-top: -20px;
+}
+p.genre-overflow{
+  overflow-wrap: break-word;
+  
+}
+.bio-graph-heading {
+  background: #284664;
+  color: #fff;
+  padding: 40px 10px 30px 19px;
+  border-radius: 10px 10px 0px 0px;
+  -webkit-border-radius: 10px 10px 0 0;
+  font-size: 16px;
+  font-weight: 300;
+}
+.bio-row {
+  width: 50%;
+  float: left;
+  display: inline-flex;
+}
+.centered {
+  justify-content: space-evenly;
+}
+.bio-row h4{
+  font-size: 20px;
+}
+.bio-graph-info {
+  color: #25211e;
+}
+
+.bio-graph-info h4 {
+  font-size: 2rem;
+  font-weight: 200;
+}
+
+.bio-chart{
+  float: left;
+  width: 40%;
+  border: #284664;
+  margin-left: 30px;
+  margin-right: -30px;
+}
+
+.bio-desk{
+  float: left;
+  width: 40%;
+  border: #284664;
+  padding: 0px 0px;
+}
+
+.canvas-statistics{
+  background: #284664;
+  color: #fff;
+  padding: 0px 0px;
+  border-radius: 4px 4px 0px 0px;
+  -webkit-border-radius: 4px 4px 0 0;
+}
+
+.count-canvas{
+  width: 54px; 
+  height: 33px; 
+  position: absolute; 
+  vertical-align: middle; 
+  margin-top: 33px; 
+  margin-left: -77px; 
+  border: 0px; 
+  font-weight: bold; 
+  font-style: normal; 
+  font-variant: normal; 
+  font-stretch: normal; 
+  font-size: 20px; 
+  line-height: normal; 
+  -webkit-appearance: none; 
+  background: none;
+}
 
 
 
@@ -537,6 +512,9 @@ a:link {
   text-decoration: none;
 }
 
+/*
+* PROFILE PAGE
+*/
 
 .name-and-edit {
   display:inline-flex;
@@ -999,8 +977,8 @@ input:hover {
 } 
 
 textarea {
-  width: 200px;
-  max-width: 330px;
+  width: 470px;
+  max-width: 470px;
   height: 110px;
   max-height: 110px;
   padding: 15px;

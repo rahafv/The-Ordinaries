@@ -2,15 +2,17 @@
 {% block title %}{{ club.name }}{% endblock %}
 {% block content %}
 
+
+
+
 <div class="container mt-5">
   <div class="row">
-      <div class="col-lg-4 pb-5">
-          <!-- Account Sidebar-->
+      <div class="col-lg-4 pb-5 mx-0">
+          <!-- Club Sidebar-->
           <div class="club-details-card pb-3">
               <div class="club-details-card-cover"></div>
               <div class="club-details-card-profile">
                   <div class="club-details-card-avatar">
-                      <img src = url(images/3.png)/>
                   </div>
                   <div class="club-details-card-details">
                       <h3 class="club-details-card-name text-lg">{{club.name}} 
@@ -46,7 +48,6 @@
                     <div class="card card-body  pb-0">
                       <!-- UPCOMMING MEETING WITH SELECTED BOOK -->
                       {%if upcoming_meeting %}
-
                         <p>Title: {{ upcoming_meeting.title }}</p>
                         <p>Time: {{ upcoming_meeting.time }}</p>
 
@@ -73,7 +74,7 @@
 
                             {% endif %} 
                             <!-- NOTES FOR THE MEETING-->
-                            <p class="mt-2"> Link: <a href={{ upcoming_meeting.link }} > meeting link </a></p>
+                            <p class="mt-2"> Link: <a href= "{{upcoming_meeting.link}}"> meeting link </a></p>
                             <p>Notes: {{ upcoming_meeting.notes }}</p>
                         {% endif %}
 
@@ -100,14 +101,14 @@
                   {% endif %}
                     <!-- TRANSFER OWNERSHIP -->
                   {% if user == club.owner %}
-                    <a class="list-group-item" href="transfer_ownership/" class="btn btn-outline-danger">
-                      <i class="fe-icon-map-pin text-muted"></i>Transfer Ownership
+                    <a class="list-group-item" href="transfer_ownership/">
+                      <i class="fe-icon-map-pin"></i>Transfer Ownership
                     </a>
                   {% endif %}
                     <!-- WITHDRAW BUTTON-->
                   {% if not user == club.owner and is_member%}
-                    <a class="list-group-item" href="{% url 'withdraw_club' club_id=club.id %}" class="btn btn-outline-warning">
-                      <i class="fe-icon-map-pin text-muted"></i>Withdraw from club
+                    <a class="list-group-item " href="{% url 'withdraw_club' club_id=club.id %}">
+                      <i class="fe-icon-map-pin" ></i>Withdraw from club
                     </a>
                   {% endif %}   
 
@@ -115,13 +116,13 @@
                   {% if not user == club.owner and not is_member and not is_applicant%}
                       {% if user.city == club.city %}
 
-                        <a  class="list-group-item" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" >
-                          <i class="fe-icon-map-pin" style="text-color:green;"></i>Join club
+                        <a  class="list-group-item" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
+                          <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
                       {% else %}
                         <a  class="list-group-item"  href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                          <i class="fe-icon-map-pin" style="text-color:green;"></i>Join club
+                          <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
                         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -164,49 +165,108 @@
           </div>
       </div>
       <!-- Club Information -->
-      <div class="col-lg-8 pb-5">
-          <form class="row">
-              <div class="col-md-6">
-                  <div class="form-group">
-                      <label for="club-theme">Club Theme</label>
-                      <input disabled class="form-control" type="text" id="club-theme" value="{{club.theme}}">
-                  </div>
+      
+      <div class="col-lg-8 pb-2">
+        <div class = "club-panel p-3">
+          <div class="row ">
+  
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                  <label class="mb-2" for="club-theme">Club Theme</label>
+                  <input disabled readonly class="form-control" type="text" id="club-theme" value="{{club.theme}}">
               </div>
-              <div class="col-md-6">
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                  <label class="mb-2" for="account-confirm-pass">Meeting type</label>
+                  <input disabled readonly class="form-control" type="text" id="club-meeting-type" value = "{{club.meeting_type}}">
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                  <label class="mb-2" for="club-type">Club Type</label>
+                  <input disabled readonly class="form-control"  id="club-type" value="{{club.club_type}}">
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-group">
+                  <label class="mb-2" for="club-setting">Club Privacy Settings</label>
+                  <input disabled readonly class="form-control" type="text" id="club-setting" value = "{{club.club_type}}">
+              </div>
+            </div>
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label for="account-confirm-pass">Meeting type</label>
-                    <input disabled class="form-control" type="text" id="club-meeting-type" value = "{{club.meeting_type}}">
+                    <label class="mb-2" for="club-city">Club City</label>
+                    <input disabled readonly class="form-control" type="text" id="club-city" value="{{club.city}}" >
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-2" for="club-country">Club Country</label>
+                    <input disabled readonly class="form-control" type="text" id="club-countryl" value="{{club.country}}">
+                </div>
+                <br/>
+            </div>
+            
+          </div>
+        </div>
+        <hr></hr>
+        <div class="row">
+            {% if is_member %}
+              <div class="list-group-item">
+                <h4  class="mb-3">Upcoming meeting:</h4>
+                <div class="card card-body  pb-0">
+                  <div class = 'row'>
+
+                      <!-- UPCOMING MEETING WITH SELECTED BOOK -->
+                      {%if upcoming_meeting %}
+                        <div class = "col-md-6">
+                          <p>Title: {{ upcoming_meeting.title }}</p>
+                          <p>Time: {{ upcoming_meeting.time }}</p>  
+                          <p class="mt-2"> 
+                            Link: <a href="{{upcoming_meeting.link}}"> meeting link </a>
+                          </p>
+                          <p>Notes: {{ upcoming_meeting.notes }}</p>
+                        </div>
+                        <div class = "col-md-6">
+                          {% if upcoming_meeting.book %}
+                            Book Title : 
+                            <a href='{% url 'book_details' upcoming_meeting.book.id %}' style = "color:black;"> 
+                              {{upcoming_meeting.book.title}}
+                            </a>
+                            <div class="profile-img">
+                              <img src="{{ upcoming_meeting.book.image_url }}"  width="110" height="150" class="mt-2 mb-3"/>
+                            </div>
+                            <!-- UPCOMING MEETING WITHOUT A SELECTED BOOK YET -->
+
+                          {% else %}
+                            <!--BOOK CHOOSING LINK FOR MEMBER WHOSE TURN IT IS -->
+                            Book:
+                            {%if user != upcoming_meeting.chooser%}
+                                <a> No book has been chosen yet.. </a> 
+
+                            {% else %}
+                              <a href="{% url 'choice_book_list' meeting_id=upcoming_meeting.id  %}" class="btn btn-outline-info"> 
+                                Choose book
+                              </a>
+
+                            {% endif %} 
+                          {% endif %}
+                        </div>
+
+                      {%else %}
+                        <a class = "mb-3"> No meeting has been scheduled yet.. </a> 
+                      {%endif%}
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                    <label for="club-type">Club Type</label>
-                    <input disabled class="form-control"  id="club-type" value="{{club.club_type}}">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                    <label for="club-setting">Club Privacy Settings</label>
-                    <input disabled class="form-control" type="text" id="club-setting" value = "{{club.club_type}}">
-                </div>
-              </div>
-              <div class="col-md-6">
-                  <div class="form-group">
-                      <label for="club-city">Club City</label>
-                      <input disabled class="form-control" type="text" id="club-city" value="{{club.city}}" >
-                  </div>
-                  <br/>
-              </div>
-              <div class="col-md-6">
-                  <div class="form-group">
-                      <label for="club-country">Club Country</label>
-                      <input disabled class="form-control" type="text" id="club-countryl" value="{{club.country}}">
-                  </div>
-                  <br/>
-              </div>
-              <hr></hr>
-          </form>
+              <a class="list-group-item" href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2"> more meetings </a>
+
+            {% endif %}
+        </div>
       </div>
+      
+      
   </div>
 </div>
 
