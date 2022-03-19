@@ -14,7 +14,7 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         self.user = User.objects.get(id=1)
 
     def test_initial_book_list_url(self):
-        self.assertEqual(self.url,'/initial_book_list/') 
+        self.assertEqual(self.url,'/initial_genres/books') 
 
     def create_test_books(self, book_count=10):
         isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'

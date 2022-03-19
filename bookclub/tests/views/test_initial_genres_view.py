@@ -17,7 +17,7 @@ class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
        self.assert_redirects_when_not_logged_in()
 
     def test_initial_genres_url(self):
-        self.assertEqual(self.url,'/initial_book_list/genres')
+        self.assertEqual(self.url,'/initial_genres/')
 
     def test_initial_genres(self):
         self._create_test_books(4)
