@@ -926,7 +926,7 @@ def cancel_meeting(request, meeting_id):
 
     if (user == club.owner ):
         meeting.delete()
-        messages.add_message(request, messages.SUCCESS, "You deleted the meeting successfully!")
+        messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
         return redirect('meetings_list', club.id)
     else:
         messages.add_message(request, messages.ERROR, "Must be owner to delete a meeting!")
