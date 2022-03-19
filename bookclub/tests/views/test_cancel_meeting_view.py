@@ -22,7 +22,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.member = User.objects.get(username="peterpickles")
 
     def test_cancel_meeting_url(self):
-        self.assertEqual(self.url, f"/cancel_meeting/{self.meeting.id}")
+        self.assertEqual(self.url, f"/meeting/{self.meeting.id}/cancel/")
 
     def test_member_cannot_cancel_meeting(self):
         self.client.login(username=self.member.username, password="Password123")
