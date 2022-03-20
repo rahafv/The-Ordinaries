@@ -975,3 +975,26 @@ def send(request):
 
         return HttpResponse('Message sent successfully')
     return render(request, '404_page.html', status=404) 
+
+@login_required
+def cancel_meeting(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    club = get_object_or_404(Club.objects, id=meeting.club.id)
+    user = request.user
+
+    if (user == club.owner ):
+        meeting.delete()
+        messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
+
+        """send email invites"""
+        MeetingHelper().send_email(request=request, 
+                                    meeting=meeting,
+                                    subject='A meeting has been cancelled ',
+                                    letter='emails/meeting_cancelation_email.html',
+                                    all_mem=True)
+
+        return redirect('meetings_list', club.id)
+    else:
+        messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
+        return redirect('meetings_list', club.id)
+   
