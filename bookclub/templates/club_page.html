@@ -18,49 +18,57 @@
                           <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square mb-3"
                           style="font-size: 1.3rem; color: grey;"></a>
                         </span>
+                        {% else %}
+                          {% if club.club_type == "Private" %}
+                            <span>
+                              <i class="bi bi-lock-fill pb-5" style="font-size: 1.3rem; color: grey;"></i>
+                            </span>
+                          {% endif %}
                         {% endif %}
                       </h3>
+                      <small class = "club-details-card-name">{{club.created_at}}</small>
                   </div>
               </div>
           </div>
           <div class="wizard">
               <nav class="list-group list-group-flush">
                 <!-- BOOKS LIST BUTTON -->
-                  <a class="list-group-item" href="books/">
+                  <a class="list-group-item disabled" href="books/">
                       <div class="d-flex justify-content-between align-items-center">
                           <div><i class="fe-icon-shopping-bag mr-1 text-muted"></i>
-                              <div class="d-inline-block font-weight-medium text-uppercase">Book List</div>
+                              <div class="d-inline-block font-weight-medium text-uppercase">Books</div>
                           </div>
                       </div>
                   </a>
                   <!-- MEMBERS LIST BUTTON-->
                   {% if is_member %}
-                    <a class="list-group-item" href='{% url "members_list" club.id %}'> 
-                    <i class="fe-icon-user text-muted"></i>Member List</a>  
+                    <a class="list-group-item disabled" href='{% url "members_list" club.id %}'> 
+                      <i class="fe-icon-user text-muted"></i>Members
+                    </a>  
                   {% endif %}
                 
                   <!--APPLICANTS LIST BUTTON-->
                   {% if user == club.owner %}
                     {% if club.club_type == "Private"%}
-                      <a class="list-group-item" href="{% url 'applicants_list' club.id %}">
-                        <i class="fe-icon-map-pin text-muted"></i>Applicants List
+                      <a class="list-group-item disabled" href="{% url 'applicants_list' club.id %}">
+                        <i class="fe-icon-map-pin text-muted"></i>Applicants 
                       </a>
                     {% endif %}
                       <!-- SCHEDULE A MEETING FOR CLUB OWNERS -->
-                    <a class="list-group-item" href="{% url 'schedule_meeting' club_id=club.id %}"> 
+                    <a class="list-group-item disabled" href="{% url 'schedule_meeting' club_id=club.id %}"> 
                       <i class="fe-icon-map-pin text-muted"></i>Schedule a meeting 
                     </a>  
                   {% endif %}
                     <!-- TRANSFER OWNERSHIP -->
                   {% if user == club.owner %}
-                    <a class="list-group-item" href="transfer_ownership/">
+                    <a class="list-group-item disabled" href="transfer_ownership/">
                       <i class="fe-icon-map-pin"></i>Transfer Ownership
                     </a>
                   {% endif %}
                     <!-- WITHDRAW BUTTON-->
                   {% if not user == club.owner and is_member%}
-                    <a class="list-group-item " href="{% url 'withdraw_club' club_id=club.id %}">
-                      <i class="fe-icon-map-pin" ></i>Withdraw from club
+                    <a class="list-group-item disabled " href="{% url 'withdraw_club' club_id=club.id %}">
+                      <i class="fe-icon-map-pin"></i>Withdraw from club
                     </a>
                   {% endif %}   
 
@@ -68,12 +76,12 @@
                   {% if not user == club.owner and not is_member and not is_applicant%}
                       {% if user.city == club.city %}
 
-                        <a  class="list-group-item" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
+                        <a  class="list-group-item disabled" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
                           <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
                       {% else %}
-                        <a  class="list-group-item"  href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <a  class="list-group-item disabled"  href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
                           <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
@@ -101,10 +109,10 @@
                   {% endif %}
                 
                   
-                  <a class="list-group-item d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
-                  <span class = "d-inline-block font-weight-medium text-uppercase ms-2"> 
-                    Owner
-                  </span>
+                  <a class="list-group-item disabled d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
+                    <span class = "d-inline-block font-weight-medium text-uppercase ms-2"> 
+                      Owner
+                    </span>
                   </a>
               </nav>
               <div class="collapse" id="owner">
@@ -132,18 +140,6 @@
               <div class="form-group">
                   <label class="mb-2" for="account-confirm-pass">Meeting type</label>
                   <input disabled readonly class="form-control" type="text" id="club-meeting-type" value = "{{club.meeting_type}}">
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="form-group">
-                  <label class="mb-2" for="club-type">Club Type</label>
-                  <input disabled readonly class="form-control"  id="club-type" value="{{club.club_type}}">
-              </div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <div class="form-group">
-                  <label class="mb-2" for="club-setting">Club Privacy Settings</label>
-                  <input disabled readonly class="form-control" type="text" id="club-setting" value = "{{club.club_type}}">
               </div>
             </div>
             <div class="col-md-6">
