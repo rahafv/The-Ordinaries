@@ -107,6 +107,12 @@
                         <b>Awaiting approval!</b>
                       </a>
                   {% endif %}
+
+                  {% if is_member and club.member_count != 0 %}
+                      <a href='{% url "chat_room" club_id=club.id %}' class=" list-group-item active bi bi-chat-left-dots"
+                        style="font-size: 1.4rem; color: black;"> Chat Room
+                      </a>
+                  {% endif %}
                 
                   
                   <a class="list-group-item working d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
