@@ -27,7 +27,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self.url = reverse('meetings_list', kwargs={'club_id': self.club.id})
         
     def test_meetings_list_url(self):
-        self.assertEqual(self.url,f'/club/1/meetings/')
+        self.assertEqual(self.url,f'/club/{self.club.id}/meetings/')
 
     def test_get_meetings_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

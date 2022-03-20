@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Meeting, User, Club, Book, Rating, Event
+from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -21,7 +21,7 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
+import humanize
 
 
 @login_prohibited
@@ -905,7 +905,6 @@ def delete_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
 
-
 @login_required
 def meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)
@@ -930,4 +929,87 @@ def previous_meetings_list(request, club_id):
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
+
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
+
+@login_required
+def chat_room(request, club_id=None):
+    user = request.user
+    if club_id:
+        club = get_object_or_404(Club.objects, id=club_id)
+        if not club.is_member(user) or club.members.count() <= 1:
+            return render(request, '404_page.html', status=404) 
+    else:
+        clubs = user.clubs.all()
+        if clubs:
+            club = None
+            for c in clubs:
+                if c.members.count() > 1:
+                    club = c
+                    break
+            if not club:
+                messages.add_message(request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
+                return redirect('clubs_list')
+        else:
+            messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
+            return redirect('clubs_list')
+    
+    return render(request, "chat_room.html", {"club":club})
+
+@login_required
+def getMessages(request, club_id):
+    if request.is_ajax():
+        club = get_object_or_404(Club.objects, id=club_id)
+        current_user = request.user
+        
+        chats = list(club.chats.all().values())[:200]
+        modifiedItems = []
+        for key in chats:
+            user_id = key.get("user_id")
+            user = get_object_or_404(User.objects, id=user_id)
+            prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+            modifiedItems.append({"name": user.full_name(), "time":prettyDate})
+
+        return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+    return render(request, '404_page.html', status=404) 
+
+@login_required
+def send(request):
+    if request.method == "POST":
+        message = request.POST['message']
+        
+        if message.strip():
+            username = request.POST['username']
+            club_id = request.POST['club_id']
+
+            club = get_object_or_404(Club.objects, id=club_id)
+            user = get_object_or_404(User.objects, username=username)
+
+            new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+            new_chat_msg.save()
+
+        return HttpResponse('Message sent successfully')
+    return render(request, '404_page.html', status=404) 
+
+@login_required
+def cancel_meeting(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    club = get_object_or_404(Club.objects, id=meeting.club.id)
+    user = request.user
+
+    if (user == club.owner ):
+        meeting.delete()
+        messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
+
+        """send email invites"""
+        MeetingHelper().send_email(request=request, 
+                                    meeting=meeting,
+                                    subject='A meeting has been cancelled ',
+                                    letter='emails/meeting_cancelation_email.html',
+                                    all_mem=True)
+
+        return redirect('meetings_list', club.id)
+    else:
+        messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
+        return redirect('meetings_list', club.id)
+   

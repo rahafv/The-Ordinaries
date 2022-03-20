@@ -5,16 +5,17 @@ from bookclub.models import User, Club, Event, Book, Meeting, Rating
 class EventTest(TestCase):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
-                'bookclub/tests/fixtures/default_club.json',
-                'bookclub/tests/fixtures/other_users.json',
-                'bookclub/tests/fixtures/other_club.json',
-                'bookclub/tests/fixtures/default_book.json',
-                'bookclub/tests/fixtures/default_meeting.json',
-                'bookclub/tests/fixtures/default_rating.json',
-                'bookclub/tests/fixtures/default_user_event.json',
-                'bookclub/tests/fixtures/default_club_event.json',
-                'bookclub/tests/fixtures/other_club_event.json',
-                'bookclub/tests/fixtures/other_user_events.json']
+        'bookclub/tests/fixtures/default_club.json',
+        'bookclub/tests/fixtures/other_users.json',
+        'bookclub/tests/fixtures/other_club.json',
+        'bookclub/tests/fixtures/default_book.json',
+        'bookclub/tests/fixtures/default_meeting.json',
+        'bookclub/tests/fixtures/default_rating.json',
+        'bookclub/tests/fixtures/default_user_event.json',
+        'bookclub/tests/fixtures/default_club_event.json',
+        'bookclub/tests/fixtures/other_club_event.json',
+        'bookclub/tests/fixtures/other_user_events.json'
+    ]
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -54,7 +55,7 @@ class EventTest(TestCase):
     def test_club_event_club_must_not_be_blank(self):
         self.club_event.club= None
         self._assert_event_is_invalid(self.club_event)
-#---
+
     def test_user_event_club_action_must_not_be_blank(self):
         self.user_event.club = None
         self._assert_event_is_invalid(self.user_event)

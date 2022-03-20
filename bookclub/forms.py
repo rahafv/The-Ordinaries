@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django import forms
 from django.core.validators import RegexValidator
 import pytz
-from .models import User, Club, Book, Rating, Meeting
+from .models import Chat, User, Club, Book, Rating, Meeting
 from django.contrib.auth import authenticate
 
 class SignUpForm(forms.ModelForm):
@@ -447,4 +447,3 @@ class MeetingForm(forms.ModelForm):
         if not self.cleaned_data.get('cont'):
             meeting.assign_chooser()
         return meeting
-        
