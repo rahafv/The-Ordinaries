@@ -50,18 +50,20 @@
     
             <div class="messages-box">
                 <div class="list-group rounded-0 scroll" style="max-height:100vh;">
-                    {% for userClub in user.clubs.all %}
-                        <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
-                            <div class="media">
-                                <div class="media-body ">
-                                    <i class="bi bi-people-fill"></i>
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h6 class="mb-0">{{userClub.name}}</h6>
-                                        <i class="font-italic text-muted mb-0 text-small">{{userClub.members.count}} members </i>
+                    {% for userClub in request.user.clubs.all %}
+                        {% if userClub.members.count > 1%}
+                            <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
+                                <div class="media">
+                                    <div class="media-body ">
+                                        <i class="bi bi-people-fill"></i>
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h6 class="mb-0">{{userClub.name}}</h6>
+                                            <i class="font-italic text-muted mb-0 text-small">{{userClub.members.count}} members </i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -76,12 +78,14 @@
                 <b class="mb-0 py-1">{{club.name}} chat room</b>
                 <button class="bg-purple btn btn-sm btn-outline-dark bi bi-caret-down-fill" onClick="scrollSmoothToBottom('display')"></button> 
             </div>
+
+            
             
             <div id="display" class="scroll d-flex flex-column-reverse"></div>
 
             <form id="post-form" class="bg-light input-group">
                 {% csrf_token %}
-                <input type="hidden" name="username" id="username" value="{{user.username}}"/>
+                <input type="hidden" name="username" id="username" value="{{request.user.username}}"/>
                 <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
                 <input type="text" placeholder="Type a message"  name="message" id="message" class="form-control" style="width: 750"/>
                 <button id="button-addon2" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane" style="color:black"></i></button>

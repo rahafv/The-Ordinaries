@@ -922,17 +922,24 @@ def chat_room(request, club_id=None):
     user = request.user
     if club_id:
         club = get_object_or_404(Club.objects, id=club_id)
-        if not user in club.members.all():
+        if not club.is_member(user) or club.members.count() <= 1:
             return render(request, '404_page.html', status=404) 
     else:
         clubs = user.clubs.all()
         if clubs:
-            club = clubs[0]
+            club = None
+            for c in clubs:
+                if c.members.count() > 1:
+                    club = c
+                    break
+            if not club:
+                messages.add_message(request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
+                return redirect('clubs_list')
         else:
             messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
             return redirect('clubs_list')
     
-    return render(request, "chat_room.html", {"user": user, "club":club})
+    return render(request, "chat_room.html", {"club":club})
 
 @login_required
 def getMessages(request, club_id):

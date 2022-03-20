@@ -7,14 +7,16 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageT
 class MeetingsListTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
 
     fixtures=['bookclub/tests/fixtures/default_user.json',
+        'bookclub/tests/fixtures/other_users.json',
         'bookclub/tests/fixtures/default_club.json',
-        'bookclub/tests/fixtures/other_users.json'
+        'bookclub/tests/fixtures/other_club.json',
     ]
 
     def setUp(self):
         self.club = Club.objects.get(id=1)
         self.user = User.objects.get(id=2)
-        self.sec_user = User.objects.get(id=4)
+        self.sec_user = User.objects.get(id=6)
+        self.third_user = User.objects.get(id=5)
         self.url = reverse('chat_room', kwargs={'club_id': self.club.id})
         
     def test_chat_room_url(self):
@@ -43,6 +45,16 @@ class MeetingsListTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTest
 
     def test_get_chat_room_for_no_clubs(self):
         self.client.login(username=self.sec_user.username, password='Password123')
+        self.url = reverse('chat_room')
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse('clubs_list')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'clubs.html')
+        self.assert_info_message(response)
+        self.assert_menu(response)
+
+    def test_get_chat_room_for_no_clubs_with_members(self):
+        self.client.login(username=self.third_user.username, password='Password123')
         self.url = reverse('chat_room')
         response = self.client.get(self.url, follow=True)
         response_url = reverse('clubs_list')
