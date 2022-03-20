@@ -44,9 +44,9 @@
         {%if list_length != 0 %}
             <div class="text-center">
                 {%if list_length < 3 %}
-                    <a href={% url 'home' %} class="btn  btn-outline-light disabled" role="button" aria-disabled="true">Continue</a>
+                    <a href={% url 'home' %} class="btn  btn-outline-light mb-3 disabled" role="button" aria-disabled="true">Continue</a>
                 {% else %}
-                    <a href={% url 'home' %} class="btn  btn-outline-light" role="button" >Continue</a>
+                    <a href={% url 'home' %} class="btn  btn-outline-light mb-3" role="button" >Continue</a>
                 {% endif %}
             </div>
         {% endif %}
