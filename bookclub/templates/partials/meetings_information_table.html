@@ -42,6 +42,32 @@
                                         <p>{{meeting.notes}}</p> 
                                        
                                     </td>
+                                    
+                                    {%if user == meeting.club.owner %}
+                                    {%if not is_previous  %}
+                                    
+                                    <td>
+                                        <button type="button" class="btn btn-lg btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Cancel</button>
+                                
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog">
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Cancel Meeting</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-muted">
+                                                <small>Are you sure you want to cancel {{meeting.title}}?</small>
+                                            </div>
+                                          <div class="modal-footer">
+                                            <a href="{% url 'cancel_meeting' meeting_id=meeting.id %}" class="btn btn-sm btn-outline-danger">Yes, cancel</a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    </td>
+                                    {%endif%}
+                                    {%endif%}
                                 </tr>
                             {%endfor%}
                         </tbody>
