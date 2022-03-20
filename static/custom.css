@@ -78,7 +78,6 @@
   background: #fff;
   color: #284664;
   cursor: default;
-  pointer-events: none;
 }
 
 .list-group-item.disabled:not(.active) {
@@ -86,7 +85,6 @@
   background: #fff;
   color: rgb(36, 36, 36);
   cursor: default;
-  pointer-events: none;
 }
 
 .list-group-item {
@@ -107,9 +105,10 @@
   background-color: #284664;
 }
 
-.list-group-item.working:not(.active)::before {
+.list-group-item.button:not(.active)::before {
   background-color: rgb(156, 156, 156);
 }
+
 
 .list-group-item::before {
   display: block;
