@@ -62,5 +62,21 @@
       "bio": "The quick brown fox jumps over the lazy dog.",
       "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc="
     }
+  },
+  {
+    "model": "bookclub.user",
+    "pk": 6,
+    "fields": {
+      "email_verified":"True",
+      "first_name": "Mark",
+      "last_name": "jackson",
+      "username": "markjackson",
+      "email": "markjackson@example.org",
+      "city": "new york",
+      "region": "NY",
+      "country": "United states",
+      "bio": "The quick brown fox jumps over the lazy dog.",
+      "password": "pbkdf2_sha256$260000$4BNvFuAWoTT1XVU8D6hCay$KqDCG+bHl8TwYcvA60SGhOMluAheVOnF1PMz0wClilc="
+    }
   }
 ]
