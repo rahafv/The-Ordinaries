@@ -5,16 +5,28 @@
 
 <div class="container">
   <div id='third' class="row" style='display:none'>
-    <h5 class='text-muted' style='padding-top: 30px;'>You might also like</h5>
-
+    <h5 class='text-muted' style='padding-top: 30px;'>You might also like </h5>
+    <br>
+<div class='row '>
     {% for rec in recs %}
-    <div class="col">
-        <img style='width:120px; height: 200px;'src="{{rec.image_url}}"/>
-          <p >{{ rec.title }}</p>    
-          <a href={% url "book_details" book_id=rec.id %} class="btn btn-outline-dark " style="margin-left:6em"  role="button" > view </a>
+    <div class="col text-center">
+          <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
+          <a style=" display: -webkit-box; max-width: 200px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
+          <span style=" display: -webkit-box; max-width: 180px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;"class="user-link">{{rec.author}}</span>
     </div>
   {% endfor %}
   </div>
+
+</div>
+
+<script>
+  var message_ele = document.getElementById("third");
+
+  setTimeout(function(){ 
+    message_ele.style.display = "none"; 
+  }, 10000);
+</script>
+
 <br>
   <div class="row">
     <div class="col-12">
