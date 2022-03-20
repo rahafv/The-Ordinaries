@@ -73,15 +73,16 @@ urlpatterns = [
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
-    path('search_page', views.search_page, name='search_page'),  
+    path('search_page', views.search_page, name='search_page'),
     path('search_page/<str:searched>/<str:label>/', views.show_sorted, name='show_sorted'), 
     path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
     path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
     path('meeting/<int:meeting_id>/book_choices/', views.choice_book_list, name='choice_book_list'),
     path('meeting/<int:meeting_id>/search/', views.search_book, name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
-    path('club/<int:club_id>/meetings/', views.meetings_list, name='meetings_list'),
-    path('club/<int:club_id>/previous_meetings/', views.previous_meetings_list, name='previous_meetings_list'),
+    path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),
+    path("club/<int:club_id>/previous_meetings/", views.previous_meetings_list, name='previous_meetings_list'),
+    path('meeting/<int:meeting_id>/cancel/', views.cancel_meeting, name='cancel_meeting'),
 ]
 
 handler404 = 'bookclub.views.handler404'
