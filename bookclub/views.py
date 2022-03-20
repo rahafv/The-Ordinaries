@@ -890,6 +890,7 @@ def edit_review(request, review_id ):
 
     return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
+"""Enable user to follow and unfollow other users."""
 @login_required
 def follow_toggle(request, user_id):
     current_user = request.user
