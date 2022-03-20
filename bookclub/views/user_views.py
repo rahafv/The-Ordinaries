@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.generic import DetailView
 from system import settings
 
 @login_required
@@ -39,6 +40,9 @@ def home(request):
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
+
+class ProfilePageView(DetailView):
+    pass
 
 @login_required
 def show_profile_page(request, user_id=None, is_clubs=False):

@@ -266,18 +266,6 @@ class AddBookView(FormView):
         else:
             return render('add_book.html')
 
-# @login_required
-# def add_book(request):
-#     if request.method == "POST":
-#         form = BookForm(request.POST)
-#         if form.is_valid():
-#             book = form.save()
-#             return redirect('book_details', book_id=book.id)
-#     else:
-#         form = BookForm()
-#     return render(request, "add_book.html", {"form": form})
-
-
 class BookDetailsView(DetailView, FormMixin):
     model = Book
     template_name = 'book_details.html'
@@ -305,26 +293,6 @@ class BookDetailsView(DetailView, FormMixin):
         context['reader'] = book.is_reader(user)
         context['numberOfRatings'] = book.ratings.all().count()
         return context
-
-
-# @login_required
-# def book_details(request, book_id):
-#     book = get_object_or_404(Book.objects, id=book_id)
-#     numberOfRatings=book.ratings.all().count()
-#     form = RatingForm()
-#     user = request.user
-#     check_reader = book.is_reader(user)
-#     reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
-#     rating = book.ratings.all().filter(user=request.user)
-#     if rating:
-#         rating = rating[0]
-#     reviews_count = book.ratings.all().exclude(
-#         review="").exclude(user=request.user).count()
-#     context = {'book': book, 'form': form,
-#                'rating': rating, 'reviews': reviews,
-#                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
-#     return render(request, "book_details.html", context)
-
 
 @login_required
 def show_profile_page(request, user_id=None, is_clubs=False):
