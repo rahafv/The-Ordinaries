@@ -72,6 +72,14 @@ class User(AbstractUser):
         'self', symmetrical=False, related_name='followees'
     )
 
+    all_books = models.ManyToManyField(
+        "Book",
+        related_name='all_books',
+        null = True , 
+        blank = True
+    )
+
+    
     class Meta:
         ordering = ['first_name', 'last_name']
 
@@ -129,6 +137,15 @@ class User(AbstractUser):
         """Returns the number of followees of self."""
 
         return self.followees.count()
+
+    def all_books_count(self):
+        return self.all_books.all().count()
+
+    def add_book_to_all_books(self , book):
+        if book not in self.all_books.all():
+            self.all_books.add(book)
+       
+
 
 class Club(models.Model):
     """Club model."""
@@ -285,7 +302,6 @@ class Book(models.Model):
         blank=True,
         null=True
     )
-
 
     readers = models.ManyToManyField(
         User,

@@ -57,6 +57,7 @@ def home(request):
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+   
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
@@ -254,6 +255,7 @@ def add_book(request):
         if form.is_valid():
             book = form.save()
             return redirect('book_details', book_id=book.id)
+           
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -270,6 +272,7 @@ def book_details(request, book_id):
     rating = book.ratings.all().filter(user=request.user)
     if rating:
         rating = rating[0]
+        user.add_book_to_all_books(book)
     reviews_count = book.ratings.all().exclude(
         review="").exclude(user=request.user).count()
     context = {'book': book, 'form': form,
@@ -764,6 +767,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
