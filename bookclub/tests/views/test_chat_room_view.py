@@ -4,7 +4,7 @@ from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 
-class MeetingsListTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
+class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
 
     fixtures=['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/default_club.json',
