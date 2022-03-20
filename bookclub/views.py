@@ -57,8 +57,7 @@ def home(request):
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-   
-
+    
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited

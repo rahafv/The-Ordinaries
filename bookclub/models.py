@@ -74,7 +74,7 @@ class User(AbstractUser):
 
     all_books = models.ManyToManyField(
         "Book",
-        related_name='all_books',
+        related_name='+',
         null = True , 
         blank = True
     )
