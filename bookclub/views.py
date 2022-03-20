@@ -218,6 +218,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
@@ -271,7 +272,6 @@ def book_details(request, book_id):
     rating = book.ratings.all().filter(user=request.user)
     if rating:
         rating = rating[0]
-        user.add_book_to_all_books(book)
     reviews_count = book.ratings.all().exclude(
         review="").exclude(user=request.user).count()
     context = {'book': book, 'form': form,
