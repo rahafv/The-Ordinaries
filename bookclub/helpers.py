@@ -1,3 +1,4 @@
+from collections import defaultdict
 from django.shortcuts import redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
@@ -133,3 +134,19 @@ def get_list_of_objects(searched, label):
     return {
         "category" : category, 
         "filtered_list" : filtered_list}
+
+def getGenres():
+    genres = {}
+    books = Book.objects.all()
+    
+    for book in books:
+        genreList = book.genre.split(',')
+            
+        for genre in genreList:
+            if genre != '':
+                if genre in genres:
+                    genres[genre] += 1
+                else:
+                    genres[genre] = 1
+
+    return genres
