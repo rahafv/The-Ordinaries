@@ -59,7 +59,7 @@
       {%if filtered%}
       <div style="text-align: center; ">
         <h4 class="lead mt-5 "> There are no matches. </h4>
-        <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
+        <a href={% url 'clubs_list' user.id %}  class="btn my-2 btn-outline-dark">Go back</a>
       </div>
       {% else %}
       <div style="text-align: center;   padding-top: 50px;">
