@@ -821,28 +821,8 @@ textarea:hover {
     border-collapse: separate;
 }
 
-
-#genre-label input {
-  opacity: 0;
-  overflow: hidden;
-}
-
-#genre-label span.y {
-  display: none;
-}
-
-#genre-label span.n {
-  display: inline;
-}
-
-#genre-label input:checked ~span.y {
-  text-decoration: line-through; 
-  color: #999999;
-
-}
-
-#genre-label input:checked ~span.n {
-  text-decoration: line-through; 
+#genre input:checked~.checkmark {
+  text-decoration: line-through;
   color: #999999;
 
 }

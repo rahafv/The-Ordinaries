@@ -873,7 +873,7 @@ def show_sorted(request, searched, label):
 @login_required
 def initial_genres(request):
     genres = getGenres()
-    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:30]
+    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
 
     return render(request, 'initial_genres.html', {'genres':sorted_genres})
 

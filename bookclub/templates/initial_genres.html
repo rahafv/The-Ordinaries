@@ -4,7 +4,9 @@
 {% endblock %}
 {% block body %}
 
-<div style="background-color:black; height:100vh">
+<style type="text/css">
+    body { background: black !important; } 
+</style>
 
 <div class="container">
     <div class="row py-md-5">
@@ -16,26 +18,19 @@
 
     <div class="col-sm-8 mx-auto text-center text-white">
         <p class="lead text-center " style="color:white;"> Select your favourtie </p>
-
         <form method=GET action="{% url 'initial_book_list'%}">
             {% for genre in genres %}
-                <label id="genre-label" style="font-size: 20px">
-                    <input type="checkbox" name="genre" value={{genre}}>
-                    <span class="y">{{genre}}</span>
-                    <span class="n">{{genre}}</span>
-                </label>
-            {% endfor %}
+                <label id="genre">
+                    <input type="checkbox" id="genre" name="genre" value="{{genre}}" style="opacity:0">
+                    <span class="checkmark">{{genre}}</span>
+                  </label>
+                {% endfor %}
     </div>
-            <br>
-
             <div class="text-center">
                 {% include 'partials/bootstrap_form.html' with form=form %}
-                <button class="btn btn-outline-light" type="submit" style="align:center;  "> Continue </button>
+                <button class="btn btn-outline-light mt-3" type="submit" style="align:center;"> Continue </button>
             </div>
         </form>
 </div>
-</div>
-
-
 {% endblock %}
 
