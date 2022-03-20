@@ -20,7 +20,7 @@ class UserFormTestCase(TestCase):
             'last_name': 'Doe2',
             'username': 'johndoe2',
             'email': 'johndoe2@example.org',
-            'date_of_birth': date(2001, 1, 5),
+            'DOB': date(2001, 1, 5),
             'bio': "Hello, I'm John Doe2.",
             'city' : 'New York',
             'region' :'NY',
@@ -37,7 +37,7 @@ class UserFormTestCase(TestCase):
         email_field = form.fields['email']
         self.assertTrue(isinstance(email_field, forms.EmailField))
         self.assertIn('bio', form.fields)
-        self.assertIn('date_of_birth', form.fields)
+        self.assertIn('DOB', form.fields)
         self.assertIn('city', form.fields)
         self.assertIn('region', form.fields)
         self.assertIn('country', form.fields)
@@ -54,9 +54,19 @@ class UserFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_year_should_be_valid(self): 
-        self.form_input["date_of_birth"] = date(2021, 1, 5)
+        self.form_input["DOB"] = date(2021, 1, 5)
         form = UserForm(self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_invalid_date(self):
+        self.form_input['DOB'] = date(2024, 1, 5)
+        form = UserForm(self.form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_blank_date(self):
+        self.form_input['DOB'] = None
+        form = UserForm(self.form_input)
+        self.assertTrue(form.is_valid())
 
     def test_form_must_save_correctly(self):
         form = UserForm(instance=self.user, data=self.form_input, user = self.user)

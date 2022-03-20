@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class TransferClubOwnershipTestCase(TestCase, MessageTester, MenueTestMixin, LoginRedirectTester):
+class TransferClubOwnershipTestCase(TestCase, MessageTester, MenuTestMixin, LoginRedirectTester):
 
     fixtures = [
         'bookclub/tests/fixtures/default_club.json',

@@ -1,13 +1,17 @@
 """Unit tests for the Club model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Club
+from bookclub.models import User, Club, Meeting, Book
 
 class ClubModelTestCase(TestCase):
 
-    fixtures = ['bookclub/tests/fixtures/other_users.json',
+    fixtures = ['bookclub/tests/fixtures/default_user.json',
+        'bookclub/tests/fixtures/other_users.json',
         'bookclub/tests/fixtures/other_club.json', 
-        'bookclub/tests/fixtures/default_club.json'
+        'bookclub/tests/fixtures/default_club.json',
+        'bookclub/tests/fixtures/default_meeting.json',
+        'bookclub/tests/fixtures/other_meeting.json',
+        'bookclub/tests/fixtures/default_book.json',
     ]
 
     def setUp(self):
@@ -77,6 +81,7 @@ class ClubModelTestCase(TestCase):
     def test_club_type(self):
         self.club.club_type = self.club.ClubType.PUBLIC
         self.assertEqual(self.club.club_type, "Public")
+        self.assertEqual("Public", self.club.get_club_type_display())
     
     def test_city_may_be_blank(self):
         self.club.city = ''
@@ -97,7 +102,7 @@ class ClubModelTestCase(TestCase):
     def test_country_may_be_blank(self):
         self.club.country = ''
         self._assert_club_is_valid()
-
+    
     def test_country_may_be_not_unique(self):
         self.club.country = self.other_club.country
         self._assert_club_is_valid()
@@ -124,10 +129,18 @@ class ClubModelTestCase(TestCase):
         self.club.make_owner(otherMember)
         self.assertEqual(self.club.owner, otherMember)
 
-
     def test_member_addition_when_user_is_already_a_member(self):
         nonMember = User.objects.get(id=4)
         self.club.add_member(nonMember)
         count = self.club.member_count()
         self.club.add_member(nonMember)
         self.assertEqual(self.club.member_count(), count)
+    
+    def test_get_previous_meetings(self):
+        previous_meetings = self.club.get_previous_meetings()
+        self.assertEqual(len(previous_meetings), 4)
+
+    def test_get_upcoming_meetings(self):
+        upcoming_meetings = self.club.get_upcoming_meetings()
+        self.assertEqual(len(upcoming_meetings), 2)
+

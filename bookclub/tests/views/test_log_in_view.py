@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import LogInForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenueTestMixin
+from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenuTestMixin
 
-class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
+class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
 
     fixtures = ['bookclub/tests/fixtures/default_user.json' , 
                 'bookclub/tests/fixtures/other_users.json' , 
@@ -103,9 +103,9 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenueTestMixin):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
-        response_url = reverse('initial_book_list')
+        response_url = reverse('initial_genres')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'initial_book_list.html')
+        self.assertTemplateUsed(response, 'initial_genres.html')
         self.assert_no_message(response)
 
     def test_succesful_log_in_with_prev_books(self):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bookclub.models import User, Club, Book , Rating, Meeting, Event
+from bookclub.models import User, Club, Book , Rating, Meeting, Event, Chat
 
 
 @admin.register(User)
@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ["username", "email", "first_name", "last_name"]
 
 @admin.register(Club)
-class UserAdmin(admin.ModelAdmin):
+class ClubAdmin(admin.ModelAdmin):
     list_display = ["name", "theme", "owner"]
 
 @admin.register(Book)
@@ -27,9 +27,12 @@ class MeetingAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for events."""
-    list_display = [
-        'type_of_actor', 'type_of_action', 'message', 'created_at',
-    ]
+    list_display = ["type_of_actor", "type_of_action", "message", "created_at"]
+
+@admin.register(Chat)
+class ChatAdmin(admin.ModelAdmin):
+    """Configuration of the admin interface for events."""
+    list_display = ["club", "user", "message", "created_at"]
 
     
     

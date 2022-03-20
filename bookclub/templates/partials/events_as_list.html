@@ -17,7 +17,14 @@
                 <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
              </li>
              &emsp;
-        {% endif %}
+        {%elif event.type_of_action == 'U' %}
+        <li class="post-text">
+            <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
+            {{ event.message }}
+            <a href= {% url 'profile' event.action_user.id  %} style= "color: black">  {{ event.get_action }}  </a>
+         </li>
+         &emsp;
+    {% endif %}
     {% endif %}
     
 {% endfor %}

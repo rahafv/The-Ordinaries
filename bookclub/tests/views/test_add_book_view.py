@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
 from bookclub.models import User, Book, Event
-from bookclub.tests.helpers import LoginRedirectTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
-class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
+class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Tests of the add bookview."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]
@@ -17,8 +17,8 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
             'ISBN': '0195153448',
             'title':'Classical',
             'author': 'Mark',
-            'publisher': 'Oxford',
-            'year': 2002,
+            'genre': 'Classics,European Literature,Czech Literature',
+            'describtion': 'describtion'
         }
 
     def test_add_book_url(self):
@@ -60,8 +60,8 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenueTestMixin):
         club = Book.objects.get(ISBN="0195153448")
         self.assertEqual(club.title, "Classical")
         self.assertEqual(club.author, "Mark")
-        self.assertEqual(club.publisher, "Oxford")
-        self.assertEqual(club.year, 2002)
+        self.assertEqual(club.genre, "Classics,European Literature,Czech Literature")
+        self.assertEqual(club.describtion, "describtion")
 
         self.assert_menu(response)
 

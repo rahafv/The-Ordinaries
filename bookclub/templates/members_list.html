@@ -1,12 +1,19 @@
 {% extends 'base_content.html' %}
 {% load bootstrap_pagination %}
-{% block title %} Members {% endblock %}
+{% block title %}
+| Members 
+{% endblock %}
 {% block content %}
 
 <div class="container">
     <div class="row">
         <div class="col-12">
             <h1 class="mb-3 mt-3">Members of {{club.name}} club </h1>
+            <form class="d-flex" method=GET action='{% url 'members_list' club.id %}'> 
+                {% csrf_token %}
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
+            </form>
             {%include 'partials/users_information_table.html' with Users=members %}
             <ul class="pagination justify-content-center">
                 {% bootstrap_paginate members show_prev_next="false"  show_first_last="true" range=5  %}
@@ -14,4 +21,7 @@
         </div>
     </div>
 </div>  
+
+
+
 {% endblock %}

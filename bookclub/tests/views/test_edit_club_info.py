@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 #from bookclub.forms import ClubForm
 from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenueTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenueTestMixin):
+class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the profile view."""
 
     fixtures = [

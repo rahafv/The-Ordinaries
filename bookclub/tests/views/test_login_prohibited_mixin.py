@@ -18,7 +18,7 @@ class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
-        response_url = reverse('initial_book_list')
+        response_url = reverse('initial_genres')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         sign_up_url = reverse('sign_up')
         response = self.client.get(sign_up_url)
