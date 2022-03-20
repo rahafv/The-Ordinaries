@@ -10,10 +10,10 @@
 }
 
 .club-details-card {
-position: relative;
-padding-bottom: 48px;
-background-color: #fff;
-box-shadow: 0 12px 20px 1px rgba(64, 64, 64, .09);
+  position: relative;
+  padding-bottom: 48px;
+  background-color: #fff;
+  box-shadow: 0 12px 20px 1px rgba(64, 64, 64, .09);
 }
 .club-details-card .club-details-card-cover {
   position: relative;
@@ -30,32 +30,32 @@ box-shadow: 0 12px 20px 1px rgba(64, 64, 64, .09);
 }
 
 .club-details-card .club-details-card-profile {
-display: table;
-position: relative;
-margin-top: -22px;
-padding-right: 15px;
-padding-bottom: 16px;
-padding-left: 20px;
-z-index: 5;
+  display: table;
+  position: relative;
+  margin-top: -22px;
+  padding-right: 15px;
+  padding-bottom: 16px;
+  padding-left: 20px;
+  z-index: 5;
 }
 
 .club-details-card .club-details-card-profile .club-details-card-avatar, .club-details-card .club-details-card-profile .club-details-card-details {
-display: table-cell;
-vertical-align: middle;
+  display: table-cell;
+  vertical-align: middle;
 }
 .club-details-card .club-details-card-profile .club-details-card-avatar {
-width: 85px;
-border-radius: 48%;
-box-shadow: 0 8px 20px 0 rgba(0, 0, 0, .15);
-overflow: hidden;
+  width: 85px;
+  border-radius: 48%;
+  box-shadow: 0 8px 20px 0 rgba(0, 0, 0, .15);
+  overflow: hidden;
 }
 .club-details-card .club-details-card-profile .club-details-card-avatar > img {
-display: block;
-width: 100%;
+  display: block;
+  width: 100%;
 }
 .club-details-card .club-details-card-profile .club-details-card-details {
-padding-top: 20px;
-padding-left: 15px;
+  padding-top: 20px;
+  padding-left: 15px;
 }
 
 
@@ -68,6 +68,7 @@ padding-left: 15px;
   font-size: 1.2em;
   vertical-align: middle;
 }
+
 .mr-1, .mx-1 {
   margin-right: .25rem !important;
 }
@@ -77,7 +78,7 @@ padding-left: 15px;
   background: #fff;
   color: #284664;
   cursor: default;
-  /* pointer-events: none; */
+  pointer-events: none;
 }
 
 .list-group-item.disabled:not(.active) {
@@ -85,7 +86,7 @@ padding-left: 15px;
   background: #fff;
   color: rgb(36, 36, 36);
   cursor: default;
-  /* pointer-events: none; */
+  pointer-events: none;
 }
 
 .list-group-item {
@@ -101,20 +102,12 @@ padding-left: 15px;
   text-decoration: none;
 }
 
-/* .list-group-item {
-  position: relative;
-  display: block;
-  padding: .75rem 1.25rem;
-  margin-bottom: -1px;
-  background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.125);
-} */
 
 .list-group-item.active:not(.disabled)::before {
   background-color: #284664;
 }
 
-.list-group-item.disabled:not(.active)::before {
+.list-group-item.working:not(.active)::before {
   background-color: rgb(156, 156, 156);
 }
 
@@ -129,9 +122,10 @@ padding-left: 15px;
   content: '';
 }
 
+
 .club-panel{
   background-color: #284664;
-  padding: 10px 20px 10px 20px;
+  padding: 30px 30px 30px 45px;
   color: #fff;
 }
 
@@ -201,16 +195,30 @@ padding-left: 15px;
   max-width: 300px
 }
 
-.slide-left {
-  animation: 2s slide-left 0s forwards;
+@media (min-width: 60em) {
+  .slide-left {
+    animation: 2s slide-left 0s forwards;
     transform:translateX(110%);
-}
-
-@keyframes slide-left {
-  to {
-    transform:translateX(-30%);
+    -webkit-transform: translateX(110%);
+    -moz-transform:translateX(110%); 
+    -o-transform: translateX(110%); 
+    -ms-transform :translateX(110%);
   }
 }
+
+
+@media (min-width: 60em){
+  @keyframes slide-left {
+    to {
+      transform:translateX(0%);
+      -webkit-transform: translateX(0%);
+      -moz-transform:translateX(0%); 
+      -o-transform: translateX(0%); 
+      -ms-transform :translateX(0%);
+    }
+  }
+}
+
 
 .slide-up {
   height: 300%;
@@ -221,13 +229,23 @@ padding-left: 15px;
 .slide-up a {
   animation: 1.5s slide-up 0s forwards;
   transform:translateY(1000%);
+  -webkit-transform: translateY(1000%);
+  -moz-transform:translateY(1000%); 
+  -o-transform: translateY(1000%); 
+  -ms-transform :translateY(1000%);
+}
+@media screen{
+  @keyframes slide-up {
+    to {
+      transform:translateY(-10%);
+      -webkit-transform: translateY(-10%);
+      -moz-transform:translateY(-10%); 
+      -o-transform: translateY(-10%); 
+      -ms-transform :translateY(-10%);
+    }
+  }   
 }
 
-@keyframes slide-up {
-  to {
-    transform:translateY(-10%);
-  }
-}   
 
 
 
