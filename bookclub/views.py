@@ -456,9 +456,13 @@ def books_list(request, club_id=None, user_id=None):
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True
+    filtered=False
     if user_id:
+        user= get_object_or_404(User.objects, id=user_id)
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+    else: 
+        user= request.user
 
     form = ClubsSortForm(request.GET or None)
     sort = ""
@@ -468,11 +472,28 @@ def clubs_list(request, user_id=None):
         sort_helper = SortHelper(sort, clubs_queryset)
         clubs_queryset = sort_helper.sort_clubs()
 
-    count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    privacy= request.GET.get('privacy')
+    if privacy=='public': 
+        clubsSet = clubs_queryset.filter(club_type='Public')
+        filtered=True
+    elif privacy=='private': 
+        clubsSet = clubs_queryset.filter(club_type='Private')
+        filtered=True
+    else:
+        clubsSet = clubs_queryset.all()
+
+    ownership= request.GET.get('ownership')
+    if ownership=='owned': 
+        clubsSet = clubsSet.filter(owner=user)
+        filtered=True
+    
+
+
+    count = clubsSet.count()
+    clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership, 'filtered':filtered })
 
 
 @login_required
@@ -819,6 +840,7 @@ def search_page(request):
         sortForm = ""
         if(category == "Clubs"):
             sortForm = ClubsSortForm(request.GET or None)
+            
         elif(category == "Books"):
             sortForm = BooksSortForm(request.GET or None)
         else:

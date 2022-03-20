@@ -44,29 +44,58 @@
 <div class="container">
   {% if count == 0 %}
     {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
-        <h4 class="lead "> There are no clubs, want to create one?</h4>
-        <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
-      </div>
+      {%if filtered%}
+        <div style="text-align: center;">
+          <h4 class="lead "> There are no matches. </h4>
+          <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
+        </div>
+      {% else %}
+        <div style="text-align: center;   padding-top: 50px;">
+          <h4 class="lead "> There are no clubs, want to create one?</h4>
+          <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-dark">Create club</a>
+        </div>
+      {%endif%}
     {% else %}
+      {%if filtered%}
+      <div style="text-align: center; ">
+        <h4 class="lead mt-5 "> There are no matches. </h4>
+        <a href={% url 'clubs_list' user.id %}  class="btn my-2 btn-outline-dark">Go back</a>
+      </div>
+      {% else %}
       <div style="text-align: center;   padding-top: 50px;">
         <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
-        <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
+        <a href='/clubs'  class="btn my-2 btn-outline-dark">More clubs</a>
       </div>
+      {% endif %}
     {% endif %}
     
   {% else %}
-    <div class = "col - 12">
-      {% if general %}
-        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
+  <div style="float: right;">
+    {% if general %}
+    <form method=GET action="{% url 'clubs_list'%}">
       {% else %}
-        <form class = "d-flex" method = "GET" action = '{% url 'clubs_list' user.id %}'>
-      {% endif %}
-          {% csrf_token %}
-          {% include 'partials/bootstrap_form.html' with form=form %}
-          <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
-      </form>
-    </div>
+      <form method=GET action="{% url 'clubs_list' user.id%}">
+        {% endif %}
+        <div style="text-align:left;">
+        Privacy:
+        <select id="privacy" name="privacy" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
+          <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
+          <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
+        </select>
+      </div>
+      <div style="text-align:left;">
+        Ownership:
+        <select id="ownership" name="ownership" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
+          <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
+        </select>
+      </div>
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Filter </button>
+    </form>
+  </div>
+
 
     
 
