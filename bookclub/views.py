@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
@@ -248,16 +248,34 @@ def club_page(request, club_id):
     return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
 
 
-@login_required
-def add_book(request):
-    if request.method == "POST":
-        form = BookForm(request.POST)
-        if form.is_valid():
-            book = form.save()
-            return redirect('book_details', book_id=book.id)
-    else:
-        form = BookForm()
-    return render(request, "add_book.html", {"form": form})
+class AddBookView(FormView):
+    form_class = BookForm
+    template_name = 'add_book.html' 
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.book = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):         
+        if  self.book:
+            return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
+        else:
+            return render('add_book.html')
+
+# @login_required
+# def add_book(request):
+#     if request.method == "POST":
+#         form = BookForm(request.POST)
+#         if form.is_valid():
+#             book = form.save()
+#             return redirect('book_details', book_id=book.id)
+#     else:
+#         form = BookForm()
+#     return render(request, "add_book.html", {"form": form})
 
 
 class BookDetailsView(DetailView, FormMixin):
@@ -455,31 +473,74 @@ def withdraw_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
+class BookListView(ListView):
+    model = Book
+    template_name = 'books.html'
+    form_class = BooksSortForm()
+    paginate_by = settings.BOOKS_PER_PAGE
 
-@login_required
-def books_list(request, club_id=None, user_id=None):
-    books_queryset = Book.objects.all()
-    general = True
-    if club_id:
-        books_queryset = Club.objects.get(id=club_id).books.all()
-        general = False
-    if user_id:
-        books_queryset = User.objects.get(id=user_id).books.all()
-        general = False
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-    form = BooksSortForm(request.GET or None)
-    sort = ""
+    def get(self, request, *args, **kwargs):
+        """Retrieves the club_id from url and stores it in self for later use."""
+        self.club_id = kwargs.get('club_id') 
+        self.user_id = kwargs.get('user_id') 
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        books_queryset = Book.objects.all()
+        general = True
 
-    if form.is_valid():
-        sort = form.cleaned_data.get('sort')
-        sort_helper = SortHelper(sort, books_queryset)
-        books_queryset = sort_helper.sort_books()
+        if self.club_id:
+            books_queryset = Club.objects.get(id=self.club_id).books.all()
+            general = False
+        if self.user_id:
+            books_queryset = User.objects.get(id=self.user_id).books.all()
+            general = False
 
-    count = books_queryset.count()
-    books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-    page_number = request.GET.get('page')
-    books = books_pg.get_page(page_number)
-    return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
+        form = BooksSortForm(self.request.GET or None)
+        sort = ""
+        if form.is_valid():
+            sort = form.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, books_queryset)
+            books_queryset = sort_helper.sort_books()
+
+        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+        page_number = self.request.GET.get('page')
+        books = books_pg.get_page(page_number)
+        context['books'] = books
+        context['general'] = general
+        context['form'] = form
+        context['count'] = books_queryset.count()
+        return context
+
+# @login_required
+# def books_list(request, club_id=None, user_id=None):
+#     books_queryset = Book.objects.all()
+#     general = True
+#     if club_id:
+#         books_queryset = Club.objects.get(id=club_id).books.all()
+#         general = False
+#     if user_id:
+#         books_queryset = User.objects.get(id=user_id).books.all()
+#         general = False
+
+#     form = BooksSortForm(request.GET or None)
+#     sort = ""
+
+#     if form.is_valid():
+#         sort = form.cleaned_data.get('sort')
+#         sort_helper = SortHelper(sort, books_queryset)
+#         books_queryset = sort_helper.sort_books()
+
+#     count = books_queryset.count()
+#     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     books = books_pg.get_page(page_number)
+#     return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
 
 
 @login_required
