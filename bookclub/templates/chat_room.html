@@ -31,12 +31,16 @@
     },1000);
     })
 
-   const scrollSmoothToBottom = (id) => {
-    const element = $(`#${id}`);
-    element.animate({
-       scrollTop: element.prop("scrollHeight")
-    }, 1000);
- }
+    const scrollSmoothToBottom = (id) => {
+        const element = $(`#${id}`);
+        element.animate({
+        scrollTop: element.prop("scrollHeight")
+        }, 1000);
+    }
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 </script>
 
 <div class="row rounded-lg overflow-hidden" style="margin:0px;">
@@ -76,7 +80,7 @@
 
             <div class="px-4 py-2 bg-purple text-white d-flex justify-content-between">
                 <b class="mb-0 py-1">{{club.name}} chat room</b>
-                <button class="bg-purple btn btn-sm btn-outline-dark bi bi-caret-down-fill" onClick="scrollSmoothToBottom('display')"></button> 
+                <button class="bg-purple btn btn-sm btn-outline-dark bi bi-caret-down-fill" onClick="scrollSmoothToBottom('display')" data-toggle="tooltip" data-placement="left" title="Scroll down"></button> 
             </div>
 
             
