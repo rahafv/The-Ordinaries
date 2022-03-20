@@ -1,5 +1,6 @@
 .club-details-card-avatar{
-  background-image: url(images/3.png);background-position: center;
+  background-image: url(images/3.png);
+  background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   -webkit-background-size: contain;
@@ -17,7 +18,9 @@
 }
 .club-details-card .club-details-card-cover {
   position: relative;
-  background-image: url(images/clubPageCover.png);
+  background-image: url(images/clubPage.svg);
+  background-color: #d4c4c4;
+  fill: #dac3c3;
   width: 100%;
   height: 140px;
   background-position: center;

@@ -7,12 +7,16 @@
       <div class="col-lg-4 pb-5 mx-0">
           <!-- Club Sidebar-->
           <div class="club-details-card pb-3">
-              <div class="club-details-card-cover"></div>
+              <div class="club-details-card-cover">
+                <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+                  <!-- <rect width="100%" height="100%" /> -->
+                  <a width="100%" height="100%" href="/images/clubPage.svg"></a>
+                </svg>
+              </div>
               <div class="club-details-card-profile">
-                  <div class="club-details-card-avatar">
-                  </div>
-                  <div class="club-details-card-details">
-                      <h3 class="club-details-card-name text-lg">{{club.name}} 
+                  <div class="club-details-card-avatar"></div>
+                  <div class="club-details-card-details ">
+                      <h3 class="club-details-card-name  mt-3 text-lg ps-2">{{club.name}} 
                         {% if user == club.owner %}
                         <span>
                           <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square mb-3"
