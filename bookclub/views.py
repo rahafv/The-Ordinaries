@@ -137,6 +137,7 @@ class ActivateUserView(TemplateView):
     template_name = "activate-fail.html"
 
     def get(self, *args, **kwargs):
+        """Retrieves user if valid and sets its email verified field to true."""
         try:
             uid = force_text(urlsafe_base64_decode(kwargs["uidb64"]))
             self.user = User.objects.get(pk=uid)
@@ -153,6 +154,7 @@ class ActivateUserView(TemplateView):
 
     
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template"""
         context = super().get_context_data(**kwargs)
         context["user"] = self.user
         return context
@@ -648,7 +650,7 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         return kwargs
 
     def get_context_data(self, **kwargs):
-        """Sets self.object to store club."""
+        """Set self.object to store club."""
         self.object = self.get_object()
         return super().get_context_data(**kwargs)
 
@@ -707,7 +709,7 @@ class EditClubInformationView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = "club_id"
     
     def get_context_data(self, **kwargs):
-        """"""
+        """Set self.object to store club_id."""
         context = super().get_context_data(**kwargs)
         context['club_id'] = self.object.id
         return context
@@ -791,6 +793,7 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
     model = Book
 
     def get_context_data(self, *args, **kwargs):
+        """Generate context data for the template."""
         context = super().get_context_data(*args, **kwargs)
         meeting = get_object_or_404(Meeting.objects, id=kwargs["meeting_id"])
         if self.request.user == meeting.chooser and not meeting.book:
@@ -820,6 +823,7 @@ class SearchBookView(LoginRequiredMixin, ListView):
         return books
 
     def get_context_data(self, **kwargs):
+        """Generate context data for the template."""
         context = super().get_context_data(**kwargs)
         meeting = get_object_or_404(Meeting.objects, id=self.meeting_id)
         if self.request.user == meeting.chooser and not meeting.book:
@@ -830,7 +834,7 @@ class SearchBookView(LoginRequiredMixin, ListView):
         else:
             raise Http404   
  
-
+"""Allow user to choose a book for a meeting."""
 @login_required
 def choose_book(request, book_id, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
