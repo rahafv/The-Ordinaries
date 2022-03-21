@@ -4,30 +4,19 @@
 
 
 <div class="container">
-  <div id='third' class="row" style='display:none'>
-    <h5 class='text-muted' style='padding-top: 30px;'>You might also like </h5>
-    <br>
-<div class='row '>
-    {% for rec in recs %}
-    <div class="col text-center">
-          <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
-          <a style=" display: -webkit-box; max-width: 200px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
-          <span style=" display: -webkit-box; max-width: 180px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;"class="user-link">{{rec.author}}</span>
+  <div id='third' class="row mt-3" style='display:none; background-color:gainsboro;'>
+    <h5 style='padding-top: 30px;'>You might also like </h5>
+    <div class='row mb-3'>
+        {% for rec in recs %}
+        <div class="col-sm-6 col-md-3 mb-2 mt-2 text-center">
+              <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
+              <a style=" display: -webkit-box; max-width: 200px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
+              <span style=" display: -webkit-box; max-width: 180px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;"class="user-link">{{rec.author}}</span>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
   </div>
 
-</div>
-
-<script>
-  var message_ele = document.getElementById("third");
-
-  setTimeout(function(){ 
-    message_ele.style.display = "none"; 
-  }, 10000);
-</script>
-
-<br>
   <div class="row">
     <div class="col-12">
         <h2 class="d-flex justify-content-center mb-5">{{ book.title }} </h2>
@@ -155,7 +144,7 @@
   </div>
 
 <script>
-  
+
   var currentPath = window.location.hash;
   if(currentPath.substring(1) == 'third'){
     const targetDiv = document.getElementById(currentPath.substring(1));
@@ -164,6 +153,7 @@
     targetDiv.style.display = "block";
     }
   }
+  
 
 </script>
 </div>

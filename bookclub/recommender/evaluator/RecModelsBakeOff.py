@@ -6,31 +6,34 @@ Created on Thu May  3 11:11:13 2018
 """
 
 from .Evaluator import Evaluator
-from bookclub.recommender.rec import ContentKNNAlgorithm, Recommender
-from surprise import KNNBasic, SVD
-from surprise import NormalPredictor
+from surprise import KNNBasic, SVD, NormalPredictor
+from bookclub.recommender.book_ratings import BookRatings
+from bookclub.recommender.rec import ContentKNNAlgorithm
 
 import random
 import numpy as np
 
 class RecModelsBakeOff:
+
     def __init__(self):
-        self.rec = Recommender()
+        self.bookRatings = BookRatings()
 
     def LoadBooksData(self):
         print("Loading book ratings...")
-        data = self.rec.load_dataset()
-        return data
+        data = self.bookRatings.load_dataset()
+        rankings = self.bookRatings.getPopularityRanks()
+
+        return (data, rankings)
 
     def evaluate(self):
         np.random.seed(0)
         random.seed(0)
 
         # Load up common data set for the recommender algorithms
-        evaluationData = self.LoadBooksData()
+        (evaluationData, rankings) = self.LoadBooksData()
 
-        # Construct an Evaluator to, you know, evaluate them
-        evaluator = Evaluator(evaluationData)
+        # Construct an Evaluator to evaluate the recommender algorithms
+        evaluator = Evaluator(evaluationData, rankings)
 
         # User-based KNN
         UserKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': True})
@@ -40,19 +43,19 @@ class RecModelsBakeOff:
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
 
-        # Item-based KNN
-        genre = ContentKNNAlgorithm()
-        evaluator.AddAlgorithm(genre, "genre similarity")
+        # Content KNN
+        ContentKNN = ContentKNNAlgorithm()
+        evaluator.AddAlgorithm(ContentKNN, "Content KNN")
 
         # SVD
         svd = SVD()
         evaluator.AddAlgorithm(svd, "SVD")
 
-        # Just make random recommendations
+        # Random recommendations
         Random = NormalPredictor()
         evaluator.AddAlgorithm(Random, "Random")
 
         # Fight!
-        evaluator.Evaluate(False)
+        evaluator.Evaluate(True)
 
-        evaluator.SampleTopNRecs(self.rec)
+        evaluator.SampleTopNRecs(self.bookRatings, self.bookRatings.getTestUser())

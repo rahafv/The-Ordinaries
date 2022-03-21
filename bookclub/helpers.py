@@ -10,7 +10,7 @@ import six
 from django.conf import settings
 from .models import Event, Rating, User, Club, Book
 from django.db.models.functions import Lower
-from bookclub.recommender.rec import Recommender
+from bookclub.recommender.recommender import Recommender
 from collections import ChainMap, Counter
 
 def login_prohibited(view_function):

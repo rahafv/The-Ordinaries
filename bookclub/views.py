@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.contrib.auth import authenticate, login, logout
 from bookclub.management.excel import Excel
 
-from bookclub.recommender.rec import Recommender
+from bookclub.recommender.recommender import Recommender
 
 from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
@@ -810,14 +810,15 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = RecommendationHelper()
-    print("----------------------------------------------------------------------------------------------")
-    print("reema: ", recommendations.get_recommendations(5, request.user.id))
-    print("----------------------------------------------------------------------------------------------")
-    print("luois: ", recommendations.get_recommendations(5, 1))
-    print("----------------------------------------------------------------------------------------------")
-    print("club: ", recommendations.get_club_recommendations(5, 102))
-    print("----------------------------------------------------------------------------------------------")
+    recommendations = RecModelsBakeOff()
+    recommendations.evaluate()
+    # print("----------------------------------------------------------------------------------------------")
+    # print("reema: ", recommendations.get_recommendations(5, request.user.id))
+    # print("----------------------------------------------------------------------------------------------")
+    # print("luois: ", recommendations.get_recommendations(5, 1))
+    # print("----------------------------------------------------------------------------------------------")
+    # print("club: ", recommendations.get_club_recommendations(5, 102))
+    # print("----------------------------------------------------------------------------------------------")
 
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')

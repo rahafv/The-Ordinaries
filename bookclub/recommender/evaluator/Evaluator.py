@@ -11,8 +11,8 @@ class Evaluator:
     
     algorithms = []
     
-    def __init__(self, dataset):
-        ed = EvaluationData(dataset)
+    def __init__(self, dataset, rankings):
+        ed = EvaluationData(dataset, rankings)
         self.dataset = ed
         
     def AddAlgorithm(self, algorithm, name):
@@ -36,13 +36,16 @@ class Evaluator:
                         name, metrics["RMSE"], metrics["MAE"], metrics["HR"], metrics["cHR"], metrics["ARHR"],
                                       metrics["Coverage"], metrics["Diversity"], metrics["Novelty"]))
         else:
-            print("{:<10} {:<10} {:<10}".format("Algorithm", "RMSE", "MAE"))
+            print("{:<11}          {:<10}          {:<10}".format("Algorithm", "RMSE", "MAE"))
+            print("-"*51)
             for (name, metrics) in results.items():
-                print("{:<10} {:<10.4f} {:<10.4f}".format(name, metrics["RMSE"], metrics["MAE"]))
+                print("{:<11}          {:<10.4f}          {:<10.4f}".format(name, metrics["RMSE"], metrics["MAE"]))
                 
+
         print("\nLegend:\n")
         print("RMSE:      Root Mean Squared Error. Lower values mean better accuracy.")
         print("MAE:       Mean Absolute Error. Lower values mean better accuracy.")
+
         if (doTopN):
             print("HR:        Hit Rate; how often we are able to recommend a left-out rating. Higher is better.")
             print("cHR:       Cumulative Hit Rate; hit rate, confined to ratings above a certain threshold. Higher is better.")
@@ -61,7 +64,7 @@ class Evaluator:
             trainSet = self.dataset.GetFullTrainSet()
             algo.GetAlgorithm().fit(trainSet)
             
-            print("Computing recommendations...")
+            print("Computing recommendations...") # fix error here
             testSet = self.dataset.GetAntiTestSetForUser(testSubject)
         
             predictions = algo.GetAlgorithm().test(testSet)
@@ -77,7 +80,6 @@ class Evaluator:
 
             for ratings in recommendations[:10]:
                 print(rec.getBookName(ratings[0]), ratings[1])
-            print("")
             
  
                 

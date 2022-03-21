@@ -1,88 +1,9 @@
 import math
-
 import numpy as np
-from bookclub.models import Rating, Book, User
-from bookclub.recommender.evaluator.Evaluator import Evaluator
 from surprise import AlgoBase, KNNBasic, PredictionImpossible
-from surprise import Dataset
-from surprise import Reader
-from surprise import SVD
-from surprise.model_selection import cross_validate
+from bookclub.recommender.book_ratings import BookRatings
 
-import pandas as pd
-
-from collections import defaultdict
-from operator import itemgetter
 import heapq
-
-import os
-import csv
-
-class Recommender:
-    def __init__(self):
-        self.trainset = self.load_dataset().build_full_trainset()
-        self.dataset = self.load_dataset()
-
-    def load_dataset(self):
-        ratingObj = Rating.objects.all()
-        user_ids = []
-        book_ids = []
-        ratings = [] 
-        for obj in ratingObj:
-            user_ids.append(obj.user.id)
-            book_ids.append(obj.book.id)
-            ratings.append(obj.rating)
-
-        ratings_dict = {'userID': user_ids,
-                    'bookID': book_ids,
-                    'rating': ratings}
-        df = pd.DataFrame.from_dict(ratings_dict)
-
-        reader = Reader(rating_scale=(0, 10))
-        data = Dataset.load_from_df(df[['userID', 'bookID', 'rating']], reader)
-        return data
-
-    def generateCandidates(self, user_id, k=20):
-        similarity_matrix = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False}).fit(self.trainset).compute_similarities()
-
-        user_iid = self.trainset.to_inner_uid(user_id)
-        user_ratings = self.trainset.ur[user_iid]
-        k_neighbors = heapq.nlargest(k, user_ratings, key=lambda t: t[1])
-
-        candidates = defaultdict(float)
-        for itemID, rating in k_neighbors:
-            try:
-                similaritities = similarity_matrix[itemID]
-                for innerID, score in enumerate(similaritities):
-                    candidates[innerID] += score * (rating / 10.0)
-            except:
-                continue
-
-        watched = {}
-        for itemID, rating in self.trainset.ur[user_iid]:
-            watched[itemID] = 1
-
-        return candidates, watched
-
-    def get_recommendations(self, user_id, numOfRec):
-        recommendations = []
-        candidates, watched = self.generateCandidates(user_id)
-
-        position = 0
-        for itemID, rating_sum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-            if not itemID in watched:
-                recommendations.append(self.trainset.to_raw_iid(itemID))
-                position += 1
-                if (position > numOfRec): 
-                    break 
-
-        return recommendations 
-
-    def getBookName(self, bookID):
-        try:
-            return Book.objects.all().get(id=bookID).title
-        except:
-            return None
 
 class ContentKNNAlgorithm(AlgoBase):
 
@@ -96,7 +17,7 @@ class ContentKNNAlgorithm(AlgoBase):
         # Compute item similarity matrix based on content attributes
 
         # Load up genre vectors for every book
-        genres = self.getGenres()
+        genres = BookRatings().getGenres()
 
         print("Computing content-based similarity matrix...")
         
@@ -144,37 +65,6 @@ class ContentKNNAlgorithm(AlgoBase):
             sumxy += x * y
         
         return sumxy/math.sqrt(sumxx*sumyy)
-
-    def getGenres(self):
-        genres = defaultdict(list)
-        genreIDs = {}
-        maxGenreID = 0
-        books = Book.objects.all()
-        
-        for book in books:
-            book_id = book.id
-            genreList = book.genre.split(',')
-            genreIDList = []
-            
-            for genre in genreList:
-                if genre in genreIDs:
-                    genreID = genreIDs[genre]
-                else:
-                    genreID = maxGenreID
-                    genreIDs[genre] = genreID
-                    maxGenreID += 1
-                genreIDList.append(genreID)
-            
-            genres[book_id] = genreIDList
-        
-        # Convert integer-encoded genre lists to bitfields that we can treat as vectors
-        for (book_id, genreIDList) in genres.items():
-            bitfield = [0] * maxGenreID
-            for genreID in genreIDList:
-                bitfield[genreID] = 1
-            genres[book_id] = bitfield            
-        
-        return genres
 
     def estimate(self, u, i):
 

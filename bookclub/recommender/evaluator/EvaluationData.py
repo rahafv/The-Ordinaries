@@ -10,7 +10,9 @@ from surprise import KNNBaseline
 
 class EvaluationData:
     
-    def __init__(self, data):
+    def __init__(self, data, popularityRankings):
+
+        self.rankings = popularityRankings
                 
         #Build a full training set for evaluating overall properties
         self.fullTrainSet = data.build_full_trainset()
@@ -67,4 +69,7 @@ class EvaluationData:
     
     def GetSimilarities(self):
         return self.simsAlgo
+
+    def GetPopularityRankings(self):
+        return self.rankings
     
