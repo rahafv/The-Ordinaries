@@ -401,7 +401,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
-            notify.send(user, recipient=club.owner, verb='applied to your club', action_object=club,  description='notification-' )
+            notify.send(user, recipient=club.owner, verb=notificationMessages.APPLIED, action_object=club,  description='notification-' )
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
@@ -600,7 +600,7 @@ def reject_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.applicants.remove(applicant)
         messages.add_message(request, messages.WARNING, "Applicant rejected!")
-        notify.send(current_user, recipient=applicant, verb='rejected you from ', action_object=club,  description='notification')
+        notify.send(current_user, recipient=applicant, verb=notificationMessages.REJECT, action_object=club,  description='notification')
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,

@@ -142,19 +142,19 @@ def get_appropriate_redirect(notification):
     action_name = notification.verb
 
 
-    if action_name == "applied to your club":
+    if action_name == notificationMessages.APPLIED:
         return redirect('applicants_list', club_id=notification.action_object.id)
 
-    elif action_name == "accepted you into":
+    elif action_name == notificationMessages.ACCEPT:
         return redirect('club_page', club_id=notification.action_object.id)
 
-    elif action_name == "rejected you from":
+    elif action_name == notificationMessages.REJECT:
         return redirect('club_page', club_id=notification.action_object.id)
 
-    elif action_name == "followed you":
+    elif action_name == notificationMessages.FOLLOW:
         return redirect('profile', user_id=notification.actor.id)
 
-    elif action_name == "unfollowed you" or action_name == "Leave":
+    elif action_name == notificationMessages.UNFOLLOW :
         return redirect('profile', user_id=notification.actor.id)
     else:
         raise BaseException
@@ -176,3 +176,5 @@ class notificationMessages:
         FOLLOW =  ' followed you'
         UNFOLLOW =  ' unfollowed you'
         ACCEPT = " accepted you into "
+        REJECT = " did not accept you into "
+        APPLIED = " applied to your club "
