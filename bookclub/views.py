@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -11,9 +11,9 @@ from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import RecommendationHelper, delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
+from .helpers import RecommendationHelper, delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Meeting, User, Club, Book, Rating, Event
+from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -26,6 +26,10 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+<<<<<<< HEAD
+=======
+import humanize
+>>>>>>> 7b3e507bf2806962f291977e22a22df654abeb50
 
 
 @login_prohibited
@@ -61,7 +65,7 @@ def home(request):
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-
+    
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited
@@ -140,7 +144,7 @@ def log_in(request):
             if user:
                 login(request, user)
                 if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_book_list'
+                    redirect_url = next or 'initial_genres'
                 else:
                     redirect_url = next or 'home'
                 return redirect(redirect_url)
@@ -222,6 +226,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
@@ -258,6 +263,7 @@ def add_book(request):
         if form.is_valid():
             book = form.save()
             return redirect('book_details', book_id=book.id)
+           
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -462,9 +468,13 @@ def books_list(request, club_id=None, user_id=None):
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True
+    filtered=False
     if user_id:
+        user= get_object_or_404(User.objects, id=user_id)
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+    else: 
+        user= request.user
 
     form = ClubsSortForm(request.GET or None)
     sort = ""
@@ -474,11 +484,28 @@ def clubs_list(request, user_id=None):
         sort_helper = SortHelper(sort, clubs_queryset)
         clubs_queryset = sort_helper.sort_clubs()
 
-    count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    privacy= request.GET.get('privacy')
+    if privacy=='public': 
+        clubsSet = clubs_queryset.filter(club_type='Public')
+        filtered=True
+    elif privacy=='private': 
+        clubsSet = clubs_queryset.filter(club_type='Private')
+        filtered=True
+    else:
+        clubsSet = clubs_queryset.all()
+
+    ownership= request.GET.get('ownership')
+    if ownership=='owned': 
+        clubsSet = clubsSet.filter(owner=user)
+        filtered=True
+    
+
+
+    count = clubsSet.count()
+    clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership, 'filtered':filtered })
 
 
 @login_required
@@ -769,6 +796,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
@@ -886,13 +914,27 @@ def show_sorted(request, searched, label):
         return render(request, 'search_page.html', {})
 
 @login_required
+def initial_genres(request):
+    genres = getGenres()
+    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
+
+    return render(request, 'initial_genres.html', {'genres':sorted_genres})
+
+@login_required
 def initial_book_list(request):
     current_user = request.user
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    list_length = len(current_user.books.all())
+
+    genres = request.GET.getlist('genre')
+    if genres:
+        for genre in genres:
+            my_books = my_books.filter(genre__contains=genre)
+
     sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+    list_length = len(current_user.books.all())
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
 @login_required
 def delete_club(request, club_id):
@@ -905,7 +947,6 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
-
 
 @login_required
 def meetings_list(request, club_id):
@@ -931,6 +972,87 @@ def previous_meetings_list(request, club_id):
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
+
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
 
+@login_required
+def chat_room(request, club_id=None):
+    user = request.user
+    if club_id:
+        club = get_object_or_404(Club.objects, id=club_id)
+        if not club.is_member(user) or club.members.count() <= 1:
+            return render(request, '404_page.html', status=404) 
+    else:
+        clubs = user.clubs.all()
+        if clubs:
+            club = None
+            for c in clubs:
+                if c.members.count() > 1:
+                    club = c
+                    break
+            if not club:
+                messages.add_message(request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
+                return redirect('clubs_list')
+        else:
+            messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
+            return redirect('clubs_list')
+    
+    return render(request, "chat_room.html", {"club":club})
 
+@login_required
+def getMessages(request, club_id):
+    if request.is_ajax():
+        club = get_object_or_404(Club.objects, id=club_id)
+        current_user = request.user
+        
+        chats = list(club.chats.all().values())[:200]
+        modifiedItems = []
+        for key in chats:
+            user_id = key.get("user_id")
+            user = get_object_or_404(User.objects, id=user_id)
+            prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+            modifiedItems.append({"name": user.full_name(), "time":prettyDate})
+
+        return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+    return render(request, '404_page.html', status=404) 
+
+@login_required
+def send(request):
+    if request.method == "POST":
+        message = request.POST['message']
+        
+        if message.strip():
+            username = request.POST['username']
+            club_id = request.POST['club_id']
+
+            club = get_object_or_404(Club.objects, id=club_id)
+            user = get_object_or_404(User.objects, username=username)
+
+            new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+            new_chat_msg.save()
+
+        return HttpResponse('Message sent successfully')
+    return render(request, '404_page.html', status=404) 
+
+@login_required
+def cancel_meeting(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    club = get_object_or_404(Club.objects, id=meeting.club.id)
+    user = request.user
+
+    if (user == club.owner ):
+        meeting.delete()
+        messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
+
+        """send email invites"""
+        MeetingHelper().send_email(request=request, 
+                                    meeting=meeting,
+                                    subject='A meeting has been cancelled ',
+                                    letter='emails/meeting_cancelation_email.html',
+                                    all_mem=True)
+
+        return redirect('meetings_list', club.id)
+    else:
+        messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
+        return redirect('meetings_list', club.id)
+   

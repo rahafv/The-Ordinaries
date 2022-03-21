@@ -1,12 +1,16 @@
 """Unit tests for the User model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User
+from bookclub.models import Book, User
 
 class UserModelTestCase(TestCase):
 
     fixtures = ['bookclub/tests/fixtures/other_users.json',
-        'bookclub/tests/fixtures/default_user.json'
+        'bookclub/tests/fixtures/default_user.json' , 
+        'bookclub/tests/fixtures/default_book.json' , 
+        'bookclub/tests/fixtures/other_books.json',
+        'bookclub/tests/fixtures/default_rating.json' , 
+        
     ]
 
     def setUp(self):
@@ -235,5 +239,25 @@ class UserModelTestCase(TestCase):
     def test_user_cannot_follow_self(self):
         self.user.toggle_follow(self.user)
         self.assertEqual(self.user.follower_count(), 0)
-        self.assertEqual(self.user.followee_count(), 0)
-        
+        self.assertEqual(self.user.followee_count(), 0) 
+
+    def test_all_books_counters(self):
+        first_book = Book.objects.get(id=1)
+        second_book = Book.objects.get(id=2)
+        third_book = Book.objects.get(id=3)
+        self.assertEqual(self.user.all_books_count(), 0)
+        self.user.add_book_to_all_books(first_book)
+        self.assertEqual(self.user.all_books_count(), 1)
+        self.user.add_book_to_all_books(second_book)
+        self.user.add_book_to_all_books(third_book)
+        self.assertEqual(self.user.all_books_count(), 3) 
+
+    def test_cannot_add_duplicate_books(self):
+        first_book = Book.objects.get(id=1)
+        self.assertEqual(self.user.all_books_count(), 0)
+        self.user.add_book_to_all_books(first_book)
+        self.user.add_book_to_all_books(first_book)
+        self.assertEqual(self.user.all_books_count(), 1)
+       
+
+      

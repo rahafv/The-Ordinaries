@@ -16,7 +16,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.owner = User.objects.get(username="janedoe")
         self.member = User.objects.get(username="peterpickles")
 
-    def test_withdarw_url(self):
+    def test_delete_club_url(self):
         self.assertEqual(self.url, f"/delete_club/{self.club.id}")
 
     def test_member_cannot_delete_club(self):
@@ -45,5 +45,5 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
         self.assertEqual(before_count, Club.objects.count())
         self.assertEqual(response.status_code, 404)
 
-    def test_withdraw_club_redirects_when_not_logged_in(self):
+    def test_delete_club_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

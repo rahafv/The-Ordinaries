@@ -717,7 +717,6 @@ label:hover ~ input:checked ~ label{
   }
 }
 
-
 body {
   font-family: 'Lato', sans-serif;
   background: #eceae8;
@@ -774,11 +773,9 @@ textarea:hover {
   color: #e2dedb;
 }
 
-
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
@@ -799,7 +796,41 @@ textarea:hover {
   visibility: visible;
 }
 
+#rcorners1 {
+  border-radius: 25px;
+  padding: 15px; 
+  width: auto;
+  max-width: 350px;
+  height: relative; 
+  background-color: DimGrey; 
+  word-wrap:break-word;
+}
 
+#rcorners2 {
+  border-radius: 25px;
+  padding: 20px; 
+  width: auto;
+  max-width: 350px;
+  height: relative;  
+  text-align: right; 
+  word-wrap:break-word;
+}
+
+#display {
+  height: 100vh;
+  padding-top: 10px !important;
+  padding: 30px;
+}
+
+.borders {
+  border-top: 0px !important;
+  border: 2px solid;
+}
+
+.scroll {
+  height: 100%;
+  overflow: auto;
+}
 
 /* LISTS TABLE */
 .user-list tbody td > img {
@@ -815,10 +846,13 @@ textarea:hover {
 	margin-left: 60px;
 }
 
-
 /* TABLES */
 .table {
     border-collapse: separate;
 }
 
+#genre input:checked~.checkmark {
+  text-decoration: line-through;
+  color: #999999;
 
+}

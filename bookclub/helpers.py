@@ -253,3 +253,18 @@ class RecommendationHelper:
         final_recommendations = [ seq[0] for seq in counter_list ]
         return final_recommendations
 
+def getGenres():
+    genres = {}
+    books = Book.objects.all()
+    
+    for book in books:
+        genreList = book.genre.split(',')
+            
+        for genre in genreList:
+            if genre != '':
+                if genre in genres:
+                    genres[genre] += 1
+                else:
+                    genres[genre] = 1
+
+    return genres

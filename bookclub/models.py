@@ -72,6 +72,13 @@ class User(AbstractUser):
         'self', symmetrical=False, related_name='followees'
     )
 
+    all_books = models.ManyToManyField(
+        "Book",
+        related_name='+',
+        blank = True
+    )
+
+    
     class Meta:
         ordering = ['first_name', 'last_name']
 
@@ -129,6 +136,15 @@ class User(AbstractUser):
         """Returns the number of followees of self."""
 
         return self.followees.count()
+
+    def all_books_count(self):
+        return self.all_books.all().count()
+
+    def add_book_to_all_books(self , book):
+        if book not in self.all_books.all():
+            self.all_books.add(book)
+       
+
 
 class Club(models.Model):
     """Club model."""
@@ -285,7 +301,6 @@ class Book(models.Model):
         blank=True,
         null=True
     )
-
 
     readers = models.ManyToManyField(
         User,
@@ -554,3 +569,38 @@ class Event(models.Model):
             return self.meeting.title
         else:
             return self.rating.book.title
+
+class Chat(models.Model):
+    
+    club = models.ForeignKey(
+        Club,
+        on_delete=models.CASCADE,
+        related_name='chats'
+    )
+
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+    )
+
+    message = models.CharField(
+        max_length=500,
+        blank=False,
+        null=False
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        blank=False,
+        null =False
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def clean(self):
+        super().clean()
+
+        """ checks that the user is a member of the club """
+        if not self.user in self.club.members.all():
+            raise ValidationError('User must be a member of the club')

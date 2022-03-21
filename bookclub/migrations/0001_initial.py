@@ -138,6 +138,19 @@ class Migration(migrations.Migration):
                 'ordering': ['-created_at'],
             },
         ),
+        migrations.CreateModel(
+            name='Chat',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('message', models.CharField(max_length=500)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('club', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chats', to='bookclub.club')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'ordering': ['-created_at'],
+            },
+        ),
         migrations.AddField(
             model_name='book',
             name='clubs',

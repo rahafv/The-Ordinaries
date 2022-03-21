@@ -245,6 +245,7 @@ class Command(BaseCommand):
                 )
 
                 book.add_reader(user)
+                user.add_book_to_all_books(book)
 
                 create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
                 create_event('U', 'B', Event.EventType.REVIEW, user=user, book=book)
