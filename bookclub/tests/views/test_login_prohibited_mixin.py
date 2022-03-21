@@ -33,5 +33,3 @@ class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
         self.client.login(username=self.user.username, password='Password123')
         self.assertRaises(ImproperlyConfigured, self.client.get, self.url)
         
-
-    def test_user_must_be_logged_i
