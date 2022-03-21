@@ -73,32 +73,30 @@ urlpatterns = [
     path("club/<int:club_id>/applicants/", views.ApplicantsListView.as_view(), name='applicants_list'),
     path("club/<int:club_id>/applicants/accept/<int:user_id>", views.accept_applicant, name='accept_applicant'),
     path("club/<int:club_id>/applicants/reject/<int:user_id>", views.reject_applicant, name='reject_applicant'),
-    #path('club/<int:club_id>/edit_club/', views.edit_club_information, name='edit_club'),
     path('club/<int:club_id>/edit_club/', views.EditClubInformationView.as_view(), name='edit_club'),
-    #path('club/<int:club_id>/edit_club/', views.EditClubInformationView.as_view(), name='edit_club'),
-    # path('club/<int:club_id>/transfer_ownership/', views.transfer_club_ownership, name ='transfer_ownership'),
     path('club/<int:club_id>/transfer_ownership/', views.TransferClubOwnershipView.as_view(), name ='transfer_ownership'),
     path('follow_toggle/<int:user_id>/', views.follow_toggle, name='follow_toggle'),
+
     path('followings/<int:user_id>/', views.FollowingListView.as_view(), name='following_list'),
     path('followers/<int:user_id>/', views.FollowersListView.as_view(), name='followers_list'),
     path('search_page', views.search_page, name='search_page'),
-    path('search_page/<str:searched>/<str:label>/', views.show_sorted, name = "show_sorted"),
+    path('search_page/<str:searched>/<str:label>/', views.ShowSortedView.as_view(), name = "show_sorted"),
+
     path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
-    #path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
     path('club/<int:club_id>/schedule_meeting/', views.ScheduleMeetingView.as_view(), name='schedule_meeting'),
-    #path('meeting/<int:meeting_id>/book_choices/', views.choice_book_list, name='choice_book_list'),
     path('meeting/<int:meeting_id>/book_choices/', views.ChoiceBookListView.as_view(), name='choice_book_list'),
-    #path('meeting/<int:meeting_id>/search/', views.search_book, name='search_book'),
     path('meeting/<int:meeting_id>/search/', views.SearchBookView.as_view(), name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
    
-    path('chat_room/', views.chat_room, name='chat_room'),
-    path('club/<int:club_id>/chat_room/', views.chat_room, name='chat_room'),
+    
+    path('chat_room/', views.ChatRoomView.as_view(), name='chat_room'),
+    path('club/<int:club_id>/chat_room/', views.ChatRoomView.as_view(), name='chat_room'),
     path('getMessages/<int:club_id>/', views.getMessages, name='getMessages'),
     path('send', views.send, name='send'),
 
-    path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),
-    path("club/<int:club_id>/previous_meetings/", views.previous_meetings_list, name='previous_meetings_list'),
+    
+    path("club/<int:club_id>/meetings/", views.MeetingsListView.as_view(), name='meetings_list'),
+    path("club/<int:club_id>/previous_meetings/", views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
     path('meeting/<int:meeting_id>/cancel/', views.cancel_meeting, name='cancel_meeting'),
 ]
 

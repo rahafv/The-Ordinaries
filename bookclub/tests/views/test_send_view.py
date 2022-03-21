@@ -33,7 +33,6 @@ class SendTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(count_chats_before, Chat.objects.count())
-        self.assertTemplateUsed(response, "404_page.html")
  
     def test_send_successful(self):
         self.client.login(username=self.user.username, password="Password123")
