@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -57,7 +57,7 @@ def home(request):
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-
+    
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited
@@ -136,7 +136,7 @@ def log_in(request):
             if user:
                 login(request, user)
                 if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_book_list'
+                    redirect_url = next or 'initial_genres'
                 else:
                     redirect_url = next or 'home'
                 return redirect(redirect_url)
@@ -218,6 +218,7 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
@@ -254,6 +255,7 @@ def add_book(request):
         if form.is_valid():
             book = form.save()
             return redirect('book_details', book_id=book.id)
+           
     else:
         form = BookForm()
     return render(request, "add_book.html", {"form": form})
@@ -785,6 +787,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
@@ -893,13 +896,27 @@ def show_sorted(request, searched, label):
         return render(request, 'search_page.html', {})
 
 @login_required
+def initial_genres(request):
+    genres = getGenres()
+    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
+
+    return render(request, 'initial_genres.html', {'genres':sorted_genres})
+
+@login_required
 def initial_book_list(request):
     current_user = request.user
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    list_length = len(current_user.books.all())
+
+    genres = request.GET.getlist('genre')
+    if genres:
+        for genre in genres:
+            my_books = my_books.filter(genre__contains=genre)
+
     sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+    list_length = len(current_user.books.all())
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
 @login_required
 def delete_club(request, club_id):
@@ -937,6 +954,7 @@ def previous_meetings_list(request, club_id):
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
+
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
 
 @login_required

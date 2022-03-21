@@ -1193,3 +1193,9 @@ textarea:hover {
 .table {
     border-collapse: separate;
 }
+
+#genre input:checked~.checkmark {
+  text-decoration: line-through;
+  color: #999999;
+
+}

@@ -52,7 +52,10 @@ urlpatterns = [
     path('add_book/', views.add_book, name ='add_book'),
     path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
-    path('initial_book_list/', views.initial_book_list, name ='initial_book_list'),
+    
+    path('initial_genres/', views.initial_genres, name ='initial_genres'),
+    path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
+
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name ='join_club'),
