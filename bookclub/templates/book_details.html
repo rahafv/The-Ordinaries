@@ -5,12 +5,12 @@
 
 <div class="container">
   <div id='third' class="row mt-3" style='display:none; background-color:gainsboro;'>
-    <h5 style='padding-top: 30px;'>You might also like </h5>
-    <div class='row mb-3'>
+    <h5 style='padding-top: 30px; padding-left: 60px;'>You might also like.. </h5>
+    <div class='row mb-4 text-center' style=" text-align:center">
         {% for rec in recs %}
-        <div class="col-sm-6 col-md-3 mb-2 mt-2 text-center">
+        <div class="col-sm-5 col-md-2 mb-2 mt-2 text-center" style=" text-align:center">
               <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
-              <a style=" display: -webkit-box; max-width: 200px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
+              <a style="  max-width: 3000px; -webkit-line-clamp: 4; -webkit-box-orient: horizontal; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
               <span style=" display: -webkit-box; max-width: 180px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;"class="user-link">{{rec.author}}</span>
         </div>
       {% endfor %}

@@ -59,11 +59,10 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+    recommendations = RecommendationHelper()
+    rec_books = recommendations.get_recommendations(request, 3, user_id=current_user.id)
     
-    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
+    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':rec_books})
 
 @login_prohibited
 def sign_up(request):
@@ -270,7 +269,7 @@ def add_book(request):
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     recommendations = RecommendationHelper()
-    recs = recommendations.get_recommendations(request, 4, user_id=request.user.id, book_id=book.id)
+    recs = recommendations.get_recommendations(request, 6, user_id=request.user.id, book_id=book.id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user

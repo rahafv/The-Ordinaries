@@ -36,7 +36,7 @@ class Recommender:
 
         return candidates, viewed
 
-    def get_recommendations(self, user_id, numOfRec):
+    def get_recommendations(self, user_id, num_of_rec):
         recommendations = []
         candidates, viewed = self.generateCandidates(user_id)
         user = User.objects.get(id =user_id )
@@ -46,7 +46,7 @@ class Recommender:
             if not itemID in user.all_books.all():
                 recommendations.append(self.trainset.to_raw_iid(itemID))
                 position += 1
-                if (position > numOfRec): 
+                if (position >= num_of_rec): 
                     break 
 
         return recommendations 

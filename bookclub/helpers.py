@@ -150,7 +150,6 @@ class RecommendationHelper:
             recommendations = self.get_recommendations_for_club(request, num_of_rec, club_id)
 
         else:
-            
             try:
                 user = User.objects.get(id=user_id)
             except:
