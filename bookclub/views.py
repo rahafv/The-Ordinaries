@@ -26,10 +26,7 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-<<<<<<< HEAD
-=======
 import humanize
->>>>>>> 7b3e507bf2806962f291977e22a22df654abeb50
 
 
 @login_prohibited
@@ -838,15 +835,17 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = RecModelsBakeOff()
-    recommendations.evaluate()
-    # print("----------------------------------------------------------------------------------------------")
-    # print("reema: ", recommendations.get_recommendations(5, request.user.id))
-    # print("----------------------------------------------------------------------------------------------")
-    # print("luois: ", recommendations.get_recommendations(5, 1))
-    # print("----------------------------------------------------------------------------------------------")
-    # print("club: ", recommendations.get_club_recommendations(5, 102))
-    # print("----------------------------------------------------------------------------------------------")
+    # recommendations = RecModelsBakeOff()
+    # recommendations.evaluate()
+
+    recommendations = RecommendationHelper()
+    print("----------------------------------------------------------------------------------------------")
+    print("gary: ", recommendations.get_recommendations(5, request.user.id))
+    print("----------------------------------------------------------------------------------------------")
+    print("luois: ", recommendations.get_recommendations(5, 1))
+    print("----------------------------------------------------------------------------------------------")
+    print("club: ", recommendations.get_club_recommendations(5, 102))
+    print("----------------------------------------------------------------------------------------------")
 
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')

@@ -21,6 +21,7 @@ class RecModelsBakeOff:
     def LoadBooksData(self):
         print("Loading book ratings...")
         data = self.bookRatings.load_dataset()
+        
         rankings = self.bookRatings.getPopularityRanks()
 
         return (data, rankings)

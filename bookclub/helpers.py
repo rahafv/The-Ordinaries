@@ -1,6 +1,7 @@
 from collections import defaultdict
 from functools import reduce
 import math
+import random
 from django.shortcuts import redirect
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template.loader import render_to_string
@@ -140,22 +141,31 @@ def get_list_of_objects(searched, label):
         "filtered_list" : filtered_list}
 
 class RecommendationHelper:
-    def get_recommendations(self, num_of_rec, user_id, book_id=None):
+    def get_recommendations(self, num_of_rec, user_id, book_id=None, club_id=None):
         recommendations = []
-        if not book_id:
+        if book_id:
+            recommendations = list(self.get_recommendations_for_book(user_id, book_id).keys())[:num_of_rec]
+        
+        elif club_id:
+            self.get_recommendations_for_book(num_of_rec, club_id)
+
+        else:
+            user = User.objects.get(id=user_id)
             if Rating.objects.filter(user_id=user_id):
                 recommender = Recommender()
                 recommendations = recommender.get_recommendations(user_id, num_of_rec)
                 
-            else:
+            elif user.books.count() >= 1:
                 recommendations = self.get_genre_recommendations(user_id)[:num_of_rec]
-        
-        else:
-            recommendations = list(self.get_book_recommendations(user_id, book_id).keys())[:num_of_rec]
+
+            else:
+                books = Book.objects.all()
+                return books.order_by('-average_rating','-readers_count')[:num_of_rec]
+            
             
         return self.get_books(recommendations)
 
-    def get_book_recommendations(self, user_id, book_id):
+    def get_recommendations_for_book(self, user_id, book_id):
         book = Book.objects.get(id=book_id)
         user = User.objects.get(id=user_id)
         books = user.books.all()
@@ -238,9 +248,9 @@ class RecommendationHelper:
         
         return books
 
-    def get_club_recommendations(self, num_of_rec, club_id):
+    def get_recommendations_for_club(self, num_of_rec, club_id):
         club = Club.objects.get(id=club_id)
-        members = club.members.order_by("?") #Fix later
+        members = club.members.all()
         books = club.books.all() #remove from recommendations
 
         recommendations =  []
@@ -248,6 +258,7 @@ class RecommendationHelper:
             recommendations.append(self.get_recommendations(num_of_rec, mem.id))
 
         all_recommendations = reduce(lambda z, y :z + y, recommendations)
+        random.shuffle(all_recommendations)
         counter = Counter(all_recommendations)
         counter_list = counter.most_common(num_of_rec)
         final_recommendations = [ seq[0] for seq in counter_list ]
