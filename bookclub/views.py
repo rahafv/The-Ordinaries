@@ -270,7 +270,7 @@ def add_book(request):
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     recommendations = RecommendationHelper()
-    recs = recommendations.get_recommendations(4, request.user.id, book.id)
+    recs = recommendations.get_recommendations(request, 4, user_id=request.user.id, book_id=book.id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
@@ -716,7 +716,7 @@ def schedule_meeting(request, club_id):
                                                    letter='emails/chooser_reminder.html',
                                                    all_mem=False
                                                    )
-                        rec_book = RecommendationHelper().get_club_recommendations(1, meeting.club.id)[0]
+                        rec_book = RecommendationHelper().get_recommendations(request, 1, club_id=meeting.club.id)[0]
                         deadline = timedelta(7).total_seconds()  # 0.00069444
                         Timer(deadline, MeetingHelper().assign_rand_book,
                               [meeting, rec_book, request]).start()
@@ -840,11 +840,7 @@ def search_page(request):
 
     recommendations = RecommendationHelper()
     print("----------------------------------------------------------------------------------------------")
-    print("gary: ", recommendations.get_recommendations(5, request.user.id))
-    print("----------------------------------------------------------------------------------------------")
-    print("luois: ", recommendations.get_recommendations(5, 1))
-    print("----------------------------------------------------------------------------------------------")
-    print("club: ", recommendations.get_club_recommendations(5, 102))
+    print("club: ", recommendations.get_recommendations(request, 5, club_id=102))
     print("----------------------------------------------------------------------------------------------")
 
     # if request.method == 'GET':

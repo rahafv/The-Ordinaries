@@ -141,16 +141,21 @@ def get_list_of_objects(searched, label):
         "filtered_list" : filtered_list}
 
 class RecommendationHelper:
-    def get_recommendations(self, num_of_rec, user_id, book_id=None, club_id=None):
+    def get_recommendations(self, request, num_of_rec, user_id=None, book_id=None, club_id=None):
         recommendations = []
         if book_id:
             recommendations = list(self.get_recommendations_for_book(user_id, book_id).keys())[:num_of_rec]
         
         elif club_id:
-            self.get_recommendations_for_book(num_of_rec, club_id)
+            recommendations = self.get_recommendations_for_club(request, num_of_rec, club_id)
 
         else:
-            user = User.objects.get(id=user_id)
+            
+            try:
+                user = User.objects.get(id=user_id)
+            except:
+                user = request.user
+
             if Rating.objects.filter(user_id=user_id):
                 recommender = Recommender()
                 recommendations = recommender.get_recommendations(user_id, num_of_rec)
@@ -160,15 +165,14 @@ class RecommendationHelper:
 
             else:
                 books = Book.objects.all()
-                return books.order_by('-average_rating','-readers_count')[:num_of_rec]
-            
+                return books.order_by('-average_rating','-readers_count')[:num_of_rec]    
             
         return self.get_books(recommendations)
 
     def get_recommendations_for_book(self, user_id, book_id):
         book = Book.objects.get(id=book_id)
         user = User.objects.get(id=user_id)
-        books = user.books.all()
+        books = user.all_books.all()
         all_books = Book.objects.all().exclude(id__in=books).exclude(id=book.id)
 
         genres = self.getGenres()
@@ -187,7 +191,7 @@ class RecommendationHelper:
 
         similarity = []   
         for book in books:
-            sim = self.get_book_recommendations(user_id, book.id)
+            sim = self.get_recommendations_for_book(user_id, book.id)
             similarity.append(sim)
         
         similarity = ChainMap(*similarity)
@@ -232,7 +236,6 @@ class RecommendationHelper:
             
             genres[book_id] = genreIDList
         
-        # Convert integer-encoded genre lists to bitfields that we can treat as vectors
         for (book_id, genreIDList) in genres.items():
             bitfield = [0] * maxGenreID
             for genreID in genreIDList:
@@ -248,20 +251,21 @@ class RecommendationHelper:
         
         return books
 
-    def get_recommendations_for_club(self, num_of_rec, club_id):
+    def get_recommendations_for_club(self, request, num_of_rec, club_id):
         club = Club.objects.get(id=club_id)
         members = club.members.all()
-        books = club.books.all() #remove from recommendations
+        books = club.books.all()
 
         recommendations =  []
         for mem in members:
-            recommendations.append(self.get_recommendations(num_of_rec, mem.id))
+            recommendations.append(self.get_recommendations(request, num_of_rec, mem.id))
 
         all_recommendations = reduce(lambda z, y :z + y, recommendations)
-        random.shuffle(all_recommendations)
-        counter = Counter(all_recommendations)
+        filtered_rec = [book for book in all_recommendations if book not in books]
+        random.shuffle(filtered_rec)
+        counter = Counter(filtered_rec)
         counter_list = counter.most_common(num_of_rec)
-        final_recommendations = [ seq[0] for seq in counter_list ]
+        final_recommendations = [ seq[0].id for seq in counter_list ]
         return final_recommendations
 
 def getGenres():

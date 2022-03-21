@@ -1,5 +1,5 @@
 from bookclub.recommender.book_ratings import BookRatings
-from bookclub.models import Book
+from bookclub.models import User
 from surprise import KNNBasic
 from bookclub.recommender.book_ratings import BookRatings
 
@@ -31,18 +31,19 @@ class Recommender:
                 continue
 
         viewed = {}
-        for itemID, rating in self.trainset.ur[user_iid]:
-            viewed[itemID] = 1
+        # for itemID, rating in self.trainset.ur[user_iid]:
+        #     viewed[itemID] = 1
 
         return candidates, viewed
 
     def get_recommendations(self, user_id, numOfRec):
         recommendations = []
         candidates, viewed = self.generateCandidates(user_id)
-
+        user = User.objects.get(id =user_id )
         position = 0
+        
         for itemID, rating_sum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-            if not itemID in viewed:
+            if not itemID in user.all_books.all():
                 recommendations.append(self.trainset.to_raw_iid(itemID))
                 position += 1
                 if (position > numOfRec): 
