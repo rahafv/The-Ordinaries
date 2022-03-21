@@ -5,7 +5,7 @@ from bookclub.recommender.book_ratings import BookRatings
 
 import heapq
 
-class ContentKNNAlgorithm(AlgoBase):
+class GenreKNNAlgorithm(AlgoBase):
 
     def __init__(self, k=40, sim_options={}):
         AlgoBase.__init__(self)

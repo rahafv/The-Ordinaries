@@ -8,7 +8,7 @@ Created on Thu May  3 11:11:13 2018
 from .Evaluator import Evaluator
 from surprise import KNNBasic, SVD, NormalPredictor
 from bookclub.recommender.book_ratings import BookRatings
-from bookclub.recommender.rec import ContentKNNAlgorithm
+from .genreKNN import GenreKNNAlgorithm
 
 import random
 import numpy as np
@@ -44,8 +44,8 @@ class RecModelsBakeOff:
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
 
         # Content KNN
-        ContentKNN = ContentKNNAlgorithm()
-        evaluator.AddAlgorithm(ContentKNN, "Content KNN")
+        genreKNN = GenreKNNAlgorithm()
+        evaluator.AddAlgorithm(genreKNN, "Content KNN")
 
         # SVD
         svd = SVD()
