@@ -1,4 +1,5 @@
 {% extends 'base_content.html' %}
+{% load humanize %}
 {% block title %}{{ club.name }}{% endblock %}
 {% block content %}
 
@@ -7,15 +8,14 @@
       <div class="col-lg-4 pb-5 mx-0">
           <!-- Club Sidebar-->
           <div class="club-details-card pb-3">
-              <div class="club-details-card-cover">
+              <div class="club-details-card-cover mb-3">
                 <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-                  <!-- <rect width="100%" height="100%" /> -->
                   <a width="100%" height="100%" href="/images/clubPage.svg"></a>
                 </svg>
               </div>
               <div class="club-details-card-profile">
                   <div class="club-details-card-avatar"></div>
-                  <div class="club-details-card-details ">
+                  <div class="club-details-card-details">
                       <h3 class="club-details-card-name  mt-3 text-lg ps-2">{{club.name}} 
                         {% if user == club.owner %}
                         <span>
@@ -30,7 +30,7 @@
                           {% endif %}
                         {% endif %}
                       </h3>
-                      <small class = "club-details-card-name">{{club.created_at}}</small>
+                      <small class = "club-details-card-name">{{club.created_at|naturaltime}}</small>
                   </div>
               </div>
           </div>
@@ -63,15 +63,26 @@
                       <i class="fe-icon-map-pin text-muted"></i>Schedule a meeting 
                     </a>  
                   {% endif %}
+                  
+                  <!-- CHAT ROOM BUTTON -->
+                  
+                  {% if club.members.count > 1 and is_member %}                    
+                      <a class = "list-group-item chat " href='{% url "chat_room" club_id=club.id %}'> 
+                        <i class="fe-icon-map-pin"></i>Chat Room
+                      </a>
+                    
+                  {% endif %}
+
                     <!-- TRANSFER OWNERSHIP -->
                   {% if user == club.owner %}
-                    <a class="list-group-item button" href="transfer_ownership/">
+                    <a class="list-group-item transfer" href="transfer_ownership/">
                       <i class="fe-icon-map-pin"></i>Transfer Ownership
                     </a>
                   {% endif %}
+
                     <!-- WITHDRAW BUTTON-->
                   {% if not user == club.owner and is_member%}
-                    <a class="list-group-item button " href="{% url 'withdraw_club' club_id=club.id %}">
+                    <a class="list-group-item withdraw " href="{% url 'withdraw_club' club_id=club.id %}">
                       <i class="fe-icon-map-pin"></i>Withdraw from club
                     </a>
                   {% endif %}   
@@ -80,12 +91,12 @@
                   {% if not user == club.owner and not is_member and not is_applicant%}
                       {% if user.city == club.city %}
 
-                        <a  class="list-group-item button" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
+                        <a  class="list-group-item join" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
                           <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
                       {% else %}
-                        <a  class="list-group-item button"  href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <a  class="list-group-item join"  href="{% url 'join_club' club_id=club.id %}" id = "join_club_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
                           <i class="fe-icon-map-pin"></i>Join club
                         </a> 
 
@@ -111,19 +122,8 @@
                         <b>Awaiting approval!</b>
                       </a>
                   {% endif %}
-
-                  <!-- CHAT ROOM BUTTON -->
                   
-                  {% if club.members.count > 1 and is_member %}                    
-                      <a class = "list-group-item active" href='{% url "chat_room" club_id=club.id %}'> Chat Room
-                        <!-- class=" list-group-item button bi bi-chat-left-dots"
-                        style="font-size: 1.4rem; color: black;" -->
-                      </a>
-                    
-                  {% endif %}
-                
-                  
-                  <a class="list-group-item button d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
+                  <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
                     <span class = "d-inline-block font-weight-medium text-uppercase ms-2"> 
                       Owner
                     </span>
@@ -147,7 +147,7 @@
             <div class="w-100"></div>
             <div class="col-md-6 mb-3">
               <div class="form-group">
-                  <label class="text-md mb-2" for="club-theme">Club Theme:</label>
+                  <label class="text-md mb-2" for="club-theme"> Theme:</label>
                   <p class = "text-white" id="club-theme">{{club.theme}}</p>
               </div>
             </div>
@@ -159,13 +159,13 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="text-md  mb-2" for="club-city">Club City:</label>
+                    <label class="text-md  mb-2" for="club-city"> City:</label>
                     <p class = "text-white" id="club-city" >{{club.city}}</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="text-md mb-2" for="club-country">Club Country:</label>
+                    <label class="text-md mb-2" for="club-country"> Country:</label>
                     <p class = "text-white"  id="club-country">{{club.country}}</p>
                 </div>
                 <br/>

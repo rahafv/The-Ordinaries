@@ -47,9 +47,8 @@
   vertical-align: middle;
 }
 .club-details-card .club-details-card-profile .club-details-card-avatar {
-  width: 85px;
+  width:4.81em;
   border-radius: 48%;
-  box-shadow: 0 8px 20px 0 rgba(0, 0, 0, .15);
   overflow: hidden;
 }
 .club-details-card .club-details-card-profile .club-details-card-avatar > img {
@@ -76,6 +75,9 @@
   margin-right: .25rem !important;
 }
 
+/* Awaiting approval text  and chat button club page */
+
+/* Awaiting approval */
 .list-group-item.active:not(.disabled) {
   border-color: #ddd;
   background: #fff;
@@ -83,12 +85,91 @@
   cursor: default;
 }
 
+/* Chat room */
+.list-group-item.chat:not(.disabled):hover {
+  border-color: #ddd;
+  background: #fff;
+  color: #74a5b4;
+  cursor: default;
+}
+
+.list-group-item.active:not(.disabled)::before, .list-group-item.chat:not(.disabled)::before {
+  background-color: #284664;
+}
+
+/*  Buttons club page */
 .list-group-item.disabled:not(.active) {
   border-color: #ddd;
   background: #fff;
   color: rgb(36, 36, 36);
   cursor: default;
 }
+
+.list-group-item.button:not(.active)::before {
+  background-color: rgb(156, 156, 156);
+}
+
+/* Join button club page */
+.list-group-item.join:not(.active) {
+  border-color: #ddd;
+  background: #fff;
+  color: rgb(110, 177, 65);
+  cursor: default;
+}
+
+.list-group-item.join:not(.active):hover {
+  border-color: #ddd;
+  background: #fff;
+  color: #74a5b4;
+  cursor: default;
+}
+
+.list-group-item.join:not(.active)::before {
+  background-color: rgb(110, 177, 65);
+}
+
+
+/* Withdraw button club page */
+
+.list-group-item.withdraw:not(.active) {
+  border-color: #ddd;
+  background: #fff;
+  color: rgb(207, 114, 114);
+  cursor: default;
+}
+
+.list-group-item.withdraw:not(.active):hover {
+  border-color: #ddd;
+  background: #fff;
+  color: #74a5b4;
+  cursor: default;
+}
+
+.list-group-item.withdraw:not(.active)::before {
+  background-color: rgb(207, 114, 114);
+}
+
+/* Transfer ownership button club page */
+
+.list-group-item.transfer:not(.active) {
+  border-color: #ddd;
+  background: #fff;
+  color: rgb(236, 177, 82);
+  cursor: default;
+}
+
+.list-group-item.transfer:not(.active):hover {
+  border-color: #ddd;
+  background: #fff;
+  color: #74a5b4;
+  cursor: default;
+}
+
+.list-group-item.transfer:not(.active)::before {
+  background-color: rgb(236, 177, 82);
+}
+
+/**/
 
 .list-group-item {
   padding-top: 16px;
@@ -102,16 +183,6 @@
   text-transform: uppercase;
   text-decoration: none;
 }
-
-
-.list-group-item.active:not(.disabled)::before {
-  background-color: #284664;
-}
-
-.list-group-item.button:not(.active)::before {
-  background-color: rgb(156, 156, 156);
-}
-
 
 .list-group-item::before {
   display: block;
@@ -542,7 +613,8 @@ a{
 
 /* mouse over link */
 a:hover {
-  color:rgb(214, 196, 195);
+  /* color:rgb(214, 196, 195); */
+  color: #74a5b4;
 }
 
 a:link {
