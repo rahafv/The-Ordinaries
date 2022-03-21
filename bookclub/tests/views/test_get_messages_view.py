@@ -31,7 +31,6 @@ class GetMessagesTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTeste
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, '404_page.html')
 
     def test_get_get_messages_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from pyexpat import model
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -26,6 +27,9 @@ from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from django.utils.decorators import method_decorator
 import humanize
+from django.views.generic.detail import DetailView
+from django.views.generic.base import TemplateView
+from django.views.generic import ListView
 
 @login_prohibited
 def welcome(request):
@@ -442,7 +446,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
 
     items = ""
     items_count = 0
- 
+
     if user_id is not None:
         books_queryset = User.objects.get(id=user_id).books.all()
         books_count = books_queryset.count()
@@ -1001,11 +1005,11 @@ class EditReviewView(UpdateView):
         if self.request.user != get_object_or_404(Rating.objects, id=self.review_id).user:
             raise Http404
         return super().get(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         review_user = self.request.user
         review = get_object_or_404(Rating.objects, id=self.review_id)
-        
+
         form.save(review_user, review.book)
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
 
@@ -1050,37 +1054,6 @@ def follow_toggle(request, user_id):
                      current_user, action_user=followee)
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
-
-@login_required
-def search_page(request):
-    if request.method == 'GET':
-        searched = request.GET.get('searched')
-        category = request.GET.get('category')
-        label = category
-
-        # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
-        category = search_page_results["category"]
-        filtered_list = search_page_results["filtered_list"]
-
-        sortForm = ""
-        if(category == "Clubs"):
-            sortForm = ClubsSortForm(request.GET or None)
-
-        elif(category == "Books"):
-            sortForm = BooksSortForm(request.GET or None)
-        else:
-            sortForm = UsersSortForm(request.GET or None)
-
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
-        current_user=request.user
-        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
-
-    else:
-        return render(request, 'search_page.html', {})
 
 class SearchPageView(TemplateView):
 
@@ -1137,10 +1110,14 @@ class SearchPageView(TemplateView):
         context['current_user'] = self.request.user
         return context
 
-
 @login_required
-def show_sorted(request, searched, label):
-    if request.method == "GET":
+def search_page(request):
+    if request.method == 'GET':
+        searched = request.GET.get('searched')
+        category = request.GET.get('category')
+        label = category
+
+        # method in helpers to return a dictionary with a list of users, clubs or books searched
         search_page_results = get_list_of_objects(
             searched=searched, label=label)
         category = search_page_results["category"]
@@ -1149,30 +1126,74 @@ def show_sorted(request, searched, label):
         sortForm = ""
         if(category == "Clubs"):
             sortForm = ClubsSortForm(request.GET or None)
+
         elif(category == "Books"):
             sortForm = BooksSortForm(request.GET or None)
         else:
             sortForm = UsersSortForm(request.GET or None)
 
-        sort = ""
-        if (sortForm.is_valid()):
-            sort = sortForm.cleaned_data.get('sort')
-            sort_helper = SortHelper(sort, filtered_list)
-
-            if(category == "Clubs"):
-                filtered_list = sort_helper.sort_clubs()
-            elif(category == "Books"):
-                filtered_list = sort_helper.sort_books()
-            else:
-                filtered_list = sort_helper.sort_users()
-
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = request.GET.get('page')
         filtered_list = pg.get_page(page_number)
-        return render(request, 'search_page.html', {'searched': searched, 'label': label,  'category': category, 'form': sortForm, "filtered_list": filtered_list})
+        current_user=request.user
+        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
     else:
         return render(request, 'search_page.html', {})
+
+class ShowSortedView(LoginRequiredMixin, ListView):
+    template_name = 'search_page.html'
+    paginate_by = settings.MEMBERS_PER_PAGE
+
+    def post(self, *args, **kwargs):
+        """Handle post request."""
+        return render(self.request, 'search_page.html', {})
+
+    def get(self, *args, **kwargs):
+        """Handle get request."""
+        self.searched = kwargs['searched']
+        self.label = kwargs['label']
+        search_page_results = get_list_of_objects(
+            searched=kwargs['searched'], label=kwargs['label'])
+        self.category = search_page_results["category"]
+        self.filtered_list = search_page_results["filtered_list"]
+
+        self.sortForm = ""
+        if(self.category == "Clubs"):
+            self.sortForm = ClubsSortForm(self.request.GET or None)
+        elif(self.category == "Books"):
+            self.sortForm = BooksSortForm(self.request.GET or None)
+        else:
+            self.sortForm = UsersSortForm(self.request.GET or None)
+
+        sort = ""
+        if (self.sortForm.is_valid()):
+            sort = self.sortForm.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, self.filtered_list)
+
+            if(self.category == "Clubs"):
+                self.filtered_list = sort_helper.sort_clubs()
+            elif(self.category == "Books"):
+                self.filtered_list = sort_helper.sort_books()
+            else:
+                self.filtered_list = sort_helper.sort_users()
+
+        return super().get(*args, **kwargs)
+
+    def get_queryset(self):
+        """Return filtered list based on search."""
+        return self.filtered_list
+
+    def get_context_data(self, **kwargs):
+        """Retrieve context data to be shown on the template."""
+        context = super().get_context_data(**kwargs)
+        context['searched'] = self.searched
+        context['label'] = self.label
+        context['category'] = self.category
+        context['form'] = self.sortForm
+        context['filtered_list'] = context['page_obj']
+        return context
+
 
 class InitialGenresView(TemplateView):
     template_name = 'initial_genres.html'
@@ -1186,7 +1207,7 @@ class InitialGenresView(TemplateView):
         genres = getGenres()
         context['genres'] = sorted(genres, reverse=True, key=genres.get)[0:40]
         return context
-    
+
 
 # @login_required
 # def initial_genres(request):
@@ -1247,56 +1268,84 @@ def delete_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
 
-@login_required
-def meetings_list(request, club_id):
-    user = get_object_or_404(User.objects, id=request.user.id)
-    club = get_object_or_404(Club.objects, id=club_id)
+class MeetingsListView(LoginRequiredMixin, ListView):
+    template_name = 'meetings_list.html'
+    model = Meeting
+    paginate_by = settings.MEMBERS_PER_PAGE
+
+    def get(self, *args, **kwargs):
+        """Store user and club in self."""
+        self.user = get_object_or_404(User, id=self.request.user.id)
+        self.club = get_object_or_404(Club, id=kwargs['club_id'])
+        return super().get(*args, **kwargs)
+
+    def get_queryset(self):
+        """Return club's upcoming meetings."""
+        return self.club.get_upcoming_meetings()
+
+    def get_context_data(self, **kwargs):
+        """Retrieve context data to be shown on the template."""
+        context = super().get_context_data(**kwargs)
+        context['meetings_list'] = context['page_obj']
+        context['user'] = self.user
+        context['club'] = self.club
+
+        return context
 
 
-    meetings = club.get_upcoming_meetings()
+class PreviousMeetingsList(LoginRequiredMixin, ListView):
+    template_name = 'meetings_list.html'
+    model = Meeting
+    paginate_by = settings.MEMBERS_PER_PAGE
 
-    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    meetings_list = meetings_pg.get_page(page_number)
-    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'club':club })
+    def get(self, *args, **kwargs):
+        """Store user and club in self."""
+        self.user = get_object_or_404(User, id=self.request.user.id)
+        self.club = get_object_or_404(Club, id=kwargs['club_id'])
+        return super().get(*args, **kwargs)
 
-@login_required
-def previous_meetings_list(request, club_id):
-    user = get_object_or_404(User.objects, id=request.user.id)
-    club = get_object_or_404(Club.objects, id=club_id)
-    is_previous = True
+    def get_queryset(self):
+        """Return club's previous meetings."""
+        return self.club.get_previous_meetings()
 
-    meetings = club.get_previous_meetings()
+    def get_context_data(self, **kwargs):
+        """Retrieve context data to be shown on the template."""
+        context = super().get_context_data(**kwargs)
+        context['meetings_list'] = context['page_obj']
+        context['user'] = self.user
+        context['is_previous'] = True
+        context['club'] = self.club
 
-    meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    meetings_list = meetings_pg.get_page(page_number)
+        return context
 
-    return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
+class ChatRoomView(LoginRequiredMixin, TemplateView):
+    template_name = "chat_room.html"
 
-@login_required
-def chat_room(request, club_id=None):
-    user = request.user
-    if club_id:
-        club = get_object_or_404(Club.objects, id=club_id)
-        if not club.is_member(user) or club.members.count() <= 1:
-            return render(request, '404_page.html', status=404)
-    else:
-        clubs = user.clubs.all()
-        if clubs:
-            club = None
-            for c in clubs:
-                if c.members.count() > 1:
-                    club = c
-                    break
-            if not club:
-                messages.add_message(request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
-                return redirect('clubs_list')
+    def get(self, *args, **kwargs):
+        """Handle get request and perform checks on whether a user is a member
+        of a club and if the club has more than one member before displaying chats. """
+        user = self.request.user
+        club = get_object_or_404(Club, id=kwargs['club_id']) if 'club_id' in kwargs else None
+
+        if club:
+            if not club.is_member(user) or club.members.count() <= 1:
+                raise Http404
         else:
-            messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
-            return redirect('clubs_list')
+            clubs = user.clubs.all()
+            if clubs:
+                club = None
+                for c in clubs:
+                    if c.members.count() > 1:
+                        club = c
+                        break
+                if not club:
+                    messages.add_message(self.request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
+                    return redirect('clubs_list')
+            else:
+                messages.add_message(self.request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
+                return redirect('clubs_list')
+        return render(self.request, "chat_room.html", {"club":club})
 
-    return render(request, "chat_room.html", {"club":club})
 
 @login_required
 def getMessages(request, club_id):
@@ -1313,7 +1362,7 @@ def getMessages(request, club_id):
             modifiedItems.append({"name": user.full_name(), "time":prettyDate})
 
         return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
-    return render(request, '404_page.html', status=404)
+    raise Http404
 
 @login_required
 def send(request):
@@ -1331,7 +1380,7 @@ def send(request):
             new_chat_msg.save()
 
         return HttpResponse('Message sent successfully')
-    return render(request, '404_page.html', status=404)
+    raise Http404
 
 @login_required
 def cancel_meeting(request, meeting_id):
