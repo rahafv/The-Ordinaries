@@ -517,29 +517,22 @@ section {
 /*
 * BOOK PAGE
 */
-.book-nav{
-  margin-top:3rem;   
-}
 
 .book-info{
-  margin-top: 10rem;
+  margin-top: 2.5rem;
 }
 
-.book-heading img {
-  margin-top: -20px;
-}
 p.genre-overflow{
-  overflow-wrap: break-word;
-  
+  overflow-wrap: break-word; 
 }
 .bio-graph-heading {
   background: #284664;
   color: #fff;
-  padding: 40px 10px 30px 19px;
-  border-radius: 10px 10px 0px 0px;
-  -webkit-border-radius: 10px 10px 0 0;
+  padding: 30px 30px 30px 45px;
+  border-radius: 5px 5px 5px 5px;
+  -webkit-border-radius: 5px 5px 5px 5px;
   font-size: 16px;
-  font-weight: 300;
+  font-weight: 200;
 }
 .bio-row {
   width: 50%;
@@ -573,15 +566,13 @@ p.genre-overflow{
   float: left;
   width: 40%;
   border: #284664;
-  padding: 0px 0px;
 }
 
 .canvas-statistics{
   background: #284664;
   color: #fff;
-  padding: 0px 0px;
-  border-radius: 4px 4px 0px 0px;
-  -webkit-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 4px 4px;
+  -webkit-border-radius: 4px 4px 4px 4px;
 }
 
 .count-canvas{

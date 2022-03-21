@@ -3,23 +3,23 @@
 {% block content %}
 
 <div class="container">
-  <div class="row">
+  <div class="row mt-3">
+    <div class = "d-flex justify-content-center text-black name-and-edit mb-4 mt-2">
+      <h2 class = "me-2">{{ book.title }}</h2> 
+        {% if reader %}
+          <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill float-left"
+          style="font-size: 2.3rem; color: green;"></a>
+        {% else %}
+          <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-plus"
+          style="font-size: 2.3rem; color: grey;"></a>
+        {% endif %}
+    </div>
     <div class="book-nav col-md-4 col-sm-3">
         <div class="panel">
             <div class="book-heading">
-              <div class = "d-flex justify-content-safe-center text-black name-and-edit mb-2">
-                <h2 class = "me-2">{{ book.title }}</h2> 
-                  {% if reader %}
-                    <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill float-left"
-                    style="font-size: 2.3rem; color: green;"></a>
-                  {% else %}
-                    <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-plus"
-                    style="font-size: 2.3rem; color: grey;"></a>
-                  {% endif %}
-              </div>
-              <div>
+              <div class = "align-items-center">
                 <h5>
-                  <div class="fw-light  text-black text-left me-5 mb-5">
+                  <div class="fw-light  text-black text-left me-5 mb-3">
                   
                     <i class="fa fa-star{% if book.average_rating < 1%}-o{% elif book.average_rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
                     <i class="fa fa-star{% if book.average_rating < 3%}-o{% elif book.average_rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
@@ -97,17 +97,17 @@
                 <div class="row overflow-text no-gutters ">
                   {% if book.author %}
                     <div class="bio-row" style="text-align: left;">
-                        <h4>Author:</h4> &emsp;
+                        <label class="text-md">Author:</label> &emsp;
                         <p>{{book.author}}</p>
                     </div>
                   {%  endif %}
                   <div class="bio-row" style="text-align: right;">
-                      <h4>ISBN:</h4> &emsp;
+                      <label>ISBN:</label> &emsp;
                       <p>{{book.ISBN}}</p>
                   </div>
                   {% if book.genre %}
                     <div class="bio-row" style="text-align: left; overflow-wrap: break-word;">
-                      <h4>Genre:</h4> &emsp;
+                      <label>Genre:</label> &emsp;
                       <div style = "max-width: 15rem; min-width:6rem;overflow-wrap: break-word;">
                         <p style=" text-align: left;" class = "m-0">{{book.genre}}</p>
                       </div>
@@ -115,7 +115,7 @@
                   {% endif %}
                   {% if book.pages_num %}
                   <div class="bio-row px-3" style="text-align: right;">
-                    <h4>Pages:</h4> &emsp;
+                    <label>Pages:</label> &emsp;
                     <p>{{book.pages_num}}</p>
                 </div>
                   {% endif %}
@@ -124,13 +124,14 @@
             {% if book.description %}
               <div class="panel-body bio-graph-info mt-3 mb-5">
                 <h4>Description:</h4>
-                  <p>{{ book.description}}</p>
+                  <p>{{ book.description }}</p>
               </div>
             {% endif %}
         </div>
-        <div>
+        <div class="w-100"></div>
+        <div class = "justify-content-center">
           <div class="row mt-3 centered">
-              <div class="col-md-5 col-sm-6 canvas-statistics text-align:center">
+              <div class="col-lg-5 col-sm-4 canvas-statistics text-align:center">
                   <div class="panel">
                       <div class="panel-body">
                           <div class="bio-chart">
@@ -146,7 +147,7 @@
                       </div>
                   </div>
               </div>
-              <div class="col-md-5 col-sm-6 canvas-statistics text-align:center">
+              <div class="col-lg-5 col-sm-4 canvas-statistics text-align:center">
                 <div class="panel">
                   <div class="panel-body">
                       <div class="bio-chart">
