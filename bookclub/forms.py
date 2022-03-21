@@ -453,4 +453,4 @@ class TransferOwnershipForm(forms.Form):
         user_id = kwargs.pop("user_id")
         super().__init__(*args, **kwargs)
         self.fields["new_owner"] = forms.ModelChoiceField(queryset=Club.objects.get(id=club_id).members.all().exclude(id=user_id), label="Please select a new owner")
-        self.fields["confirm"] = forms.BooleanField(label="Please confirm by checking this box", widget=forms.CheckboxInput(attrs={"class": "form-check-input"}))
+        self.fields["confirm"] = forms.BooleanField(label_suffix="", label="Please confirm by checking this box", help_text = "checkbox", widget=forms.CheckboxInput(attrs={"class": "form-check-input"}))
