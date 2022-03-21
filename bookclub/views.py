@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Meeting, User, Club, Book, Rating, Event
+from .models import Meeting, User, Club, Book, Rating, Event, Chat
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -35,7 +35,7 @@ class HomeView(TemplateView):
 
     template_name = 'home.html'
 
-    def events_created_at(event):
+    def events_created_at(self, event):
         return event.created_at
 
     def get_context_data(self, *args, **kwargs):
@@ -438,7 +438,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
 
     items = ""
     items_count = 0
-
+ 
     if user_id is not None:
         books_queryset = User.objects.get(id=user_id).books.all()
         books_count = books_queryset.count()
@@ -1082,6 +1082,10 @@ class SearchPageView(TemplateView):
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, *args, **kwargs):
         self.searched = self.request.GET.get('searched')
         self.category = self.request.GET.get('category')
@@ -1164,6 +1168,21 @@ def show_sorted(request, searched, label):
 
     else:
         return render(request, 'search_page.html', {})
+
+class InitialGenresView(TemplateView):
+    template_name = 'initial_genres.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        genres = getGenres()
+        context['genres'] = sorted(genres, reverse=True, key=genres.get)[0:40]
+        return context
+    
+
 
 @login_required
 def initial_genres(request):

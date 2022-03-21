@@ -34,8 +34,8 @@ urlpatterns = [
     path('send_verification/<int:user_id>', views.send_activiation_email, name='send_verification'),
     path('activate_user/<uidb64>/<token>', views.activate_user, name='activate'),
     path('log_in/', views.log_in, name='log_in'),
-    # path('home/' , views.home, name='home'),
-    path('home/' , views.HomeView.as_view(), name='home'),
+    path('home/' , views.home, name='home'),
+    # path('home/' , views.HomeView.as_view(), name='home'),
     path('log_out/', views.log_out, name='log_out'),
 
     path('profile/', views.show_profile_page, name='profile'),
@@ -60,7 +60,8 @@ urlpatterns = [
     path('initial_book_list/', views.initial_book_list, name='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
 
-    path('initial_genres/', views.initial_genres, name ='initial_genres'),
+    # path('initial_genres/', views.initial_genres, name ='initial_genres'),
+    path('initial_genres/', views.InitialGenresView.as_view(), name ='initial_genres'),
     path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name='join_club'),
