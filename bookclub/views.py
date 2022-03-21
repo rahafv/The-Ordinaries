@@ -1,12 +1,12 @@
 from datetime import timedelta
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse, reverse_lazy
@@ -25,6 +25,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from django.utils.decorators import method_decorator
+import humanize
 
 @login_prohibited
 def welcome(request):
@@ -47,7 +48,7 @@ class HomeView(TemplateView):
         club_events = []
         for author in authors:
             user_events += list(Event.objects.filter(user=author))
-        
+
         final_user_events = user_events
         final_user_events.sort(reverse=True, key=self.events_created_at)
         context['user_events'] = final_user_events[0:25]
@@ -64,7 +65,7 @@ class HomeView(TemplateView):
         already_selected_books = current_user.books.all()
         my_books = Book.objects.all().exclude(id__in=already_selected_books)
         context['books'] = my_books.order_by('-average_rating','-readers_count')[:3]
-        
+
         context['user'] = current_user
         return context
 
@@ -175,7 +176,7 @@ def log_in(request):
             if user:
                 login(request, user)
                 if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_book_list'
+                    redirect_url = next or 'initial_genres'
                 else:
                     redirect_url = next or 'home'
                 return redirect(redirect_url)
@@ -245,17 +246,17 @@ def create_club(request):
 
 class AddReviewView(FormView):
     template_name = 'book_details.html'
-    pk_url_kwarg = 'book_id' 
+    pk_url_kwarg = 'book_id'
     context_object_name = 'book'
     form_class = RatingForm
-    
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """Retrieves the club_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id') 
+        self.book_id = kwargs.get('book_id')
 
         return super().get(request, *args, **kwargs)
 
@@ -271,8 +272,8 @@ class AddReviewView(FormView):
 
         create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
-        
-        self.reviewed_book.calculate_average_rating() 
+
+        self.reviewed_book.calculate_average_rating()
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -280,7 +281,7 @@ class AddReviewView(FormView):
                          "Review cannot be over 250 characters.")
         return super().form_invalid(form)
 
-    def get_success_url(self):         
+    def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 @login_required
@@ -296,10 +297,11 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
-            reviewed_book.calculate_average_rating() 
+            reviewed_book.calculate_average_rating()
 
             return redirect('book_details', book_id=reviewed_book.id)
 
@@ -315,20 +317,20 @@ def club_page(request, club_id):
     is_member = club.is_member(user)
     is_applicant = club.is_applicant(user)
     upcoming_meetings = club.get_upcoming_meetings()
-    try: 
+    try:
         upcoming_meeting = upcoming_meetings[0]
     except:
         upcoming_meeting=None
 
-    
-    
+
+
     return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
 
 
 class AddBookView(FormView):
     form_class = BookForm
-    template_name = 'add_book.html' 
-    
+    template_name = 'add_book.html'
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -337,7 +339,7 @@ class AddBookView(FormView):
         self.book = form.save()
         return super().form_valid(form)
 
-    def get_success_url(self):         
+    def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 class BookDetailsView(DetailView, FormMixin):
@@ -346,11 +348,11 @@ class BookDetailsView(DetailView, FormMixin):
     context_object_name = 'book'
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
-    
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-        
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
@@ -358,7 +360,7 @@ class BookDetailsView(DetailView, FormMixin):
         rating = book.ratings.all().filter(user=user)
         if rating:
             rating = rating[0]
-        
+
         context['book'] = book
         context['form'] = RatingForm()
         context['rating'] = rating
@@ -390,7 +392,7 @@ class ProfilePageView(DetailView):
 
     def get(self, request, *args, **kwargs):
         """Retrieves the user_id from url and stores it in self for later use."""
-        self.user_id = kwargs.get('user_id') 
+        self.user_id = kwargs.get('user_id')
         self.is_clubs = kwargs.get('is_clubs')
         return super().get(request, *args, **kwargs)
 
@@ -408,7 +410,7 @@ class ProfilePageView(DetailView):
         context['user'] = user
         context['following'] = request.user.is_following(user)
         context['followable'] = (request.user != user)
-        
+
         if self.user_id:
             books_queryset = User.objects.get(id=self.user_id).books.all()
             books_count = books_queryset.count()
@@ -429,7 +431,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
 
     if user_id:
         user = get_object_or_404(User.objects, id=user_id)
-        
+
 
     following = request.user.is_following(user)
     followable = (request.user != user)
@@ -447,7 +449,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
         items_count = books_count
 
         return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': items, 'items_count': items_count, 'is_clubs': is_clubs})
-       
+
     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, })
 
 
@@ -579,10 +581,10 @@ class BookListView(ListView):
 
     def get(self, request, *args, **kwargs):
         """Retrieves the club_id from url and stores it in self for later use."""
-        self.club_id = kwargs.get('club_id') 
-        self.user_id = kwargs.get('user_id') 
+        self.club_id = kwargs.get('club_id')
+        self.user_id = kwargs.get('user_id')
         return super().get(request, *args, **kwargs)
-    
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         books_queryset = Book.objects.all()
@@ -641,9 +643,13 @@ class BookListView(ListView):
 def clubs_list(request, user_id=None):
     clubs_queryset = Club.objects.all()
     general = True
+    filtered=False
     if user_id:
+        user= get_object_or_404(User.objects, id=user_id)
         clubs_queryset = User.objects.get(id=user_id).clubs.all()
         general = False
+    else:
+        user= request.user
 
     form = ClubsSortForm(request.GET or None)
     sort = ""
@@ -653,11 +659,28 @@ def clubs_list(request, user_id=None):
         sort_helper = SortHelper(sort, clubs_queryset)
         clubs_queryset = sort_helper.sort_clubs()
 
-    count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    privacy= request.GET.get('privacy')
+    if privacy=='public':
+        clubsSet = clubs_queryset.filter(club_type='Public')
+        filtered=True
+    elif privacy=='private':
+        clubsSet = clubs_queryset.filter(club_type='Private')
+        filtered=True
+    else:
+        clubsSet = clubs_queryset.all()
+
+    ownership= request.GET.get('ownership')
+    if ownership=='owned':
+        clubsSet = clubsSet.filter(owner=user)
+        filtered=True
+
+
+
+    count = clubsSet.count()
+    clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
     page_number = request.GET.get('page')
     clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form})
+    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership, 'filtered':filtered })
 
 
 @login_required
@@ -793,7 +816,7 @@ def transfer_club_ownership(request, club_id):
 
             messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
             create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
-            
+
             current_site = get_current_site(request)
             subject = club.name + ' Club updates'
             email_from = settings.EMAIL_HOST_USER
@@ -950,6 +973,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
+        request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
@@ -957,7 +981,7 @@ def add_book_to_list(request, book_id):
 
 class EditReviewView(FormView):
     model = Rating
-    template_name = 'edit_review.html' 
+    template_name = 'edit_review.html'
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
 
@@ -965,10 +989,10 @@ class EditReviewView(FormView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get(self, request, *args, **kwargs):
         """Retrieves the club_id from url and stores it in self for later use."""
-        self.review_id = kwargs.get('review_id')  
+        self.review_id = kwargs.get('review_id')
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -985,7 +1009,7 @@ class EditReviewView(FormView):
                          "Review cannot be over 250 characters.")
         return super().form_invalid(form)
 
-    def get_success_url(self): 
+    def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.review.book.id})
 
 
@@ -1003,7 +1027,7 @@ def edit_review(request, review_id):
             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
             form = EditRatingForm(instance = review)
-        
+
         return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
 
     else:
@@ -1038,6 +1062,7 @@ def search_page(request):
         sortForm = ""
         if(category == "Clubs"):
             sortForm = ClubsSortForm(request.GET or None)
+
         elif(category == "Books"):
             sortForm = BooksSortForm(request.GET or None)
         else:
@@ -1053,26 +1078,26 @@ def search_page(request):
         return render(request, 'search_page.html', {})
 
 class SearchPageView(TemplateView):
-    
+
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
-    
+
     def get(self, *args, **kwargs):
         self.searched = self.request.GET.get('searched')
         self.category = self.request.GET.get('category')
         return super().get(*args, **kwargs)
-    
-    
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         label = self.category
 
         search_page_results = get_list_of_objects(
             searched=self.searched, label=label)
         self.category = search_page_results["category"]
         filtered_list = search_page_results["filtered_list"]
-        
+
         sortForm = ""
         if(self.category == "Clubs"):
             sortForm = ClubsSortForm(self.request.GET or None)
@@ -1141,13 +1166,27 @@ def show_sorted(request, searched, label):
         return render(request, 'search_page.html', {})
 
 @login_required
+def initial_genres(request):
+    genres = getGenres()
+    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
+
+    return render(request, 'initial_genres.html', {'genres':sorted_genres})
+
+@login_required
 def initial_book_list(request):
     current_user = request.user
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    list_length = len(current_user.books.all())
+
+    genres = request.GET.getlist('genre')
+    if genres:
+        for genre in genres:
+            my_books = my_books.filter(genre__contains=genre)
+
     sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'user':current_user , 'list_length':list_length })
+
+    list_length = len(current_user.books.all())
+    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
 @login_required
 def delete_club(request, club_id):
@@ -1161,32 +1200,91 @@ def delete_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
 
-
 @login_required
 def meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)
     club = get_object_or_404(Club.objects, id=club_id)
-    
-    
+
+
     meetings = club.get_upcoming_meetings()
-    
+
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'club':club })
-    
+
 @login_required
 def previous_meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)
     club = get_object_or_404(Club.objects, id=club_id)
     is_previous = True
-    
+
     meetings = club.get_previous_meetings()
-    
+
     meetings_pg = Paginator(meetings, settings.MEMBERS_PER_PAGE)
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
+
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'is_previous': is_previous, 'club': club })
+
+@login_required
+def chat_room(request, club_id=None):
+    user = request.user
+    if club_id:
+        club = get_object_or_404(Club.objects, id=club_id)
+        if not club.is_member(user) or club.members.count() <= 1:
+            return render(request, '404_page.html', status=404)
+    else:
+        clubs = user.clubs.all()
+        if clubs:
+            club = None
+            for c in clubs:
+                if c.members.count() > 1:
+                    club = c
+                    break
+            if not club:
+                messages.add_message(request, messages.INFO, "All your clubs have one member. Join more clubs and be part of a community.")
+                return redirect('clubs_list')
+        else:
+            messages.add_message(request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
+            return redirect('clubs_list')
+
+    return render(request, "chat_room.html", {"club":club})
+
+@login_required
+def getMessages(request, club_id):
+    if request.is_ajax():
+        club = get_object_or_404(Club.objects, id=club_id)
+        current_user = request.user
+
+        chats = list(club.chats.all().values())[:200]
+        modifiedItems = []
+        for key in chats:
+            user_id = key.get("user_id")
+            user = get_object_or_404(User.objects, id=user_id)
+            prettyDate = humanize.naturaltime(key.get("created_at").replace(tzinfo=None))
+            modifiedItems.append({"name": user.full_name(), "time":prettyDate})
+
+        return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
+    return render(request, '404_page.html', status=404)
+
+@login_required
+def send(request):
+    if request.method == "POST":
+        message = request.POST['message']
+
+        if message.strip():
+            username = request.POST['username']
+            club_id = request.POST['club_id']
+
+            club = get_object_or_404(Club.objects, id=club_id)
+            user = get_object_or_404(User.objects, username=username)
+
+            new_chat_msg = Chat.objects.create(club=club, user=user, message=message)
+            new_chat_msg.save()
+
+        return HttpResponse('Message sent successfully')
+    return render(request, '404_page.html', status=404)
 
 @login_required
 def cancel_meeting(request, meeting_id):
@@ -1199,7 +1297,7 @@ def cancel_meeting(request, meeting_id):
         messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
 
         """send email invites"""
-        MeetingHelper().send_email(request=request, 
+        MeetingHelper().send_email(request=request,
                                     meeting=meeting,
                                     subject='A meeting has been cancelled ',
                                     letter='emails/meeting_cancelation_email.html',
@@ -1209,4 +1307,3 @@ def cancel_meeting(request, meeting_id):
     else:
         messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
         return redirect('meetings_list', club.id)
-    

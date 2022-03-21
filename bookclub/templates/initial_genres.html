@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}
+| Trending Now 
+{% endblock %}
+{% block body %}
+
+<style type="text/css">
+    body { background: black !important; } 
+</style>
+
+<div class="container">
+    <div class="row py-md-5">
+        <div class="col mx-auto">
+          <h1 class="fw-light center text-white" style="text-align: center;">Genres </h1>
+          <p class="lead text-center " style="color:white;"> Tell us what genres you enjoy to help us give you insightful recommendations </p>
+        </div>
+    </div>
+
+    <div class="col-sm-8 mx-auto text-center text-white">
+        <p class="lead text-center " style="color:white;"> Select your favourtie </p>
+        <form method=GET action="{% url 'initial_book_list'%}">
+            {% for genre in genres %}
+                <label id="genre">
+                    <input type="checkbox" id="genre" name="genre" value="{{genre}}" style="opacity:0">
+                    <span class="checkmark">{{genre}}</span>
+                  </label>
+                {% endfor %}
+    </div>
+            <div class="text-center">
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <button class="btn btn-outline-light mt-3" type="submit" style="align:center;"> Continue </button>
+            </div>
+        </form>
+</div>
+{% endblock %}
+

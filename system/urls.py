@@ -60,6 +60,9 @@ urlpatterns = [
     path('initial_book_list/', views.initial_book_list, name='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
 
+    path('initial_genres/', views.initial_genres, name ='initial_genres'),
+    path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
+
     path('club/<int:club_id>/join_club', views.join_club, name='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name='withdraw_club'),
     path('books/', views.BookListView.as_view(), name='books_list'),
@@ -81,12 +84,18 @@ urlpatterns = [
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
     path('search_page', views.search_page, name='search_page'),
     # path('search_page', views.SearchPageView.as_view(), name='search_page'),
-    path('search_page/<str:searched>/<str:label>/', views.show_sorted, name='show_sorted'), 
+    path('search_page/<str:searched>/<str:label>/', views.show_sorted, name='show_sorted'),
     path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
     path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
     path('meeting/<int:meeting_id>/book_choices/', views.choice_book_list, name='choice_book_list'),
     path('meeting/<int:meeting_id>/search/', views.search_book, name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', views.choose_book, name='choose_book'),
+
+    path('chat_room/', views.chat_room, name='chat_room'),
+    path('club/<int:club_id>/chat_room/', views.chat_room, name='chat_room'),
+    path('getMessages/<int:club_id>/', views.getMessages, name='getMessages'),
+    path('send', views.send, name='send'),
+
     path("club/<int:club_id>/meetings/", views.meetings_list, name='meetings_list'),
     path("club/<int:club_id>/previous_meetings/", views.previous_meetings_list, name='previous_meetings_list'),
     path('meeting/<int:meeting_id>/cancel/', views.cancel_meeting, name='cancel_meeting'),
