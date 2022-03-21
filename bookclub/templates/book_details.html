@@ -4,7 +4,7 @@
 
 <div class="container">
   <div class="row mt-3">
-    <div class = "d-flex justify-content-center text-black name-and-edit mb-4 mt-2">
+    <div class = "d-flex justify-content-center text-black name-and-edit mb- mt-2">
       <h2 class = "me-2">{{ book.title }}</h2> 
         {% if reader %}
           <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill float-left"
@@ -55,7 +55,7 @@
                       <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
                       <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
                     </div>         
-                    <textarea name="review" rows="4" class="form-control mb-3 justify-content-safe-center" placeholder="Write your review"></textarea>
+                    <textarea name="review" rows="4" class="form-control mb-3 justify-content-safe-center book_textarea" placeholder="Write your review"></textarea>
                     <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
                   </div>
                 </h5>
@@ -154,7 +154,7 @@
                           <div style="display:inline; width:70px;height:90px;">
                               <canvas width="70px" height="90px"></canvas>
                               <input  disabled class="knob count-canvas" style = "color:#eceae8;" 
-                              value = " {{reviews_count}}" data-width="100" data-height="100"  data-thickness=".2">
+                              value = "{{reviews_count}}" data-width="100" data-height="100"  data-thickness=".2">
                           </div>
                       </div>
                       <div class="bio-desk mt-4 pt-2">

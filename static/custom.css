@@ -567,6 +567,14 @@ p.genre-overflow{
   width: 40%;
   border: #284664;
 }
+  
+.book_textarea{
+  padding: 0 !important;
+  width: 330px !important;
+  max-width: 330px !important;
+  height: 110px !important;
+  max-height: 110px !important;
+}
 
 .canvas-statistics{
   background: #284664;
