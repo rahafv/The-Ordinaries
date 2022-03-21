@@ -170,15 +170,18 @@ class Command(BaseCommand):
             self.create_meeting(club, club.owner)
 
     def create_meeting(self, club, chooser):
+        book = Book.objects.first()
         meeting = Meeting.objects.create(
             title = 'Meeting 1',
             club = club,
             chooser = chooser,
-            book = Book.objects.first(),
+            book = book,
             time = pytz.utc.localize(datetime.today()+timedelta(15)),
             link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
 
         )
+
+        book.add_club(club)
 
         create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
 
