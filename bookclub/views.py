@@ -35,6 +35,10 @@ class HomeView(TemplateView):
 
     template_name = 'home.html'
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def events_created_at(self, event):
         return event.created_at
 
@@ -69,36 +73,36 @@ class HomeView(TemplateView):
         context['user'] = current_user
         return context
 
-@login_required
-def home(request):
-    def events_created_at(event):
-        return event.created_at
+# @login_required
+# def home(request):
+#     def events_created_at(event):
+#         return event.created_at
 
-    current_user = request.user
-    authors = list(current_user.followees.all()) + [current_user]
-    clubs = list(User.objects.get(id=current_user.id).clubs.all())
-    user_events = []
-    club_events = []
-    for author in authors:
-        user_events += list(Event.objects.filter(user=author))
-    final_user_events = user_events
-    final_user_events.sort(reverse=True, key=events_created_at)
-    first_twentyFive = final_user_events[0:25]
+#     current_user = request.user
+#     authors = list(current_user.followees.all()) + [current_user]
+#     clubs = list(User.objects.get(id=current_user.id).clubs.all())
+#     user_events = []
+#     club_events = []
+#     for author in authors:
+#         user_events += list(Event.objects.filter(user=author))
+#     final_user_events = user_events
+#     final_user_events.sort(reverse=True, key=events_created_at)
+#     first_twentyFive = final_user_events[0:25]
 
-    for club in clubs:
-        club_events += list(Event.objects.filter(club=club))
+#     for club in clubs:
+#         club_events += list(Event.objects.filter(club=club))
 
-    final_club_events = club_events
-    final_club_events.sort(reverse=True, key=events_created_at)
-    first_ten = final_club_events[0:10]
+#     final_club_events = club_events
+#     final_club_events.sort(reverse=True, key=events_created_at)
+#     first_ten = final_club_events[0:10]
 
-    club_events_length = len(first_ten)
+#     club_events_length = len(first_ten)
 
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+#     already_selected_books = current_user.books.all()
+#     my_books = Book.objects.all().exclude(id__in=already_selected_books)
+#     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
 
-    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
+#     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited
 def sign_up(request):
@@ -255,20 +259,20 @@ class AddReviewView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
+        """Retrieves the book_id from url and stores it in self for later use."""
         self.book_id = kwargs.get('book_id')
-
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         self.review_user = self.request.user
         if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
-            raise Http404
+            return HttpResponseForbidden()
 
         form.instance.user = self.review_user
         form.instance.book = self.reviewed_book
         form.save(self.review_user, self.reviewed_book)
+        self.review_user.add_book_to_all_books(self.reviewed_book)
 
         create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
@@ -979,12 +983,13 @@ def add_book_to_list(request, book_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 
-class EditReviewView(FormView):
+class EditReviewView(UpdateView):
+    """View to edit the user's review."""
+
     model = Rating
     template_name = 'edit_review.html'
     pk_url_kwarg = 'review_id'
-    form_class = EditRatingForm
-
+    form_class = RatingForm
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -993,14 +998,14 @@ class EditReviewView(FormView):
     def get(self, request, *args, **kwargs):
         """Retrieves the club_id from url and stores it in self for later use."""
         self.review_id = kwargs.get('review_id')
+        if self.request.user != get_object_or_404(Rating.objects, id=self.review_id).user:
+            raise Http404
         return super().get(request, *args, **kwargs)
-
+    
     def form_valid(self, form):
         review_user = self.request.user
         review = get_object_or_404(Rating.objects, id=self.review_id)
-        if review_user != review.user:
-            raise Http404
-
+        
         form.save(review_user, review.book)
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
 
@@ -1010,7 +1015,7 @@ class EditReviewView(FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.review.book.id})
+        return reverse('book_details', kwargs = {'book_id': self.review.book.id})
 
 
 @login_required
@@ -1183,13 +1188,36 @@ class InitialGenresView(TemplateView):
         return context
     
 
+# @login_required
+# def initial_genres(request):
+#     genres = getGenres()
+#     sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
 
-@login_required
-def initial_genres(request):
-    genres = getGenres()
-    sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
+#     return render(request, 'initial_genres.html', {'genres':sorted_genres})
 
-    return render(request, 'initial_genres.html', {'genres':sorted_genres})
+class InitialBookListView(TemplateView):
+    template_name = 'initial_book_list.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_user = self.request.user
+        already_selected_books = current_user.books.all()
+        my_books = Book.objects.all().exclude(id__in=already_selected_books)
+
+        genres = self.request.GET.getlist('genre')
+        if genres:
+            for genre in genres:
+                my_books = my_books.filter(genre__contains=genre)
+
+        context['my_books'] = my_books
+        context['list_length'] = len(current_user.books.all())
+        context['genres'] = genres
+        return context
+
 
 @login_required
 def initial_book_list(request):
