@@ -1,20 +1,25 @@
 {% load notifications_tags %}
 
 
-<a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <span  class="bi-bell"> {% live_notify_badge badge_class="badge" %}</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                {% for notification in  request.user.notifications.unread %}
-                <div>
+<a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span  class="bi-bell">  {{request.user.notifications_count}}</span>
+</a>
+<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+    {%if request.user.notifications.unread %}
+        {% for notification in  request.user.notifications.unread %}
+            {%if 'notification' in notification.description%}
+                <div  style="text-align:center">
                     <a class="dropdown-item" href="{% url 'mark_as_read' notification.slug%}" type="button"> 
                         {{ notification.actor}} {{notification.verb}} 
-                        {% comment %} {%if notification.action_object%} <a href='{% url 'club_page'  notification.action_object.id %}' class="rm-3">
-                             - {{notification.action_object.name}}</a> 
-                        {%endif%}    {% endcomment %}
+                        {%if notification.action_object%} 
+                        <a href={% url 'club_page'  notification.action_object.id %} style= "color: black">   {{notification.action_object.name}}  </a>
+                        {%endif%} 
                     </a>
-                  </div>
-                  <div class="dropdown-divider"></div>
-              {% endfor %}
-            </ul>
+                </div>
+                <div class="dropdown-divider"></div>
+            {%endif%}
+        {% endfor %}
+    {%else %}
+        <div style="text-align:center"> No notifications</div>
+    {%endif%}
+</ul>

@@ -158,3 +158,21 @@ def get_appropriate_redirect(notification):
         return redirect('profile', user_id=notification.actor.id)
     else:
         raise BaseException
+
+
+class notificationMessages:
+
+        #user-events
+        JOIN = " joined "
+        WITHDRAW = " withdrew from "
+        CREATE = " created "
+        REVIEW = " reviewed "
+        ADD = " added "
+        #club-events
+        SCHEDULE = " scheduled a meeting about "
+        TRANSFER = " ownership is transfered to "
+        CHOICE = " chose the book "
+        #notifications
+        FOLLOW =  ' followed you'
+        UNFOLLOW =  ' unfollowed you'
+        ACCEPT = " accepted you into "

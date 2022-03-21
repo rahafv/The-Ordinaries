@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect, notificationMessages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse
@@ -57,13 +57,17 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-  
-
+    ##########
+    notifications = current_user.notifications.unread()
+    user_events = notifications.filter(description__contains ='user-event')
+    club_events = notifications.filter(description__contains='club-event')
+    club_events_length = len(club_events)
+    #########
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
 
-    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
+    return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': club_events_length, 'books':top_rated_books})
 
 @login_prohibited
 def sign_up(request):
@@ -200,8 +204,9 @@ def create_club(request):
             club_owner = request.user
             form.instance.owner = club_owner
             club = form.save()
-            create_event('U', 'C', Event.EventType.CREATE,
-                         user=club_owner, club=club)
+            #create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=club)
+            notify.send(club_owner, recipient=club_owner.followees.all(), verb=notificationMessages.CREATE, action_object=club, description='user-event-C')      
+
             """ adds the owner to the members list. """
             club.add_member(club_owner)
             return redirect('club_page', club_id=club.id)
@@ -223,7 +228,9 @@ def add_review(request, book_id):
             form.instance.user = review_user
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
+            #create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
+            notify.send(review_user, recipient=review_user.followees.all(), verb=notificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )      
+
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
             reviewed_book.calculate_average_rating() 
@@ -394,7 +401,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
-            notify.send(user, recipient=club.owner, verb='applied to your club', action_object=club )
+            notify.send(user, recipient=club.owner, verb='applied to your club', action_object=club,  description='notification-' )
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
@@ -404,8 +411,10 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
-    create_event('U', 'C', Event.EventType.JOIN, user, club)
-    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
+    #create_event('U', 'C', Event.EventType.JOIN, user, club)
+    notify.send(user, recipient=user.followees.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
+
+    #delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -426,8 +435,10 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
-    create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
+
+    notify.send(user, recipient=user.followees.all(), verb=notificationMessages.WITHDRAW, action_object=club, description='user-event-C' )      
+    #delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
+    #create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -569,9 +580,11 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
+        #create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
+        notify.send(applicant, recipient=applicant.followees.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
+        print(applicant.full_name(), notificationMessages.JOIN, club.name,": ", applicant.followees.all()[1].full_name() )
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
-        notify.send(current_user, recipient=applicant, verb='accepted you into ', action_object=club )
+        notify.send(current_user, recipient=applicant, verb= notificationMessages.ACCEPT, action_object=club, description='notification' )
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -587,7 +600,7 @@ def reject_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.applicants.remove(applicant)
         messages.add_message(request, messages.WARNING, "Applicant rejected!")
-        notify.send(current_user, recipient=applicant, verb='rejected you from ', action_object=club)
+        notify.send(current_user, recipient=applicant, verb='rejected you from ', action_object=club,  description='notification')
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -615,7 +628,10 @@ def transfer_club_ownership(request, club_id):
             club.make_owner(member)
 
             messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
-            create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
+            #create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
+            notify.send(club, recipient=club.members.all(), verb=notificationMessages.TRANSFER, action_object=member, description='club-event-U' )      
+
+
             
             current_site = get_current_site(request)
             subject = club.name + ' Club updates'
@@ -698,8 +714,10 @@ def schedule_meeting(request, club_id):
                         Timer(deadline, MeetingHelper().assign_rand_book,
                               [meeting, request]).start()
 
-                    create_event('C', 'M', Event.EventType.SCHEDULE,
-                                 club=club, meeting=meeting)
+                    #create_event('C', 'M', Event.EventType.SCHEDULE, club=club, meeting=meeting)
+                    notify.send(club, recipient=club.members.all(), verb=notificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
+
+                    
                     messages.add_message(
                         request, messages.SUCCESS, "Meeting has been scheduled!")
                     return redirect('club_page', club_id=club.id)
@@ -758,6 +776,8 @@ def choose_book(request, book_id, meeting_id):
 
         messages.add_message(request, messages.SUCCESS,
                              "Book has been chosen!")
+        notify.send(meeting, recipient=meeting.club.members.all(), verb=notificationMessages.CHOICE, action_object=book, description='club-event-B' )      
+
         return redirect('club_page', club_id=meeting.club.id)
     else:
         return render(request, '404_page.html', status=404)
@@ -772,7 +792,9 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
-        create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
+        #create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
+        notify.send(user, recipient=user.followees.all(), verb=notificationMessages.ADD, action_object=book, description='user-event-B' )      
+        
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
@@ -803,13 +825,11 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        create_event('U', 'U', Event.EventType.FOLLOW,
-                     current_user, action_user=followee)
-        notify.send(current_user, recipient=followee, verb='followed you' )
+        #create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
+        notify.send(current_user, recipient=followee, verb=notificationMessages.FOLLOW,  description='notification' )
     else:
-        delete_event('U', 'U', Event.EventType.FOLLOW,
-                     current_user, action_user=followee)
-        notify.send(current_user, recipient=followee, verb='unfollowed you')
+        #delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
+        notify.send(current_user, recipient=followee, verb=notificationMessages.UNFOLLOW,  description='notification')
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 

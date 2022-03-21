@@ -83,12 +83,21 @@
         
         <h1>Feed</h1>
             {% include 'partials/events_as_table.html' with user_events=user_events%}
+            {% comment %} {%for notification in notifications%}
+              {%if notification.description == "user-event"%}
+                <p>
+              {{ notification.actor}} {{notification.verb}} 
+                {%if notification.action_object%} {{notification.action_object}} {%endif%}
+                </p>
+              {%endif%}
+            {%endfor%} {% endcomment %}
       </div>
       <div class="col-md-4">
         <div class="position-sticky" style="top: 10rem;">
           <div class="p-4 mb-3 bg-light-blue rounded">
             <h4 class="fst-italic">Club Updates</h4>
-            {% include 'partials/events_as_list.html' with club_events=club_events%}
+            {% include 'partials/events_as_list.html' with club_events=club_events%} 
+            
           </div>
         </div>
       </div>

@@ -6,22 +6,23 @@
     <td>
     <p class="event-author">
         <span class="author-user-details">
-            <b class= "bi bi-person-circle mr-1"> <a href= {% url 'profile' event.user.id  %}> {{event.user.username}} </a></b>
+            <b class= "bi bi-person-circle mr-1"> <a href= {% url 'profile' event.actor.id  %}> {{event.actor.username}} </a></b>
 
             &nbsp;&middot;&nbsp;
-            <i class= "fa fa-clock mr-1"> </i> {{ event.created_at | naturaltime}}
+            <i class= "fa fa-clock mr-1"> </i> {{ event.timestamp | naturaltime}}
         </span>
     </p>
     <p class="post-text">
-        {{ event.get_actor }}
-        {{ event.message }}
-        {% if event.type_of_action == 'C' %}
-            <a href= {% url 'club_page' event.club.id  %} style= "color: black">  {{ event.get_action }}  </a>
-        {% elif event.type_of_action == 'B' %}
-            <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
-        {% elif event.type_of_action == 'U' %}
-            <a href= {% url 'profile' event.action_user.id  %} style= "color: black">  {{ event.get_action }}  </a> 
-        {% endif %}
+        {{ event.actor.username }}
+        {{ event.verb }}
+        {% with event.description|last as last%}
+            {% if last == 'B' %}
+                <a href= {% url 'book_details' event.action_object.id  %} style= "color: black">{{ event.action_object.title }}  </a>
+            {% elif last == 'C'  %}
+                <a href= {% url 'club_page' event.action_object.id  %} style= "color: black">{{ event.action_object.name }}  </a>
+            {% endif %}
+        {%endwith%}
+
 
 
         

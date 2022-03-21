@@ -7,6 +7,7 @@ import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 import pytz
 
+
 class User(AbstractUser):
     """User model used for authentication."""
 
@@ -78,6 +79,10 @@ class User(AbstractUser):
     def full_name(self):
         """Return full name."""
         return f'{self.first_name} {self.last_name}'
+
+    def notifications_count(self):
+        return self.notifications.unread().filter(description__contains ='notification').count()
+        
 
     def location(self):
         checked = [self.city, self.country, self.region]
