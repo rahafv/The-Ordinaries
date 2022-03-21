@@ -952,7 +952,7 @@ def delete_club(request, club_id):
     return redirect('home')
 
 class MeetingsListView(LoginRequiredMixin, ListView):
-    template_name = 'meetings_list.html'
+    #template_name = 'meetings_list.html'
     model = Meeting
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -964,7 +964,17 @@ class MeetingsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Return club's upcoming meetings."""
+        
         return self.club.get_upcoming_meetings()
+
+    def get_template_names(self):
+        """Returns a different template name if the user does not have access rights."""
+        if self.club.is_member(self.user):
+            return ['meetings_list.html']
+        else:
+            messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
+            return ['club_page.html']
+    
 
     def get_context_data(self, **kwargs):
         """Retrieve context data to be shown on the template."""
@@ -977,7 +987,6 @@ class MeetingsListView(LoginRequiredMixin, ListView):
 
 
 class PreviousMeetingsList(LoginRequiredMixin, ListView):
-    template_name = 'meetings_list.html'
     model = Meeting
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -990,6 +999,15 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """Return club's previous meetings."""
         return self.club.get_previous_meetings()
+
+    def get_template_names(self):
+        """Returns a different template name if the user does not have access rights."""
+        
+        if self.club.is_member(self.user):
+            return ['meetings_list.html']
+        else:
+            messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
+            return ['club_page.html']
 
     def get_context_data(self, **kwargs):
         """Retrieve context data to be shown on the template."""

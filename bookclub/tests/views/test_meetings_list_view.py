@@ -3,10 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 import pytz
 from bookclub.models import User, Club, Meeting, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester 
 from system import settings
 
-class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
+class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTester):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
@@ -20,6 +20,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.club = Club.objects.get(id=1)
+        self.club.add_member(self.user)
         self.other_club = Club.objects.get(id=2)
         self.meeting = Meeting.objects.get(id=1)
         self.sec_meeting = Meeting.objects.get(id=4)
@@ -88,6 +89,16 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         page_obj = response.context['meetings_list']
         self.assertTrue(page_obj.has_previous())
         self.assertFalse(page_obj.has_next())
+        self.assert_menu(response)
+
+    def test_non_members_cannot_access_meetings_list(self):
+        self.non_member = User.objects.get(id=4)
+        self.client.login(username=self.non_member.username, password='Password123')
+        self._create_test_meetings()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "club_page.html")
+        self.assert_error_message(response)
         self.assert_menu(response)
 
 

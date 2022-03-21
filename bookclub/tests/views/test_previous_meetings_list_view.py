@@ -3,9 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 import pytz
 from bookclub.models import User, Club, Meeting, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester 
 
-class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
+class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTester ):
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
@@ -33,6 +33,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
 
     def test_get_club_previous_meetings_list(self):
         self.client.login(username=self.user.username, password='Password123')
+        self.club.add_member(self.user)
         self.url = reverse('previous_meetings_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -41,6 +42,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         
     def test_get_previous_meetings_list(self):
         self.client.login(username=self.user.username, password='Password123')
+        self.club.add_member(self.user)
         self._create_test_previous_meetings()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -49,6 +51,16 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         for meeting_id in range(10):
             self.assertContains(response, f'meeting {meeting_id}')
             self.assertContains(response, "https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1")
+        self.assert_menu(response)
+
+    def test_non_members_cannot_access_previous_meetings_list(self):
+        self.non_member = User.objects.get(id=4)
+        self.client.login(username=self.non_member.username, password='Password123')
+        self._create_test_previous_meetings()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "club_page.html")
+        self.assert_error_message(response)
         self.assert_menu(response)
 
     def _create_test_previous_meetings(self, meetings_count=10):
