@@ -30,7 +30,7 @@
                           {% endif %}
                         {% endif %}
                       </h3>
-                      <small class = "club-details-card-name">{{club.created_at|naturaltime}}</small>
+                      <small class = "club-details-card-name">{{club.created_at|date:"M Y"}}</small>
                   </div>
               </div>
           </div>
@@ -148,25 +148,41 @@
             <div class="col-md-6 mb-3">
               <div class="form-group">
                   <label class="text-md mb-2" for="club-theme"> Theme:</label>
-                  <p class = "text-white" id="club-theme">{{club.theme}}</p>
+                  {% if club.theme %}
+                    <p class = "text-white" id="club-theme">{{club.theme}}</p>
+                  {% else %}
+                    <p class = "text-white"> - </p>
+                  {% endif %}
               </div>
             </div>
             <div class="col-md-6 mb-3">
               <div class="form-group">
                   <label class="text-md mb-2" for="account-confirm-pass">Meeting type:</label>
-                  <p class = "text-white"  id="club-meeting-type"> {{club.meeting_type}}</p>
+                  {% if club.meeting_type %}
+                    <p class = "text-white"  id="club-meeting-type"> {{club.meeting_type}}</p>
+                  {% else %}
+                    <p class = "text-white"> - </p>
+                  {% endif %}
               </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="text-md  mb-2" for="club-city"> City:</label>
-                    <p class = "text-white" id="club-city" >{{club.city}}</p>
+                    {% if club.city %}
+                      <p class = "text-white" id="club-city" >{{club.city}}</p>
+                    {% else %}
+                      <p class = "text-white"> - </p>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="text-md mb-2" for="club-country"> Country:</label>
-                    <p class = "text-white"  id="club-country">{{club.country}}</p>
+                    {% if club.country %}
+                      <p class = "text-white"  id="club-country">{{club.country}}</p>
+                    {% else %}
+                      <p class = "text-white"> - </p>
+                    {% endif %}
                 </div>
                 <br/>
             </div>
