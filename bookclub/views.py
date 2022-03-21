@@ -87,8 +87,7 @@ class LoginProhibitedMixin:
             raise ImproperlyConfigured(
                 "LoginProhibitedMixin requires either a value for "
                 "'redirect_when_logged_in_url', or an implementation for "
-                "'get_redirect_when_logged_in_url"
-                ""
+                "'get_redirect_when_logged_in_url'"
             )
         else:
             return self.redirect_when_logged_in_url
@@ -1149,7 +1148,7 @@ def meetings_list(request, club_id):
     page_number = request.GET.get('page')
     meetings_list = meetings_pg.get_page(page_number)
     return render(request, 'meetings_list.html', {'meetings_list': meetings_list, 'user': user, 'club':club })
-    
+  
 @login_required
 def previous_meetings_list(request, club_id):
     user = get_object_or_404(User.objects, id=request.user.id)

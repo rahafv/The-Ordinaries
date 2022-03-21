@@ -3,6 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
 from bookclub.tests.helpers import LoginRedirectTester, LogInTester
+from bookclub.views import LogInView
+from django.core.exceptions import ImproperlyConfigured
 
 class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
     """Test suite for the log in prohibited mixin."""
@@ -12,7 +14,7 @@ class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
 
     def setUp(self):
         self.url = reverse("log_in")
-
+        self.user = User.objects.get(id=1)
 
     def test_successful_log_in_prohibited(self):
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
@@ -26,4 +28,10 @@ class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
 
 
+    def test_handle_improperly_configured_view(self):
+        LogInView.redirect_when_logged_in_url = None
+        self.client.login(username=self.user.username, password='Password123')
+        self.assertRaises(ImproperlyConfigured, self.client.get, self.url)
         
+
+    def test_user_must_be_logged_i
