@@ -21,6 +21,7 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+from django.views.generic.base import TemplateView
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from django.utils.decorators import method_decorator
@@ -29,6 +30,43 @@ from django.utils.decorators import method_decorator
 def welcome(request):
     return render(request, 'welcome.html')
 
+class HomeView(TemplateView):
+
+    template_name = 'home.html'
+
+    def events_created_at(event):
+        return event.created_at
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+
+        authors = list(current_user.followees.all()) + [current_user]
+        clubs = list(User.objects.get(id=current_user.id).clubs.all())
+        user_events = []
+        club_events = []
+        for author in authors:
+            user_events += list(Event.objects.filter(user=author))
+        
+        final_user_events = user_events
+        final_user_events.sort(reverse=True, key=self.events_created_at)
+        context['user_events'] = final_user_events[0:25]
+
+        for club in clubs:
+            club_events += list(Event.objects.filter(club=club))
+
+        final_club_events = club_events
+        final_club_events.sort(reverse=True, key=self.events_created_at)
+        first_ten = final_club_events[0:10]
+        context['club_events'] = first_ten
+        context['club_events_length'] = len(first_ten)
+
+        already_selected_books = current_user.books.all()
+        my_books = Book.objects.all().exclude(id__in=already_selected_books)
+        context['books'] = my_books.order_by('-average_rating','-readers_count')[:3]
+        
+        context['user'] = current_user
+        return context
 
 @login_required
 def home(request):
@@ -205,6 +243,45 @@ def create_club(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
+class AddReviewView(FormView):
+    template_name = 'book_details.html'
+    pk_url_kwarg = 'book_id' 
+    context_object_name = 'book'
+    form_class = RatingForm
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """Retrieves the club_id from url and stores it in self for later use."""
+        self.book_id = kwargs.get('book_id') 
+
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        self.review_user = self.request.user
+        if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
+            raise Http404
+
+        form.instance.user = self.review_user
+        form.instance.book = self.reviewed_book
+        form.save(self.review_user, self.reviewed_book)
+
+        create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
+        messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
+        
+        self.reviewed_book.calculate_average_rating() 
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+        return super().form_invalid(form)
+
+    def get_success_url(self):         
+        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 @login_required
 def add_review(request, book_id):
@@ -261,10 +338,7 @@ class AddBookView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):         
-        if  self.book:
-            return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
-        else:
-            return render('add_book.html')
+        return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 class BookDetailsView(DetailView, FormMixin):
     model = Book
@@ -293,6 +367,58 @@ class BookDetailsView(DetailView, FormMixin):
         context['reader'] = book.is_reader(user)
         context['numberOfRatings'] = book.ratings.all().count()
         return context
+
+# @login_required
+# def add_book(request):
+#     if request.method == "POST":
+#         form = BookForm(request.POST)
+#         if form.is_valid():
+#             book = form.save()
+#             return redirect('book_details', book_id=book.id)
+#     else:
+#         form = BookForm()
+#     return render(request, "add_book.html", {"form": form})
+
+class ProfilePageView(DetailView):
+    model = User
+    pk_url_kwarg = 'review_id'
+    # paginate_by = settings.BOOKS_PER_PAGE
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """Retrieves the user_id from url and stores it in self for later use."""
+        self.user_id = kwargs.get('user_id') 
+        self.is_clubs = kwargs.get('is_clubs')
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, request, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.user_id:
+            user = get_object_or_404(User.objects, id=self.user_id)
+        else:
+            user = get_object_or_404(User.objects, id=request.user.id)
+
+        if self.user_id == request.user.id:
+            return redirect('profile')
+
+        context['current_user'] = request.user
+        context['user'] = user
+        context['following'] = request.user.is_following(user)
+        context['followable'] = (request.user != user)
+        
+        if self.user_id:
+            books_queryset = User.objects.get(id=self.user_id).books.all()
+            books_count = books_queryset.count()
+            books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+            page_number = request.GET.get('page')
+            books = books_pg.get_page(page_number)
+            context['items'] = books
+            context['items_count'] = books_count
+        return context
+
 
 @login_required
 def show_profile_page(request, user_id=None, is_clubs=False):
@@ -777,6 +903,7 @@ def choice_book_list(request, meeting_id):
         return render(request, '404_page.html', status=404)
 
 
+
 @login_required
 def search_book(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
@@ -827,6 +954,39 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
+
+class EditReviewView(FormView):
+    model = Rating
+    template_name = 'edit_review.html' 
+    pk_url_kwarg = 'review_id'
+    form_class = EditRatingForm
+
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieves the club_id from url and stores it in self for later use."""
+        self.review_id = kwargs.get('review_id')  
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        review_user = self.request.user
+        review = get_object_or_404(Rating.objects, id=self.review_id)
+        if review_user != review.user:
+            raise Http404
+
+        form.save(review_user, review.book)
+        messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+        return super().form_invalid(form)
+
+    def get_success_url(self): 
+        return reverse_lazy('book_details', kwargs = {'book_id': self.review.book.id})
 
 
 @login_required
@@ -891,6 +1051,57 @@ def search_page(request):
 
     else:
         return render(request, 'search_page.html', {})
+
+class SearchPageView(TemplateView):
+    
+    template_name = 'search_page.html'
+    paginate_by = settings.MEMBERS_PER_PAGE
+    
+    def get(self, *args, **kwargs):
+        self.searched = self.request.GET.get('searched')
+        self.category = self.request.GET.get('category')
+        return super().get(*args, **kwargs)
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        label = self.category
+
+        search_page_results = get_list_of_objects(
+            searched=self.searched, label=label)
+        self.category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+        
+        sortForm = ""
+        if(self.category == "Clubs"):
+            sortForm = ClubsSortForm(self.request.GET or None)
+        elif(self.category == "Books"):
+            sortForm = BooksSortForm(self.request.GET or None)
+        else:
+            sortForm = UsersSortForm(self.request.GET or None)
+
+        if (sortForm.is_valid()):
+            sort = sortForm.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, filtered_list)
+
+            if(self.category == "Clubs"):
+                filtered_list = sort_helper.sort_clubs()
+            elif(self.category == "Books"):
+                filtered_list = sort_helper.sort_books()
+            else:
+                filtered_list = sort_helper.sort_users()
+
+        context['searched'] = self.searched
+        context['category'] = self.category
+        context['label'] = label
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = self.request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        context['filtered_list'] = filtered_list
+        context['form'] = sortForm
+        context['current_user'] = self.request.user
+        return context
 
 
 @login_required

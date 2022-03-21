@@ -34,7 +34,8 @@ urlpatterns = [
     path('send_verification/<int:user_id>', views.send_activiation_email, name='send_verification'),
     path('activate_user/<uidb64>/<token>', views.activate_user, name='activate'),
     path('log_in/', views.log_in, name='log_in'),
-    path('home/' , views.home, name='home'),
+    # path('home/' , views.home, name='home'),
+    path('home/' , views.HomeView.as_view(), name='home'),
     path('log_out/', views.log_out, name='log_out'),
 
     path('profile/', views.show_profile_page, name='profile'),
@@ -45,12 +46,16 @@ urlpatterns = [
 
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
+    # path('edit_review/<int:review_id>', views.EditReviewView.as_view(), name='edit_review'),
     path('password/',views.PasswordView.as_view(), name='password'),
     path('create_club/', views.create_club, name='create_club'),
     path('club/<int:club_id>/', views.club_page, name='club_page'),
 
     path('add_book/', views.AddBookView.as_view(), name='add_book'),
+    # path('add_book/', views.add_book, name='add_book'),
     path('book/<int:book_id>/book_details', views.BookDetailsView.as_view(), name='book_details'),
+    # path('book/<int:book_id>/book_details', views.book_details, name='book_details'),
+    # path('book/<int:book_id>/add_review', views.AddReviewView.as_view(), name='add_review'),
     path('book/<int:book_id>/add_review', views.add_review, name='add_review'),
     path('initial_book_list/', views.initial_book_list, name='initial_book_list'),
     path('book/<int:book_id>/add_to_list', views.add_book_to_list, name ='add_book_to_list'),
@@ -58,6 +63,7 @@ urlpatterns = [
     path('club/<int:club_id>/join_club', views.join_club, name='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name='withdraw_club'),
     path('books/', views.BookListView.as_view(), name='books_list'),
+    # path('books/', views.books_list, name='books_list'),
     path('clubs/', views.clubs_list, name='clubs_list'),
     path('club/<int:club_id>/books/', views.BookListView.as_view(), name='books_list'),
 
@@ -74,6 +80,7 @@ urlpatterns = [
     path('followings/<int:user_id>/', views.following_list, name='following_list'),
     path('followers/<int:user_id>/', views.followers_list, name='followers_list'),
     path('search_page', views.search_page, name='search_page'),
+    # path('search_page', views.SearchPageView.as_view(), name='search_page'),
     path('search_page/<str:searched>/<str:label>/', views.show_sorted, name='show_sorted'), 
     path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
     path('club/<int:club_id>/schedule_meeting/', views.schedule_meeting, name='schedule_meeting'),
