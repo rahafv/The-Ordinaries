@@ -1017,10 +1017,9 @@ def edit_review(request, review_id):
         
         return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
 
-    else:
-        return render(request, '404_page.html', status=404)
+    
+    return render(request, '404_page.html', status=404)
 
-    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
 """Enable user to follow and unfollow other users."""
 @login_required
