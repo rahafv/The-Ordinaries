@@ -276,8 +276,7 @@ def book_details(request, book_id):
     rating = book.ratings.all().filter(user=request.user)
     if rating:
         rating = rating[0]
-    reviews_count = book.ratings.all().exclude(
-        review="").exclude(user=request.user).count()
+    reviews_count = book.ratings.all().count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
