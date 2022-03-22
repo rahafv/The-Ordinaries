@@ -2,9 +2,10 @@ from datetime import timedelta
 from pyexpat import model
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from logging import exception
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
+from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
@@ -22,6 +23,11 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from django.views.generic.detail import  DetailView, SingleObjectMixin
+from django.views.generic.base import TemplateView
+from django.core.exceptions import ImproperlyConfigured
 import humanize
 from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView
@@ -64,23 +70,54 @@ def home(request):
     
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
-@login_prohibited
-def sign_up(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            return redirect('send_verification', user_id=user.id)
-    else:
-        form = SignUpForm()
-    return render(request, 'sign_up.html', {'form': form})
+class LoginProhibitedMixin:
+    """Mixin that redirects when a user is logged in."""
+
+    redirect_when_logged_in_url = None
+
+    def dispatch(self, *args, **kwargs):
+        """Redirect when logged in, or dispatch as normal otherwise."""
+        if self.request.user.is_authenticated:
+            return self.handle_already_logged_in(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
+
+    def handle_already_logged_in(self, *args, **kwargs):
+        url = self.get_redirect_when_logged_in_url()
+        return redirect(url)
+
+    def get_redirect_when_logged_in_url(self):
+        """Returns the url to direct to when not logged in."""
+        if self.redirect_when_logged_in_url is None:
+            raise ImproperlyConfigured(
+                "LoginProhibitedMixin requires either a value for "
+                "'redirect_when_logged_in_url', or an implementation for "
+                "'get_redirect_when_logged_in_url'"
+            )
+        else:
+            return self.redirect_when_logged_in_url
+
+class SignUpView(LoginProhibitedMixin, FormView):
+    """Handles user sign up."""
+
+    form_class = SignUpForm
+    template_name = "sign_up.html"
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    user = None
+
+    def form_valid(self, form):
+        """Saves the user when form is validated."""
+        self.user = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
+        return reverse('send_verification', kwargs={'user_id':self.user.id})
+
 
 
 def send_activiation_email(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-    except:
-        raise Http404
+    
+    user = get_object_or_404(User, id=user_id)
 
     if not user.email_verified:
         current_site = get_current_site(request)
@@ -104,58 +141,78 @@ def send_activiation_email(request, user_id):
 
     return redirect('log_in')
 
+class ActivateUserView(TemplateView):
+    """Handles activation of a user after their email is verified."""
 
-def activate_user(request, uidb64, token):
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except:
-        user = None
-        return render(request, 'activate-fail.html', {'user': user})
+    template_name = "activate-fail.html"
 
-    if user and generate_token.check_token(user, token):
-        user.email_verified = True
-        user.save()
-        messages.add_message(request, messages.SUCCESS, 'Account verified!')
-        return redirect(reverse('log_in'))
+    def get(self, *args, **kwargs):
+        """Retrieves user if valid and sets its email verified field to true."""
+        try:
+            uid = force_text(urlsafe_base64_decode(kwargs["uidb64"]))
+            self.user = User.objects.get(pk=uid)
+        except:
+            self.user = None
 
-    return render(request, 'activate-fail.html', {'user': user})
+        if self.user and generate_token.check_token(self.user, kwargs["token"]):
+            self.user.email_verified = True
+            self.user.save()
+            messages.add_message(self.request, messages.SUCCESS, 'Account verified!')
+            return redirect(reverse('log_in'))
+
+        return super().get(*args, **kwargs)
+
+    
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template"""
+        context = super().get_context_data(**kwargs)
+        context["user"] = self.user
+        return context
 
 
-@login_prohibited
-def log_in(request):
-    if request.method == 'POST':
+
+class LogInView(LoginProhibitedMixin, FormView):
+    """Handle log in attempt."""
+
+    http_method_names = ['get', 'post']
+    redirect_when_logged_in_url = 'home'
+    
+    def get(self, request):
+        """Display log in template."""
+        self.next = request.GET.get('next') or ''
+        return self.render()
+
+    def post(self, request):
+        """Handle log in attempt."""
         form = LogInForm(request.POST)
-        next = request.POST.get('next') or ''
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+        self.next = request.POST.get('next') or ''
+        user = form.get_user()
 
-            if user and not user.email_verified:
-                messages.add_message(request, messages.ERROR,
-                                     "Email is not verified, please check your email inbox!")
-                return render(request, 'log_in.html', {'form': form, 'next': next, 'request': request, 'user': user})
+        if user and not user.email_verified:
+            messages.add_message(request, messages.ERROR,
+                "Email is not verified, please check your email inbox!")
+            return render(request, 'log_in.html', {'form': form, 'next': self.next, 'request': request, 'user': user})
 
-            if user:
-                login(request, user)
-                if len(user.books.all()) == 0:
-                    redirect_url = next or 'initial_genres'
-                else:
-                    redirect_url = next or 'home'
-                return redirect(redirect_url)
-        messages.add_message(request, messages.ERROR,
-                             "The credentials provided were invalid!")
-    else:
-        next = request.GET.get('next') or ''
-    form = LogInForm()
-    return render(request, 'log_in.html', {'form': form, 'next': next})
+        if user:
+            login(request, user)
+            if len(user.books.all()) == 0:
+                redirect_url = self.next or 'initial_genres'
+            else:
+                redirect_url = self.next or 'home'
+            return redirect(redirect_url)
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+        return self.render()
+
+    def render(self):
+        """Render log in template with blank log in form."""
+        form = LogInForm()
+        return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
 
 
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
-
+"""Handle log out attempt."""
 @login_required
 def log_out(request):
     logout(request)
@@ -164,49 +221,52 @@ def log_out(request):
 
 
 class PasswordView(LoginRequiredMixin, FormView):
-    """View that handles password change requests."""
+    """Handle password change requests."""
 
     template_name = 'password.html'
     form_class = PasswordForm
 
     def get_form_kwargs(self, **kwargs):
         """Pass the current user to the password change form."""
-
         kwargs = super().get_form_kwargs(**kwargs)
         kwargs.update({'user': self.request.user})
         return kwargs
 
     def form_valid(self, form):
         """Handle valid form by saving the new password."""
-
         form.save()
         login(self.request, self.request.user)
         return super().form_valid(form)
 
     def get_success_url(self):
         """Redirect the user after successful password change."""
-
-        messages.add_message(
-            self.request, messages.SUCCESS, "Password updated!")
+        messages.add_message(self.request, messages.SUCCESS, "Password updated!")
         return reverse('home')
 
+class CreateClubView(LoginRequiredMixin, CreateView):
+    """Handle creation of new club."""
 
-@login_required
-def create_club(request):
-    if request.method == 'POST':
-        form = CreateClubForm(request.POST)
-        if form.is_valid():
-            club_owner = request.user
-            form.instance.owner = club_owner
-            club = form.save()
-            create_event('U', 'C', Event.EventType.CREATE,
-                         user=club_owner, club=club)
-            """ adds the owner to the members list. """
-            club.add_member(club_owner)
-            return redirect('club_page', club_id=club.id)
-    else:
-        form = CreateClubForm()
-    return render(request, 'create_club.html', {'form': form})
+    model = Club
+    template_name = 'create_club.html'
+    form_class = CreateClubForm
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        club_owner = self.request.user
+        form.instance.owner = club_owner
+        self.club = form.save()
+        create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=self.club)
+        self.club.add_member(club_owner)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
+        return reverse('club_page', kwargs={"club_id": self.club.id})
+
+    def handle_no_permission(self):
+        """If there is no permission, redirect to log in."""
+        return redirect(reverse('log_in') + '?next=/create_club/')
+
 
 
 @login_required
@@ -235,22 +295,28 @@ def add_review(request, book_id):
     return render(request, 'book_details.html', {'book': reviewed_book})
 
 
-@login_required
-def club_page(request, club_id):
-    user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
-    is_member = club.is_member(user)
-    is_applicant = club.is_applicant(user)
-    upcoming_meetings = club.get_upcoming_meetings()
-    try: 
-        upcoming_meeting = upcoming_meetings[0]
-    except:
-        upcoming_meeting=None
+class ClubPageView(LoginRequiredMixin, DetailView):
+    """Show individual club details."""
 
-    
-    
-    return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
+    model = Club
+    template_name = 'club_page.html'
+    pk_url_kwarg = 'club_id'
+    context_object_name = 'club'
 
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        context = super().get_context_data()
+        user = self.request.user
+        
+        context['is_member'] = context['club'].is_member(user)
+        context['is_applicant'] = context['club'].is_applicant(user)
+        upcoming_meetings = context['club'].get_upcoming_meetings()
+        try: 
+            context['upcoming_meeting'] = upcoming_meetings[0]
+        except:
+            context['upcoming_meeting']=None
+
+        return context
 
 @login_required
 def add_book(request):
@@ -364,7 +430,6 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_form_kwargs(self):
         """ Passes the request object to the form class.
          This is necessary to update the date_of_birth of the given user"""
-
         kwargs = super(ProfileUpdateView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
@@ -381,6 +446,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('profile')
 
 
+"""Enable user to join a club."""
 @login_required
 def join_club(request, club_id):
 
@@ -410,6 +476,7 @@ def join_club(request, club_id):
     return redirect('club_page', club_id)
 
 
+"""Enable a user to withdraw from a club."""
 @login_required
 def withdraw_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -458,129 +525,206 @@ def books_list(request, club_id=None, user_id=None):
     return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
 
 
-@login_required
-def clubs_list(request, user_id=None):
-    clubs_queryset = Club.objects.all()
-    general = True
-    filtered=False
-    if user_id:
-        user= get_object_or_404(User.objects, id=user_id)
-        clubs_queryset = User.objects.get(id=user_id).clubs.all()
-        general = False
-    else: 
-        user= request.user
-
-    form = ClubsSortForm(request.GET or None)
-    sort = ""
-
-    if form.is_valid():
-        sort = form.cleaned_data.get('sort')
-        sort_helper = SortHelper(sort, clubs_queryset)
-        clubs_queryset = sort_helper.sort_clubs()
-
-    privacy= request.GET.get('privacy')
-    if privacy=='public': 
-        clubsSet = clubs_queryset.filter(club_type='Public')
-        filtered=True
-    elif privacy=='private': 
-        clubsSet = clubs_queryset.filter(club_type='Private')
-        filtered=True
-    else:
-        clubsSet = clubs_queryset.all()
-
-    ownership= request.GET.get('ownership')
-    if ownership=='owned': 
-        clubsSet = clubsSet.filter(owner=user)
-        filtered=True
+class ClubsListView(LoginRequiredMixin, ListView):
+    """Display list of clubs."""
+    
+    model = Club
+    template_name = "clubs.html"
+    paginate_by = settings.CLUBS_PER_PAGE
     
 
+    def get(self, request, *args, **kwargs):
+        """Retrieves the user_id from url (if exists) and stores it in self for later use."""
+        self.user_id = kwargs.get("user_id") 
+        self.privacy = self.request.GET.get('privacy')
+        self.ownership = self.request.GET.get('ownership')
+        return super().get(request, *args, **kwargs)
 
-    count = clubsSet.count()
-    clubs_pg = Paginator(clubsSet, settings.CLUBS_PER_PAGE)
-    page_number = request.GET.get('page')
-    clubs = clubs_pg.get_page(page_number)
-    return render(request, 'clubs.html', {'clubs': clubs, 'general': general, 'count': count, 'form': form, 'privacy':privacy ,'ownership':ownership, 'filtered':filtered })
+    def get_queryset(self):
+        """If user_id is provided return all clubs the user is a member in, else return all clubs."""
+        self.general = True
+        self.clubs_queryset = super().get_queryset()
+        self.user = self.request.user
+        
+        if self.user_id:
+            self.user = User.objects.get(id=self.user_id)
+            self.clubs_queryset = self.user.clubs.all()
+            self.general = False
+
+        self.form = ClubsSortForm(self.request.GET or None)
+
+        if self.form.is_valid(): 
+            sort = self.form.cleaned_data.get('sort')
+            sort_helper = SortHelper(sort, self.clubs_queryset)
+            self.clubs_queryset = sort_helper.sort_clubs()      
+
+        self.filtered = False
+        if self.privacy == 'public': 
+            self.clubs_queryset = self.clubs_queryset.filter(club_type='Public')
+            self.filtered = True
+        elif self.privacy == 'private': 
+            self.clubs_queryset = self.clubs_queryset.filter(club_type='Private')
+            self.filtered = True
+
+        if self.ownership == 'owned': 
+            self.clubs_queryset = self.clubs_queryset.filter(owner=self.user)
+            self.filtered = True
+
+        return self.clubs_queryset
+
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        
+        context = super().get_context_data(**kwargs)
+        context['general'] = self.general
+        context['privacy'] = self.privacy
+        context['ownership'] = self.ownership
+        context['filtered'] = self.filtered
+        context['form'] = self.form
+        context['clubs'] = context["page_obj"]
+        context['count'] = self.object_list.count()
+        
+        return context
+
+class MembersListView(LoginRequiredMixin, ListView):
+    """Display list of members."""
+    
+    model = User
+    paginate_by = settings.MEMBERS_PER_PAGE
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieves the club_id from url and stores it in self for later use."""
+        self.club_id = kwargs.get("club_id") 
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        """Return all members of a club if the user has access, else return an empty queryset."""
+        self.club = get_object_or_404(Club, id=self.club_id)
+        self.form = UsersSortForm(self.request.GET or None)
+        if(self.club.is_member(self.request.user)):
+            self.members_queryset = self.club.members.all()
+            if self.form.is_valid():
+                sort = self.form.cleaned_data.get('sort')
+                sort_helper = SortHelper(sort, self.members_queryset)
+                self.members_queryset = sort_helper.sort_users()
+
+            return self.members_queryset
+        return self.model.objects.none()
+
+    def get_template_names(self):
+        """Returns a different template name if the user does not have access rights."""
+        if self.club.is_member(self.request.user):
+            return ['members_list.html']
+        else:
+            messages.add_message(self.request, messages.ERROR, "You cannot access the members list" )
+            return ['club_page.html']
+
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        context = super().get_context_data(**kwargs)
+        context['members'] = context["page_obj"]
+        context['club'] = self.club
+        context['current_user'] = self.request.user
+        context['form'] = self.form
+        return context
 
 
-@login_required
-def members_list(request, club_id):
-    current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
-    is_member = club.is_member(current_user)
-    members_queryset = club.members.all()
-    #form to display user sorting options
-    form = UsersSortForm(request.GET or None)
-    sort = ""
-    if form.is_valid():
-        sort = form.cleaned_data.get('sort')
-        sort_helper = SortHelper(sort, members_queryset)
-        members_queryset = sort_helper.sort_users()
+class FollowingListView(LoginRequiredMixin, ListView):
+    """Display following list of a user."""
+    
+    model = User
+    template_name = "follow_list.html"
+    paginate_by = settings.MEMBERS_PER_PAGE
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieves the user_id from url and stores it in self for later use."""
+        self.user_id = kwargs.get("user_id") 
+        return super().get(request, *args, **kwargs)
 
-    # count = members_queryset.count()
-    members_pg = Paginator(members_queryset, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    members = members_pg.get_page(page_number)
-    if (is_member):
-        return render(request, 'members_list.html', {'members': members, 'club': club, 'current_user': current_user, 'form': form})
-    else:
-        messages.add_message(request, messages.ERROR,
-                             "You cannot access the members list")
-        return redirect('club_page', club_id)
+    def get_queryset(self):
+        """Returns following list of a user."""
+        self.user = get_object_or_404(User, id=self.user_id)
+        return self.user.followees.all()
 
-
-@login_required
-def following_list(request, user_id):
-    user = get_object_or_404(User.objects, id=user_id)
-    is_following = True
-    list = user.followees.all()
-    current_user = request.user
-
-    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    follow_list = follow_pg.get_page(page_number)
-    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user': current_user})
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        context = super().get_context_data(**kwargs)
+        context['follow_list'] = context["page_obj"]
+        context['user'] =self.user
+        context['is_following'] = True
+        context['current_user'] = self.request.user
+        return context
 
 
-@login_required
-def followers_list(request, user_id):
-    user = get_object_or_404(User.objects, id=user_id)
-    is_following = False
-    list = user.followers.all()
-    current_user = request.user
+class FollowersListView(LoginRequiredMixin, ListView):
+    """Displays followers list of a user."""
+    
+    model = User
+    template_name = "follow_list.html"
+    paginate_by = settings.MEMBERS_PER_PAGE
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieves the user_id from url and stores it in self for later use."""
+        self.user_id = kwargs.get("user_id") 
+        return super().get(request, *args, **kwargs)
+   
+    def get_queryset(self):
+        """Returns followers list of a user."""
+        self.user = get_object_or_404(User, id=self.user_id)
+        return self.user.followers.all()
 
-    follow_pg = Paginator(list, settings.MEMBERS_PER_PAGE)
-    page_number = request.GET.get('page')
-    follow_list = follow_pg.get_page(page_number)
-    return render(request, 'follow_list.html', {'follow_list': follow_list, 'user': user, 'is_following': is_following, 'current_user': current_user})
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        context = super().get_context_data(**kwargs)
+        context['follow_list'] = context["page_obj"]
+        context['user'] = self.user
+        context['is_following'] = False
+        context['current_user'] = self.request.user
+        return context
 
 
-@login_required
-def applicants_list(request, club_id):
-    current_user = request.user
-    club = get_object_or_404(Club.objects, id=club_id)
-    applicants_queryset = club.applicants.all()
-    is_owner = (club.owner == current_user)
-    if (is_owner):
-        #Form to display sorting options for Users
-        form = UsersSortForm(request.GET or None)
+class ApplicantsListView(LoginRequiredMixin, ListView):
+    """Displays applicants list of a club."""
+    
+    model = User
+    template_name = "applicants_list.html"
+    context_object_name = "applicants"
+    
+    def get(self, request, *args, **kwargs):
+        """Retrieves the club_id from url and stores it in self for later use."""
+        self.club_id = kwargs.get("club_id") 
+        return super().get(request, *args, **kwargs)
 
-        sort = ""
-        if form.is_valid():
-            # get the value to sort by from the valid form
-            sort = form.cleaned_data.get('sort')
-            sort_helper = SortHelper(sort, applicants_queryset)
-            applicants_queryset = sort_helper.sort_users()
+    def get_queryset(self):
+        """Return all applicants of a club if the user is owner, else return an empty queryset."""
+        self.club = get_object_or_404(Club, id=self.club_id)
+        self.form = UsersSortForm(self.request.GET or None)
+        if(self.club.owner == self.request.user):
+            self.applicants_queryset = self.club.applicants.all()
+            if self.form.is_valid():
+                sort = self.form.cleaned_data.get('sort')
+                sort_helper = SortHelper(sort, self.applicants_queryset)
+                self.applicants_queryset = sort_helper.sort_users()
 
-        applicants_pg = Paginator(
-            applicants_queryset, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        applicants = applicants_pg.get_page(page_number)
-        return render(request, 'applicants_list.html', {'applicants': applicants, 'is_owner': is_owner, 'club': club, 'current_user': current_user, 'form': form})
-    else:
-        messages.add_message(request, messages.ERROR,
-                             "You cannot access the applicants list")
-        return redirect('club_page', club_id)
+            return self.applicants_queryset
+        return self.model.objects.none()
 
+    def get_template_names(self):
+        """Returns a different template name if the user is not owner."""
+        if self.club.owner == self.request.user:  
+            return ['applicants_list.html']
+        else:
+            messages.add_message(self.request, messages.ERROR, "You cannot access the applicants list" )
+            return ['club_page.html']
+
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
+        context = super().get_context_data(**kwargs)
+        context['is_owner'] = self.club.owner == self.request.user
+        context['club'] = self.club
+        context['current_user'] = self.request.user
+        context['form'] = self.form
+        return context
 
 @login_required
 def accept_applicant(request, club_id, user_id):
@@ -613,153 +757,214 @@ def reject_applicant(request, club_id, user_id):
                              "You cannot change applicant status list")
         return redirect('club_page', club_id)
 
+class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin):
+    """Enables owner to transfer ownership to another member."""
+    
+    template_name = "transfer_ownership.html"
+    form_class = TransferOwnershipForm
+    pk_url_kwarg = "club_id"
+    context_object_name = "club"
+    model = Club
 
-@login_required
-def transfer_club_ownership(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
-    user = request.user
-    memberlist = club.members.all().exclude(id=user.id)
-    if user != club.owner:
-        messages.add_message(request, messages.ERROR,
-                             "You are not permitted to access this page!")
-        return redirect('club_page', club_id=club.id)
-    if memberlist.count() == 0:
-        messages.add_message(request, messages.WARNING,
-                             "There are no other members to tranfer the club to!")
-        return redirect('club_page', club_id=club.id)
-    if request.method == "POST":
-        selectedmember = request.POST.get('selected_member', '')
-        if selectedmember != '':
-            member = get_object_or_404(User.objects, id=int(selectedmember))
-            club.make_owner(member)
+    def get_form_kwargs(self):
+        """Generates data that the form needs to initialise."""
+        kwargs = super().get_form_kwargs()
+        kwargs["club_id"] = self.get_object().id
+        kwargs["user_id"] = self.request.user.id
+        return kwargs
 
-            messages.add_message(request, messages.SUCCESS, "Ownership transferred!")
-            create_event('C', 'U', Event.EventType.TRANSFER, club=club, action_user=member)
-            
-            current_site = get_current_site(request)
-            subject = club.name + ' Club updates'
-            email_from = settings.EMAIL_HOST_USER
+    def get_context_data(self, **kwargs):
+        """Set self.object to store club."""
+        self.object = self.get_object()
+        return super().get_context_data(**kwargs)
 
-            members_email_body = render_to_string('emails/transfer.html', {
-            'owner': member,
-            'domain': current_site,
-            'club':club
-            })
-
-            owner_email_body = render_to_string('emails/new_owner.html', {
-            'owner': member,
-            'domain': current_site,
-            'club':club
-            })
-
-            email_to_members = club.members.exclude(id=member.id).values_list('email', flat=True)
-            email_to_owner = [member.email]
-
-            send_mail(subject, members_email_body, email_from, email_to_members)
-            send_mail(subject, owner_email_body, email_from, email_to_owner)
-
+    def get(self, *args, **kwargs):
+        """Get method with additonal checks for permissions."""
+        club = self.get_object()
+        if self.request.user != club.owner:
+            messages.add_message(self.request, messages.ERROR, "You are not permitted to access this page!")
             return redirect('club_page', club_id = club.id)
 
-    return render(request, 'transfer_ownership.html', {'club': club, 'user':user, 'memberlist': memberlist})
+        members = club.members.all().exclude(id=self.request.user.id)
+        if members.count() == 0:
+            messages.add_message(self.request, messages.WARNING, "There are no other members to tranfer the club to!")
+            return redirect('club_page', club_id = club.id)
+
+        return super().get(*args, **kwargs)
+
+    def form_valid(self, form):
+        """Changes the owner after the form is validated."""
+        self.club = self.get_object()
+        member = form.cleaned_data.get("new_owner")
+        self.club.make_owner(member)
+        create_event('C', 'U', Event.EventType.TRANSFER, club=self.club, action_user=member)
+            
+        current_site = get_current_site(self.request)
+        subject = self.club.name + ' Club updates'
+        email_from = settings.EMAIL_HOST_USER
+
+        members_email_body = render_to_string('emails/transfer.html', {
+        'owner': member,
+        'domain': current_site,
+        'club':self.club
+        })
+
+        owner_email_body = render_to_string('emails/new_owner.html', {
+        'owner': member,
+        'domain': current_site,
+        'club':self.club
+        })
+
+        email_to_members = self.club.members.exclude(id=member.id).values_list('email', flat=True)
+        email_to_owner = [member.email]
+
+        send_mail(subject, members_email_body, email_from, email_to_members)
+        send_mail(subject, owner_email_body, email_from, email_to_owner)
+
+        messages.add_message(self.request, messages.SUCCESS, "Ownership transferred!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
+        return reverse('club_page', kwargs={"club_id": self.club.id})
 
 
-@login_required
-def edit_club_information(request, club_id):
-    club = Club.objects.get(id=club_id)
-    if(request.method == "POST"):
-        form = ClubForm(request.POST, instance=club)
-        if (form.is_valid()):
-            form_owner_detail = form.save(commit=False)
-            form_owner_detail.owner = request.user
-            form_owner_detail.save()
-            club = form.save()
-            messages.add_message(request, messages.SUCCESS,
-                                 "Successfully updated club information!")
-            return redirect('club_page', club_id)
-    else:
-        form = ClubForm(instance=club)
-    context = {
-        'form': form,
-        'club_id': club_id,
-        'club': club,
-    }
-    return render(request, 'edit_club_info.html', context)
 
 
-@login_required
-def schedule_meeting(request, club_id):
-    club = get_object_or_404(Club.objects, id=club_id)
-    if request.user == club.owner:
-        if club.members.count() > 1:
-            if request.method == 'POST':
-                form = MeetingForm(club, request.POST)
+class EditClubInformationView(LoginRequiredMixin, UpdateView):
+    """View that handles club information change requests."""
+    model = Club
+    fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
+    template_name = "edit_club_info.html"
+    pk_url_kwarg = "club_id"
+    
+    def get_context_data(self, **kwargs):
+        """Set self.object to store club_id."""
+        context = super().get_context_data(**kwargs)
+        context['club_id'] = self.object.id
+        return context
 
-                if form.is_valid():
-                    meeting = form.save()
+    def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
+        messages.add_message(self.request, messages.SUCCESS, "Successfully updated club information!")
+        return reverse('club_page', args=[self.object.id])
 
-                    """send email invites"""
-                    MeetingHelper().send_email(request=request,
-                                               meeting=meeting,
-                                               subject='A New Meeting Has Been Scheduled',
-                                               letter='emails/meeting_invite.html',
-                                               all_mem=True
-                                               )
 
-                    if meeting.chooser:
-                        """send email to member who has to choose a book"""
-                        MeetingHelper().send_email(request=request,
-                                                   meeting=meeting,
-                                                   subject='It Is Your Turn!',
-                                                   letter='emails/chooser_reminder.html',
-                                                   all_mem=False
-                                                   )
-                        deadline = timedelta(7).total_seconds()  # 0.00069444
-                        Timer(deadline, MeetingHelper().assign_rand_book,
-                              [meeting, request]).start()
 
-                    create_event('C', 'M', Event.EventType.SCHEDULE,
-                                 club=club, meeting=meeting)
-                    messages.add_message(
-                        request, messages.SUCCESS, "Meeting has been scheduled!")
-                    return redirect('club_page', club_id=club.id)
-            else:
-                form = MeetingForm(club)
-            return render(request, 'schedule_meeting.html', {'form': form, 'club_id': club.id})
+class ScheduleMeetingView(LoginRequiredMixin, FormView):
+    template_name = "schedule_meeting.html"
+    form_class = MeetingForm
+
+    def get_context_data(self, **kwargs):
+        """Extract club_id from self and store it in the context."""
+        context = super().get_context_data(**kwargs)
+        context["club_id"] = self.club_id
+        return context
+
+    def get_form_kwargs(self):
+        """Generates data that the form needs to initialise."""
+        kwargs = super().get_form_kwargs()
+        kwargs["club"] = get_object_or_404(Club.objects, id=self.club_id)
+        return kwargs
+    
+    def get(self, *args, **kwargs):
+        """Extracts club id and stores it in self for later use."""
+        self.club_id = kwargs["club_id"]
+        self.club = get_object_or_404(Club.objects, id=self.club_id)
+        if self.request.user != self.club.owner:
+            raise Http404
+        
+        #check that the club has members
+        if self.club.members.count() <= 1:
+            messages.add_message(self.request, messages.ERROR, "There are no members!")
+            return redirect('club_page', club_id=self.club.id)
+
+        return super().get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        """Check that user is owner upon form submission."""
+        self.club_id = kwargs["club_id"]
+        self.club = get_object_or_404(Club.objects, id=self.club_id)
+
+        if self.request.user != self.club.owner: 
+            raise Http404
+
+        return super().post(*args, **kwargs)
+
+    def form_valid(self, form):
+        """Process valid form."""
+        meeting = form.save()
+        #send email invites
+        MeetingHelper().send_email(request=self.request, 
+            meeting=meeting, 
+            subject='A New Meeting Has Been Scheduled', 
+            letter='emails/meeting_invite.html', 
+            all_mem=True
+        )
+
+        if meeting.chooser:
+            #send email to member who has to choose a book
+            MeetingHelper().send_email(request=self.request, 
+                meeting=meeting, 
+                subject='It Is Your Turn!', 
+                letter='emails/chooser_reminder.html', 
+                all_mem=False
+            )
+            deadline = timedelta(7).total_seconds() #0.00069444
+            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, self.request]).start()
+
+        create_event('C', 'M', Event.EventType.SCHEDULE, club=self.club, meeting=meeting)
+        messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")
+        return redirect('club_page', club_id=self.club_id)
+
+
+class ChoiceBookListView(LoginRequiredMixin, TemplateView):
+    template_name = "choice_book_list.html"
+    model = Book
+
+    def get_context_data(self, *args, **kwargs):
+        """Generate context data for the template."""
+        context = super().get_context_data(*args, **kwargs)
+        meeting = get_object_or_404(Meeting.objects, id=kwargs["meeting_id"])
+        if self.request.user == meeting.chooser and not meeting.book:
+            read_books = meeting.club.books.all()
+            my_books =  Book.objects.all().exclude(id__in = read_books)            
+            context["rec_books"] = my_books.order_by('-average_rating','-readers_count')[0:24]
+            return context
         else:
-            messages.add_message(request, messages.ERROR,
-                                 "There are no members!")
-            return redirect('club_page', club_id=club.id)
-    else:
-        return render(request, '404_page.html', status=404)
+            raise Http404
+        
 
+class SearchBookView(LoginRequiredMixin, ListView):
+    template_name = "choice_book_list.html"
+    model = Book
+    paginate_by = settings.BOOKS_PER_PAGE
 
-@login_required
-def choice_book_list(request, meeting_id):
-    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if request.user == meeting.chooser and not meeting.book:
-        read_books = meeting.club.books.all()
-        my_books =  Book.objects.all().exclude(id__in = read_books)
-        sorted_books = sorted(my_books, key=lambda b: (b.average_rating, b.readers_count), reverse=True)[0:24]
-        return render(request, 'choice_book_list.html', {'rec_books':sorted_books, 'meeting_id':meeting.id})
-    else:
-        return render(request, '404_page.html', status=404)
+    def get(self, request, *args, **kwargs):
+        """Retrieves the searched term from the query string and stores it in self for later use."""
+        self.searched = self.request.GET.get('searched', '')
+        self.meeting_id = kwargs["meeting_id"]
+        return super().get(request, *args, **kwargs)
+   
 
+    def get_queryset(self):
+        """Returns filtered book list based on the searched term."""
+        books = Book.objects.filter(title__contains=self.searched)
+        return books
 
-@login_required
-def search_book(request, meeting_id):
-    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
-    if request.method == 'GET' and request.user == meeting.chooser and not meeting.book:
-        searched = request.GET.get('searched', '')
-        books = Book.objects.filter(title__contains=searched)
-
-        pg = Paginator(books, settings.BOOKS_PER_PAGE)
-        page_number = request.GET.get('page')
-        books = pg.get_page(page_number)
-        return render(request, 'choice_book_list.html', {'searched': searched, "books": books, 'meeting_id': meeting_id})
-    else:
-        return redirect('choice_book_list', meeting_id=meeting_id)
-
-
+    def get_context_data(self, **kwargs):
+        """Generate context data for the template."""
+        context = super().get_context_data(**kwargs)
+        meeting = get_object_or_404(Meeting.objects, id=self.meeting_id)
+        if self.request.user == meeting.chooser and not meeting.book:
+            context["searched"] = self.searched
+            context["books"] = context["page_obj"]
+            context["meeting_id"] = self.meeting_id
+            return context
+        else:
+            raise Http404   
+ 
+"""Allow user to choose a book for a meeting."""
 @login_required
 def choose_book(request, book_id, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
@@ -767,21 +972,19 @@ def choose_book(request, book_id, meeting_id):
         book = get_object_or_404(Book.objects, id=book_id)
         meeting.assign_book(book)
 
-        """send email to member who has to choose a book"""
-        MeetingHelper().send_email(request=request,
-                                   meeting=meeting,
-                                   subject='A book has be chosen',
-                                   letter='emails/book_confirmation.html',
-                                   all_mem=True
-                                   )
+        #send email to member who has to choose a book
+        MeetingHelper().send_email(request=request, 
+            meeting=meeting, 
+            subject='A book has be chosen', 
+            letter='emails/book_confirmation.html', 
+            all_mem=True
+        )
 
-        messages.add_message(request, messages.SUCCESS,
-                             "Book has been chosen!")
+        messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
         return redirect('club_page', club_id=meeting.club.id)
     else:
-        return render(request, '404_page.html', status=404)
-
-
+        raise Http404
+        
 @login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
@@ -818,6 +1021,9 @@ def edit_review(request, review_id):
     else:
         return render(request, '404_page.html', status=404)
 
+    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
+
+"""Enable user to follow and unfollow other users."""
 @login_required
 def follow_toggle(request, user_id):
     current_user = request.user
@@ -935,10 +1141,10 @@ def initial_book_list(request):
             my_books = my_books.filter(genre__contains=genre)
 
     sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-
     list_length = len(current_user.books.all())
     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
+"""Enables an owner to delete their club."""
 @login_required
 def delete_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)
@@ -950,6 +1156,7 @@ def delete_club(request, club_id):
     club.delete()
     messages.add_message(request, messages.SUCCESS, "Deletion successful!")
     return redirect('home')
+
 
 class MeetingsListView(LoginRequiredMixin, ListView):
     template_name = 'meetings_list.html'

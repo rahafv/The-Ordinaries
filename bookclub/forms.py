@@ -80,6 +80,16 @@ class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
+    def get_user(self):
+        """Returns authenticated user if possible."""
+    
+        user = None
+        if self.is_valid():
+            username = self.cleaned_data.get('username')
+            password = self.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+        return user
+
 class CreateClubForm(forms.ModelForm):
     """Form to create or update club information."""
 
@@ -232,17 +242,6 @@ class UserForm(forms.ModelForm):
         self.log_in_user.set_age(new_age)
         return self.log_in_user
 
-
-class ClubForm(forms.ModelForm):
-    """Form to update club information."""
-
-    class Meta:
-        """Form options."""
-
-        model = Club
-        fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
-        labels = {'club_type': "Club Privacy Setting:"}
-        exclude = ['owner']
 
 class EditRatingForm(forms.ModelForm):
     """Form to update club information."""
@@ -447,3 +446,11 @@ class MeetingForm(forms.ModelForm):
         if not self.cleaned_data.get('cont'):
             meeting.assign_chooser()
         return meeting
+
+class TransferOwnershipForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        club_id = kwargs.pop("club_id")
+        user_id = kwargs.pop("user_id")
+        super().__init__(*args, **kwargs)
+        self.fields["new_owner"] = forms.ModelChoiceField(queryset=Club.objects.get(id=club_id).members.all().exclude(id=user_id), label="Please select a new owner")
+        self.fields["confirm"] = forms.BooleanField(label_suffix="", label="Please confirm by checking this box", help_text = "checkbox", widget=forms.CheckboxInput(attrs={"class": "form-check-input"}))
