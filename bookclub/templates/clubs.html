@@ -96,9 +96,6 @@
     </form>
   </div>
 
-
-    
-
     {% include 'partials/clubs_list.html' with clubs=clubs %}
   <ul class="pagination justify-content-center">
     {% bootstrap_paginate clubs show_prev_next="false"  show_first_last="true" range=5  %}
