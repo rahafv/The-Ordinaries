@@ -366,9 +366,8 @@ class BooksSortForm(forms.Form):
     SORT_CHOICES = [
         (ASC_NAME, "Name A-Z"),
         (DESC_NAME, "Name Z-A"),
-        (DESC_RATING, "High rating"),
-        (ASC_RATING, "Low rating"),
-       
+        (DESC_RATING, "Highest rating first"),
+        (ASC_RATING, "Lowest rating first"),  
     ]
 
     sort = forms.ChoiceField(
