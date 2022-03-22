@@ -1,17 +1,37 @@
-from bookclub.recommender.book_ratings import BookRatings
-from bookclub.models import User
-from surprise import KNNBasic
-from bookclub.recommender.book_ratings import BookRatings
+import pandas as pd
+from bookclub.models import Rating, User
+from surprise import Dataset, KNNBasic, Reader
 
 from collections import defaultdict
 from operator import itemgetter
 import heapq
 
 
-class Recommender:
+class ItemBasedModel:
     def __init__(self):
-        self.dataset = BookRatings().load_dataset()
-        self.trainset = self.dataset.build_full_trainset()
+        self.trainset = self.load_dataset().build_full_trainset()
+
+    def load_dataset(self):
+        
+        self.ratingObjs = Rating.objects.all()
+        user_ids = []
+        book_ids = []
+        ratings = [] 
+
+        for rating in self.ratingObjs:
+            user_ids.append(rating.user.id)
+            book_ids.append(rating.book.id)
+            ratings.append(rating.rating)
+
+        ratings_dict = {'userID': user_ids,
+                        'bookID': book_ids,
+                        'rating': ratings}
+
+        df = pd.DataFrame.from_dict(ratings_dict)
+        reader = Reader(rating_scale = (0, 10))
+        data = Dataset.load_from_df(df[['userID', 'bookID', 'rating']], reader)
+        
+        return data
 
     def generateCandidates(self, user_id, k=20):
         similarity_matrix = KNNBasic(sim_options = {'name': 'cosine',
@@ -30,21 +50,19 @@ class Recommender:
             except:
                 continue
 
-        viewed = {}
-        # for itemID, rating in self.trainset.ur[user_iid]:
-        #     viewed[itemID] = 1
-
-        return candidates, viewed
+        return candidates
 
     def get_recommendations(self, user_id, num_of_rec):
         recommendations = []
-        candidates, viewed = self.generateCandidates(user_id)
+        candidates = self.generateCandidates(user_id)
         user = User.objects.get(id =user_id )
         position = 0
         
         for itemID, rating_sum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
-            if not itemID in user.all_books.all():
-                recommendations.append(self.trainset.to_raw_iid(itemID))
+            
+            id = self.trainset.to_raw_iid(itemID)
+            if user.all_books.filter(id=id).exists():
+                recommendations.append(id)
                 position += 1
                 if (position >= num_of_rec): 
                     break 

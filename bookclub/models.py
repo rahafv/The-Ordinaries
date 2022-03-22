@@ -455,12 +455,12 @@ class Meeting(models.Model):
         id = meeting_ind%members.count()
         mem = members.all()[id]
         self.chooser = mem
-        Meeting.objects.filter(id = self.id).update(chooser=mem).save()
+        Meeting.objects.filter(id = self.id).update(chooser=mem)
 
     def assign_book(self, book_in):
         book_in.add_club(self.club)
         self.book = book_in
-        Meeting.objects.filter(id = self.id).update(book=book_in).save()
+        Meeting.objects.filter(id = self.id).update(book=book_in)
 
         
 ACTOR_CHOICES = (

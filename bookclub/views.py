@@ -1,17 +1,13 @@
 from datetime import timedelta
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from bookclub.management.excel import Excel
-
-from bookclub.recommender.recommender import Recommender
-
-from .recommender.evaluator.RecModelsBakeOff import RecModelsBakeOff
+from bookclub.recommender.recommendation import Recommendation
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import RecommendationHelper, delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -59,7 +55,7 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-    recommendations = RecommendationHelper()
+    recommendations = Recommendation(True)
     rec_books = recommendations.get_recommendations(request, 3, user_id=current_user.id)
     
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':rec_books})
@@ -268,7 +264,7 @@ def add_book(request):
 @login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
-    recommendations = RecommendationHelper()
+    recommendations = Recommendation(False)
     recs = recommendations.get_recommendations(request, 6, user_id=request.user.id, book_id=book.id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
@@ -715,7 +711,7 @@ def schedule_meeting(request, club_id):
                                                    letter='emails/chooser_reminder.html',
                                                    all_mem=False
                                                    )
-                        rec_book = RecommendationHelper().get_recommendations(request, 1, club_id=meeting.club.id)[0]
+                        rec_book = Recommendation(True).get_recommendations(request, 1, club_id=meeting.club.id)[0]
                         deadline = timedelta(7).total_seconds()  # 0.00069444
                         Timer(deadline, MeetingHelper().assign_rand_book,
                               [meeting, rec_book, request]).start()
@@ -740,7 +736,7 @@ def schedule_meeting(request, club_id):
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
-        rec_books = RecommendationHelper().get_club_recommendations(8, meeting.club.id)
+        rec_books = Recommendation(True).get_recommendations(request, 8, club_id=meeting.club.id)
         return render(request, 'choice_book_list.html', {'rec_books':rec_books, 'meeting_id':meeting.id})
     else:
         return render(request, '404_page.html', status=404)
@@ -837,7 +833,7 @@ def search_page(request):
     # recommendations = RecModelsBakeOff()
     # recommendations.evaluate()
 
-    recommendations = RecommendationHelper()
+    recommendations = Recommendation(True)
     print("----------------------------------------------------------------------------------------------")
     print("club: ", recommendations.get_recommendations(request, 5, club_id=102))
     print("----------------------------------------------------------------------------------------------")
