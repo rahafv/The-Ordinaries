@@ -90,7 +90,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
     def test_only_owner_can_schedule(self):
         self.client.login(username=self.user.username, password="Password123")
         count_meetings_before = Meeting.objects.count()
-        response = self.client.post(self.url, self.form_input)
+        response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(count_meetings_before, Meeting.objects.count())
 
