@@ -42,13 +42,20 @@
                           <div><i class="fe-icon-shopping-bag mr-1 text-muted"></i>
                               <div class="d-inline-block font-weight-medium text-uppercase">Books</div>
                           </div>
-                      </div>
+                          <span class = "badge badge-pill" style="background-color: #284664; font-size: x-small;">{{club.books.count}}</span>
+                        </div>
                   </a>
                   <!-- MEMBERS LIST BUTTON-->
                   {% if is_member %}
-                    <a class="list-group-item button" href='{% url "members_list" club.id %}'> 
-                      <i class="fe-icon-user text-muted"></i>Members
-                    </a>  
+                    <a class="list-group-item button" href='{% url "members_list" club.id %}'>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <i class="fe-icon-heart mr-1 text-muted"></i>
+                          <div class="d-inline-block font-weight-medium text-uppercase">Members</div>
+                        </div>
+                        <span class="badge badge-pill" style="background-color: #284664; font-size: x-small;">{{club.member_count}}</span>
+                      </div>
+                    </a>
                   {% endif %}
                 
                   <!--APPLICANTS LIST BUTTON-->
