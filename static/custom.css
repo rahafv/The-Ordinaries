@@ -529,8 +529,8 @@ p.genre-overflow{
   background: #284664;
   color: #fff;
   padding: 30px 30px 30px 45px;
-  border-radius: 5px 5px 5px 5px;
-  -webkit-border-radius: 5px 5px 5px 5px;
+  /* border-radius: 5px 5px 5px 5px; */
+  /* -webkit-border-radius: 5px 5px 5px 5px; */
   font-size: 16px;
   font-weight: 200;
 }
@@ -582,8 +582,8 @@ p.genre-overflow{
 .canvas-statistics{
   background: #284664;
   color: #fff;
-  border-radius: 4px 4px 4px 4px;
-  -webkit-border-radius: 4px 4px 4px 4px;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
 }
 
 .count-canvas{
