@@ -159,6 +159,15 @@ def get_appropriate_redirect(notification):
     else:
         raise BaseException
 
+def delete_notifications(user, recipients, notificationMessage, club=None):
+    for recepient in recipients:
+        notifications = recepient.notifications.unread().filter(verb=notificationMessage)
+        for notif in notifications:
+            if notif.actor == user and notif.action_object == club:
+                notif.mark_as_read()
+
+
+
 
 class notificationMessages:
 

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect, notificationMessages
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect, notificationMessages, delete_notifications
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Meeting, User, Club, Book, Rating, Event
 from django.urls import reverse
@@ -412,9 +412,14 @@ def join_club(request, club_id):
 
     club.members.add(user)
     #create_event('U', 'C', Event.EventType.JOIN, user, club)
+    delete_notifications(user, user.followees.all(), notificationMessages.JOIN, club )
     notify.send(user, recipient=user.followees.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
 
+
+    
+
     #delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
+
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -436,7 +441,9 @@ def withdraw_club(request, club_id):
 
     club.members.remove(user)
 
-    notify.send(user, recipient=user.followees.all(), verb=notificationMessages.WITHDRAW, action_object=club, description='user-event-C' )      
+    delete_notifications(user, user.followees.all(), notificationMessages.WITHDRAW, club )
+    notify.send(user, recipient=user.followees.all(), verb=notificationMessages.WITHDRAW, action_object=club, description='user-event-C' )  
+    
     #delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
     #create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
@@ -826,10 +833,13 @@ def follow_toggle(request, user_id):
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
         #create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
+        delete_notifications(current_user, [followee], notificationMessages.FOLLOW )
         notify.send(current_user, recipient=followee, verb=notificationMessages.FOLLOW,  description='notification' )
     else:
+        
         #delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
-        notify.send(current_user, recipient=followee, verb=notificationMessages.UNFOLLOW,  description='notification')
+        delete_notifications(current_user, [followee], notificationMessages.FOLLOW )
+        # notify.send(current_user, recipient=followee, verb=notificationMessages.UNFOLLOW,  description='notification')
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
