@@ -70,7 +70,7 @@
     </div>
     <div class="row">
        {% for book in books %}
-          <div class="col-sm-6 col-md-3">
+          <div class="col-sm-6 col-md-3 text-center">
             {% include 'partials/book_card.html' with book=book %}
             <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>

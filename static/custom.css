@@ -574,6 +574,9 @@ p.genre-overflow{
   max-width: 330px !important;
   height: 110px !important;
   max-height: 110px !important;
+  overflow: hidden;
+  flex-grow: inherit;
+  flex-shrink: inherit; 
 }
 
 .canvas-statistics{
@@ -1088,9 +1091,7 @@ textarea {
   max-width: 470px;
   height: 110px;
   max-height: 110px;
-  padding: 15px;
-  flex-grow: inherit;
-  flex-shrink: inherit;  
+  padding: 15px; 
   background: transparent;
   outline: none;
   
@@ -1159,10 +1160,12 @@ textarea:hover {
 }
 
 #display {
-  height: 100vh;
+  max-height: 90vh;
+  height: 82vh;
   padding-top: 10px !important;
   padding: 30px;
 }
+
 
 .borders {
   border-top: 0px !important;
@@ -1172,6 +1175,10 @@ textarea:hover {
 .scroll {
   height: 100%;
   overflow: auto;
+}
+
+.row{
+  display: flex; 
 }
 
 /* LISTS TABLE */

@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <div class="row py-md-5">
+    <div class="row py-md-5 justify-content-center">
         {% if genres %}
             <p class="lead text-center text-white"><b>Selected genres: </b> 
                 {% for genre in genres %} {{genre}} {% endfor %}
@@ -33,16 +33,16 @@
             </div>
         {% else %}
             {% for book in my_books %}
-                <div class="col-sm-6 col-md-3">
+                <div class="col-sm-6 col-md-3 text-center justify-content-center">
                     {% include 'partials/book_card.html' with book=book %}
-                    <a href={% url "add_book_to_list" book_id=book.id %} class="btn btn-outline-light bi bi-plus-lg" style="margin-left:6em"  role="button" > Add </a>
+                    <a href={% url "add_book_to_list" book_id=book.id %} class="btn btn-outline-light bi bi-plus-lg ms-2" style="margin-left:6em"  role="button" > Add </a>
                 </div>
             {% endfor %}
         {% endif %}   
     </div>
     
         {%if list_length != 0 %}
-            <div class="text-center">
+            <div class="text-center mt-4">
                 {%if list_length < 3 %}
                     <a href={% url 'home' %} class="btn  btn-outline-light mb-3 disabled" role="button" aria-disabled="true">Continue</a>
                 {% else %}
