@@ -45,12 +45,12 @@
 <div class="container">
   {% if count == 0 %}
     {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
+      <div style="text-align: center; padding-top: 50px;">
         <h4 class="lead ">There are no books, want to add one?</h4>
         <a href={% url 'add_book' %} class="btn my-2 btn-outline-secondary">Add a book</a>
       </div>
     {% else %}
-      <div style="text-align: center;   padding-top: 50px;">
+      <div style="text-align: center; padding-top: 50px;">
         <h4 class="lead ">The book list is empty! find more book you might like.</h4>
         <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
       </div>
@@ -68,11 +68,11 @@
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
       </form>
     </div>
-    <div class="row">
+    <div class="row justify-content-center">
        {% for book in books %}
           <div class="col-sm-6 col-md-3 text-center">
             {% include 'partials/book_card.html' with book=book %}
-            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark" style="margin-left:6em"  role="button" > View &raquo;</a>
+            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark ms-2" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>
         {% endfor %}
     </div>
