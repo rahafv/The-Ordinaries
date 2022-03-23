@@ -88,7 +88,7 @@
                   {% endif %}
 
                     <!-- WITHDRAW BUTTON-->
-                  {% if not user == club.owner and is_member%}
+                  {% if is_member%}
                     <a class="list-group-item withdraw " href="{% url 'withdraw_club' club_id=club.id %}">
                       <i class="fe-icon-map-pin"></i>Withdraw from club
                     </a>
