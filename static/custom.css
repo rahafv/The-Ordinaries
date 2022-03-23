@@ -530,9 +530,9 @@ p.genre-overflow{
   background: #284664;
   color: #fff;
   padding: 30px 30px 30px 45px;
-  font-size: 16px;
   font-weight: 200;
 }
+
 .bio-row {
   width: 50%;
   float: left;
@@ -541,15 +541,13 @@ p.genre-overflow{
 .centered {
   justify-content: space-evenly;
 }
-.bio-row h4{
-  font-size: 20px;
-}
+
 .bio-graph-info {
   color: #25211e;
 }
 
 .bio-graph-info h4 {
-  font-size: 2rem;
+  font-size: 24px;
   font-weight: 200;
 }
 
@@ -566,7 +564,7 @@ p.genre-overflow{
   width: 40%;
   border: #284664;
   margin-left: -15px;
-  font-size: 17px; 
+  font-size: 16px; 
   font-weight: bold; 
   font-style: normal; 
   font-variant: normal; 
@@ -596,7 +594,7 @@ p.genre-overflow{
   font-style: normal; 
   font-variant: normal; 
   font-stretch: normal; 
-  font-size: 18px; 
+  font-size: 17px; 
   line-height: normal; 
   -webkit-appearance: none; 
   background: none;
