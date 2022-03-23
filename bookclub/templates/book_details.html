@@ -66,14 +66,14 @@
                     </form>
                   </div>
                   {%else%}
-                  <div class="list-group-item button">
+                  <div class="list-group-item button" style="font-weight: 400;text-transform:none;">
                     <div class='reviews-heading mt-3'>
                       <div class = "name-and-edit mb-2">
                         <h5 class= "text-uppercase font-weight-bold">Your Review:</h5>
                         &emsp; 
-                        <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-2 pb-1" style = "font-size:1.3rem"> </a>
+                        <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-2" style = "font-size:1.3rem"> </a>
                       </div>
-                      <p class="review-info-alternate-heading mt-1">
+                      <p class="review-info-alternate-heading mt-1" >
                         <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
                       </p>
                       <div class="rating-star">
@@ -88,7 +88,7 @@
                       </div>
                     </div> 
                     <div class= "review-body mt-2">
-                      <p>{{rating.review}}</p> 
+                      <p style="font-size:16px;">{{rating.review}}</p> 
                     </div>
                   </div>
                   {% endif %}
