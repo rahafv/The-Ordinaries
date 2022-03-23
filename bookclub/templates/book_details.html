@@ -73,9 +73,9 @@
                         &emsp; 
                         <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-2 pb-1" style = "font-size:1.3rem"> </a>
                       </div>
-                      <h6 class="review-info-alternate-heading mt-1">
+                      <p class="review-info-alternate-heading mt-1">
                         <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
-                      </h6>
+                      </p>
                       <div class="rating-star">
                     
                         <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
