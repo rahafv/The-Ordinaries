@@ -14,12 +14,12 @@
           style="font-size: 2.3rem; color: grey;"></a>
         {% endif %}
     </div>
-    <div class="book-nav col-md-4 col-sm-3">
+    <div class="book-nav col-md-4 col-sm-3 mb-3">
         <div class="panel">
             <div class="book-heading">
-              <div class = "align-items-center">
+              <div class="club-details-card pt-3 pb-3">
                 <h5>
-                  <div class="fw-light  text-black text-left me-5 mb-3">
+                  <div class="fw-light  text-black text-left ms-4 ps-3 mb-3">
                   
                     <i class="fa fa-star{% if book.average_rating < 1%}-o{% elif book.average_rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
                     <i class="fa fa-star{% if book.average_rating < 3%}-o{% elif book.average_rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
@@ -33,68 +33,71 @@
                     {%endif%}
                   </div>
                 </h5>
-                <div>
+                <div class="text-center">
                   <img src= "{{ book.image_url }}" class="image-thumbnail mb-2 img-fluid" width="330" height="460" />
                 </div>
-                <div class="w-100"></div>
-                <hr/>
               </div>
-              
-                {% if not rating %}
-                <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
-                  {% csrf_token %}
-                  <h5 class = " mt-2 mb-3">How do you rate this book? 
-                    
-                    <div>
-                      <div class="rate mb-2 mt-2">
-                        <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
-                        <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
-                        <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
-                        <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
-                        <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
-                        <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
-                        <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
-                      </div>         
-                      <textarea name="review" rows="4" class="form-control mb-3 justify-content-center"style = "max-width: 330px" placeholder="Write your review"></textarea>
-                      <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
-                    </div>
-                  </h5>
-                </form>
-                {%else%}
-                <div>
-                  <div class='reviews-heading mt-3'>
-                    <div class = "name-and-edit mb-2">
-                      <h4 class ="font-weight-bold me-2">Your Review:</h4>
-                      &emsp; 
-                      <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-1" style = "font-size:1.3rem"> </a>
-                    </div>
-                    <h6 class="review-info-alternate-heading mt-1">
-                      <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
-                    </h6>
-                    <div class="rating-star">
-                  
-                      <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
-                      <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
-                      <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
-                      <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
-                      <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
-                  
-                      <span>( {{ rating.rating }}/10.0 )</span>
-                    </div>
-                  </div> 
-                  <div class= "review-body mt-2">
-                    <p>{{rating.review}}</p> 
+              <div class="wizard">
+                <hr class="m-0"/>
+                <nav class="list-group list-group-flush">
+                  {% if not rating %}
+                  <div class="list-group-item button" style="text-align: center;">
+                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
+                      {% csrf_token %}
+                      <h5 class = " mt-2 mb-3">How do you rate this book? 
+                        
+                        <div class="justify-content-center">
+                          <div class="rate mb-2 mt-2">
+                            <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
+                            <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
+                            <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
+                            <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
+                            <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
+                            <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
+                          </div>         
+                          <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
+                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                        </div>
+                      </h5>
+                    </form>
                   </div>
-                </div>
-                {% endif %}
-               
+                  {%else%}
+                  <div class="list-group-item button">
+                    <div class='reviews-heading mt-3'>
+                      <div class = "name-and-edit mb-2">
+                        <h4 class ="font-weight-bold me-2">Your Review:</h4>
+                        &emsp; 
+                        <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-2 pb-1" style = "font-size:1.3rem"> </a>
+                      </div>
+                      <h6 class="review-info-alternate-heading mt-1">
+                        <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
+                      </h6>
+                      <div class="rating-star">
+                    
+                        <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                        <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    
+                        <span>( {{ rating.rating }}/10.0 )</span>
+                      </div>
+                    </div> 
+                    <div class= "review-body mt-2">
+                      <p>{{rating.review}}</p> 
+                    </div>
+                  </div>
+                  {% endif %}
+                </nav>
+              </div>
             </div>    
         </div>
     </div>
-    <div class="book-info col-md-8 col-sm-9 max-width: 100%; and height: auto;">
+    <div class="book-info col-md-8 col-sm-9 max-width: 100%; and height: auto; mt-0">
         <div class="panel">
             <div class="bio-graph-heading">
                 <h2 class = "mb-3 me-5">About the book:</h2>
@@ -144,49 +147,48 @@
               </div>
               <hr class="my-4"/>
             {%else%}
-              <p class="mt-5 mb-5 "></p>   
               <hr class="my-4"/>   
-              <p class="mt-5 mb-5 "></p>       
             {% endif %}
         </div>
+
         <div class="w-100"></div>
-        
-        <div class="card card-body p-5 ">
-          <div class = "row justify-content-around">
-              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
+
+          <div class=" list-group-item active card card-body p-5 ">
+            <div class = "row justify-content-around">
+                <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="bio-chart">
+                                <div style="display:inline; width:50px;height:90px;">
+                                    <canvas width="20px" height="90px"></canvas>
+                                    <input disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
+                                    value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                                </div>
+                            </div>
+                            <div class="bio-desk mt-4 pt-2">
+                                <p>Readers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
                   <div class="panel">
-                      <div class="panel-body">
-                          <div class="bio-chart">
-                              <div style="display:inline; width:50px;height:90px;">
-                                  <canvas width="20px" height="90px"></canvas>
-                                  <input disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                                  value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
-                              </div>
-                          </div>
-                          <div class="bio-desk mt-4 pt-2">
-                              <p>Readers</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
-                <div class="panel">
-                  <div class="panel-body">
-                      <div class="bio-chart">
-                          <div style="display:inline; width:50px;height:90px;">
-                              <canvas width="20px" height="90px"></canvas>
-                              <input  disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                              value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
-                          </div>
-                      </div>
-                      <div class="bio-desk mt-4 pt-2">
-                          <p>Reviews</p>
-                      </div>
+                    <div class="panel-body">
+                        <div class="bio-chart">
+                            <div style="display:inline; width:50px;height:90px;">
+                                <canvas width="20px" height="90px"></canvas>
+                                <input  disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
+                                value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                            </div>
+                        </div>
+                        <div class="bio-desk mt-4 pt-2">
+                            <p>Reviews</p>
+                        </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-        </div>
+          </div>       
     </div>
       <div class="container mt-5">
         <h5 class= "text-uppercase font-weight-bold">Reviews:</h5>
