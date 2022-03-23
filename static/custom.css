@@ -558,26 +558,24 @@ p.genre-overflow{
   float: left;
   width: 40%;
   border: #284664;
-  margin-left: 30px;
-  margin-right: -30px;
+  margin-left: 40px;
+  margin-right: -40px;
 }
 
 .bio-desk{
   float: left;
   width: 40%;
   border: #284664;
+  margin-left: -10px;
+  font-size: 17px; 
+  font-weight: bold; 
+  font-style: normal; 
+  font-variant: normal; 
+  font-stretch: normal; 
+  overflow: hidden;
+  overflow-wrap:normal ;
 }
   
-.book_textarea{
-  padding: 0 !important;
-  width: 330px !important;
-  max-width: 330px !important;
-  height: 110px !important;
-  max-height: 110px !important;
-  overflow: hidden;
-  flex-grow: inherit;
-  flex-shrink: inherit; 
-}
 
 .canvas-statistics{
   background: #284664;
@@ -587,18 +585,19 @@ p.genre-overflow{
 }
 
 .count-canvas{
-  width: 54px; 
+  width: 30px; 
   height: 33px; 
   position: absolute; 
   vertical-align: middle; 
   margin-top: 33px; 
-  margin-left: -77px; 
+  margin-left: -30px;
+  padding-bottom: 10px; 
   border: 0px; 
   font-weight: bold; 
   font-style: normal; 
   font-variant: normal; 
   font-stretch: normal; 
-  font-size: 20px; 
+  font-size: 18px; 
   line-height: normal; 
   -webkit-appearance: none; 
   background: none;

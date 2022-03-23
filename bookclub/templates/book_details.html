@@ -39,56 +39,58 @@
                 <div class="w-100"></div>
                 <hr/>
               </div>
-              {% if not rating %}
-              <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
-                {% csrf_token %}
-                <h5 class = " mt-2 mb-3">How do you rate this book? 
+              
+                {% if not rating %}
+                <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
+                  {% csrf_token %}
+                  <h5 class = " mt-2 mb-3">How do you rate this book? 
+                    
+                    <div>
+                      <div class="rate mb-2 mt-2">
+                        <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
+                        <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
+                        <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
+                        <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
+                        <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
+                        <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
+                        <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
+                      </div>         
+                      <textarea name="review" rows="4" class="form-control mb-3 justify-content-center"style = "max-width: 330px" placeholder="Write your review"></textarea>
+                      <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                    </div>
+                  </h5>
+                </form>
+                {%else%}
+                <div>
+                  <div class='reviews-heading mt-3'>
+                    <div class = "name-and-edit mb-2">
+                      <h4 class ="font-weight-bold me-2">Your Review:</h4>
+                      &emsp; 
+                      <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-1" style = "font-size:1.3rem"> </a>
+                    </div>
+                    <h6 class="review-info-alternate-heading mt-1">
+                      <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
+                    </h6>
+                    <div class="rating-star">
                   
-                  <div>
-                    <div class="rate mb-2 mt-2">
-                      <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
-                      <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
-                      <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
-                      <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
-                      <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
-                      <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
-                      <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
-                      <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
-                      <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
-                      <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
-                    </div>         
-                    <textarea name="review" rows="4" class="form-control mb-3 justify-content-center"style = "max-width: 330px" placeholder="Write your review"></textarea>
-                    <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                      <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                      <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                  
+                      <span>( {{ rating.rating }}/10.0 )</span>
+                    </div>
+                  </div> 
+                  <div class= "review-body mt-2">
+                    <p>{{rating.review}}</p> 
                   </div>
-                </h5>
-              </form>
-              {%else%}
-              <div>
-                <div class='reviews-heading mt-3'>
-                  <div class = "name-and-edit mb-2">
-                    <h4 class ="font-weight-bold me-2">Your Review:</h4>
-                    &emsp; 
-                    <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-1" style = "font-size:1.3rem"> </a>
-                  </div>
-                  <h6 class="review-info-alternate-heading mt-1">
-                    <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
-                  </h6>
-                  <div class="rating-star">
-                
-                    <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
-                    <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
-                    <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
-                    <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
-                    <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
-                
-                    <span>( {{ rating.rating }}/10.0 )</span>
-                  </div>
-                </div> 
-                <div class= "review-body mt-2">
-                  <p>{{rating.review}}</p> 
                 </div>
-              </div>
-              {% endif %}
+                {% endif %}
+               
             </div>    
         </div>
     </div>
@@ -97,76 +99,88 @@
             <div class="bio-graph-heading">
                 <h2 class = "mb-3 me-5">About the book:</h2>
                 <div class="row overflow-text no-gutters ">
-                  {% if book.author %}
+                  
                     <div class="bio-row" style="text-align: left;">
-                        <label class="text-md">Author:</label> &emsp;
-                        <p>{{book.author}}</p>
+                        <label class=" mb-3">Author:</label> &emsp;
+                        {% if book.author %}
+                          <p>{{book.author}}</p>
+                        {%else%}
+                          <p> -  </p>
+                        {%  endif %}
                     </div>
-                  {%  endif %}
+                  
                   <div class="bio-row" style="text-align: right;">
-                      <label>ISBN:</label> &emsp;
+                      <label class="mb-3">ISBN:</label> &emsp;
                       <p>{{book.ISBN}}</p>
                   </div>
-                  {% if book.genre %}
+                  
                     <div class="bio-row" style="text-align: left; overflow-wrap: break-word;">
-                      <label>Genre:</label> &emsp;
+                      <label class="mb-3">Genre:</label> &emsp13;
                       <div style = "max-width: 15rem; min-width:6rem;overflow-wrap: break-word;">
-                        <p style=" text-align: left;" class = "m-0">{{book.genre}}</p>
+                        {% if book.genre %}
+                          <p style=" text-align: left;" class = "m-0">{{book.genre}}</p>
+                        {%else%}
+                          <p> -  </p>
+                        {%  endif %}
                       </div>
                     </div>
-                  {% endif %}
-                  {% if book.pages_num %}
+                  
                   <div class="bio-row px-3" style="text-align: right;">
-                    <label>Pages:</label> &emsp;
-                    <p>{{book.pages_num}}</p>
-                </div>
-                  {% endif %}
+                    <label class="mb-3"></label>Pages:</label>&emsp;
+                    {% if book.pages_num %}
+                      <p>{{book.pages_num}}</p>
+                    {%else%}
+                      <p> -  </p>
+                    {% endif %}
+                  </div>
+                  
                 </div>
             </div>
             {% if book.description %}
-            <hr class="my-4">
+            <hr class="my-4"/>
               <div class="panel-body bio-graph-info">
                 <h4>Description:</h4>
                   <p>{{ book.description }}</p>
               </div>
+              <hr class="my-4"/>
             {%else%}
-              <p class="mt-5 mb-5 "></p>
-              <p class="mt-5 mb-5 "></p>
-              <p class="mt-5 mb-5 "></p>
+              <p class="mt-5 mb-5 "></p>   
+              <hr class="my-4"/>   
+              <p class="mt-5 mb-5 "></p>       
             {% endif %}
         </div>
         <div class="w-100"></div>
-        <hr class="my-4">
-        <div class = "justify-content-center">
-          <div class="row mt-3 centered">
-              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center">
+        
+        <div class="card card-body p-5 ">
+          <div class = "row justify-content-around">
+              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
                   <div class="panel">
                       <div class="panel-body">
                           <div class="bio-chart">
-                              <div style="display:inline; width:70px;height:90px;">
-                                  <canvas width="70px" height="90px"></canvas>
+                              <div style="display:inline; width:50px;height:90px;">
+                                  <canvas width="20px" height="90px"></canvas>
                                   <input disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                                  value = " {{book.readers_count}}" data-width="100" data-height="100"  data-thickness=".2">
+                                  value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
                               </div>
                           </div>
                           <div class="bio-desk mt-4 pt-2">
-                              <h3 class="">Readers</h3>
+                              <p>Readers</p>
                           </div>
                       </div>
                   </div>
               </div>
-              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center">
+              <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
                 <div class="panel">
                   <div class="panel-body">
                       <div class="bio-chart">
-                          <div style="display:inline; width:70px;height:90px;">
-                              <canvas width="70px" height="90px"></canvas>
+                          <div style="display:inline; width:50px;height:90px;">
+                              <canvas width="20px" height="90px"></canvas>
                               <input  disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                              value = "{{reviews_count}}" data-width="100" data-height="100"  data-thickness=".2">
+                              value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
                           </div>
                       </div>
                       <div class="bio-desk mt-4 pt-2">
-                          <h3 class="">Reviews</h3>
+                          <p>Reviews</p>
                       </div>
                   </div>
                 </div>
