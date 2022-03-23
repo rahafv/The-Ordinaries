@@ -216,7 +216,7 @@ def handler404(request, exception):
 @login_required
 def log_out(request):
     logout(request)
-    messages.add_message(request, messages.SUCCESS, "You've been logged out.")
+    messages.add_message(request, messages.SUCCESS, "You've been logged out!")
     return redirect('welcome')
 
 
@@ -284,14 +284,14 @@ def add_review(request, book_id):
             form.save(review_user, reviewed_book)
             review_user.add_book_to_all_books(reviewed_book)
             create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
-            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+            messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
 
             reviewed_book.calculate_average_rating() 
 
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR,
-                         "Review cannot be over 250 characters.")
+                         "Review cannot be over 250 characters!")
     return render(request, 'book_details.html', {'book': reviewed_book})
 
 
@@ -342,8 +342,7 @@ def book_details(request, book_id):
     rating = book.ratings.all().filter(user=request.user)
     if rating:
         rating = rating[0]
-    reviews_count = book.ratings.all().exclude(
-        review="").exclude(user=request.user).count()
+    reviews_count = book.ratings.all().count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
@@ -484,7 +483,7 @@ def withdraw_club(request, club_id):
 
     if user == club.owner:
         messages.add_message(request, messages.ERROR,
-                             "Must transfer ownership before leaving club!")
+                             "Ownership must be transferred before withdrawing from club!")
         return redirect('club_page', club_id)
 
     if not club.is_member(user):
@@ -616,7 +615,7 @@ class MembersListView(LoginRequiredMixin, ListView):
         if self.club.is_member(self.request.user):
             return ['members_list.html']
         else:
-            messages.add_message(self.request, messages.ERROR, "You cannot access the members list" )
+            messages.add_message(self.request, messages.ERROR, "You cannot access the members list!" )
             return ['club_page.html']
 
     def get_context_data(self, **kwargs):
@@ -714,7 +713,7 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
         if self.club.owner == self.request.user:  
             return ['applicants_list.html']
         else:
-            messages.add_message(self.request, messages.ERROR, "You cannot access the applicants list" )
+            messages.add_message(self.request, messages.ERROR, "You cannot access the applicants list!" )
             return ['club_page.html']
 
     def get_context_data(self, **kwargs):
@@ -739,7 +738,7 @@ def accept_applicant(request, club_id, user_id):
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
-                             "You cannot change applicant status list")
+                             "You cannot change applicant's status!")
         return redirect('club_page', club_id)
 
 
@@ -754,7 +753,7 @@ def reject_applicant(request, club_id, user_id):
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
-                             "You cannot change applicant status list")
+                             "You cannot change applicant's status!")
         return redirect('club_page', club_id)
 
 class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin):
@@ -1018,10 +1017,9 @@ def edit_review(request, review_id):
         
         return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
 
-    else:
-        return render(request, '404_page.html', status=404)
+    
+    return render(request, '404_page.html', status=404)
 
-    return render(request, 'edit_review.html', {'form' : form , 'review_id':review.id })
 
 """Enable user to follow and unfollow other users."""
 @login_required
@@ -1280,7 +1278,7 @@ def cancel_meeting(request, meeting_id):
 
     if (user == club.owner ):
         meeting.delete()
-        messages.add_message(request, messages.SUCCESS, "You canceled the meeting successfully!")
+        messages.add_message(request, messages.SUCCESS, "You cancelled the meeting successfully!")
 
         """send email invites"""
         MeetingHelper().send_email(request=request, 

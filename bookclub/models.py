@@ -285,7 +285,7 @@ class Book(models.Model):
         blank=True
     )
 
-    describtion = models.CharField(
+    description = models.CharField(
         max_length=500,
         unique=False,
         blank=True
@@ -348,6 +348,7 @@ class Book(models.Model):
 
     def clubs_count(self):
         return self.clubs.all().count()
+     
 
     def calculate_average_rating(self):
         if self.ratings.all().count() != 0:
