@@ -83,6 +83,7 @@ class Command(BaseCommand):
                     bio = row[4],
                     password = Command.DEFAULT_PASSWORD,
                     email_verified = True,
+                    training_counter = 0
                 )
 
                 users.append(user)
@@ -193,16 +194,16 @@ class Command(BaseCommand):
 
             for col in books_data:
               
-                image_url = self.check_blank_image(col[3])
+                image_url = self.check_blank_image(col[2])
 
                 book = Book(
-                    ISBN = col[4],
-                    title = col[6],
+                    ISBN = col[3],
+                    title = col[5],
                     author = col[0],
-                    genre = col[7],
+                    genre = col[6],
                     describtion = col[1],
                     image_url = image_url,
-                    pages_num = col[5]
+                    pages_num = col[4]
                 )
 
                 books.append(book)

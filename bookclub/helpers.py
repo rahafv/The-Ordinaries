@@ -5,6 +5,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail 
 import six
 from django.conf import settings
+
+from bookclub.recommender.recommendation import Recommendation
 from .models import Event, User, Club, Book
 from django.db.models.functions import Lower
 
@@ -149,3 +151,14 @@ def getGenres():
                     genres[genre] = 1
 
     return genres
+
+def get_recommender_books(request, numOfRecs, user_id=None, book_id=None, club_id=None):
+    user_counter = request.user.training_counter
+    if user_counter >= 10:
+        request.user.reset_counter()
+        rec.train()
+
+    return rec.get_recommendations(request, numOfRecs, user_id=user_id, book_id=book_id, club_id=club_id)
+
+
+rec = Recommendation()

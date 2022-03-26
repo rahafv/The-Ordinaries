@@ -10,6 +10,8 @@ import heapq
 class ItemBasedModel:
     def __init__(self):
         self.trainset = self.load_dataset().build_full_trainset()
+        self.similarity_matrix = KNNBasic(sim_options = {'name': 'cosine',
+                 'user_based': False}).fit(self.trainset).compute_similarities()
 
     def load_dataset(self):
         
@@ -34,8 +36,7 @@ class ItemBasedModel:
         return data
 
     def generateCandidates(self, user_id, k=20):
-        similarity_matrix = KNNBasic(sim_options = {'name': 'cosine',
-                 'user_based': False}).fit(self.trainset).compute_similarities()
+        
 
         user_iid = self.trainset.to_inner_uid(user_id)
         user_ratings = self.trainset.ur[user_iid]
@@ -44,7 +45,7 @@ class ItemBasedModel:
         candidates = defaultdict(float)
         for itemID, rating in k_neighbors:
             try:
-                similaritities = similarity_matrix[itemID]
+                similaritities = self.similarity_matrix[itemID]
                 for innerID, score in enumerate(similaritities):
                     candidates[innerID] += score * (rating / 10.0)
             except:
@@ -61,7 +62,7 @@ class ItemBasedModel:
         for itemID, rating_sum in sorted(candidates.items(), key=itemgetter(1), reverse=True):
             
             id = self.trainset.to_raw_iid(itemID)
-            if user.all_books.filter(id=id).exists():
+            if not user.all_books.filter(id=id).exists():
                 recommendations.append(id)
                 position += 1
                 if (position >= num_of_rec): 

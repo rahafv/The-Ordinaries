@@ -12,6 +12,11 @@ class User(AbstractUser):
 
     email_verified = models.BooleanField(default=False)
 
+    training_counter = models.PositiveSmallIntegerField(
+        null=False,
+        blank=False
+    )
+
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -143,7 +148,14 @@ class User(AbstractUser):
     def add_book_to_all_books(self , book):
         if book not in self.all_books.all():
             self.all_books.add(book)
-       
+
+    def increment_counter(self):
+        self.training_counter += 1
+        self.save()
+
+    def reset_counter(self):
+        self.training_counter = 0
+        self.save()  
 
 
 class Club(models.Model):
