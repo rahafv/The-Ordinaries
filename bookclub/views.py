@@ -471,7 +471,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
-            notify.send(user, recipient=club.owner, verb=notificationMessages.APPLIED, action_object=club,  description='notification-' )
+            notify.send(user, recipient=club.owner, verb=notificationMessages.APPLIED, action_object=club,  description='notification' )
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)

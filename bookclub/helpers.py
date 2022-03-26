@@ -158,7 +158,7 @@ def get_appropriate_redirect(notification):
     elif action_name == notificationMessages.UNFOLLOW :
         return redirect('profile', user_id=notification.actor.id)
     else:
-        raise BaseException
+        return redirect('home')
 
 def delete_notifications(user, recipients, notificationMessage, club=None):
     for recepient in recipients:

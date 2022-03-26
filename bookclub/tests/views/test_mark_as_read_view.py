@@ -1,20 +1,24 @@
 """Tests of the mark as read view."""
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 from notifications.signals import notify
-from bookclub.models import User
-from bookclub.helpers import notificationMessages
+from bookclub.models import User, Club
+from bookclub.helpers import notificationMessages, delete_notifications
+from bookclub.views import mark_as_read
 
 
 class MarkAsReadViewTestCase(TestCase):
     """Tests of the mark_as_read view."""
 
-    fixtures = ['bookclub/tests/fixtures/default_user.json' , 
-                'bookclub/tests/fixtures/other_users.json']
+    fixtures = ['bookclub/tests/fixtures/default_user.json', 
+                'bookclub/tests/fixtures/other_users.json', 
+                'bookclub/tests/fixtures/default_club.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.sec_user = User.objects.get(id=2)
+        self.third_user = User.objects.get(id=3)
+        self.club=Club.objects.get(id=1)
         notify.send(self.sec_user, recipient=self.user, verb=notificationMessages.FOLLOW)
         self.slug = self.user.notifications.unread()[0].slug
         self.url = reverse('mark_as_read', kwargs={'slug': self.slug})
@@ -29,3 +33,77 @@ class MarkAsReadViewTestCase(TestCase):
         self.assertEqual(after_count, before_count - 1)
         redirect_url = reverse('profile', kwargs={'user_id':2} )
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+
+    def test_get_appropriate_redirect_APPLY(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=notificationMessages.APPLIED, action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('applicants_list', kwargs={'club_id': self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+
+    def test_get_appropriate_redirect_ACCEPT(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=notificationMessages.ACCEPT, action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('club_page', kwargs={'club_id': self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+
+    def test_get_appropriate_redirect_REJECT(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=notificationMessages.REJECT, action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('club_page', kwargs={'club_id': self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+
+    def test_get_appropriate_redirect_FOLLOW(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=notificationMessages.FOLLOW, action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('profile')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+
+    def test_get_appropriate_redirect_UNFOLLOW(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=notificationMessages.UNFOLLOW, action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('profile')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_get_appropriate_redirect_wrong_verb(self): 
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb="test_verb", action_object=self.club, description='notification')
+        slug2 = self.user.notifications.unread()[0].slug
+        url = reverse('mark_as_read', kwargs={'slug': slug2})
+        response = self.client.get(url, follow=True)
+        response_url = reverse('home')
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+
+    def test_delete_notification_helper_with_wrong_argument(self):
+        self.client.login(username=self.user.username, password="Password123")
+        self.user.toggle_follow(self.sec_user)
+        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
+        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
+        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
+        before_count = self.user.notifications.unread().count()
+        delete_notifications(self.user,[self.user, self.sec_user, self.third_user], "test notification")
+        after_count = self.user.notifications.unread().count()
+        self.assertEqual(after_count, before_count)
+        
+
+
+    
