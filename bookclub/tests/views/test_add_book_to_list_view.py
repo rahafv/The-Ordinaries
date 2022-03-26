@@ -15,6 +15,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
         self.url = reverse('add_book_to_list', kwargs={'book_id': self.book.id})
         self.follower = User.objects.get(username = "willsmith")
         self.user.toggle_follow(self.follower)
+        self.follower.toggle_follow(self.user)
 
     def test_book_details_url(self):
         self.assertEqual(self.url,f'/book/{self.book.id}/add_to_list')

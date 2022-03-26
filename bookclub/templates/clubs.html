@@ -8,27 +8,27 @@
 {% load humanize %}
     
 {% if general %}
-<h1 class="fw-light center bg-purple" style="text-align: center;">Clubs</h1>
-<div class="carousel-inner" style="top: -8px;">
-  <div class="carousel-item active">
-    
+  <h1 class="fw-light center bg-purple" style="text-align: center;">Clubs</h1>
+  <div class="carousel-inner" style="top: -8px;">
+    <div class="carousel-item active">
+      
 
-    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <rect width="100%" height="100%" fill="#faf3ee"/>
-      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
+      <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+        <rect width="100%" height="100%" fill="#faf3ee"/>
+        <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
 
-    </svg>
+      </svg>
 
-    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
-      <div class="carousel-caption">
-          <div class="col-sm-6 col-md-3 col-lg-4">
-            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
-            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+      <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+        <div class="carousel-caption">
+            <div class="col-sm-6 col-md-3 col-lg-4">
+              <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
+              <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+            </div>
           </div>
         </div>
-      </div>
+    </div>
   </div>
-</div>
 
 
   <div class="container">
@@ -41,34 +41,60 @@
  {% endif %}
  
 
-<div class="container">
+<div class="container mt-5">
   {% if count == 0 %}
     {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
-        <h4 class="lead "> There are no clubs, want to create one?</h4>
-        <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-secondary">Create club</a>
-      </div>
+      {%if filtered%}
+        <div style="text-align: center;">
+          <h4 class="lead "> There are no matches. </h4>
+          <a href='/clubs'  class="btn my-2 btn-outline-dark">Go back</a>
+        </div>
+      {% else %}
+        <div style="text-align: center;   padding-top: 50px;">
+          <h4 class="lead "> There are no clubs, want to create one?</h4>
+          <a href='{% url 'create_club' %}'  class="btn my-2 btn-outline-dark">Create club</a>
+        </div>
+      {%endif%}
     {% else %}
+      {%if filtered%}
+      <div style="text-align: center; ">
+        <h4 class="lead mt-5 "> There are no matches. </h4>
+        <a href={% url 'clubs_list' user.id %}  class="btn my-2 btn-outline-dark">Go back</a>
+      </div>
+      {% else %}
       <div style="text-align: center;   padding-top: 50px;">
         <h4 class="lead "> You are not a member of any clubs want to explore? </h4>
-        <a href='/clubs'  class="btn my-2 btn-outline-secondary">More clubs</a>
+        <a href='/clubs'  class="btn my-2 btn-outline-dark">More clubs</a>
       </div>
+      {% endif %}
     {% endif %}
     
   {% else %}
-    <div class = "col - 12">
-      {% if general %}
-        <form class="d-flex" method=GET action='{% url 'clubs_list' %}' > 
+  <div style="float: right; margin-top: 2rem;">
+    {% if general %}
+    <form method=GET action="{% url 'clubs_list'%}">
       {% else %}
-        <form class = "d-flex" method = "GET" action = '{% url 'clubs_list' user.id %}'>
-      {% endif %}
-          {% csrf_token %}
-          {% include 'partials/bootstrap_form.html' with form=form %}
-          <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
-      </form>
-    </div>
-
-    
+      <form method=GET action="{% url 'clubs_list' user.id%}">
+        {% endif %}
+        <div style="text-align:left;">
+        Privacy:
+        <select id="privacy" name="privacy" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
+          <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
+          <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
+        </select>
+      </div>
+      <div style="text-align:left;">
+        Ownership:
+        <select id="ownership" name="ownership" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+          <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
+          <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
+        </select>
+      </div>
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; margin-left:1em"> Filter </button>
+    </form>
+  </div>
 
     {% include 'partials/clubs_list.html' with clubs=clubs %}
   <ul class="pagination justify-content-center">

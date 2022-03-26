@@ -21,7 +21,7 @@
     "fields": {
         "name": "club3",
         "owner": 3,
-        "members": [],
+        "members": [5],
         "theme": "Fiction",
         "meeting_type": "In-person", 
         "club_type": "Private", 

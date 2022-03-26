@@ -200,7 +200,7 @@ class Command(BaseCommand):
                     title = col[6],
                     author = col[0],
                     genre = col[7],
-                    describtion = col[1],
+                    description = col[1],
                     image_url = image_url,
                     pages_num = col[5]
                 )
@@ -252,6 +252,7 @@ class Command(BaseCommand):
                 )
 
                 book.add_reader(user)
+                user.add_book_to_all_books(book)
 
                 create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
                 create_event('U', 'B', Event.EventType.REVIEW, user=user, book=book)

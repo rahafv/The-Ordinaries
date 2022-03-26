@@ -17,8 +17,8 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenuTestMixin, Logi
         self.member = User.objects.get(username="peterpickles")
         self.url = reverse("transfer_ownership", kwargs={"club_id": self.club.id})
         self.form_input = {
-            'selected_member':{self.member.id},
-            'defaultCheck':'checked',
+            'new_owner':{self.member.id},
+            'confirm':'checked',
             'submit':'Save'
 	    }
 

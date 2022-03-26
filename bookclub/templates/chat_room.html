@@ -1,0 +1,125 @@
+{% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+{% load humanize %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+    setInterval(function(){
+        $.ajax({
+            type: 'GET',
+            url : "/getMessages/{{club.id}}/",
+            success: function(response){
+                console.log(response);
+                $("#display").empty();
+
+                for (var key in response.chats) {
+                    if(response.user_id != response.chats[key].user_id) {
+                        var temp="<div class='row justify-content-start'><div id=rcorners1 class='text-white mb-1'><b>"+response.modifiedItems[key].name+"</b><p>"+
+                            response.chats[key].message+"</p><span>"+
+                            response.modifiedItems[key].time+"</span></div></div>";                    }
+                    else {
+                        var temp="<div class='row justify-content-end'><div id=rcorners2 class='bg-dark-blue text-white mb-1'><div style='text-align:left !important'><p>"+
+                            response.chats[key].message+"</p></div><span class='time-left'>"+
+                                response.modifiedItems[key].time+"</span></div></div>";
+                    }
+                    $("#display").append(temp);
+                }
+            }
+        });
+    },1000);
+    })
+
+    const scrollSmoothToBottom = (id) => {
+        const element = $(`#${id}`);
+        element.animate({
+        scrollTop: element.prop("scrollHeight")
+        }, 1000);
+    }
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<div class="row rounded-lg overflow-hidden" style="margin:0px;">
+
+    <div class="col-3 px-0" id="columnOne">
+        <div class="bg-white">
+
+            <div class="px-4 py-2 bg-purple text-white">
+                <p class="h5 mb-0 py-1">Chats</p>
+            </div>
+    
+            <div class="messages-box">
+                <div class="list-group rounded-0 scroll" style="max-height:90vh; height:86vh">
+                    {% for userClub in request.user.clubs.all %}
+                        {% if userClub.members.count > 1%}
+                            <a href="{% url "chat_room" userClub.id %}" class="list-group-item list-group-item-action list-group-item-light rounded-0">
+                                <div class="media">
+                                    <div class="media-body ">
+                                        <i class="bi bi-people-fill"></i>
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h6 class="mb-0">{{userClub.name}}</h6>
+                                            <i class="font-italic text-muted mb-0 text-small">{{userClub.members.count}} members </i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Box-->
+    <div class="col-9 px-0" id="columnTwo" >
+        <div class="chat-box bg-white borders">
+
+            <div class="px-4 py-2 bg-purple text-white d-flex justify-content-between">
+                <b class="mb-0 py-1">{{club.name}} chat room</b>
+                <button class="bg-purple btn btn-sm btn-outline-dark bi bi-caret-down-fill" onClick="scrollSmoothToBottom('display')" data-toggle="tooltip" data-placement="left" title="Scroll down"></button> 
+            </div>
+
+            
+            
+            <div id="display" class="scroll d-flex flex-column-reverse"></div>
+
+            <form id="post-form" class="bg-light input-group">
+                {% csrf_token %}
+                <input type="hidden" name="username" id="username" value="{{request.user.username}}"/>
+                <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+                <input type="text" placeholder="Type a message"  name="message" id="message" class="form-control" style="width: 750"/>
+                <button id="button-addon2" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane" style="color:black"></i></button>
+            </form>
+        </div>
+    </div>
+</div>    
+
+<script type="text/javascript">
+    $(document).on('submit','#post-form',function(e){
+      e.preventDefault();
+  
+      $.ajax({
+        type:'POST',
+        url:'/send',
+        data:{
+            username:$('#username').val(),
+            club_id:$('#club_id').val(),
+            message:$('#message').val(),
+          csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+            scrollSmoothToBottom('display')
+        }
+      });
+      document.getElementById('message').value = ''
+    });
+
+    $("#columnTwo").height($("#columnOne").height());
+
+</script>
+
+{% endblock %}

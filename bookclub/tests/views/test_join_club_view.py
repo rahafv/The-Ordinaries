@@ -23,6 +23,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.applicant = User.objects.get(username = "willsmith")
         self.follower = User.objects.get(username = "willsmith")
         self.user.toggle_follow(self.follower)
+        self.follower.toggle_follow(self.user)
 
 
     def test_join_url(self):

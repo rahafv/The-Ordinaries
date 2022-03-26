@@ -27,22 +27,25 @@
                             <span class = "profile-email">{{user.email}}</span>
                         {% endif %}
                     </div>
-                    <div class="opacity-60 mb-2"> 
-                            {% if user.age %}
-                                <span class="profile-statistics">Age: </span>
-                                <span class = "profile-statistics-item">{{user.age}}</span>
-                            {% endif %}
-                            &emsp;
-                            {% if user.location %}
-                                <span class="profile-statistics">Location:</span>
-                                <span class = "profile-statistics-item">{{user.location}}</span>
-                            {% endif %}
-                    </div>
-                    <div class="bio-text pt-2 pb-4 opacity-75">
-                        {% if user.bio %}
-                            <span>{{user.bio}}</span> 
-                        {% endif %}
-                    </div>  
+                    {% if user.age or user.location %}
+                        <div class="opacity-60 mb-2"> 
+                                {% if user.age %}
+                                    <span class="profile-statistics">Age: </span>
+                                    <span class = "profile-statistics-item">{{user.age}}</span>
+                                {% endif %}
+                                &emsp;
+                                {% if user.location %}
+                                    <span class="profile-statistics">Location:</span>
+                                    <span class = "profile-statistics-item">{{user.location}}</span>
+                                {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if user.bio %}
+                        <div class="bio-text pt-2 pb-4 opacity-75">
+                                <span>{{user.bio}}</span> 
+                        </div>  
+                    {% endif %}
+
                 </div>
                 <div class="text-center pt-2 pb-1.7">
                     <a href="{% url 'following_list' user_id=user.id %}"  class = "d-inline-block text-white"> {{ user.followee_count }}  <span class= "opacity-75">following</span></a>

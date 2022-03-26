@@ -26,6 +26,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         }
         self.follower = User.objects.get(username = "willsmith")
         self.user.toggle_follow(self.follower)
+        self.follower.toggle_follow(self.user)
 
     def test_create_club_url(self):
         self.assertEqual(self.url, "/create_club/")
