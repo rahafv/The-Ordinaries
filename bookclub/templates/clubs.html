@@ -8,27 +8,27 @@
 {% load humanize %}
     
 {% if general %}
-<h1 class="fw-light center bg-purple" style="text-align: center;">Clubs</h1>
-<div class="carousel-inner" style="top: -8px;">
-  <div class="carousel-item active">
-    
+  <h1 class="fw-light center bg-purple" style="text-align: center;">Clubs</h1>
+  <div class="carousel-inner" style="top: -8px;">
+    <div class="carousel-item active">
+      
 
-    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <rect width="100%" height="100%" fill="#faf3ee"/>
-      <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
+      <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+        <rect width="100%" height="100%" fill="#faf3ee"/>
+        <image width="200%" height="200%"  xlink:href="{% static '/images/clubs_page1.png' %}"  />
 
-    </svg>
+      </svg>
 
-    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
-      <div class="carousel-caption">
-          <div class="col-sm-6 col-md-3 col-lg-4">
-            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
-            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+      <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+        <div class="carousel-caption">
+            <div class="col-sm-6 col-md-3 col-lg-4">
+              <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Create your own community.</h1>
+              <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'create_club' %}'>Create Club</a></p>
+            </div>
           </div>
         </div>
-      </div>
+    </div>
   </div>
-</div>
 
 
   <div class="container">
@@ -41,7 +41,7 @@
  {% endif %}
  
 
-<div class="container">
+<div class="container mt-5">
   {% if count == 0 %}
     {% if general %}
       {%if filtered%}
@@ -70,7 +70,7 @@
     {% endif %}
     
   {% else %}
-  <div style="float: right;">
+  <div style="float: right; margin-top: 2rem;">
     {% if general %}
     <form method=GET action="{% url 'clubs_list'%}">
       {% else %}
@@ -92,12 +92,9 @@
         </select>
       </div>
         {% include 'partials/bootstrap_form.html' with form=form %}
-        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; align:center; margin-left:1em"> Filter </button>
+        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; margin-left:1em"> Filter </button>
     </form>
   </div>
-
-
-    
 
     {% include 'partials/clubs_list.html' with clubs=clubs %}
   <ul class="pagination justify-content-center">

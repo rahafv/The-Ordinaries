@@ -18,7 +18,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
             'title':'Classical',
             'author': 'Mark',
             'genre': 'Classics,European Literature,Czech Literature',
-            'describtion': 'describtion'
+            'description': 'description'
         }
 
     def test_add_book_url(self):
@@ -61,7 +61,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertEqual(club.title, "Classical")
         self.assertEqual(club.author, "Mark")
         self.assertEqual(club.genre, "Classics,European Literature,Czech Literature")
-        self.assertEqual(club.describtion, "describtion")
+        self.assertEqual(club.description, "description")
 
         self.assert_menu(response)
 

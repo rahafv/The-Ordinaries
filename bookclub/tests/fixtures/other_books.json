@@ -7,7 +7,7 @@
         "title": "Clara Callan",
         "author": "Richard Bruce Wright",
         "genre": "Classics,European Literature,Czech Literature",
-        "describtion": "describtion",
+        "description": "description",
         "readers": [], 
         "clubs": []
       }
@@ -21,7 +21,7 @@
       "title": "Test Book",
       "author": "Ghaliah",
       "genre": "Classics,European Literature,Czech Literature",
-      "describtion": "describtion",
+      "description": "description",
       "readers": [3], 
       "clubs": []
     }
