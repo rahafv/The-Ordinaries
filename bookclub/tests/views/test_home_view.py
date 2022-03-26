@@ -2,7 +2,7 @@
 from urllib import response
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User , Event , Club , Book
+from bookclub.models import User , Club , Book
 from bookclub.tests.helpers import LogInTester, LoginRedirectTester, reverse_with_next , MenuTestMixin, NotificationsTester
 
 class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin, NotificationsTester):

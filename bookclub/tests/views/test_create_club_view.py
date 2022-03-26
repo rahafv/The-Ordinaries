@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import CreateClubForm
-from bookclub.models import Club, User, Event
+from bookclub.models import Club, User
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
 class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):

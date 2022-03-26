@@ -3,7 +3,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Meeting, User, Club, Event
+from bookclub.models import Book, Meeting, User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 import pytz
 

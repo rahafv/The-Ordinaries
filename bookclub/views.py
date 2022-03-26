@@ -8,9 +8,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, get_appropriate_redirect, notificationMessages, delete_notifications, getGenres
+from .helpers import get_list_of_objects, login_prohibited, generate_token, MeetingHelper, SortHelper, get_appropriate_redirect, notificationMessages, delete_notifications, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Chat, Meeting, User, Club, Book , Rating, Event
+from .models import Chat, Meeting, User, Club, Book , Rating
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -45,40 +45,16 @@ def welcome(request):
 
 @login_required
 def home(request):
-    def events_created_at(event):
-        return event.created_at
-
     current_user = request.user
-    authors = list(current_user.followees.all()) + [current_user]
-    clubs = list(User.objects.get(id=current_user.id).clubs.all())
-    user_events = []
-    club_events = []
-    for author in authors:
-        user_events += list(Event.objects.filter(user=author))
-    final_user_events = user_events
-    final_user_events.sort(reverse=True, key=events_created_at)
-    first_twentyFive = final_user_events[0:25]
-
-    for club in clubs:
-        club_events += list(Event.objects.filter(club=club))
-
-    final_club_events = club_events
-    final_club_events.sort(reverse=True, key=events_created_at)
-    first_ten = final_club_events[0:10]
-
-    club_events_length = len(first_ten)
-
-    ##########
     notifications = current_user.notifications.unread()
     user_events = notifications.filter(description__contains ='user-event')
     club_events = notifications.filter(description__contains='club-event')
-    club_events_length = len(club_events)
-    #########
+
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
 
-    return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': club_events_length, 'books':top_rated_books})
+    return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -267,7 +243,6 @@ class CreateClubView(LoginRequiredMixin, CreateView):
         form.instance.owner = club_owner
         self.club = form.save()
         notify.send(club_owner, recipient=club_owner.followers.all(), verb=notificationMessages.CREATE, action_object=self.club, description='user-event-C' ) 
-        create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=self.club)
         self.club.add_member(club_owner)
         return super().form_valid(form)
 
@@ -294,7 +269,6 @@ def add_review(request, book_id):
             form.save(review_user, reviewed_book)
             review_user.add_book_to_all_books(reviewed_book)
             notify.send(review_user, recipient=review_user.followers.all(), verb=notificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' ) 
-            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
             messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
 
             reviewed_book.calculate_average_rating() 
@@ -481,14 +455,8 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
-    #create_event('U', 'C', Event.EventType.JOIN, user, club)
     delete_notifications(user, user.followers.all(), notificationMessages.JOIN, club )
     notify.send(user, recipient=user.followers.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
-
-
-    
-
-    #delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
 
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
@@ -515,8 +483,6 @@ def withdraw_club(request, club_id):
     delete_notifications(user, user.followers.all(), notificationMessages.WITHDRAW, club )
     notify.send(user, recipient=user.followers.all(), verb=notificationMessages.WITHDRAW, action_object=club, description='user-event-C' )  
     
-    #delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
-    #create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -756,7 +722,6 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        #create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
         notify.send(applicant, recipient=applicant.followers.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         notify.send(current_user, recipient=applicant, verb= notificationMessages.ACCEPT, action_object=club, description='notification' )
@@ -1056,14 +1021,11 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     if(not current_user.is_following(followee)):
-        #create_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
         delete_notifications(current_user, [followee], notificationMessages.FOLLOW )
         notify.send(current_user, recipient=followee, verb=notificationMessages.FOLLOW,  description='notification' )
     else:
         
-        #delete_event('U', 'U', Event.EventType.FOLLOW, current_user, action_user=followee)
         delete_notifications(current_user, [followee], notificationMessages.FOLLOW )
-        # notify.send(current_user, recipient=followee, verb=notificationMessages.UNFOLLOW,  description='notification')
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 

@@ -1,7 +1,7 @@
 """Tests of the withdraw club view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club, Event
+from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 

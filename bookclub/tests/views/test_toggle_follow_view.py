@@ -2,7 +2,7 @@ import profile
 from django import http
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club, Event
+from bookclub.models import User, Club
 from bookclub.tests.helpers import reverse_with_next
 
 class ShowUserTest(TestCase):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book, Event
+from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 
 class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):

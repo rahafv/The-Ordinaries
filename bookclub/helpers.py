@@ -6,7 +6,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail 
 import six
 from django.conf import settings
-from .models import Event, User, Club, Book
+from .models import User, Club, Book
 from django.db.models.functions import Lower
 import re
 
@@ -19,25 +19,6 @@ def login_prohibited(view_function):
             return view_function(request)
     return modified_view_function
 
-def create_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
-    event = Event(
-                type_of_actor = type_of_actor,
-                type_of_action = type_of_action,
-                message = message,
-                user = user ,
-                club = club,
-                meeting = meeting,
-                book = book, 
-                rating = rating,
-                action_user = action_user
-            )
-
-    event.save()
-    return event
-
-def delete_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
-    event = Event.objects.filter(type_of_actor = type_of_actor, type_of_action = type_of_action, message = message, user = user , club = club, meeting = meeting, book = book, rating = rating, action_user = action_user)
-    event.delete()
 
 class MeetingHelper:
     def assign_rand_book(self, meeting, request=None):
