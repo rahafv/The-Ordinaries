@@ -22,6 +22,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertEqual(self.url,'/log_in/')
 
     def test_get_log_in(self):
+        print("test1")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'log_in.html')
@@ -34,6 +35,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_menu(response)
 
     def test_get_log_in_with_redirect(self):
+        print("test2")
         destination_url = reverse('home')
         self.url = reverse_with_next('log_in', destination_url)
         response = self.client.get(self.url)
@@ -48,6 +50,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_menu(response)
 
     def test_get_log_in_redirects_when_logged_in(self):
+        print("test3")
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url, follow=True)
         redirect_url = reverse('home')
@@ -55,6 +58,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assertTemplateUsed(response, 'home.html')
 
     def test_unsuccesful_log_in(self):
+        print("test4")
         form_input = { 'username': 'johndoe', 'password': 'WrongPassword123' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
@@ -67,6 +71,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_menu(response)
 
     def test_log_in_with_blank_username(self):
+        print("test5")
         form_input = { 'username': '', 'password': 'Password123' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
@@ -79,6 +84,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_menu(response)
 
     def test_log_in_with_blank_password(self):
+        print("test6")
         form_input = { 'username': 'johndoe', 'password': '' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
@@ -91,6 +97,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_menu(response)
 
     def test_unverified_log_in(self):
+        print("test7")
         self.user.email_verified = False
         self.user.save()
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
@@ -100,6 +107,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_error_message(response)
 
     def test_succesful_log_in_with_no_prev_books(self):
+        print("test8")
         form_input = { 'username': 'johndoe', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
@@ -109,6 +117,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_message(response)
 
     def test_succesful_log_in_with_prev_books(self):
+        print("test9")
         form_input = { 'username': 'peterpickles', 'password': 'Password123' }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
@@ -118,6 +127,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_message(response)
 
     def test_succesful_log_in_with_redirect_with_no_prev_books(self):
+        print("test10")
         redirect_url = reverse('initial_book_list')
         form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
@@ -127,6 +137,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_message(response)
 
     def test_succesful_log_in_with_redirect_with_prev_books(self):
+        print("test11")
         redirect_url = reverse('home')
         form_input = { 'username': 'peterpickles', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
@@ -136,6 +147,7 @@ class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
         self.assert_no_message(response)
 
     def test_post_log_in_with_incorrect_credentials_and_redirect(self):
+        print("test12")
         redirect_url = reverse('log_in')
         form_input = { 'username': 'johndoe', 'password': 'WrongPassword123', 'next': redirect_url }
         response = self.client.post(self.url, form_input)

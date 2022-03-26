@@ -8,11 +8,14 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Test suite for the create club view."""
 
-    fixtures = ["bookclub/tests/fixtures/default_user.json"]
+    fixtures = ["bookclub/tests/fixtures/default_user.json", 
+                'bookclub/tests/fixtures/other_users.json',]
+
 
     def setUp(self):
         self.url = reverse("create_club")
         self.user = User.objects.get(id=1)
+
         self.form_input = {
             'name': 'Club1',
             'theme': 'Fiction',
@@ -21,6 +24,8 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
             'city': 'nyc', 
             'country': 'usa'
         }
+        self.follower = User.objects.get(username = "willsmith")
+        self.user.toggle_follow(self.follower)
 
     def test_create_club_url(self):
         self.assertEqual(self.url, "/create_club/")
@@ -38,11 +43,11 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
     def test_create_club_successful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_clubs_before = Club.objects.count()
-        count_events_before = Event.objects.count() 
+        count_events_before = self.follower.notifications.unread().count()
         target_url = reverse("club_page", kwargs={"club_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(count_clubs_before + 1, Club.objects.count())
-        self.assertEqual(count_events_before + 1, Event.objects.count())
+        self.assertEqual(count_events_before + 1, self.follower.notifications.unread().count())
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "club_page.html")
         club = Club.objects.get(name="Club1")

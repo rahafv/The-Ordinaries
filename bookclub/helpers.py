@@ -187,3 +187,5 @@ class notificationMessages:
         ACCEPT = " accepted you into "
         REJECT = " did not accept you into "
         APPLIED = " applied to your club "
+
+

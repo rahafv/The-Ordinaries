@@ -136,7 +136,7 @@ def log_in(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-
+            print(user)
             if user and not user.email_verified:
                 messages.add_message(request, messages.ERROR,
                                      "Email is not verified, please check your email inbox!")
@@ -589,7 +589,6 @@ def accept_applicant(request, club_id, user_id):
         club.applicants.remove(applicant)
         #create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
         notify.send(applicant, recipient=applicant.followees.all(), verb=notificationMessages.JOIN, action_object=club, description='user-event-C' )      
-        print(applicant.full_name(), notificationMessages.JOIN, club.name,": ", applicant.followees.all()[1].full_name() )
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
         notify.send(current_user, recipient=applicant, verb= notificationMessages.ACCEPT, action_object=club, description='notification' )
         return redirect('applicants_list', club_id)

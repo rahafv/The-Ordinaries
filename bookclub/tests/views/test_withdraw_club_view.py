@@ -5,6 +5,7 @@ from bookclub.models import User, Club, Event
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 
+
 class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the withdraw club view."""
 
@@ -20,6 +21,11 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.owner = User.objects.get(username="janedoe")
         self.member = User.objects.get(username="peterpickles")
         self.user = User.objects.get(username="edgaralen")
+        self.follower = User.objects.get(username="willsmith")
+        self.follower.toggle_follow(self.user)
+        self.follower.toggle_follow(self.member)
+        self.member.toggle_follow(self.follower)
+        self.user.toggle_follow(self.follower)
 
 
     def test_withdarw_url(self):
@@ -50,25 +56,26 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
     def test_member_successful_withdraw_club(self):
         self.client.login(username=self.member.username, password="Password123")
         before_count = self.club.member_count()
-        events_before_count = Event.objects.count() 
+        events_before_count = self.follower.notifications.unread().count()
         response = self.client.get(self.url, follow=True)
         self.assertFalse(self.club.is_member(self.user))
         self.assertEqual(before_count - 1, self.club.member_count())
-        self.assertEqual(events_before_count + 1, Event.objects.count())
+        self.assertEqual(events_before_count + 1,self.follower.notifications.unread().count())
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)
         self.assert_menu(response)
 
     def test_user_joins_then_withdraws_deletes_join_event(self):
-        join_url = reverse("join_club", kwargs={"club_id": self.club.id})
         self.client.login(username=self.user.username, password="Password123")
+        join_url = reverse("join_club", kwargs={"club_id": self.club.id})
         response = self.client.get(join_url, follow=True)
-        events_after_joining_count = Event.objects.count() 
+        events_after_joining_count =self.follower.notifications.unread().count()
         response = self.client.get(self.url, follow=True)
-        events_after_withdrawing_count = Event.objects.count() 
+        response = self.client.get(join_url, follow=True)
+        events_after_withdrawing_count = self.follower.notifications.unread().count()
         self.assertEqual(events_after_joining_count, 1)
-        self.assertEqual(events_after_withdrawing_count, 1)
+        self.assertEqual(events_after_withdrawing_count, 2)
   
 
     def test_withdraw_club_with_invalid_id(self):

@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from notifications.signals import notify
 from bookclub.models import User
+from bookclub.helpers import notificationMessages
 
 
 class MarkAsReadViewTestCase(TestCase):
@@ -14,7 +15,7 @@ class MarkAsReadViewTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.sec_user = User.objects.get(id=2)
-        notify.send(self.sec_user, recipient=self.user, verb="followed you")
+        notify.send(self.sec_user, recipient=self.user, verb=notificationMessages.FOLLOW)
         self.slug = self.user.notifications.unread()[0].slug
         self.url = reverse('mark_as_read', kwargs={'slug': self.slug})
         
@@ -22,7 +23,7 @@ class MarkAsReadViewTestCase(TestCase):
     def test_notification_is_read(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = self.user.notifications.unread().count()
-        self.assertEqual(self.user.notifications.unread()[0].verb,"followed you")
+        self.assertEqual(self.user.notifications.unread()[0].verb,notificationMessages.FOLLOW)
         response = self.client.get(self.url, follow=True)
         after_count = self.user.notifications.unread().count()
         self.assertEqual(after_count, before_count - 1)
