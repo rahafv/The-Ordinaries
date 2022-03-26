@@ -93,17 +93,7 @@ class MarkAsReadViewTestCase(TestCase):
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
 
-    def test_delete_notification_helper_with_wrong_argument(self):
-        self.client.login(username=self.user.username, password="Password123")
-        self.user.toggle_follow(self.sec_user)
-        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
-        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
-        notify.send(self.sec_user, recipient=[self.user, self.sec_user, self.third_user], verb=notificationMessages.FOLLOW, action_object=self.user)
-        before_count = self.user.notifications.unread().count()
-        delete_notifications(self.user,[self.user, self.sec_user, self.third_user], "test notification")
-        after_count = self.user.notifications.unread().count()
-        self.assertEqual(after_count, before_count)
-        
+    
 
 
     

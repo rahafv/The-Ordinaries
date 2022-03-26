@@ -22,7 +22,6 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.user = User.objects.get(username="edgaralen")
         self.applicant = User.objects.get(username = "willsmith")
         self.follower = User.objects.get(username = "willsmith")
-        self.user.toggle_follow(self.follower)
         self.follower.toggle_follow(self.user)
 
 

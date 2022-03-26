@@ -24,9 +24,7 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.follower = User.objects.get(username="willsmith")
         self.follower.toggle_follow(self.user)
         self.follower.toggle_follow(self.member)
-        self.member.toggle_follow(self.follower)
-        self.user.toggle_follow(self.follower)
-
+        
 
     def test_withdarw_url(self):
         self.assertEqual(self.url, f"/club/{self.club.id}/withdraw_club")

@@ -23,7 +23,6 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         }
         self.follower =  User.objects.get(id=2)
         self.follower.toggle_follow(self.user)
-        self.user.toggle_follow(self.follower)
 
     def test_add_review_url(self):
         self.assertEqual(self.url,f"/book/{self.book.id}/add_review")
