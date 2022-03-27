@@ -7,13 +7,15 @@ from .contentBasedModel import ContentBasedModel
 
 
 class Recommendation:
-    def __init__(self):
-        self.item_based = ItemBasedModel()
-        self.content_based = ContentBasedModel()
+    def __init__(self, isItemBased):
+        if isItemBased:
+            self.item_based = ItemBasedModel()
+        else:
+            self.content_based = ContentBasedModel()
 
-    def train(self):
-        self.item_based = ItemBasedModel()
-        self.content_based = ContentBasedModel()
+    # def train(self):
+    #     self.item_based = ItemBasedModel()
+    #     self.content_based = ContentBasedModel()
 
     def get_recommendations(self, request, num_of_rec, user_id=None, book_id=None, club_id=None):
         recommendations = []

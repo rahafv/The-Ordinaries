@@ -7,7 +7,7 @@ Created on Thu May  3 11:11:13 2018
 
 from .Evaluator import Evaluator
 from surprise import KNNBasic, SVD, NormalPredictor
-from bookclub.recommender.book_ratings import BookRatings
+from .book_rating import BookRatings
 from .genreKNN import GenreKNNAlgorithm
 
 import random
@@ -32,29 +32,37 @@ class RecModelsBakeOff:
 
         # Load up common data set for the recommender algorithms
         (evaluationData, rankings) = self.LoadBooksData()
+        print('here=================')
 
         # Construct an Evaluator to evaluate the recommender algorithms
         evaluator = Evaluator(evaluationData, rankings)
+        print('here#######################')
 
         # User-based KNN
         UserKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': True})
         evaluator.AddAlgorithm(UserKNN, "User KNN")
+        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Item-based KNN
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
+        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Content KNN
         genreKNN = GenreKNNAlgorithm()
         evaluator.AddAlgorithm(genreKNN, "Content KNN")
+        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # SVD
         svd = SVD()
         evaluator.AddAlgorithm(svd, "SVD")
+        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Random recommendations
         Random = NormalPredictor()
         evaluator.AddAlgorithm(Random, "Random")
+
+        print('here')
 
         # Fight!
         evaluator.Evaluate(True)

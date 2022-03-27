@@ -152,13 +152,13 @@ def getGenres():
 
     return genres
 
-def get_recommender_books(request, numOfRecs, user_id=None, book_id=None, club_id=None):
-    user_counter = request.user.training_counter
-    if user_counter >= 10:
-        request.user.reset_counter()
-        rec.train()
+# def get_recommender_books(request, numOfRecs, user_id=None, book_id=None, club_id=None):
+#     user_counter = request.user.training_counter
+#     if user_counter >= 10:
+#         request.user.reset_counter()
+#         rec.train()
 
-    return rec.get_recommendations(request, numOfRecs, user_id=user_id, book_id=book_id, club_id=club_id)
+#     return rec.get_recommendations(request, numOfRecs, user_id=user_id, book_id=book_id, club_id=club_id)
 
 
-rec = Recommendation()
+# rec = Recommendation()

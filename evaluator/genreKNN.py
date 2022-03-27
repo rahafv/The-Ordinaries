@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from surprise import AlgoBase, KNNBasic, PredictionImpossible
-from bookclub.recommender.book_ratings import BookRatings
+from .book_rating import BookRatings
 
 import heapq
 

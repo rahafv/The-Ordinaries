@@ -83,7 +83,7 @@ class Command(BaseCommand):
                     bio = row[4],
                     password = Command.DEFAULT_PASSWORD,
                     email_verified = True,
-                    training_counter = 0
+                    # training_counter = 0
                 )
 
                 users.append(user)

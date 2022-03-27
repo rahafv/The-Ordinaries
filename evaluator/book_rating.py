@@ -1,31 +1,34 @@
 from collections import defaultdict
+import csv
+import os
 import pandas as pd
 from surprise import Dataset, Reader
 from bookclub.models import Rating, Book
 
 class BookRatings:
 
-    def __init__(self):
-        self.user = Rating.objects.all()[0].user.id
-        self.ratingObjs = Rating.objects.all()
-
 
     def load_dataset(self):
+
+        self.ratings_path = os.path.abspath("book-review-dataset/ratings-evaluator.csv")
 
         user_ids = []
         book_ids = []
         ratings = [] 
+        
+        with open(self.ratings_path, newline='', encoding='ISO-8859-1') as csvfile:
+            ratingReader = csv.reader(csvfile)
+            next(ratingReader)  #Skip header line
+            for row in ratingReader:
+                user_ids.append(row[0])
+                book_ids.append(row[1])
+                ratings.append(row[2])
 
-        for rating in self.ratingObjs:
-            user_ids.append(rating.user.id)
-            book_ids.append(rating.book.id)
-            ratings.append(rating.rating)
-
-        ratings_dict = {'userID': user_ids,
+        self.ratings_dict = {'userID': user_ids,
                         'bookID': book_ids,
                         'rating': ratings}
 
-        df = pd.DataFrame.from_dict(ratings_dict)
+        df = pd.DataFrame.from_dict(self.ratings_dict)
         reader = Reader(rating_scale = (0, 10))
         data = Dataset.load_from_df(df[['userID', 'bookID', 'rating']], reader)
         
@@ -65,9 +68,9 @@ class BookRatings:
     def getPopularityRanks(self):
         ratings = defaultdict(int)
         rankings = defaultdict(int)
-     
-        for row in self.ratingObjs:
-            bookID = row.book.id
+        
+        for row in self.ratings_dict['bookID']:
+            bookID = row
             ratings[bookID] += 1
         rank = 1
         for bookID, ratingCount in sorted(ratings.items(), key=lambda x: x[1], reverse=True):

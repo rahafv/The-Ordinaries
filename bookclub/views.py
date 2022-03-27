@@ -7,7 +7,7 @@ from bookclub.recommender.recommendation import Recommendation
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres, get_recommender_books, rec
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -23,6 +23,7 @@ from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
 import humanize
+from evaluator.RecModelsBakeOff import RecModelsBakeOff
 
 
 @login_prohibited
@@ -55,7 +56,7 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-    rec_books = get_recommender_books(request, 3, user_id=current_user.id)
+    rec_books = Recommendation(True).get_recommendations(request, 3, user_id=current_user.id)
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':rec_books})
 
@@ -223,8 +224,6 @@ def add_review(request, book_id):
 
             reviewed_book.calculate_average_rating() 
 
-            review_user.increment_counter()
-
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR,
@@ -255,7 +254,6 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             book = form.save()
-            request.user.increment_counter()
             return redirect('book_details', book_id=book.id)
            
     else:
@@ -267,7 +265,7 @@ def add_book(request):
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
 
-    recs = get_recommender_books(request, 6, user_id=request.user.id, book_id=book.id)
+    recs = Recommendation(False).get_recommendations(request, 6, user_id=request.user.id, book_id=book.id)
     
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
@@ -715,7 +713,7 @@ def schedule_meeting(request, club_id):
                                                    all_mem=False
                                                    )
                         
-                        rec_book = get_recommender_books(request, 1, club_id=meeting.club.id)[0]
+                        rec_book = Recommendation(True).get_recommendations(request, 1, club_id=meeting.club.id)[0]
                         
                         deadline = timedelta(7).total_seconds()  # 0.00069444
                         Timer(deadline, MeetingHelper().assign_rand_book,
@@ -790,13 +788,11 @@ def add_book_to_list(request, book_id):
     user = request.user
     if book.is_reader(user):
         book.remove_reader(user)
-        request.user.increment_counter()
         messages.add_message(request, messages.SUCCESS, "Book Removed!")
     else:
         book.add_reader(user)
         request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
-        request.user.increment_counter()
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
@@ -810,7 +806,6 @@ def edit_review(request, review_id):
             if form.is_valid():
                 form.save(review_user, review.book)
                 messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
-                request.user.increment_counter()
                 return redirect('book_details', book_id= review.book.id)
             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
@@ -837,13 +832,13 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    # recommendations = RecModelsBakeOff()
-    # recommendations.evaluate()
+    recommendations = RecModelsBakeOff()
+    recommendations.evaluate()
 
-    recommendations = Recommendation(True)
-    print("----------------------------------------------------------------------------------------------")
-    print("club: ", recommendations.get_recommendations(request, 5, club_id=102))
-    print("----------------------------------------------------------------------------------------------")
+    # recommendations = Recommendation(True)
+    # print("----------------------------------------------------------------------------------------------")
+    # print("club: ", recommendations.get_recommendations(request, 5, club_id=1))
+    # print("----------------------------------------------------------------------------------------------")
 
     # if request.method == 'GET':
     #     searched = request.GET.get('searched')
