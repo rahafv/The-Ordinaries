@@ -41,30 +41,9 @@
                 <hr class="m-0"/>
                 <nav class="list-group list-group-flush">
                   {% if not rating %}
-                  <div class="list-group-item button" style="text-align: center;">
-                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
-                      {% csrf_token %}
-                      <h5 class = " mt-2 mb-3" style="font-size: 16px;">How do you rate this book? 
-                        
-                        <div class="justify-content-center">
-                          <div class="rate mb-2 mt-2">
-                            <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
-                            <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
-                            <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
-                            <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
-                            <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
-                            <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
-                          </div>         
-                          <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
-                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
-                        </div>
-                      </h5>
-                    </form>
-                  </div>
+                    <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review" style="text-align: center;">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
+                    </a>
                   {%else%}
                   <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
                     <div class='reviews-heading mt-3'>
@@ -92,7 +71,51 @@
                     </div>
                   </div>
                   {% endif %}
+
+                  <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review" style="text-align: center;">
+                    <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
+                      Update Progress
+                    </span>
+                  </a>
                 </nav>
+                <div class="collapse" id="leave-review">
+                  <div class="card card-body mb-3 pb-0">
+                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
+                      {% csrf_token %}
+                      <h5 class = "mt-2 mb-3" style="font-size: 16px;">&emsp; How do you rate this book? 
+                        
+                        <div class="justify-content-center">
+                          <div class="rate mb-2 mt-2 ms-2">
+                            <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
+                            <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
+                            <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
+                            <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
+                            <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
+                            <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
+                            <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
+                          </div>         
+                          <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
+                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                        </div>
+                      </h5>
+                    </form>
+                  </div>
+                </div>
+                <div class="collapse" id="update-progress">
+                 <div class="card card-body mb-3 pb-0">
+                  <form action="{% url 'book_details' book.id %}" method="post" class = "text-black">
+                    {% csrf_token %}
+                    <h5 class = "mt-2 mb-3 ms-2" style="font-size: 16px;"> Progress 
+                    </h5>
+                    <textarea name="progress-comment" rows="4" class="form-control mx-2 ps-3 mb-3 mt-3"style = "max-width: 330px" required="false" placeholder="How's the book?"></textarea>
+                    <input type="submit" value="Update Progress" class="btn btn-dark mb-3">
+                    
+                  </form>
+                 </div> 
+                </div>
               </div>
             </div>    
         </div>
