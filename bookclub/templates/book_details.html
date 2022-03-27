@@ -41,7 +41,8 @@
                 <hr class="m-0"/>
                 <nav class="list-group list-group-flush">
                   {% if not rating %}
-                    <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review" style="text-align: center;">
+                    <!-- REVIEW BOOK BUTTON-->
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
                       <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
                     </a>
                   {%else%}
@@ -71,16 +72,37 @@
                     </div>
                   </div>
                   {% endif %}
-
-                  <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review" style="text-align: center;">
-                    <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
-                      Update Progress
-                    </span>
-                  </a>
+                  {% if reader %}
+                      <!-- UPDATE PROGRESS BUTTON-->
+                      {% if user_progress %}
+                      <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
+                        <div class='reviews-heading mt-3'>
+                          <div class = "name-and-edit mb-2">
+                            <h5 class= "text-uppercase font-weight-bold">Your Progress:</h5>
+                            &emsp; 
+                          </div>
+                        </div> 
+                        <div class= "review-body mt-2">
+                          <p>
+                            <label for="progress" class="form-label">Percentage of book read:</label>
+                            <input type="range" class="form-range" min="0" max="100" step="0.5" id="progress" disabled value="{{user_progress.progress}}">
+                          </p>
+                          <p style="font-size:16px;">{{user_progress.comment}}</p> 
+                        </div>
+                      </div>
+                      {% else %}
+                        <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
+                          <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
+                            Update Progress
+                          </span>
+                        </a>
+                      {% endif %}
+                  {% endif %}
                 </nav>
+                <!-- COLLAPSE FOR REVIEW -->
                 <div class="collapse" id="leave-review">
                   <div class="card card-body mb-3 pb-0">
-                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
+                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black" style="text-align: center;">
                       {% csrf_token %}
                       <h5 class = "mt-2 mb-3" style="font-size: 16px;">&emsp; How do you rate this book? 
                         
@@ -98,21 +120,59 @@
                             <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
                           </div>         
                           <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
-                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
+                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3 ms-2">
                         </div>
                       </h5>
                     </form>
                   </div>
                 </div>
+
+                <!-- COLLAPSE FOR PROGRESS -->
                 <div class="collapse" id="update-progress">
-                 <div class="card card-body mb-3 pb-0">
-                  <form action="{% url 'book_details' book.id %}" method="post" class = "text-black">
+                 <div class="card card-body mb-3 pb-0 ">
+                  <form action="{% url 'book_details' book.id %}" method="GET" class = "text-black" style="text-align: center;">
                     {% csrf_token %}
-                    <h5 class = "mt-2 mb-3 ms-2" style="font-size: 16px;"> Progress 
+                    <h5 class = "mt-2 mb-3 ms-2 " style="font-size: 16px;"> 
+                      <div class="accordion accordion-flush" id="accordionFlushProgress">
+                        <!-- PERCENT SELECTED -->
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="flush-Percentages">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsePercentage" aria-expanded="false" aria-controls="flush-collapsePercentage">
+                              Percents
+                            </button>
+                          </h2>
+                          <div id="flush-collapsePercentage" class="accordion-collapse collapse" aria-labelledby="flush-Percentages" data-bs-parent="#accordionFlushProgress">
+                            <div class="accordion-body">
+                              <label for="progress" class="form-label">Percentage of book read:</label>
+                              <p class="text-center">
+                                <input class="text-center mb-2" style="width: 35px; border: #fff; background-color: #fff;" disabled type="text" id="textInput" value="50">%
+                                <input type="range" class="form-range" min="0" max="100" step="0.5" id="progress" onchange="updateTextInput(this.value);">
+                              </p>
+                            </div>
+                          </div>
+                        </div> 
+
+                        <!-- PAGES SELECTED -->
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="flush-Pages">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsePages" aria-expanded="false" aria-controls="flush-collapsePages">
+                              Pages
+                            </button>
+                          </h2>
+                          <div id="flush-collapsePages" class="accordion-collapse collapse" aria-labelledby="flush-Pages" data-bs-parent="#accordionFlushProgress">
+                            <div class="accordion-body">
+                              <label for="progress" class="form-label">Pages of book read:</label>
+                              <p class="text-center">
+                                <input class="text-center mb-2 text-black" style="width: 100px; background-color:#eceae8; border:#fff"  type="text" id="textInput">
+                              </p>
+                            </div>
+                          </div>
+                        </div> 
+                      </div>
+                      <!-- COMMENT -->
+                    <textarea id="progressComment" name="progress-comment" rows="4" class="form-control  mb-3 mt-3"style = "max-width: 360px" placeholder="How's the book?"></textarea>
                     </h5>
-                    <textarea name="progress-comment" rows="4" class="form-control mx-2 ps-3 mb-3 mt-3"style = "max-width: 330px" required="false" placeholder="How's the book?"></textarea>
-                    <input type="submit" value="Update Progress" class="btn btn-dark mb-3">
-                    
+                    <input type="submit" value="Update Progress" class="btn btn-dark mb-3 ms-2">
                   </form>
                  </div> 
                 </div>
@@ -248,4 +308,11 @@
 </div>
 <br/> 
 <br/> 
+
+<script>
+  function updateTextInput(val) {
+    document.getElementById('textInput').value=val; 
+  }
+</script>
+
 {% endblock %}

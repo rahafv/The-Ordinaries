@@ -345,7 +345,7 @@ def book_details(request, book_id):
     reviews_count = book.ratings.all().count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
+               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings }
     return render(request, "book_details.html", context)
 
 
@@ -390,7 +390,6 @@ def show_profile_page_clubs(request, user_id=None):
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    # clubs_queryset = get_list_or_404(Club, owner = user )
     clubs_queryset = user.clubs.all()
     clubs_count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
