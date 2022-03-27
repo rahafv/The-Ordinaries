@@ -87,9 +87,8 @@ class User(AbstractUser):
         """Return full name."""
         return f'{self.first_name} {self.last_name}'
 
-    def notifications_count(self):
-        return self.notifications.unread().filter(description__contains ='notification').count()
-        
+    def get_notifications(self):
+        return self.notifications.unread().filter(description__contains ='notification')
 
     def location(self):
         checked = [self.city, self.country, self.region]
@@ -472,18 +471,6 @@ class Meeting(models.Model):
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
-        
-ACTOR_CHOICES = (
-    ('U', 'User'),
-    ('C', 'Club'),
-)
-ACTION_CHOICES = (
-    ('B', 'Book'),
-    ('C', 'Club'),
-    ('M', 'Meeting'),
-    ('R', 'Rating'),
-    ('U', 'Action_User')
-)
 
 class Chat(models.Model):
     

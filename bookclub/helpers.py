@@ -141,7 +141,6 @@ class NotificationHelper:
 
         action_name = notification.verb
 
-
         if action_name == self.NotificationMessages.APPLIED:
             return redirect('applicants_list', club_id=notification.action_object.id)
 
@@ -153,7 +152,7 @@ class NotificationHelper:
 
         elif action_name == self.NotificationMessages.FOLLOW:
             return redirect('profile', user_id=notification.actor.id)
-            
+
         else:
             return redirect('home')
 
