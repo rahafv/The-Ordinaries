@@ -6,8 +6,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail 
 import six
 from django.conf import settings
-from .models import Event, User, Club, Book
+from .models import User, Club, Book
 from django.db.models.functions import Lower
+
 
 def login_prohibited(view_function):
     def modified_view_function(request):
@@ -17,25 +18,6 @@ def login_prohibited(view_function):
             return view_function(request)
     return modified_view_function
 
-def create_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
-    event = Event(
-                type_of_actor = type_of_actor,
-                type_of_action = type_of_action,
-                message = message,
-                user = user ,
-                club = club,
-                meeting = meeting,
-                book = book, 
-                rating = rating,
-                action_user = action_user
-            )
-
-    event.save()
-    return event
-
-def delete_event(type_of_actor, type_of_action, message, user=None, club=None, meeting=None, book=None, rating=None, action_user=None):
-    event = Event.objects.filter(type_of_actor = type_of_actor, type_of_action = type_of_action, message = message, user = user , club = club, meeting = meeting, book = book, rating = rating, action_user = action_user)
-    event.delete()
 
 class MeetingHelper:
     def assign_rand_book(self, meeting, request=None):
@@ -131,9 +113,56 @@ def get_list_of_objects(searched, label):
         filtered_list = Book.objects.filter(author__contains=searched)
         category= "Books"
     
-    return {
-        "category" : category, 
-        "filtered_list" : filtered_list}
+    return {"category" : category, "filtered_list" : filtered_list}
+
+class NotificationHelper:
+    
+    class NotificationMessages:
+
+            #user-events
+            JOIN = " joined "
+            WITHDRAW = " withdrew from "
+            CREATE = " created "
+            REVIEW = " reviewed "
+            ADD = " added "
+
+            #club-events
+            SCHEDULE = " scheduled a meeting about "
+            TRANSFER = " ownership is transfered to "
+            CHOICE = " chose the book "
+
+            #notifications
+            FOLLOW =  ' followed you'
+            ACCEPT = " accepted you into "
+            REJECT = " did not accept you into "
+            APPLIED = " applied to your club "
+
+    def get_appropriate_redirect(self, notification):
+
+        action_name = notification.verb
+
+        if action_name == self.NotificationMessages.APPLIED:
+            return redirect('applicants_list', club_id=notification.action_object.id)
+
+        elif action_name == self.NotificationMessages.ACCEPT:
+            return redirect('club_page', club_id=notification.action_object.id)
+
+        elif action_name == self.NotificationMessages.REJECT:
+            return redirect('club_page', club_id=notification.action_object.id)
+
+        elif action_name == self.NotificationMessages.FOLLOW:
+            return redirect('profile', user_id=notification.actor.id)
+
+        else:
+            return redirect('home')
+
+    def delete_notifications(self, user, recipients, notificationMessage, action_object=None):
+        for recepient in recipients:
+            notifications = recepient.notifications.unread().filter(verb=notificationMessage)
+            for notif in notifications:
+                if notif.actor == user and notif.action_object == action_object:
+                    notif.mark_as_read()
+
 
 def getGenres():
     genres = {}
