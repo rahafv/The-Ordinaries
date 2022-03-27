@@ -9,7 +9,7 @@ import random
 from datetime import datetime, timedelta
 import pytz
 from notifications.signals import notify
-from bookclub.helpers import notificationMessages
+from bookclub.helpers import NotificationHelper
 
 
 class Command(BaseCommand):
@@ -19,6 +19,7 @@ class Command(BaseCommand):
     def __init__(self):
         super().__init__()
         self.faker = Faker('en_GB')
+        self.notificationHelper = NotificationHelper()
 
     def handle(self, *args, **options):
         unseed.emptyDatabase()
@@ -166,7 +167,7 @@ class Command(BaseCommand):
             club.members.add(*sample)
 
             club.members.add(club.owner)
-            notify.send(club.owner, recipient=club.owner.followers.all(), verb=notificationMessages.CREATE, action_object=club, description='user-event-C' ) 
+            notify.send(club.owner, recipient=club.owner.followers.all(), verb=self.notificationHelper.NotificationMessages.CREATE, action_object=club, description='user-event-C' ) 
             
             self.create_meeting(club, club.owner)
             
@@ -181,7 +182,7 @@ class Command(BaseCommand):
             link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
 
         )
-        notify.send(club, recipient=club.members.all(), verb=notificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
+        notify.send(club, recipient=club.members.all(), verb=self.notificationHelper.NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
 
     def create_books(self):
         MAX_BOOKS = 1000
@@ -255,8 +256,11 @@ class Command(BaseCommand):
                 book.add_reader(user)
                 user.add_book_to_all_books(book)
 
-                # notify.send(user, recipient=user.followers.all(), verb=notificationMessages.ADD, action_object=book, description='user-event-B' )
-                # notify.send(user, recipient=user.followers.all(), verb=notificationMessages.REVIEW, action_object=book, description='user-event-B' )       
+                rand = random.randint(0,1)
+                if rand == 1:
+                    notify.send(user, recipient=user.followers.all(), verb=self.notificationHelper.NotificationMessages.ADD, action_object=book, description='user-event-B' )
+                else:
+                    notify.send(user, recipient=user.followers.all(), verb=self.notificationHelper.NotificationMessages.REVIEW, action_object=book, description='user-event-B' )       
 
                 pairs.append(pair)
                 ratings.append(rating)

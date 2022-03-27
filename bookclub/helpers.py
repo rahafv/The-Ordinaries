@@ -8,7 +8,6 @@ import six
 from django.conf import settings
 from .models import User, Club, Book
 from django.db.models.functions import Lower
-import re
 
 
 def login_prohibited(view_function):
@@ -114,61 +113,56 @@ def get_list_of_objects(searched, label):
         filtered_list = Book.objects.filter(author__contains=searched)
         category= "Books"
     
-    return {
-        "category" : category, 
-        "filtered_list" : filtered_list}
+    return {"category" : category, "filtered_list" : filtered_list}
+
+class NotificationHelper:
+    
+    class NotificationMessages:
+
+            #user-events
+            JOIN = " joined "
+            WITHDRAW = " withdrew from "
+            CREATE = " created "
+            REVIEW = " reviewed "
+            ADD = " added "
+
+            #club-events
+            SCHEDULE = " scheduled a meeting about "
+            TRANSFER = " ownership is transfered to "
+            CHOICE = " chose the book "
+
+            #notifications
+            FOLLOW =  ' followed you'
+            ACCEPT = " accepted you into "
+            REJECT = " did not accept you into "
+            APPLIED = " applied to your club "
+
+    def get_appropriate_redirect(self, notification):
+
+        action_name = notification.verb
 
 
-def get_appropriate_redirect(notification):
+        if action_name == self.NotificationMessages.APPLIED:
+            return redirect('applicants_list', club_id=notification.action_object.id)
 
-    action_name = notification.verb
+        elif action_name == self.NotificationMessages.ACCEPT:
+            return redirect('club_page', club_id=notification.action_object.id)
 
+        elif action_name == self.NotificationMessages.REJECT:
+            return redirect('club_page', club_id=notification.action_object.id)
 
-    if action_name == notificationMessages.APPLIED:
-        return redirect('applicants_list', club_id=notification.action_object.id)
+        elif action_name == self.NotificationMessages.FOLLOW:
+            return redirect('profile', user_id=notification.actor.id)
+            
+        else:
+            return redirect('home')
 
-    elif action_name == notificationMessages.ACCEPT:
-        return redirect('club_page', club_id=notification.action_object.id)
-
-    elif action_name == notificationMessages.REJECT:
-        return redirect('club_page', club_id=notification.action_object.id)
-
-    elif action_name == notificationMessages.FOLLOW:
-        return redirect('profile', user_id=notification.actor.id)
-
-    elif action_name == notificationMessages.UNFOLLOW :
-        return redirect('profile', user_id=notification.actor.id)
-    else:
-        return redirect('home')
-
-def delete_notifications(user, recipients, notificationMessage, club=None):
-    for recepient in recipients:
-        notifications = recepient.notifications.unread().filter(verb=notificationMessage)
-        for notif in notifications:
-            if notif.actor == user and notif.action_object == club:
-                notif.mark_as_read()
-
-
-
-
-class notificationMessages:
-
-        #user-events
-        JOIN = " joined "
-        WITHDRAW = " withdrew from "
-        CREATE = " created "
-        REVIEW = " reviewed "
-        ADD = " added "
-        #club-events
-        SCHEDULE = " scheduled a meeting about "
-        TRANSFER = " ownership is transfered to "
-        CHOICE = " chose the book "
-        #notifications
-        FOLLOW =  ' followed you'
-        UNFOLLOW =  ' unfollowed you'
-        ACCEPT = " accepted you into "
-        REJECT = " did not accept you into "
-        APPLIED = " applied to your club "
+    def delete_notifications(self, user, recipients, notificationMessage, club=None):
+        for recepient in recipients:
+            notifications = recepient.notifications.unread().filter(verb=notificationMessage)
+            for notif in notifications:
+                if notif.actor == user and notif.action_object == club:
+                    notif.mark_as_read()
 
 
 def getGenres():

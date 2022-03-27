@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from notifications.signals import notify
 from bookclub.models import User, Club
-from bookclub.helpers import notificationMessages, delete_notifications
+from bookclub.helpers import NotificationHelper
 from bookclub.views import mark_as_read
 
 
@@ -19,7 +19,8 @@ class MarkAsReadViewTestCase(TestCase):
         self.sec_user = User.objects.get(id=2)
         self.third_user = User.objects.get(id=3)
         self.club=Club.objects.get(id=1)
-        notify.send(self.sec_user, recipient=self.user, verb=notificationMessages.FOLLOW)
+        self.notificationHelper = NotificationHelper()
+        notify.send(self.sec_user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.FOLLOW)
         self.slug = self.user.notifications.unread()[0].slug
         self.url = reverse('mark_as_read', kwargs={'slug': self.slug})
         
@@ -27,7 +28,7 @@ class MarkAsReadViewTestCase(TestCase):
     def test_notification_is_read(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = self.user.notifications.unread().count()
-        self.assertEqual(self.user.notifications.unread()[0].verb,notificationMessages.FOLLOW)
+        self.assertEqual(self.user.notifications.unread()[0].verb,self.notificationHelper.NotificationMessages.FOLLOW)
         response = self.client.get(self.url, follow=True)
         after_count = self.user.notifications.unread().count()
         self.assertEqual(after_count, before_count - 1)
@@ -36,7 +37,7 @@ class MarkAsReadViewTestCase(TestCase):
 
     def test_get_appropriate_redirect_APPLY(self): 
         self.client.login(username=self.user.username, password="Password123")
-        notify.send(self.user, recipient=self.user, verb=notificationMessages.APPLIED, action_object=self.club, description='notification')
+        notify.send(self.user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.APPLIED, action_object=self.club, description='notification')
         slug2 = self.user.notifications.unread()[0].slug
         url = reverse('mark_as_read', kwargs={'slug': slug2})
         response = self.client.get(url, follow=True)
@@ -46,7 +47,7 @@ class MarkAsReadViewTestCase(TestCase):
 
     def test_get_appropriate_redirect_ACCEPT(self): 
         self.client.login(username=self.user.username, password="Password123")
-        notify.send(self.user, recipient=self.user, verb=notificationMessages.ACCEPT, action_object=self.club, description='notification')
+        notify.send(self.user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.ACCEPT, action_object=self.club, description='notification')
         slug2 = self.user.notifications.unread()[0].slug
         url = reverse('mark_as_read', kwargs={'slug': slug2})
         response = self.client.get(url, follow=True)
@@ -56,7 +57,7 @@ class MarkAsReadViewTestCase(TestCase):
 
     def test_get_appropriate_redirect_REJECT(self): 
         self.client.login(username=self.user.username, password="Password123")
-        notify.send(self.user, recipient=self.user, verb=notificationMessages.REJECT, action_object=self.club, description='notification')
+        notify.send(self.user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.REJECT, action_object=self.club, description='notification')
         slug2 = self.user.notifications.unread()[0].slug
         url = reverse('mark_as_read', kwargs={'slug': slug2})
         response = self.client.get(url, follow=True)
@@ -66,17 +67,7 @@ class MarkAsReadViewTestCase(TestCase):
 
     def test_get_appropriate_redirect_FOLLOW(self): 
         self.client.login(username=self.user.username, password="Password123")
-        notify.send(self.user, recipient=self.user, verb=notificationMessages.FOLLOW, action_object=self.club, description='notification')
-        slug2 = self.user.notifications.unread()[0].slug
-        url = reverse('mark_as_read', kwargs={'slug': slug2})
-        response = self.client.get(url, follow=True)
-        response_url = reverse('profile')
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-
-
-    def test_get_appropriate_redirect_UNFOLLOW(self): 
-        self.client.login(username=self.user.username, password="Password123")
-        notify.send(self.user, recipient=self.user, verb=notificationMessages.UNFOLLOW, action_object=self.club, description='notification')
+        notify.send(self.user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.FOLLOW, action_object=self.club, description='notification')
         slug2 = self.user.notifications.unread()[0].slug
         url = reverse('mark_as_read', kwargs={'slug': slug2})
         response = self.client.get(url, follow=True)
