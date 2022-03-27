@@ -7,8 +7,7 @@
             {% if last == 'M'  %}
                 <li class="post-text">
                     <a href= {% url 'club_page' event.actor.id  %} style= "color: black">  {{ event.actor.name }}  </a>
-                    {{event.verb}}
-                    <a href= {% url 'profile' event.action_object.id  %} style= "color: black">  {{event.action_object.title}}  </a>
+                    {{event.verb}}{{event.action_object.title}}  </a>
                 </li>
                 &emsp;
             {%elif last == 'B' %}
