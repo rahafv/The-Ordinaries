@@ -75,23 +75,13 @@
       {%endfor%}
     </div>
 
-
-
-   
     <hr class="featurette-divider">
+    
     <div class="row g-20">
       <div class="col-md-8">
         
         <h1>Feed</h1>
             {% include 'partials/events_as_table.html' with user_events=user_events%}
-            {% comment %} {%for notification in notifications%}
-              {%if notification.description == "user-event"%}
-                <p>
-              {{ notification.actor}} {{notification.verb}} 
-                {%if notification.action_object%} {{notification.action_object}} {%endif%}
-                </p>
-              {%endif%}
-            {%endfor%} {% endcomment %}
       </div>
       <div class="col-md-4">
         <div class="position-sticky" style="top: 10rem;">

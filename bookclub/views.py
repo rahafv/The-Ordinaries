@@ -47,8 +47,8 @@ def welcome(request):
 def home(request):
     current_user = request.user
     notifications = current_user.notifications.unread()
-    user_events = notifications.filter(description__contains ='user-event')
-    club_events = notifications.filter(description__contains='club-event')
+    user_events = notifications.filter(description__contains ='user-event')[:25]
+    club_events = notifications.filter(description__contains='club-event')[:10]
 
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
@@ -989,7 +989,9 @@ def add_book_to_list(request, book_id):
     else:
         book.add_reader(user)
         request.user.add_book_to_all_books(book)
-        notify.send(user, recipient=user.followers.all(), verb=NotificationHelper().NotificationMessages.ADD, action_object=book, description='user-event-B' )      
+        notificationHelper = NotificationHelper()
+        notificationHelper.delete_notifications(user, user.followers.all(), notificationHelper.NotificationMessages.ADD, book )
+        notify.send(user, recipient=user.followers.all(), verb=notificationHelper.NotificationMessages.ADD, action_object=book, description='user-event-B' )      
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 

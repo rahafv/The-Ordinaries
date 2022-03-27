@@ -156,11 +156,11 @@ class NotificationHelper:
         else:
             return redirect('home')
 
-    def delete_notifications(self, user, recipients, notificationMessage, club=None):
+    def delete_notifications(self, user, recipients, notificationMessage, action_object=None):
         for recepient in recipients:
             notifications = recepient.notifications.unread().filter(verb=notificationMessage)
             for notif in notifications:
-                if notif.actor == user and notif.action_object == club:
+                if notif.actor == user and notif.action_object == action_object:
                     notif.mark_as_read()
 
 
