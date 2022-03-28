@@ -7,7 +7,7 @@ from bookclub.recommender.recommendation import Recommendation
 from .forms import ClubsSortForm, UsersSortForm,BooksSortForm, SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, ClubForm, RatingForm , EditRatingForm, MeetingForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
+from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres, get_recommender_books, rec_helper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating, Event
 from django.urls import reverse
@@ -56,7 +56,7 @@ def home(request):
 
     club_events_length = len(first_ten)
 
-    rec_books = Recommendation(True).get_recommendations(request, 3, user_id=current_user.id)
+    rec_books = get_recommender_books(request, True, 3, user_id=current_user.id)
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':rec_books})
 
@@ -223,7 +223,7 @@ def add_review(request, book_id):
             messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
 
             reviewed_book.calculate_average_rating() 
-
+            rec_helper.increment_counter()
             return redirect('book_details', book_id=reviewed_book.id)
 
     messages.add_message(request, messages.ERROR,
@@ -265,7 +265,7 @@ def add_book(request):
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
 
-    recs = Recommendation(False).get_recommendations(request, 6, user_id=request.user.id, book_id=book.id)
+    recs = get_recommender_books(request, False, 6, user_id=request.user.id, book_id=book.id)
     
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
@@ -794,6 +794,7 @@ def add_book_to_list(request, book_id):
         request.user.add_book_to_all_books(book)
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
+    rec_helper.increment_counter()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 @login_required
@@ -805,12 +806,13 @@ def edit_review(request, review_id):
             form = EditRatingForm(data = request.POST, instance=review)
             if form.is_valid():
                 form.save(review_user, review.book)
+                rec_helper.increment_counter()
                 messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
                 return redirect('book_details', book_id= review.book.id)
             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
         else:
             form = EditRatingForm(instance = review)
-        
+
         return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
 
     else:
