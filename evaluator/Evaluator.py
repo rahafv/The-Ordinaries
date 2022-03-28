@@ -20,6 +20,8 @@ class Evaluator:
         self.algorithms.append(alg)
         
     def Evaluate(self, doTopN):
+        print("\n")
+
         results = {}
         for algorithm in self.algorithms:
             print("Evaluating ", algorithm.GetName(), "...")

@@ -69,6 +69,8 @@ class EvaluatedAlgorithm:
         
         if (verbose):
             print("Analysis complete.")
+
+        print('\n')
     
         return metrics
     

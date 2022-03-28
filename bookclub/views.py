@@ -834,41 +834,34 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = RecModelsBakeOff()
-    recommendations.evaluate()
 
-    # recommendations = Recommendation(True)
-    # print("----------------------------------------------------------------------------------------------")
-    # print("club: ", recommendations.get_recommendations(request, 5, club_id=1))
-    # print("----------------------------------------------------------------------------------------------")
+    if request.method == 'GET':
+        searched = request.GET.get('searched')
+        category = request.GET.get('category')
+        label = category
 
-    # if request.method == 'GET':
-    #     searched = request.GET.get('searched')
-    #     category = request.GET.get('category')
-    #     label = category
+        # method in helpers to return a dictionary with a list of users, clubs or books searched
+        search_page_results = get_list_of_objects(
+            searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
 
-    #     # method in helpers to return a dictionary with a list of users, clubs or books searched
-    #     search_page_results = get_list_of_objects(
-    #         searched=searched, label=label)
-    #     category = search_page_results["category"]
-    #     filtered_list = search_page_results["filtered_list"]
+        sortForm = ""
+        if(category == "Clubs"):
+            sortForm = ClubsSortForm(request.GET or None)
+        elif(category == "Books"):
+            sortForm = BooksSortForm(request.GET or None)
+        else:
+            sortForm = UsersSortForm(request.GET or None)
 
-    #     sortForm = ""
-    #     if(category == "Clubs"):
-    #         sortForm = ClubsSortForm(request.GET or None)
-    #     elif(category == "Books"):
-    #         sortForm = BooksSortForm(request.GET or None)
-    #     else:
-    #         sortForm = UsersSortForm(request.GET or None)
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        current_user=request.user
+        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
-    #     pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-    #     page_number = request.GET.get('page')
-    #     filtered_list = pg.get_page(page_number)
-    #     current_user=request.user
-    #     return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
-
-    # else:
-    return render(request, 'search_page.html', {})
+    else:
+        return render(request, 'search_page.html', {})
 
 
 @login_required
