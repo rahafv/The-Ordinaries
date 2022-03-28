@@ -336,6 +336,7 @@ def book_details(request, book_id):
         if progress_pages != '' and progress_pages != None:
             comment = request.POST.get("progress-comment-pages")
             user_progress = {'comment': comment, 'progress': progress_pages, 'label': "Pages"}
+            notify.send(request.user, recipient=request.user.followers.all(), verb=(f'commented: "{comment}"  for  {progress_pages} pages of '), action_object=book, description='user-event-B' ) 
             messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
         else:
             progress_percent = request.POST.get('progress-percent', None)
@@ -343,9 +344,10 @@ def book_details(request, book_id):
             if progress_percent != None:
                 comment = request.POST.get("progress-comment-percent")
                 user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
+                notify.send(request.user, recipient=request.user.followers.all(), verb=(f' commented: "{comment}"  for {progress_percent}% of '), action_object=book, description='user-event-B') 
                 messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
             else:
-                messages.add_message(request, messages.ERROR,"Progress cannot be updated!")
+                messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
 
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,

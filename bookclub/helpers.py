@@ -125,6 +125,7 @@ class NotificationHelper:
             CREATE = " created "
             REVIEW = " reviewed "
             ADD = " added "
+            # PROGRESS = " has read  "
 
             #club-events
             SCHEDULE = " scheduled a meeting about "
