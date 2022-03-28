@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.generic.base import TemplateView
 from django.views.generic import DetailView
 from system import settings
 
@@ -41,8 +42,7 @@ def home(request):
 
     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
 
-class ProfilePageView(DetailView):
-    pass
+
 
 @login_required
 def show_profile_page(request, user_id=None, is_clubs=False):
@@ -86,6 +86,42 @@ def add_book_to_list(request, book_id):
         create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+
+class SearchPageView(TemplateView):
+    
+    template_name = 'search_page.html'
+    paginate_by = settings.MEMBERS_PER_PAGE
+    
+    def get(self, *args, **kwargs):
+        self.searched = self.request.GET.get('searched')
+        self.category = self.request.GET.get('category')
+        return super().get(*args, **kwargs)
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        label = self.category
+
+        search_page_results = get_list_of_objects(
+            searched=self.searched, label=label)
+        self.category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
+        
+        sortForm = ""
+        if(self.category == "Clubs"):
+            sortForm = NameAndDateSortForm(self.request.GET or None)
+        else:
+            sortForm = NameSortForm(self.request.GET or None)
+
+        context['searched'] = self.searched
+        context['category'] = self.category
+        context['label'] = label
+        context['filtered_list'] = filtered_list
+        context['form'] = sortForm
+        context['current_user'] = self.request.user
+        return context
+
 
 @login_required
 def search_page(request):

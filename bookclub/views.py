@@ -1,5 +1,4 @@
 from datetime import timedelta
-from pyexpat import model
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -24,7 +23,7 @@ from threading import Timer
 from django.core.paginator import Paginator
 from django.views.generic.base import TemplateView
 from django.views.generic import DetailView, FormView, ListView, UpdateView
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, CreateView
 from django.utils.decorators import method_decorator
 import humanize
 from django.views.generic.detail import DetailView
@@ -252,71 +251,6 @@ def create_club(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
-class AddReviewView(FormView):
-    template_name = 'book_details.html'
-    pk_url_kwarg = 'book_id'
-    context_object_name = 'book'
-    form_class = RatingForm
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id')
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
-        self.review_user = self.request.user
-        if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
-            return HttpResponseForbidden()
-
-        form.instance.user = self.review_user
-        form.instance.book = self.reviewed_book
-        form.save(self.review_user, self.reviewed_book)
-        self.review_user.add_book_to_all_books(self.reviewed_book)
-
-        create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
-        messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
-
-        self.reviewed_book.calculate_average_rating()
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.add_message(self.request, messages.ERROR,
-                         "Review cannot be over 250 characters.")
-        return super().form_invalid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
-
-@login_required
-def add_review(request, book_id):
-    reviewed_book = get_object_or_404(Book.objects, id=book_id)
-    review_user = request.user
-    if reviewed_book.ratings.all().filter(user=review_user).exists():
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            form.instance.user = review_user
-            form.instance.book = reviewed_book
-            form.save(review_user, reviewed_book)
-            review_user.add_book_to_all_books(reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
-            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
-
-            reviewed_book.calculate_average_rating()
-
-            return redirect('book_details', book_id=reviewed_book.id)
-
-    messages.add_message(request, messages.ERROR,
-                         "Review cannot be over 250 characters.")
-    return render(request, 'book_details.html', {'book': reviewed_book})
-
 
 @login_required
 def club_page(request, club_id):
@@ -330,10 +264,7 @@ def club_page(request, club_id):
     except:
         upcoming_meeting=None
 
-
-
     return render(request, 'club_page.html', {'club': club, 'is_member': is_member, 'is_applicant': is_applicant, 'upcoming_meeting': upcoming_meeting, 'user':user})
-
 
 class AddBookView(FormView):
     form_class = BookForm
@@ -986,6 +917,70 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
+class AddReviewView(FormView):
+    template_name = 'book_details.html'
+    pk_url_kwarg = 'book_id'
+    context_object_name = 'book'
+    form_class = RatingForm
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        """Retrieves the book_id from url and stores it in self for later use."""
+        self.book_id = kwargs.get('book_id')
+        return super().get(self, request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        self.review_user = self.request.user
+        if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
+            return HttpResponseForbidden()
+
+        form.instance.user = self.review_user
+        form.instance.book = self.reviewed_book
+        form.save(self.review_user, self.reviewed_book)
+        self.review_user.add_book_to_all_books(self.reviewed_book)
+
+        create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
+        messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
+
+        self.reviewed_book.calculate_average_rating()
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
+
+@login_required
+def add_review(request, book_id):
+    reviewed_book = get_object_or_404(Book.objects, id=book_id)
+    review_user = request.user
+    if reviewed_book.ratings.all().filter(user=review_user).exists():
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            form.instance.user = review_user
+            form.instance.book = reviewed_book
+            form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
+            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
+            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
+
+            reviewed_book.calculate_average_rating()
+
+            return redirect('book_details', book_id=reviewed_book.id)
+
+    messages.add_message(request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+    return render(request, 'book_details.html', {'book': reviewed_book})
 
 class EditReviewView(UpdateView):
     """View to edit the user's review."""

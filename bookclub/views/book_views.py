@@ -1,10 +1,10 @@
-from bookclub.forms import BookForm, RatingForm , EditRatingForm, NameSortForm
+from bookclub.forms import BookForm, RatingForm , EditRatingForm, NameSortForm, BooksSortForm
 from bookclub.helpers import create_event, get_list_of_objects, SortHelper
 from bookclub.models import User, Book, Event, Rating, Club
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import HttpResponseForbidden
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
@@ -25,10 +25,7 @@ class AddBookView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):         
-        if  self.book:
-            return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
-        else:
-            return render('add_book.html')
+        return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 # @login_required
 # def add_book(request):
@@ -93,13 +90,8 @@ class AddReviewView(FormView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id')  
-        return super().get(request, *args, **kwargs)
-
     def form_valid(self, form):
-        self.reviewed_book = get_object_or_404(Book.objects, id=self.book_id)
+        self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         self.review_user = self.request.user
 
         form.instance.user = self.review_user
@@ -113,10 +105,10 @@ class AddReviewView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):         
-        if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
-            return HttpResponseForbidden()
-        else:
-            return reverse_lazy('book_details', kwargs = {'book_id': self.reviewed_book.id})
+        # if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
+            # return HttpResponseForbidden()
+        # else:
+        return reverse_lazy('book_details', kwargs = {'book_id': self.reviewed_book.id})
 
 @login_required
 def add_review(request, book_id):
@@ -142,21 +134,38 @@ def add_review(request, book_id):
                          "Review cannot be over 250 characters.")
     return render(request, 'book_details.html', {'book': reviewed_book})
 
-class EditReviewView(UpdateView):
+class EditReviewView(FormView):
     model = Rating
+    template_name = 'edit_review.html' 
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
+
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
     
-    def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
-        self.club_id = kwargs.get('club_id') 
-        self.user_id = kwargs.get('club_id') 
-        return super().get(request, *args, **kwargs)
+    # def get(self, request, *args, **kwargs):
+    #     """Retrieves the club_id from url and stores it in self for later use."""
+    #     self.review_id = kwargs.get('review_id')  
+    #     return super().get(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        review_user = self.request.user
+        review = get_object_or_404(Rating.objects, id=self.review_id)
+        if review_user != review.user:
+            raise Http404
+
+        form.save(review_user, review.book)
+        messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+        return super().form_invalid(form)
+
+    def get_success_url(self): 
+        return reverse_lazy('book_details', kwargs = {'book_id': self.review.book.id})
     
 
 
@@ -184,7 +193,7 @@ def edit_review(request, review_id):
 class BookListView(ListView):
     model = Book
     template_name = 'books.html'
-    form_class = BooksSortForm()
+    form_class = BooksSortForm
     paginate_by = settings.BOOKS_PER_PAGE
 
     @method_decorator(login_required)
