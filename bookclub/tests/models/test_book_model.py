@@ -71,11 +71,11 @@ class BookModelTestCase(TestCase):
 
     def test_describtion_need_not_be_unique(self):
         second_book = Book.objects.get(ISBN='0002005018')
-        self.book.describtion = second_book.describtion
+        self.book.description = second_book.description
         self._assert_book_is_valid()
 
     def test_describtion_may_be_blank(self):
-        self.book.describtion = None
+        self.book.description = None
         self._assert_book_is_valid()
 
     def test_reader_addition(self):

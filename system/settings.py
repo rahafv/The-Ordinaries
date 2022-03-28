@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'bookclub',
     'widget_tweaks',
     'isbn_field',
+    'notifications',
 ]
 
 MIDDLEWARE = [
