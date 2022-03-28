@@ -348,6 +348,8 @@ class ClubPageView(LoginRequiredMixin, DetailView):
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 class BookDetailsView(DetailView, FormMixin):
+    """Show individual book details."""
+
     model = Book
     template_name = 'book_details.html'
     context_object_name = 'book'
@@ -359,6 +361,7 @@ class BookDetailsView(DetailView, FormMixin):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
@@ -390,115 +393,169 @@ class AddBookView(FormView):
     def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
-class ProfilePageView(DetailView):
+
+class ProfilePageView(LoginRequiredMixin, TemplateView):
     model = User
-    pk_url_kwarg = 'review_id'
-    # paginate_by = settings.BOOKS_PER_PAGE
+    template_name = 'profile_page.html'
+    pk_url_kwarg = "user_id"
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        """Retrieves the user_id from url and stores it in self for later use."""
-        self.user_id = kwargs.get('user_id')
-        self.is_clubs = kwargs.get('is_clubs')
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, request, **kwargs):
+    def get(self, *args, **kwargs):
+        """Retrieves the user_id and is_clubs from url and stores it in self for later use."""
+        self.user_id = kwargs.get('user_id', None)
+        self.is_clubs = kwargs.get('is_clubs', False)
+        if self.user_id == self.request.user.id:
+            return redirect('profile')
+        return super().get(self.request, *args, **kwargs)
+        
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = get_object_or_404(User.objects, id=self.request.user.id)
+
         if self.user_id:
             user = get_object_or_404(User.objects, id=self.user_id)
-        else:
-            user = get_object_or_404(User.objects, id=request.user.id)
 
-        if self.user_id == request.user.id:
-            return redirect('profile')
-
-        context['current_user'] = request.user
-        context['user'] = user
-        context['following'] = request.user.is_following(user)
-        context['followable'] = (request.user != user)
-
-        if self.user_id:
+        if self.user_id is not None:
             books_queryset = User.objects.get(id=self.user_id).books.all()
             books_count = books_queryset.count()
             books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-            page_number = request.GET.get('page')
+            page_number = self.request.GET.get('page')
             books = books_pg.get_page(page_number)
             context['items'] = books
             context['items_count'] = books_count
+
+        context['current_user'] = self.request.user
+        context['user'] = user
+        context['following'] = self.request.user.is_following(user)
+        context['followable'] = (self.request.user != user)
+
+        return context
+
+# @login_required
+# def show_profile_page(request, user_id=None, is_clubs=False):
+#     user = get_object_or_404(User.objects, id=request.user.id)
+
+#     if user_id == request.user.id:
+#         return redirect('profile')
+
+#     if user_id:
+#         user = get_object_or_404(User.objects, id=user_id)
+
+
+#     following = request.user.is_following(user)
+#     followable = (request.user != user)
+
+#     items = ""
+#     items_count = 0
+
+#     if user_id is not None:
+#         books_queryset = User.objects.get(id=user_id).books.all()
+#         books_count = books_queryset.count()
+#         books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+#         page_number = request.GET.get('page')
+#         books = books_pg.get_page(page_number)
+#         items = books
+#         items_count = books_count
+
+#         return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': items, 'items_count': items_count, 'is_clubs': is_clubs})
+
+#     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, })
+
+
+class ProfilePageClubsView(LoginRequiredMixin, ListView):
+    model = Club
+    template_name = 'profile_page.html'
+    pk_url_kwarg = "user_id"
+
+    def get(self, *args, **kwargs):
+        """Retrieves the user_id and is_clubs from url and stores it in self for later use."""
+        self.user_id = kwargs.get('user_id', None)
+        return super().get(self.request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(User.objects, id=self.user_id)
+
+        context['following'] = self.request.user.is_following(user)
+        context['followable'] = (self.request.user != user)
+
+        clubs_queryset = user.clubs.all()
+        context['items_count'] = clubs_queryset.count()
+        clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+        page_number = self.request.GET.get('page')
+        context['items'] = clubs_pg.get_page(page_number)
+
+        context['current_user'] = self.request.user
+        context['user'] = user
+        context['is_clubs'] = True
+
         return context
 
 
-@login_required
-def show_profile_page(request, user_id=None, is_clubs=False):
-    user = get_object_or_404(User.objects, id=request.user.id)
-
-    if user_id == request.user.id:
-        return redirect('profile')
-
-    if user_id:
-        user = get_object_or_404(User.objects, id=user_id)
-
-
-    following = request.user.is_following(user)
-    followable = (request.user != user)
-
-    items = ""
-    items_count = 0
-
-    if user_id is not None:
-        books_queryset = User.objects.get(id=user_id).books.all()
-        books_count = books_queryset.count()
-        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-        page_number = request.GET.get('page')
-        books = books_pg.get_page(page_number)
-        items = books
-        items_count = books_count
-
-        return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': items, 'items_count': items_count, 'is_clubs': is_clubs})
-
-    return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, })
-
-
 """View to add link to clubs_list in user profile """
-@login_required
-def show_profile_page_clubs(request, user_id=None):
-    user = get_object_or_404(User.objects, id=request.user.id)
+# @login_required
+# def show_profile_page_clubs(request, user_id=None):
+#     user = get_object_or_404(User.objects, id=request.user.id)
 
-    user = get_object_or_404(User.objects, id=user_id)
+#     user = get_object_or_404(User.objects, id=user_id)
 
-    following = request.user.is_following(user)
-    followable = (request.user != user)
+#     following = request.user.is_following(user)
+#     followable = (request.user != user)
 
-    # clubs_queryset = get_list_or_404(Club, owner = user )
-    clubs_queryset = user.clubs.all()
-    clubs_count = clubs_queryset.count()
-    clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-    page_number = request.GET.get('page')
-    clubs = clubs_pg.get_page(page_number)
+#     # clubs_queryset = get_list_or_404(Club, owner = user )
+#     clubs_queryset = user.clubs.all()
+#     clubs_count = clubs_queryset.count()
+#     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     clubs = clubs_pg.get_page(page_number)
 
-    return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': clubs, 'items_count': clubs_count, 'is_clubs': True})
+#     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': clubs, 'items_count': clubs_count, 'is_clubs': True})
 
+class ProfilePageReadingListView(LoginRequiredMixin, ListView):
+    model = Book
+    template_name = 'profile_page.html'
+    pk_url_kwarg = "user_id"
+
+    def get(self, *args, **kwargs):
+        """Retrieves the user_id and is_clubs from url and stores it in self for later use."""
+        self.user_id = kwargs.get('user_id', None)
+        return super().get(self.request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(User.objects, id=self.user_id)
+
+        context['following'] = self.request.user.is_following(user)
+        context['followable'] = (self.request.user != user)
+
+        books_queryset = user.books.all()
+        context['items_count'] = books_queryset.count()
+        books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+        page_number = self.request.GET.get('page')
+        context['items'] = books_pg.get_page(page_number)
+
+        context['current_user'] = self.request.user
+        context['user'] = user
+        context['is_clubs'] = False
+
+        return context
 
 """ View to add link to reading_list tto user profile """
-@login_required
-def show_profile_page_reading_list(request, user_id):
-    user = get_object_or_404(User.objects, id=request.user.id)
+# @login_required
+# def show_profile_page_reading_list(request, user_id):
+#     user = get_object_or_404(User.objects, id=request.user.id)
 
-    user = get_object_or_404(User.objects, id=user_id)
+#     user = get_object_or_404(User.objects, id=user_id)
 
-    following = request.user.is_following(user)
-    followable = (request.user != user)
+#     following = request.user.is_following(user)
+#     followable = (request.user != user)
 
-    books_queryset = user.books.all()
-    books_count = books_queryset.count()
-    books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-    page_number = request.GET.get('page')
-    books = books_pg.get_page(page_number)
+#     books_queryset = user.books.all()
+#     books_count = books_queryset.count()
+#     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     books = books_pg.get_page(page_number)
 
-    return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': books, 'items_count': books_count, 'is_clubs': False})
+#     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': books, 'items_count': books_count, 'is_clubs': False})
 
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -627,32 +684,6 @@ class BookListView(ListView):
         context['form'] = form
         context['count'] = books_queryset.count()
         return context
-
-# @login_required
-# def books_list(request, club_id=None, user_id=None):
-#     books_queryset = Book.objects.all()
-#     general = True
-#     if club_id:
-#         books_queryset = Club.objects.get(id=club_id).books.all()
-#         general = False
-#     if user_id:
-#         books_queryset = User.objects.get(id=user_id).books.all()
-#         general = False
-
-#     form = BooksSortForm(request.GET or None)
-#     sort = ""
-
-#     if form.is_valid():
-#         sort = form.cleaned_data.get('sort')
-#         sort_helper = SortHelper(sort, books_queryset)
-#         books_queryset = sort_helper.sort_books()
-
-#     count = books_queryset.count()
-#     books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-#     page_number = request.GET.get('page')
-#     books = books_pg.get_page(page_number)
-#     return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
-
 
 class ClubsListView(LoginRequiredMixin, ListView):
     """Display list of clubs."""
@@ -1143,7 +1174,7 @@ class AddReviewView(CreateView):
 
     def get(self, request, *args, **kwargs):
         """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id')
+        self.book_id = kwargs.get('book_id', None)
         return super().get(self, request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -1222,28 +1253,24 @@ class SearchPageView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    # def get(self, *args, **kwargs):
-        
-    #     return super().get(*args, **kwargs)
-
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        self.searched = self.request.GET.get('searched')
-        self.category = self.request.GET.get('category')
+        searched = self.request.GET.get('searched')
+        category = self.request.GET.get('category')
 
-        label = self.category
+        label = category
 
+        # method in helpers to return a dictionary with a list of users, clubs or books searched
         search_page_results = get_list_of_objects(
-            searched=self.searched, label=label)
-        self.category = search_page_results["category"]
+            searched=searched, label=label)
+        category = search_page_results["category"]
         filtered_list = search_page_results["filtered_list"]
 
         sortForm = ""
-        if(self.category == "Clubs"):
+        if(category == "Clubs"):
             sortForm = ClubsSortForm(self.request.GET or None)
-        elif(self.category == "Books"):
+        elif(category == "Books"):
             sortForm = BooksSortForm(self.request.GET or None)
         else:
             sortForm = UsersSortForm(self.request.GET or None)
@@ -1252,15 +1279,15 @@ class SearchPageView(TemplateView):
             sort = sortForm.cleaned_data.get('sort')
             sort_helper = SortHelper(sort, filtered_list)
 
-            if(self.category == "Clubs"):
+            if(category == "Clubs"):
                 filtered_list = sort_helper.sort_clubs()
-            elif(self.category == "Books"):
+            elif(category == "Books"):
                 filtered_list = sort_helper.sort_books()
             else:
                 filtered_list = sort_helper.sort_users()
 
-        context['searched'] = self.searched
-        context['category'] = self.category
+        context['searched'] = searched
+        context['category'] = category
         context['label'] = label
         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
         page_number = self.request.GET.get('page')
@@ -1270,36 +1297,36 @@ class SearchPageView(TemplateView):
         context['current_user'] = self.request.user
         return context
 
-# @login_required
-# def search_page(request):
-#     if request.method == 'GET':
-#         searched = request.GET.get('searched')
-#         category = request.GET.get('category')
-#         label = category
+@login_required
+def search_page(request):
+    if request.method == 'GET':
+        searched = request.GET.get('searched')
+        category = request.GET.get('category')
+        label = category
 
-#         # method in helpers to return a dictionary with a list of users, clubs or books searched
-#         search_page_results = get_list_of_objects(
-#             searched=searched, label=label)
-#         category = search_page_results["category"]
-#         filtered_list = search_page_results["filtered_list"]
+        # method in helpers to return a dictionary with a list of users, clubs or books searched
+        search_page_results = get_list_of_objects(
+            searched=searched, label=label)
+        category = search_page_results["category"]
+        filtered_list = search_page_results["filtered_list"]
 
-#         sortForm = ""
-#         if(category == "Clubs"):
-#             sortForm = ClubsSortForm(request.GET or None)
+        sortForm = ""
+        if(category == "Clubs"):
+            sortForm = ClubsSortForm(request.GET or None)
 
-#         elif(category == "Books"):
-#             sortForm = BooksSortForm(request.GET or None)
-#         else:
-#             sortForm = UsersSortForm(request.GET or None)
+        elif(category == "Books"):
+            sortForm = BooksSortForm(request.GET or None)
+        else:
+            sortForm = UsersSortForm(request.GET or None)
 
-#         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-#         page_number = request.GET.get('page')
-#         filtered_list = pg.get_page(page_number)
-#         current_user=request.user
-#         return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
+        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+        page_number = request.GET.get('page')
+        filtered_list = pg.get_page(page_number)
+        current_user=request.user
+        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
-#     else:
-#         return render(request, 'search_page.html', {})
+    else:
+        return render(request, 'search_page.html', {})
 
 class ShowSortedView(LoginRequiredMixin, ListView):
     template_name = 'search_page.html'
@@ -1392,7 +1419,7 @@ class InitialBookListView(TemplateView):
         context['list_length'] = len(current_user.books.all())
         context['genres'] = genres
         return context
-        
+
 """Enables an owner to delete their club."""
 @login_required
 def delete_club(request, club_id):

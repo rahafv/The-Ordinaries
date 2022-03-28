@@ -38,11 +38,11 @@ urlpatterns = [
     path('home/' , views.HomeView.as_view() , name = 'home'),
     path('log_out/', views.log_out , name='log_out'),
 
-	path('profile/', views.show_profile_page , name='profile'),
-	path('profile/<int:user_id>', views.show_profile_page , name='profile'),
-	path('profile/<int:user_id>/reading_list', views.show_profile_page_reading_list, name='profile_reading_list'),
-	path('profile/<int:user_id>/clubs', views.show_profile_page_clubs, name='profile_clubs'),
-	path('profile/<int:user_id>/<is_clubs>', views.show_profile_page , name='profile'),
+	path('profile/', views.ProfilePageView.as_view() , name='profile'),
+	path('profile/<int:user_id>', views.ProfilePageView.as_view() , name='profile'),
+	path('profile/<int:user_id>/reading_list', views.ProfilePageReadingListView.as_view(), name='profile_reading_list'),
+	path('profile/<int:user_id>/clubs', views.ProfilePageClubsView.as_view(), name='profile_clubs'),
+	path('profile/<int:user_id>/<is_clubs>', views.ProfilePageView.as_view() , name='profile'),
 	
 	path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
 	path('edit_review/<int:review_id>', views.EditReviewView.as_view(), name='edit_review'),
@@ -79,7 +79,7 @@ urlpatterns = [
 	
 	path('followings/<int:user_id>/', views.FollowingListView.as_view(), name='following_list'),
 	path('followers/<int:user_id>/', views.FollowersListView.as_view(), name='followers_list'),
-	path('search_page', views.SearchPageView.as_view(), name='search_page'),
+	path('search_page', views.search_page, name='search_page'),
 	path('search_page/<str:searched>/<str:label>/', views.ShowSortedView.as_view(), name = "show_sorted"),
 	
 	path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
