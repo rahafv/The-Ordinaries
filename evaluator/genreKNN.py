@@ -21,8 +21,6 @@ class GenreKNNAlgorithm(AlgoBase):
 
         print("Computing content-based similarity matrix...")
         
-        itemBasedSimilarities = self.getItemBasedSimilarity()
-
         # Compute genre distance for every book combination as a 2x2 matrix
         self.similarities = np.zeros((self.trainset.n_items, self.trainset.n_items))
         
@@ -33,31 +31,22 @@ class GenreKNNAlgorithm(AlgoBase):
                 thisBookID = int(self.trainset.to_raw_iid(thisRating))
                 otherBookID = int(self.trainset.to_raw_iid(otherRating))
                 genreSimilarity = self.computeGenreSimilarity(thisBookID, otherBookID, genres)
-                self.similarities[thisRating, otherRating] = genreSimilarity
-                self.similarities[otherRating, thisRating] = genreSimilarity
+                self.similarities[thisRating, otherRating] = genreSimilarity 
+                self.similarities[otherRating, thisRating] = genreSimilarity 
 
-        for innerID, score in enumerate(self.similarities):
-            self.similarities[innerID] = score + itemBasedSimilarities[innerID]
-        
         print("...done.")
                 
         return self
-
-    def getItemBasedSimilarity(self):
-        similarity_matrix = KNNBasic(
-            sim_options={
-            'name': 'cosine',
-            'user_based': False
-            }
-        ).fit(self.trainset).compute_similarities()
-
-        return similarity_matrix
     
     def computeGenreSimilarity(self, book1, book2, genres):
         genres1 = genres[book1]
         genres2 = genres[book2]
         sumxx, sumxy, sumyy = 0, 0, 0
-        for i in range(len(genres1)):
+        length = len(genres1)
+        if length > len(genres2):
+            length = len(genres2)
+
+        for i in range(length):
             x = genres1[i]
             y = genres2[i]
             sumxx += x * x

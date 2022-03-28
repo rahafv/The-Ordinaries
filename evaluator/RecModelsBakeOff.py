@@ -6,7 +6,7 @@ Created on Thu May  3 11:11:13 2018
 """
 
 from .Evaluator import Evaluator
-from surprise import KNNBasic, SVD, NormalPredictor
+from surprise import KNNBasic, NormalPredictor,SVD, SVDpp, KNNWithMeans, KNNWithZScore
 from .book_rating import BookRatings
 from .genreKNN import GenreKNNAlgorithm
 
@@ -41,9 +41,17 @@ class RecModelsBakeOff:
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
 
-        # Content KNN
-        # genreKNN = GenreKNNAlgorithm()
-        # evaluator.AddAlgorithm(genreKNN, "Content KNN")
+        # Item-based KNNWithMeans
+        ItemKNN = KNNWithMeans(sim_options = {'name': 'cosine', 'user_based': False})
+        evaluator.AddAlgorithm(ItemKNN, "Item KNNWithMeans")
+
+        # Item-based KNNWithZScore
+        ItemKNN = KNNWithZScore(sim_options = {'name': 'cosine', 'user_based': False})
+        evaluator.AddAlgorithm(ItemKNN, "Item KNNWithZScore")
+
+        # SVD pp
+        svd = SVDpp()
+        evaluator.AddAlgorithm(svd, "SVD pp")
 
         # SVD
         svd = SVD()
@@ -54,7 +62,6 @@ class RecModelsBakeOff:
         evaluator.AddAlgorithm(Random, "Random")
 
         # Fight!
-        print('here--------------')
         evaluator.Evaluate(False)
 
         evaluator.SampleTopNRecs(bookRatings)
