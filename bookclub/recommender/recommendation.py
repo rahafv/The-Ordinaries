@@ -7,9 +7,9 @@ from .contentBasedModel import ContentBasedModel
 
 
 class Recommendation:
-    def __init__(self, isItemBased):
+    def __init__(self, isItemBased, recHelper):
         if isItemBased:
-            self.item_based = ItemBasedModel()
+            self.item_based = ItemBasedModel(recHelper)
         else:
             self.content_based = ContentBasedModel()
 
