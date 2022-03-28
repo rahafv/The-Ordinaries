@@ -17,7 +17,6 @@ class ItemBasedModel:
             recHelper.set_similarity_matrix(self.similarity_matrix)
 
             recHelper.increment_counter()
-            print("------------------nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn-------------------------")
         
         else:
             self.trainset = recHelper.trainset
