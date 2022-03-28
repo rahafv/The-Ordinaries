@@ -96,20 +96,6 @@ class HomeView(TemplateView):
         return context
 
 
-# @login_required
-# def home(request):
-#     current_user = request.user
-#     notifications = current_user.notifications.unread()
-#     user_events = notifications.filter(description__contains ='user-event')[:25]
-#     club_events = notifications.filter(description__contains='club-event')[:10]
-
-#     already_selected_books = current_user.books.all()
-#     my_books = Book.objects.all().exclude(id__in=already_selected_books)
-#     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-
-#     return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
-
-
 class EditReviewView(UpdateView):
     """View to edit the user's review."""
 
@@ -325,31 +311,6 @@ class CreateClubView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         """If there is no permission, redirect to log in."""
         return redirect(reverse('log_in') + '?next=/create_club/')
-
-@login_required
-def add_review(request, book_id):
-    reviewed_book = get_object_or_404(Book.objects, id=book_id)
-    review_user = request.user
-    if reviewed_book.ratings.all().filter(user=review_user).exists():
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            form.instance.user = review_user
-            form.instance.book = reviewed_book
-            form.save(review_user, reviewed_book)
-            review_user.add_book_to_all_books(reviewed_book)
-            notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )
-            messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
-
-            reviewed_book.calculate_average_rating()
-
-            return redirect('book_details', book_id=reviewed_book.id)
-
-    messages.add_message(request, messages.ERROR,
-                         "Review cannot be over 250 characters!")
-    return render(request, 'book_details.html', {'book': reviewed_book})
 
 
 class ClubPageView(LoginRequiredMixin, DetailView):
@@ -999,8 +960,6 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
 
-
-
 class EditClubInformationView(LoginRequiredMixin, UpdateView):
     """View that handles club information change requests."""
     model = Club
@@ -1018,8 +977,6 @@ class EditClubInformationView(LoginRequiredMixin, UpdateView):
         """Return URL to redirect the user to after valid form handling."""
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated club information!")
         return reverse('club_page', args=[self.object.id])
-
-
 
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
     template_name = "schedule_meeting.html"
@@ -1174,7 +1131,7 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
-class AddReviewView(FormView):
+class AddReviewView(CreateView):
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
     context_object_name = 'book'
@@ -1220,8 +1177,23 @@ def add_review(request, book_id):
     if reviewed_book.ratings.all().filter(user=review_user).exists():
         return HttpResponseForbidden()
 
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            form.instance.user = review_user
+            form.instance.book = reviewed_book
+            form.save(review_user, reviewed_book)
+            review_user.add_book_to_all_books(reviewed_book)
+            notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )
+            messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
 
-    return render(request, '404_page.html', status=404)
+            reviewed_book.calculate_average_rating()
+
+            return redirect('book_details', book_id=reviewed_book.id)
+
+    messages.add_message(request, messages.ERROR,
+                         "Review cannot be over 250 characters!")
+    return render(request, 'book_details.html', {'book': reviewed_book})
 
 
 """Enable user to follow and unfollow other users."""
@@ -1250,14 +1222,16 @@ class SearchPageView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, *args, **kwargs):
-        self.searched = self.request.GET.get('searched')
-        self.category = self.request.GET.get('category')
-        return super().get(*args, **kwargs)
+    # def get(self, *args, **kwargs):
+        
+    #     return super().get(*args, **kwargs)
 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        self.searched = self.request.GET.get('searched')
+        self.category = self.request.GET.get('category')
 
         label = self.category
 
@@ -1296,36 +1270,36 @@ class SearchPageView(TemplateView):
         context['current_user'] = self.request.user
         return context
 
-@login_required
-def search_page(request):
-    if request.method == 'GET':
-        searched = request.GET.get('searched')
-        category = request.GET.get('category')
-        label = category
+# @login_required
+# def search_page(request):
+#     if request.method == 'GET':
+#         searched = request.GET.get('searched')
+#         category = request.GET.get('category')
+#         label = category
 
-        # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
-        category = search_page_results["category"]
-        filtered_list = search_page_results["filtered_list"]
+#         # method in helpers to return a dictionary with a list of users, clubs or books searched
+#         search_page_results = get_list_of_objects(
+#             searched=searched, label=label)
+#         category = search_page_results["category"]
+#         filtered_list = search_page_results["filtered_list"]
 
-        sortForm = ""
-        if(category == "Clubs"):
-            sortForm = ClubsSortForm(request.GET or None)
+#         sortForm = ""
+#         if(category == "Clubs"):
+#             sortForm = ClubsSortForm(request.GET or None)
 
-        elif(category == "Books"):
-            sortForm = BooksSortForm(request.GET or None)
-        else:
-            sortForm = UsersSortForm(request.GET or None)
+#         elif(category == "Books"):
+#             sortForm = BooksSortForm(request.GET or None)
+#         else:
+#             sortForm = UsersSortForm(request.GET or None)
 
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
-        current_user=request.user
-        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
+#         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+#         page_number = request.GET.get('page')
+#         filtered_list = pg.get_page(page_number)
+#         current_user=request.user
+#         return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
-    else:
-        return render(request, 'search_page.html', {})
+#     else:
+#         return render(request, 'search_page.html', {})
 
 class ShowSortedView(LoginRequiredMixin, ListView):
     template_name = 'search_page.html'
@@ -1407,10 +1381,18 @@ class InitialBookListView(TemplateView):
         already_selected_books = current_user.books.all()
         my_books = Book.objects.all().exclude(id__in=already_selected_books)
 
-        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-        list_length = len(current_user.books.all())
-        return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
+        genres = self.request.GET.getlist('genre')
+        if genres:
+            for genre in genres:
+                my_books = my_books.filter(genre__contains=genre)
 
+        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+
+        context['my_books'] = sorted_books
+        context['list_length'] = len(current_user.books.all())
+        context['genres'] = genres
+        return context
+        
 """Enables an owner to delete their club."""
 @login_required
 def delete_club(request, club_id):

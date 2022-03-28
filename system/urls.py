@@ -79,7 +79,7 @@ urlpatterns = [
 	
 	path('followings/<int:user_id>/', views.FollowingListView.as_view(), name='following_list'),
 	path('followers/<int:user_id>/', views.FollowersListView.as_view(), name='followers_list'),
-	path('search_page', views.search_page, name='search_page'),
+	path('search_page', views.SearchPageView.as_view(), name='search_page'),
 	path('search_page/<str:searched>/<str:label>/', views.ShowSortedView.as_view(), name = "show_sorted"),
 	
 	path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),
@@ -98,6 +98,7 @@ urlpatterns = [
 	path("club/<int:club_id>/previous_meetings/", views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
 	path('meeting/<int:meeting_id>/cancel/', views.cancel_meeting, name='cancel_meeting'),
 	path(r'mark-as-read/(<slug>[-\w]+)', views.mark_as_read, name='mark_as_read'),
-]
+    
+    ]
 	
 handler404 = 'bookclub.views.handler404'
