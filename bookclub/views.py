@@ -333,21 +333,16 @@ def book_details(request, book_id):
     
     if request.method == "POST":
         progress_pages = request.POST.get('progress-pages', None)
-        print(f' PAGES:{progress_pages}')
-        if progress_pages is not '' and progress_pages is not None:
-            print(f' PAGES:{progress_pages}')
+        if progress_pages != '' and progress_pages != None:
             comment = request.POST.get("progress-comment-pages")
             user_progress = {'comment': comment, 'progress': progress_pages, 'label': "Pages"}
-            print(f'{user_progress}')
             messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
         else:
             progress_percent = request.POST.get('progress-percent', None)
 
-            if progress_percent !=0 and progress_percent is not None:
-                print(f'PERCENT:{progress_percent}')
+            if progress_percent != None:
                 comment = request.POST.get("progress-comment-percent")
                 user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
-                print(f'{user_progress}')
                 messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
             else:
                 messages.add_message(request, messages.ERROR,"Progress cannot be updated!")

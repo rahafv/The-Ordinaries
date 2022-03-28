@@ -87,6 +87,60 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.assertFalse(form.is_bound)
 
 
+
+    def test_post_update_progress_percentage_form(self):
+        form_input_percent = {'progress-percent':'90', 'progress-comment-percent':'well written'}
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.post(self.url, form_input_percent, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+        user_progress = response.context['user_progress']
+        self.assertNotEqual(user_progress,False)
+        self.assertDictEqual(user_progress, {'comment':form_input_percent['progress-comment-percent'], 'progress':form_input_percent['progress-percent'], 'label':'Percent'})
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
+    
+    def test_post_update_progress_percentage_form_with_empty_comment(self):
+        form_input_percent = {'progress-percent':'90', 'progress-comment-percent':''}
+        self.client.login(username=self.user.username, password="Password123")
+        self.form_input['progress-comment-pages']= ''
+        response = self.client.post(self.url,form_input_percent, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+        user_progress = response.context['user_progress']
+        self.assertNotEqual(user_progress,False )
+        self.assertDictEqual(user_progress, {'comment':form_input_percent['progress-comment-percent'], 'progress':form_input_percent['progress-percent'], 'label':'Percent'})
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
+
+
+    def test_post_update_progress_percentage_form_with_0_percent(self):
+        form_input_percent = {'progress-percent':'0', 'progress-comment-percent':'well written'}
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.post(self.url, form_input_percent, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+        user_progress = response.context['user_progress']
+        self.assertDictEqual(user_progress, {'comment':form_input_percent['progress-comment-percent'], 'progress':form_input_percent['progress-percent'], 'label':'Percent'})
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
+
+    def test_post_update_progress_percentage_form_with_None_percent(self):
+        form_input_percent = { 'progress-comment-percent':'well written'}
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.post(self.url, form_input_percent, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+        user_progress = response.context['user_progress']
+        self.assertEqual(user_progress,False )    
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
+
+
     def test_book_details_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
