@@ -73,37 +73,11 @@
                   </div>
                   {% endif %}
                   {% if reader %}
-                      <!-- UPDATE PROGRESS BUTTON-->
-                      {% if user_progress %}
-                      <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
-                        <div class='reviews-heading mt-3'>
-                          <div class = "name-and-edit mb-2">
-                            <h5 class= "text-uppercase font-weight-bold">Your Progress:</h5>
-                            &emsp; 
-                          </div>
-                        </div> 
-                        <div class= "review-body mt-2">
-                          <p>
-                            <label for="progress" class="form-label"style="font-size:14px" >{{user_progress.label}} of book read:</label>
-                            {% if user_progress.label == "Percent" %}
-                              <input class="text-center mb-2" style="width: 35px; border: #fff; background-color: #fff;" disabled type="text" id="textInput" value="{{user_progress.progress}}">%
-                              <input type="range" class="form-range" min="0" max="100" step="0.5" id="progress" disabled value="{{user_progress.progress}}">
-                            {% elif user_progress.label == "Pages" %}
-                              <small style="font-size:14px">&emsp;{{user_progress.progress}}</small>
-                            {% endif %}
-                          </p> 
-                          {% if user_progress.comment%}
-                          <p style="font-size:16px;">{{user_progress.comment}}</p> 
-                          {% endif %}
-                        </div>
-                      </div>
-                      {% else %}
-                        <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
-                          <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
-                            Update Progress
-                          </span>
-                        </a>
-                      {% endif %}
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
+                        Update Progress
+                      </span>
+                    </a>
                   {% endif %}
                 </nav>
                 <!-- COLLAPSE FOR REVIEW -->

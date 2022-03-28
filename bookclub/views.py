@@ -343,21 +343,34 @@ def book_details(request, book_id):
     if rating:
         rating = rating[0]
     reviews_count = book.ratings.all().count()
-
+    
     user_progress = False
+    
     if request.method == "POST":
-        progress_pages = request.POST.get('progress-pages','')
-        if progress_pages is not '':
+        progress_pages = request.POST.get('progress-pages', None)
+        print(f' PAGES:{progress_pages}')
+        if progress_pages is not '' and progress_pages is not None:
+            print(f' PAGES:{progress_pages}')
             comment = request.POST.get("progress-comment-pages")
             user_progress = {'comment': comment, 'progress': progress_pages, 'label': "Pages"}
+            print(f'{user_progress}')
+            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
         else:
-            progress_percent = request.POST.get('progress-percent')
-            comment = request.POST.get("progress-comment-percent")
-            user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
-                
+            progress_percent = request.POST.get('progress-percent', None)
+
+            if progress_percent !=0 and progress_percent is not None:
+                print(f'PERCENT:{progress_percent}')
+                comment = request.POST.get("progress-comment-percent")
+                user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
+                print(f'{user_progress}')
+                messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
+            else:
+                messages.add_message(request, messages.ERROR,"Progress cannot be updated!")
+
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings, 'user_progress':user_progress}
+        
     return render(request, "book_details.html", context)
 
 
