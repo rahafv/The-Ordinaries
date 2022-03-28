@@ -15,56 +15,46 @@ import numpy as np
 
 class RecModelsBakeOff:
 
-    def __init__(self):
-        self.bookRatings = BookRatings()
-
     def LoadBooksData(self):
+        bookRatings = BookRatings()
         print("Loading book ratings...")
-        data = self.bookRatings.load_dataset()
-        
-        rankings = self.bookRatings.getPopularityRanks()
-
-        return (data, rankings)
+        data = bookRatings.load_dataset()
+        print("\nComputing book popularity ranks to measure novelty ...")
+        rankings = bookRatings.getPopularityRanks()
+        return (bookRatings, data, rankings)
 
     def evaluate(self):
         np.random.seed(0)
         random.seed(0)
 
         # Load up common data set for the recommender algorithms
-        (evaluationData, rankings) = self.LoadBooksData()
-        print('here=================')
+        (bookRatings, evaluationData, rankings) = self.LoadBooksData()
 
         # Construct an Evaluator to evaluate the recommender algorithms
         evaluator = Evaluator(evaluationData, rankings)
-        print('here#######################')
 
         # User-based KNN
         UserKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': True})
         evaluator.AddAlgorithm(UserKNN, "User KNN")
-        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Item-based KNN
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
-        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Content KNN
-        genreKNN = GenreKNNAlgorithm()
-        evaluator.AddAlgorithm(genreKNN, "Content KNN")
-        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        # genreKNN = GenreKNNAlgorithm()
+        # evaluator.AddAlgorithm(genreKNN, "Content KNN")
 
         # SVD
         svd = SVD()
         evaluator.AddAlgorithm(svd, "SVD")
-        print('here@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         # Random recommendations
         Random = NormalPredictor()
         evaluator.AddAlgorithm(Random, "Random")
 
-        print('here')
-
         # Fight!
-        evaluator.Evaluate(True)
+        print('here--------------')
+        evaluator.Evaluate(False)
 
-        evaluator.SampleTopNRecs(self.bookRatings, self.bookRatings.getTestUser())
+        evaluator.SampleTopNRecs(bookRatings)

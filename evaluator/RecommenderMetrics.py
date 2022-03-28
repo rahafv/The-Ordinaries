@@ -132,8 +132,8 @@ class RecommenderMetrics:
             for pair in pairs:
                 book1 = pair[0][0]
                 book2 = pair[1][0]
-                innerID1 = simsAlgo.trainset.to_inner_iid(book1)
-                innerID2 = simsAlgo.trainset.to_inner_iid(book2)
+                innerID1 = simsAlgo.trainset.to_inner_iid(str(book1))
+                innerID2 = simsAlgo.trainset.to_inner_iid(str(book2))
                 similarity = simsMatrix[innerID1][innerID2]
                 total += similarity
                 n += 1

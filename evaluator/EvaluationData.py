@@ -11,16 +11,15 @@ from surprise import KNNBaseline
 class EvaluationData:
     
     def __init__(self, data, popularityRankings):
-        print('done -----')
         self.rankings = popularityRankings
-        print('done ++++++')
+
         #Build a full training set for evaluating overall properties
         self.fullTrainSet = data.build_full_trainset()
+
         self.fullAntiTestSet = self.fullTrainSet.build_anti_testset()
-        print('done 1')
+  
         #Build a 75/25 train/test split for measuring accuracy
         self.trainSet, self.testSet = train_test_split(data, test_size=.25, random_state=1)
-        print('done 2')
 
         #Build a "leave one out" train/test split for evaluating top-N recommenders
         #And build an anti-test-set for building predictions
@@ -28,14 +27,13 @@ class EvaluationData:
         for train, test in LOOCV.split(data):
             self.LOOCVTrain = train
             self.LOOCVTest = test
-        print('done 3')
+     
         self.LOOCVAntiTestSet = self.LOOCVTrain.build_anti_testset()
-        print('done 4')
+   
         #Compute similarty matrix between items so we can measure diversity
         sim_options = {'name': 'cosine', 'user_based': False}
         self.simsAlgo = KNNBaseline(sim_options=sim_options)
         self.simsAlgo.fit(self.fullTrainSet)
-        print('done 5')
             
     def GetFullTrainSet(self):
         return self.fullTrainSet
@@ -47,7 +45,7 @@ class EvaluationData:
         trainset = self.fullTrainSet
         fill = trainset.global_mean
         anti_testset = []
-        u = trainset.to_inner_uid(testSubject)
+        u = trainset.to_inner_uid(str(testSubject))
         user_items = set([j for (j, _) in trainset.ur[u]])
         anti_testset += [(trainset.to_raw_uid(u), trainset.to_raw_iid(i), fill) for
                                  i in trainset.all_items() if
