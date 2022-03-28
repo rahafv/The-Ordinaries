@@ -1,10 +1,9 @@
 from datetime import timedelta
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponseForbidden
-from logging import exception
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm
+from django.contrib.auth import login, logout
+from .forms import SignUpForm, LogInForm, CreateClubForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm, BookForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .helpers import get_list_of_objects, login_prohibited, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
@@ -22,7 +21,6 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
 from notifications.signals import notify
 from notifications.utils import slug2id
 from notifications.models import Notification
@@ -40,95 +38,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 
-@login_prohibited
-def welcome(request):
-    return render(request, 'welcome.html')
-
-class HomeView(TemplateView):
-
-    template_name = 'home.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def events_created_at(self, event):
-        return event.created_at
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        current_user = self.request.user
-
-        authors = list(current_user.followees.all()) + [current_user]
-        clubs = list(User.objects.get(id=current_user.id).clubs.all())
-        user_events = []
-        club_events = []
-        for author in authors:
-            user_events += list(Event.objects.filter(user=author))
-
-        final_user_events = user_events
-        final_user_events.sort(reverse=True, key=self.events_created_at)
-        context['user_events'] = final_user_events[0:25]
-
-        for club in clubs:
-            club_events += list(Event.objects.filter(club=club))
-
-        final_club_events = club_events
-        final_club_events.sort(reverse=True, key=self.events_created_at)
-        first_ten = final_club_events[0:10]
-        context['club_events'] = first_ten
-        context['club_events_length'] = len(first_ten)
-
-        already_selected_books = current_user.books.all()
-        my_books = Book.objects.all().exclude(id__in=already_selected_books)
-        context['books'] = my_books.order_by('-average_rating','-readers_count')[:3]
-
-        context['user'] = current_user
-        return context
-
-# @login_required
-# def home(request):
-#     def events_created_at(event):
-#         return event.created_at
-
-#     current_user = request.user
-#     authors = list(current_user.followees.all()) + [current_user]
-#     clubs = list(User.objects.get(id=current_user.id).clubs.all())
-#     user_events = []
-#     club_events = []
-#     for author in authors:
-#         user_events += list(Event.objects.filter(user=author))
-#     final_user_events = user_events
-#     final_user_events.sort(reverse=True, key=events_created_at)
-#     first_twentyFive = final_user_events[0:25]
-
-#     for club in clubs:
-#         club_events += list(Event.objects.filter(club=club))
-
-#     final_club_events = club_events
-#     final_club_events.sort(reverse=True, key=events_created_at)
-#     first_ten = final_club_events[0:10]
-
-#     club_events_length = len(first_ten)
-
-#     already_selected_books = current_user.books.all()
-#     my_books = Book.objects.all().exclude(id__in=already_selected_books)
-#     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-
-#     return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
-
-@login_required
-def home(request):
-    current_user = request.user
-    notifications = current_user.notifications.unread()
-    user_events = notifications.filter(description__contains ='user-event')[:25]
-    club_events = notifications.filter(description__contains='club-event')[:10]
-
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-
-    return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -155,6 +64,95 @@ class LoginProhibitedMixin:
             )
         else:
             return self.redirect_when_logged_in_url
+
+
+
+@login_prohibited
+def welcome(request):
+    return render(request, 'welcome.html')
+
+class HomeView(TemplateView):
+
+    template_name = 'home.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['user'] = current_user
+        notifications = current_user.notifications.unread()
+        user_events = notifications.filter(description__contains ='user-event')[:25]
+        club_events = notifications.filter(description__contains='club-event')[:10]
+
+        already_selected_books = current_user.books.all()
+        my_books = Book.objects.all().exclude(id__in=already_selected_books)
+        context['club_events'] = list(club_events)
+        context['club_events_length'] = len(club_events)
+        context['user_events'] = list(user_events)
+        context['books'] = my_books.order_by('-average_rating','-readers_count')[:3]
+        return context
+
+
+# @login_required
+# def home(request):
+#     current_user = request.user
+#     notifications = current_user.notifications.unread()
+#     user_events = notifications.filter(description__contains ='user-event')[:25]
+#     club_events = notifications.filter(description__contains='club-event')[:10]
+
+#     already_selected_books = current_user.books.all()
+#     my_books = Book.objects.all().exclude(id__in=already_selected_books)
+#     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+
+#     return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
+
+
+class EditReviewView(UpdateView):
+    """View to edit the user's review."""
+
+    model = Rating
+    template_name = 'edit_review.html'
+    pk_url_kwarg = 'review_id'
+    form_class = EditRatingForm
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['review'] = self.get_object()
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        """Retrieves the review_id from url and stores it in self for later use."""
+        self.review_id = kwargs.get('review_id')
+        self.review = get_object_or_404(Rating.objects, id=self.review_id)
+        if self.request.user != self.review.user:
+            raise Http404
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['review_id'] = self.get_object().id
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.add_message(self.request, messages.ERROR,
+                         "Review cannot be over 250 characters.")
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse('book_details', kwargs = {'book_id': self.get_object().book.id})
+
 
 class SignUpView(LoginProhibitedMixin, FormView):
     """Handles user sign up."""
@@ -416,16 +414,20 @@ class BookDetailsView(DetailView, FormMixin):
         context['numberOfRatings'] = book.ratings.all().count()
         return context
 
-# @login_required
-# def add_book(request):
-#     if request.method == "POST":
-#         form = BookForm(request.POST)
-#         if form.is_valid():
-#             book = form.save()
-#             return redirect('book_details', book_id=book.id)
-#     else:
-#         form = BookForm()
-#     return render(request, "add_book.html", {"form": form})
+class AddBookView(FormView):
+    form_class = BookForm
+    template_name = 'add_book.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.book = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 class ProfilePageView(DetailView):
     model = User
@@ -1198,7 +1200,6 @@ class AddReviewView(FormView):
         form.save(self.review_user, self.reviewed_book)
         self.review_user.add_book_to_all_books(self.reviewed_book)
 
-        create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
 
         self.reviewed_book.calculate_average_rating()
@@ -1393,14 +1394,6 @@ class InitialGenresView(TemplateView):
         context['genres'] = sorted(genres, reverse=True, key=genres.get)[0:40]
         return context
 
-
-# @login_required
-# def initial_genres(request):
-#     genres = getGenres()
-#     sorted_genres = sorted(genres, reverse=True, key=genres.get)[0:40]
-
-#     return render(request, 'initial_genres.html', {'genres':sorted_genres})
-
 class InitialBookListView(TemplateView):
     template_name = 'initial_book_list.html'
 
@@ -1414,9 +1407,9 @@ class InitialBookListView(TemplateView):
         already_selected_books = current_user.books.all()
         my_books = Book.objects.all().exclude(id__in=already_selected_books)
 
-    sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
-    list_length = len(current_user.books.all())
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
+        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+        list_length = len(current_user.books.all())
+        return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
 """Enables an owner to delete their club."""
 @login_required
