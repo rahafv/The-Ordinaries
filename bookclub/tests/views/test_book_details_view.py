@@ -40,5 +40,3 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.assertTrue(isinstance(form, RatingForm))
         self.assertFalse(form.is_bound)
 
-    def test_book_details_redirects_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()

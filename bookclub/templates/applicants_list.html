@@ -15,7 +15,7 @@
             </form>
             <table class="table table-bordered" id="membersTable">
                 <thead>
-                <tr style="background-color: white">
+                <tr>
                     <th class="th-sm">Name</th>
                     <th class="th-sm">Username</th>
                     <th class="th-sm">Age</th>
@@ -23,7 +23,7 @@
                 </thead>
                 {%if is_owner %}
                 {% for applicant in applicants %}
-                    <tr style="background-color: white">
+                    <tr>
                         {% if app == current_user %}
                             <td><p> You </p></td>
                         {% else %}
