@@ -45,8 +45,8 @@ urlpatterns = [
     path('profile/<int:user_id>/<is_clubs>', views.show_profile_page , name='profile'),
 
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
-    path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
-    # path('edit_review/<int:review_id>', views.EditReviewView.as_view(), name='edit_review'),
+    # path('edit_review/<int:review_id>', views.edit_review, name='edit_review'),
+    path('edit_review/<int:review_id>', views.EditReviewView.as_view(), name='edit_review'),
     path('password/',views.PasswordView.as_view(), name='password'),
     path('create_club/', views.create_club, name='create_club'),
     path('club/<int:club_id>/', views.club_page, name='club_page'),

@@ -993,25 +993,34 @@ class EditReviewView(UpdateView):
     model = Rating
     template_name = 'edit_review.html'
     pk_url_kwarg = 'review_id'
-    form_class = RatingForm
+    form_class = EditRatingForm
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['review'] = self.get_object()
+        return kwargs
+
     def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
+        """Retrieves the review_id from url and stores it in self for later use."""
         self.review_id = kwargs.get('review_id')
-        if self.request.user != get_object_or_404(Rating.objects, id=self.review_id).user:
+        self.review = get_object_or_404(Rating.objects, id=self.review_id)
+        if self.request.user != self.review.user:
             raise Http404
         return super().get(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        review_user = self.request.user
-        review = get_object_or_404(Rating.objects, id=self.review_id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['review_id'] = self.get_object().id
+        return context
 
-        form.save(review_user, review.book)
+    def form_valid(self, form):
+        form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR,
@@ -1019,28 +1028,28 @@ class EditReviewView(UpdateView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse('book_details', kwargs = {'book_id': self.review.book.id})
+        return reverse('book_details', kwargs = {'book_id': self.get_object().book.id})
 
 
-@login_required
-def edit_review(request, review_id):
-    review = get_object_or_404(Rating.objects, id=review_id)
-    review_user = request.user
-    if review_user == review.user:
-        if request.method == "POST":
-            form = EditRatingForm(data = request.POST, instance=review)
-            if form.is_valid():
-                form.save(review_user, review.book)
-                messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
-                return redirect('book_details', book_id= review.book.id)
-            messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
-        else:
-            form = EditRatingForm(instance = review)
+# @login_required
+# def edit_review(request, review_id):
+#     review = get_object_or_404(Rating.objects, id=review_id)
+#     review_user = request.user
+#     if review_user == review.user:
+#         if request.method == "POST":
+#             form = EditRatingForm(data = request.POST, instance=review)
+#             if form.is_valid():
+#                 form.save(review_user, review.book)
+#                 messages.add_message(request, messages.SUCCESS, "Successfully updated your review!")
+#                 return redirect('book_details', book_id= review.book.id)
+#             messages.add_message(request, messages.ERROR, "Review cannot be over 250 characters!")
+#         else:
+#             form = EditRatingForm(instance = review)
 
-        return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
+#         return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
 
-    else:
-        return render(request, '404_page.html', status=404)
+#     else:
+#         return render(request, '404_page.html', status=404)
 
 @login_required
 def follow_toggle(request, user_id):

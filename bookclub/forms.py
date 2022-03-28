@@ -252,19 +252,22 @@ class EditRatingForm(forms.ModelForm):
         model = Rating
         fields = ['rating', 'review']
 
+    def __init__(self, *args, **kwargs):
+        self.review = kwargs.pop('review', None)
+        super(EditRatingForm, self).__init__(*args, **kwargs)
 
     def calculate_rating(self, rating):
         return rating*2
 
-    def save(self , reviwer, reviewedBook):
+    def save(self):
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0
-        review_obj = Rating.objects.get(user=reviwer , book=reviewedBook)
-        review_obj.rating=self.calculate_rating(rate)
-        review_obj.review=self.cleaned_data.get('review')
-        review_obj.save()    
+
+        self.review.rating=self.calculate_rating(rate)
+        self.review.review=self.cleaned_data.get('review')
+        self.review.save()    
          
 
 class RatingForm(forms.ModelForm):
