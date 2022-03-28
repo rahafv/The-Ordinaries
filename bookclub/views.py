@@ -8,9 +8,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import delete_event, get_list_of_objects, login_prohibited, generate_token, create_event, MeetingHelper, SortHelper, getGenres
+from .helpers import get_list_of_objects, login_prohibited, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Chat, Meeting, User, Club, Book , Rating, Event
+from .models import Chat, Meeting, User, Club, Book , Rating
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, FormView
 from django.utils.http import urlsafe_base64_decode
@@ -23,6 +23,10 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
+from django.db.models.functions import Lower
+from notifications.signals import notify
+from notifications.utils import slug2id
+from notifications.models import Notification
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import  DetailView, SingleObjectMixin
@@ -41,34 +45,16 @@ def welcome(request):
 
 @login_required
 def home(request):
-    def events_created_at(event):
-        return event.created_at
-
     current_user = request.user
-    authors = list(current_user.followees.all()) + [current_user]
-    clubs = list(User.objects.get(id=current_user.id).clubs.all())
-    user_events = []
-    club_events = []
-    for author in authors:
-        user_events += list(Event.objects.filter(user=author))
-    final_user_events = user_events
-    final_user_events.sort(reverse=True, key=events_created_at)
-    first_twentyFive = final_user_events[0:25]
-
-    for club in clubs:
-        club_events += list(Event.objects.filter(club=club))
-
-    final_club_events = club_events
-    final_club_events.sort(reverse=True, key=events_created_at)
-    first_ten = final_club_events[0:10]
-
-    club_events_length = len(first_ten)
+    notifications = current_user.notifications.unread()
+    user_events = notifications.filter(description__contains ='user-event')[:25]
+    club_events = notifications.filter(description__contains='club-event')[:10]
 
     already_selected_books = current_user.books.all()
     my_books = Book.objects.all().exclude(id__in=already_selected_books)
     top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
-    
-    return render(request, 'home.html', {'user': current_user, 'user_events': first_twentyFive, 'club_events': first_ten, 'club_events_length': club_events_length, 'books':top_rated_books})
+
+    return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""
@@ -200,6 +186,7 @@ class LogInView(LoginProhibitedMixin, FormView):
             else:
                 redirect_url = self.next or 'home'
             return redirect(redirect_url)
+        
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()
 
@@ -255,7 +242,7 @@ class CreateClubView(LoginRequiredMixin, CreateView):
         club_owner = self.request.user
         form.instance.owner = club_owner
         self.club = form.save()
-        create_event('U', 'C', Event.EventType.CREATE, user=club_owner, club=self.club)
+        notify.send(club_owner, recipient=club_owner.followers.all(), verb=NotificationHelper().NotificationMessages.CREATE, action_object=self.club, description='user-event-C' ) 
         self.club.add_member(club_owner)
         return super().form_valid(form)
 
@@ -266,8 +253,6 @@ class CreateClubView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         """If there is no permission, redirect to log in."""
         return redirect(reverse('log_in') + '?next=/create_club/')
-
-
 
 @login_required
 def add_review(request, book_id):
@@ -283,7 +268,7 @@ def add_review(request, book_id):
             form.instance.book = reviewed_book
             form.save(review_user, reviewed_book)
             review_user.add_book_to_all_books(reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
+            notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' ) 
             messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
 
             reviewed_book.calculate_average_rating() 
@@ -475,6 +460,7 @@ def join_club(request, club_id):
 
     club = get_object_or_404(Club.objects, id=club_id)
     user = request.user
+    notificationHelper = NotificationHelper()
 
     if club.is_member(user):
         messages.add_message(request, messages.ERROR,
@@ -484,6 +470,7 @@ def join_club(request, club_id):
     if club.club_type == "Private":
         if not club.is_applicant(user):
             club.applicants.add(user)
+            notify.send(user, recipient=club.owner, verb=notificationHelper.NotificationMessages.APPLIED, action_object=club,  description='notification' )
             messages.add_message(request, messages.SUCCESS,
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
@@ -493,8 +480,9 @@ def join_club(request, club_id):
             return redirect('club_page', club_id)
 
     club.members.add(user)
-    create_event('U', 'C', Event.EventType.JOIN, user, club)
-    delete_event('U', 'C', Event.EventType.WITHDRAW, user, club)
+    notificationHelper.delete_notifications(user, user.followers.all(), notificationHelper.NotificationMessages.JOIN, club )
+    notify.send(user, recipient=user.followers.all(), verb=notificationHelper.NotificationMessages.JOIN, action_object=club, description='user-event-C' )      
+
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
 
@@ -516,8 +504,10 @@ def withdraw_club(request, club_id):
         return redirect('club_page', club_id)
 
     club.members.remove(user)
-    delete_event('U', 'C', Event.EventType.JOIN, user=user, club=club)
-    create_event('U', 'C', Event.EventType.WITHDRAW, user=user, club=club)
+    notificationHelper = NotificationHelper()
+    notificationHelper.delete_notifications(user, user.followers.all(), notificationHelper.NotificationMessages.WITHDRAW, club )
+    notify.send(user, recipient=user.followers.all(), verb=notificationHelper.NotificationMessages.WITHDRAW, action_object=club, description='user-event-C' )  
+    
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
@@ -757,8 +747,9 @@ def accept_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.members.add(applicant)
         club.applicants.remove(applicant)
-        create_event('U', 'C', Event.EventType.JOIN, user=applicant, club=club)
+        notify.send(applicant, recipient=applicant.followers.all(), verb=NotificationHelper().NotificationMessages.JOIN, action_object=club, description='user-event-C' )      
         messages.add_message(request, messages.SUCCESS, "Applicant accepted!")
+        notify.send(current_user, recipient=applicant, verb= NotificationHelper().NotificationMessages.ACCEPT, action_object=club, description='notification' )
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -774,6 +765,7 @@ def reject_applicant(request, club_id, user_id):
     if(current_user == club.owner):
         club.applicants.remove(applicant)
         messages.add_message(request, messages.WARNING, "Applicant rejected!")
+        notify.send(current_user, recipient=applicant, verb=NotificationHelper().NotificationMessages.REJECT, action_object=club,  description='notification')
         return redirect('applicants_list', club_id)
     else:
         messages.add_message(request, messages.ERROR,
@@ -820,7 +812,7 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         self.club = self.get_object()
         member = form.cleaned_data.get("new_owner")
         self.club.make_owner(member)
-        create_event('C', 'U', Event.EventType.TRANSFER, club=self.club, action_user=member)
+        notify.send(self.club, recipient=self.club.members.all(), verb=NotificationHelper().NotificationMessages.TRANSFER, action_object=member, description='club-event-U' )      
             
         current_site = get_current_site(self.request)
         subject = self.club.name + ' Club updates'
@@ -936,7 +928,7 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
             deadline = timedelta(7).total_seconds() #0.00069444
             Timer(deadline, MeetingHelper().assign_rand_book, [meeting, self.request]).start()
 
-        create_event('C', 'M', Event.EventType.SCHEDULE, club=self.club, meeting=meeting)
+        notify.send(self.club, recipient=self.club.members.all(), verb=NotificationHelper().NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
         messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")
         return redirect('club_page', club_id=self.club_id)
 
@@ -1003,7 +995,10 @@ def choose_book(request, book_id, meeting_id):
             all_mem=True
         )
 
-        messages.add_message(request, messages.SUCCESS, "Book has been chosen!")
+        messages.add_message(request, messages.SUCCESS,
+                             "Book has been chosen!")
+        notify.send(meeting, recipient=meeting.club.members.all(), verb=NotificationHelper().NotificationMessages.CHOICE, action_object=book, description='club-event-B' )      
+
         return redirect('club_page', club_id=meeting.club.id)
     else:
         raise Http404
@@ -1018,7 +1013,9 @@ def add_book_to_list(request, book_id):
     else:
         book.add_reader(user)
         request.user.add_book_to_all_books(book)
-        create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
+        notificationHelper = NotificationHelper()
+        notificationHelper.delete_notifications(user, user.followers.all(), notificationHelper.NotificationMessages.ADD, book )
+        notify.send(user, recipient=user.followers.all(), verb=notificationHelper.NotificationMessages.ADD, action_object=book, description='user-event-B' )      
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
@@ -1050,12 +1047,15 @@ def edit_review(request, review_id):
 def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
+    notificationHelper = NotificationHelper()
+
     if(not current_user.is_following(followee)):
-        create_event('U', 'U', Event.EventType.FOLLOW,
-                     current_user, action_user=followee)
+        notificationHelper.delete_notifications(current_user, [followee], notificationHelper.NotificationMessages.FOLLOW )
+        notify.send(current_user, recipient=followee, verb=notificationHelper.NotificationMessages.FOLLOW,  description='notification' )
     else:
-        delete_event('U', 'U', Event.EventType.FOLLOW,
-                     current_user, action_user=followee)
+        
+        notificationHelper.delete_notifications(current_user, [followee], notificationHelper.NotificationMessages.FOLLOW )
+
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
@@ -1204,6 +1204,13 @@ class MeetingsListView(LoginRequiredMixin, ListView):
 
         return context
 
+
+@login_required
+def mark_as_read(request, slug=None):
+    notification_id = slug2id(slug)
+    notification = get_object_or_404(Notification, recipient=request.user, id=notification_id)
+    notification.mark_as_read()
+    return NotificationHelper().get_appropriate_redirect(notification)
 
 class PreviousMeetingsList(LoginRequiredMixin, ListView):
     template_name = 'meetings_list.html'

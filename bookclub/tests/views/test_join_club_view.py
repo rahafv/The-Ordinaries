@@ -1,7 +1,7 @@
 """Tests of the join club view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club, Event
+from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
@@ -21,6 +21,8 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.member = User.objects.get(username="peterpickles")
         self.user = User.objects.get(username="edgaralen")
         self.applicant = User.objects.get(username = "willsmith")
+        self.follower = User.objects.get(username = "willsmith")
+        self.follower.toggle_follow(self.user)
 
 
     def test_join_url(self):
@@ -52,11 +54,11 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
     def test_non_member_successful_join_club(self):
         self.client.login(username=self.user.username, password="Password123")
         members_before_count = self.club.member_count()
-        events_before_count = Event.objects.count() 
+        events_before_count =  self.follower.notifications.unread().count()
         response = self.client.get(self.url, follow=True)
         self.assertTrue(self.club.is_member(self.user))
         self.assertEqual(members_before_count + 1, self.club.member_count())
-        self.assertEqual(events_before_count + 1, Event.objects.count())
+        self.assertEqual(events_before_count + 1, self.follower.notifications.unread().count())
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assert_success_message(response)

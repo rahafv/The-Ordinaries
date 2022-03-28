@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
-from bookclub.models import User, Book, Event
+from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
 class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
