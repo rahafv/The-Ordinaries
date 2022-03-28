@@ -58,9 +58,6 @@ class EditRatingFormTestCase(TestCase):
 
     def test_edit_review_form_must_save_correctly_and_rating_can_be_empty(self):
         form = EditRatingForm(review=self.review, data=self.updated_form_input)
-        form.save() ,
-        user = User.objects.get(id=1)
-        book = Book.objects.get(id=1)
         form.save()
         self.assertTrue(form.is_valid())
 

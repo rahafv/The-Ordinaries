@@ -63,7 +63,8 @@ urlpatterns = [
 
     # path('initial_genres/', views.initial_genres, name ='initial_genres'),
     path('initial_genres/', views.InitialGenresView.as_view(), name ='initial_genres'),
-    path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
+    # path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
+    path('initial_genres/books', views.InitialBookListView.as_view(), name ='initial_book_list'),
 
     path('club/<int:club_id>/join_club', views.join_club, name='join_club'),
     path('club/<int:club_id>/withdraw_club', views.withdraw_club, name='withdraw_club'),

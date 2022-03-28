@@ -1243,27 +1243,29 @@ class InitialBookListView(TemplateView):
             for genre in genres:
                 my_books = my_books.filter(genre__contains=genre)
 
-        context['my_books'] = my_books
+        sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+
+        context['my_books'] = sorted_books
         context['list_length'] = len(current_user.books.all())
         context['genres'] = genres
         return context
 
 
-@login_required
-def initial_book_list(request):
-    current_user = request.user
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
+# @login_required
+# def initial_book_list(request):
+#     current_user = request.user
+#     already_selected_books = current_user.books.all()
+#     my_books = Book.objects.all().exclude(id__in=already_selected_books)
 
-    genres = request.GET.getlist('genre')
-    if genres:
-        for genre in genres:
-            my_books = my_books.filter(genre__contains=genre)
+#     genres = request.GET.getlist('genre')
+#     if genres:
+#         for genre in genres:
+#             my_books = my_books.filter(genre__contains=genre)
 
-    sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
+#     sorted_books = my_books.order_by('-average_rating','-readers_count')[:8]
 
-    list_length = len(current_user.books.all())
-    return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
+#     list_length = len(current_user.books.all())
+#     return render(request, 'initial_book_list.html', {'my_books':sorted_books , 'list_length':list_length, 'genres':genres})
 
 @login_required
 def delete_club(request, club_id):
