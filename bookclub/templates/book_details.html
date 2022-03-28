@@ -84,9 +84,13 @@
                         </div> 
                         <div class= "review-body mt-2">
                           <p>
-                            <label for="progress" class="form-label">{{user_progress.label}} of book read:</label>
-                            <input class="text-center mb-2" style="width: 35px; border: #fff; background-color: #fff;" disabled type="text" id="textInput" value="{{user_progress.progress}}">%
-                            <input type="range" class="form-range" min="0" max="100" step="0.5" id="progress" disabled value="{{user_progress.progress}}">
+                            <label for="progress" class="form-label"style="font-size:14px" >{{user_progress.label}} of book read:</label>
+                            {% if user_progress.label == "Percent" %}
+                              <input class="text-center mb-2" style="width: 35px; border: #fff; background-color: #fff;" disabled type="text" id="textInput" value="{{user_progress.progress}}">%
+                              <input type="range" class="form-range" min="0" max="100" step="0.5" id="progress" disabled value="{{user_progress.progress}}">
+                            {% elif user_progress.label == "Pages" %}
+                              <small style="font-size:14px">&emsp;{{user_progress.progress}}</small>
+                            {% endif %}
                           </p> 
                           {% if user_progress.comment%}
                           <p style="font-size:16px;">{{user_progress.comment}}</p> 
@@ -111,51 +115,7 @@
                 <!-- COLLAPSE FOR PROGRESS -->
                 <div class="collapse" id="update-progress">
                  <div class="card card-body mb-3 pb-0 ">
-                  <form action="{% url 'book_details' book.id %}" method="GET" class = "text-black" style="text-align: center;">
-                    {% csrf_token %}
-                    <h5 class = "mt-2 mb-3 ms-2 " style="font-size: 16px;"> 
-                      <div class="accordion accordion-flush" id="accordionFlushProgress">
-                        <!-- PERCENT SELECTED -->
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="flush-Percent">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsePercent" aria-expanded="false" aria-controls="flush-collapsePercent">
-                              Percents
-                            </button>
-                          </h2>
-                          <div id="flush-collapsePercent" class="accordion-collapse collapse" aria-labelledby="flush-Percent" data-bs-parent="#accordionFlushProgress">
-                            <div class="accordion-body">
-                              <div class="form-control text-center">
-                                <label for="progressPercent" class="form-label">Percentage of book read:</label>
-                                <input class="text-center mb-2" style="width: 35px; border: #fff; background-color: #fff;" disabled type="text" id="textInput" value="50">%
-                                <input type="range"  name="progress-percent" class="form-range" min="0" max="100" step="0.5" id="progressPercent" onchange="updateTextInput(this.value);">
-                                 <!-- COMMENT -->
-                                <textarea id="progressComment" name="progress-comment-percent" rows="4" class="form-control  mb-3 mt-3"style = "max-width: 360px" placeholder="How's the book?"></textarea>
-                              </div>
-                            </div>
-                        </div> 
-
-                        <!-- PAGES SELECTED -->
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="flush-Pages">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsePages" aria-expanded="false" aria-controls="flush-collapsePages">
-                              Pages
-                            </button>
-                          </h2>
-                          <div id="flush-collapsePages" class="accordion-collapse collapse" aria-labelledby="flush-Pages" data-bs-parent="#accordionFlushProgress">
-                            <div class="accordion-body">
-                              <div class="form-control text-center">
-                                <label for="progressPages" class="form-label">Pages of book read:</label>
-                                <input class="text-center mb-2 text-black" style="width: 100px; background-color:#eceae8; border:#fff"  type="text"  name="progress-pages" id="progressPages">
-                                 <!-- COMMENT -->
-                                <textarea id="progressComment" name="progress-comment-pages" rows="4" class="form-control  mb-3 mt-3"style = "max-width: 360px" placeholder="How's the book?"></textarea>
-                              </div>
-                            </div>
-                          </div>
-                        </div> 
-                      </div>
-                    </h5>
-                    <input type="submit" value="Update Progress" class="btn btn-dark mb-3 ms-2">
-                  </form>
+                  {% include 'partials/book_progress_form.html' with book_id=book.id%}
                  </div> 
                 </div>
               </div>

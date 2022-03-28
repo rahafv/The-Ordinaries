@@ -345,17 +345,16 @@ def book_details(request, book_id):
     reviews_count = book.ratings.all().count()
 
     user_progress = False
-    if request.method == "GET":
-        progress_pages = request.GET.get('progress-pages')
-        progress_percent = request.GET.get('progress-percent')
-
-        if progress_percent is not None:
-            comment = request.GET.get("progress-comment-percent")
-            user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
-        elif progress_pages is not None:
-            comment = request.GET.get("progress-comment-pages")
+    if request.method == "POST":
+        progress_pages = request.POST.get('progress-pages','')
+        if progress_pages is not '':
+            comment = request.POST.get("progress-comment-pages")
             user_progress = {'comment': comment, 'progress': progress_pages, 'label': "Pages"}
-
+        else:
+            progress_percent = request.POST.get('progress-percent')
+            comment = request.POST.get("progress-comment-percent")
+            user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
+                
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings, 'user_progress':user_progress}
