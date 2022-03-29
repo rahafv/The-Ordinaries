@@ -35,7 +35,6 @@ class SignUpForm(forms.ModelForm):
         self.fields['new_password'].widget.attrs['placeholder'] = '*********'
         self.fields['password_confirmation'].widget.attrs['placeholder'] = '*********'
 
-    
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
@@ -183,7 +182,6 @@ class BookForm(forms.ModelForm):
         model = Book
         fields = ['ISBN','title','author', 'genre', 'image_url', 'description']
 
-
     def clean(self):
         self.oldISBN = self.cleaned_data.get('ISBN')
         if self.oldISBN:
@@ -206,7 +204,6 @@ class BookForm(forms.ModelForm):
         )
         return book
 
-
 class UserForm(forms.ModelForm):
     """Form to update user profile."""
 
@@ -224,7 +221,6 @@ class UserForm(forms.ModelForm):
         self.log_in_user = kwargs.pop('user',None)
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['region'].widget.attrs['placeholder'] = 'State, Province or County'
-
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
@@ -260,7 +256,6 @@ class UserForm(forms.ModelForm):
         self.log_in_user.set_age(new_age)
         return self.log_in_user
 
-
 class EditRatingForm(forms.ModelForm):
     """Form to update club information."""
 
@@ -268,7 +263,6 @@ class EditRatingForm(forms.ModelForm):
 
         model = Rating
         fields = ['rating', 'review']
-
 
     def calculate_rating(self, rating):
         return rating*2
@@ -283,7 +277,6 @@ class EditRatingForm(forms.ModelForm):
         review_obj.review=self.cleaned_data.get('review')
         review_obj.save()    
          
-
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
     
@@ -294,7 +287,6 @@ class RatingForm(forms.ModelForm):
         widgets = {
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
-
 
     def save(self, reviwer, reviewedBook):
         """Create a new rating."""
@@ -330,8 +322,7 @@ class UsersSortForm(forms.Form):
     )
 
     widgets = {'sort': forms.Select()}       
-   
-   
+    
 class ClubsSortForm(forms.Form):
 
     ASC_DATE = "date_asc"
@@ -354,7 +345,6 @@ class ClubsSortForm(forms.Form):
       widget=forms.Select(),
     )
 
-   
 class BooksSortForm(forms.Form):
 
     ASC_NAME = 'name_asc'
@@ -377,7 +367,6 @@ class BooksSortForm(forms.Form):
       widget=forms.Select(),
     )
 
- 
 class MeetingForm(forms.ModelForm):
     """Form to update club information."""
 
