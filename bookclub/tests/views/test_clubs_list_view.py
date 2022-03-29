@@ -28,8 +28,6 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_clubs_list_url(self):
         self.assertEqual(self.url,f'/clubs/')
 
-    def test_get_clubs_list_redirects_when_not_logged_in(self):
-       self.assert_redirects_when_not_logged_in()
 
     def test_get_user_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')

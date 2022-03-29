@@ -75,25 +75,25 @@
       {%endfor%}
     </div>
 
-
-
-   
     <hr class="featurette-divider">
-    <div class="row g-20">
-      <div class="col-md-8">
-        
-        <h1>Feed</h1>
-            {% include 'partials/events_as_table.html' with user_events=user_events%}
-      </div>
-      <div class="col-md-4">
-        <div class="position-sticky" style="top: 10rem;">
-          <div class="p-4 mb-3 bg-light-blue rounded">
-            <h4 class="fst-italic">Club Updates</h4>
-            {% include 'partials/events_as_list.html' with club_events=club_events%}
+    {%if request.user.is_authenticated%}
+      <div class="row g-20">
+        <div class="col-md-8">
+          
+          <h1>Feed</h1>
+              {% include 'partials/events_as_table.html' with user_events=user_events%}
+        </div>
+        <div class="col-md-4">
+          <div class="position-sticky" style="top: 10rem;">
+            <div class="p-4 mb-3 bg-light-blue rounded">
+              <h4 class="fst-italic">Club Updates</h4>
+              {% include 'partials/events_as_list.html' with club_events=club_events%} 
+              
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {%endif%}
     
     </div>
   </div>

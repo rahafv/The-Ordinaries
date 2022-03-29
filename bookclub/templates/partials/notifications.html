@@ -1,0 +1,29 @@
+{% load notifications_tags %}
+
+
+<a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    {%if request.user.get_notifications %} 
+        <span  class="bi-bell" style="color: red;"> 
+    {%else%} 
+        <span  class="bi-bell">
+    {%endif%}
+    {{request.user.get_notifications.count}}</span>
+
+</a>
+
+<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" style="max-height: 300px; overflow-y:auto">
+    {%if request.user.get_notifications %}
+        {% for notification in  request.user.get_notifications %}
+            <div  style="text-align:center">
+                <a class="dropdown-item" href="{% url 'mark_as_read' notification.slug%}" type="button" > 
+                    {{ notification.actor}} 
+                    {{notification.verb}}
+                    {%if notification.action_object%} {{notification.action_object.name}} {%endif%} 
+                </a>
+                <div class="dropdown-divider"></div>
+            </div>
+        {% endfor %}
+    {%else %}
+        <div style="text-align:center"> No notifications</div>
+    {%endif%}
+</ul>

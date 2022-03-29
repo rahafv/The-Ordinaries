@@ -37,8 +37,6 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')  
         self.assert_menu(response)
 
-    def test_get_books_list_redirects_when_not_logged_in(self):
-       self.assert_redirects_when_not_logged_in()
 
     def test_get_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
