@@ -66,8 +66,8 @@ class Command(BaseCommand):
     
             for row in users_data:
 
-                if row[10].isdigit():
-                    age = int(row[10])
+                if row[2].isdigit():
+                    age = int(row[2])
                 else:
                     age = None
 
@@ -77,9 +77,9 @@ class Command(BaseCommand):
                     username = row[5],
                     email = row[5]+"@example.org",
                     age = age,
-                    city = self.get_city(row[8]),
-                    region = self.get_region(row[8]),
-                    country = self.get_country(row[8]),
+                    city = self.get_city(row[6]),
+                    region = self.get_region(row[6]),
+                    country = self.get_country(row[6]),
                     bio = row[4],
                     password = Command.DEFAULT_PASSWORD,
                     email_verified = True,
@@ -140,7 +140,7 @@ class Command(BaseCommand):
                     club_type = 'Public'
                 
                 club = Club(
-                    name = col[4] + " club",
+                    name = col[0] + " club",
                     owner = User.objects.get(id = self.user_ids[rand_id]),
                     theme = col[1],
                     club_type = club_type,

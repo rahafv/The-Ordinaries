@@ -4,7 +4,7 @@
 
 
 <div class="container">
-  <div id='third' class="row mt-3" style='display:none; background-color:gainsboro;'>
+  <div id='recommendations' class="row mt-3" style='display:none; background-color:gainsboro;'>
     <h5 style='padding-top: 30px; padding-left: 60px;'>You might also like.. </h5>
     <div class='row mb-4 text-center' style=" text-align:center">
         {% for rec in recs %}
@@ -26,7 +26,7 @@
           <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill"
           style="font-size: 1.8rem; color: green;"></a>
           {% else %}
-            <a href='{% url 'add_book_to_list' book_id=book.id %}#third' class="bi-bookmark-plus"
+            <a href='{% url 'add_book_to_list' book_id=book.id %}#recommendations' class="bi-bookmark-plus"
             style="font-size: 1.8rem; color: grey;"></a>
           {% endif %}
         </span>
@@ -146,7 +146,7 @@
 <script>
 
   var currentPath = window.location.hash;
-  if(currentPath.substring(1) == 'third'){
+  if(currentPath.substring(1) == 'recommendations'){
     const targetDiv = document.getElementById(currentPath.substring(1));
 
     if (targetDiv.style.display === "none") {
