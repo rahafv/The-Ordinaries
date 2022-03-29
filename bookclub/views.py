@@ -1156,10 +1156,10 @@ class AddReviewView(LoginRequiredMixin, FormView):
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
 
-    def get(self, *args, **kwargs):
-        """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = self.kwargs.get('book_id', None)
-        return super().get(self, *args, **kwargs)
+    # def get(self, *args, **kwargs):
+    #     """Retrieves the book_id from url and stores it in self for later use."""
+    #     self.book_id = self.kwargs.get('book_id', None)
+    #     return super().get(self, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -1178,11 +1178,9 @@ class AddReviewView(LoginRequiredMixin, FormView):
         if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
             return HttpResponseForbidden()
 
-        # form.instance.user = self.review_user
-        # form.instance.book = self.reviewed_book
         form.save()
         self.review_user.add_book_to_all_books(self.reviewed_book)
-
+        notify.send(self.review_user, recipient=self.review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=self.reviewed_book, description='user-event-B' )
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
 
         self.reviewed_book.calculate_average_rating()
@@ -1196,30 +1194,30 @@ class AddReviewView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
-@login_required
-def add_review(request, book_id):
-    reviewed_book = get_object_or_404(Book.objects, id=book_id)
-    review_user = request.user
-    if reviewed_book.ratings.all().filter(user=review_user).exists():
-        return HttpResponseForbidden()
+# @login_required
+# def add_review(request, book_id):
+#     reviewed_book = get_object_or_404(Book.objects, id=book_id)
+#     review_user = request.user
+#     if reviewed_book.ratings.all().filter(user=review_user).exists():
+#         return HttpResponseForbidden()
 
-    if request.method == 'POST':
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            form.instance.user = review_user
-            form.instance.book = reviewed_book
-            form.save(review_user, reviewed_book)
-            review_user.add_book_to_all_books(reviewed_book)
-            notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )
-            messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
+#     if request.method == 'POST':
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             form.instance.user = review_user
+#             form.instance.book = reviewed_book
+#             form.save(review_user, reviewed_book)
+#             review_user.add_book_to_all_books(reviewed_book)
+#             notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )
+#             messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
 
-            reviewed_book.calculate_average_rating()
+#             reviewed_book.calculate_average_rating()
 
-            return redirect('book_details', book_id=reviewed_book.id)
+#             return redirect('book_details', book_id=reviewed_book.id)
 
-    messages.add_message(request, messages.ERROR,
-                         "Review cannot be over 250 characters!")
-    return render(request, 'book_details.html', {'book': reviewed_book})
+#     messages.add_message(request, messages.ERROR,
+#                          "Review cannot be over 250 characters!")
+#     return render(request, 'book_details.html', {'book': reviewed_book})
 
 
 """Enable user to follow and unfollow other users."""

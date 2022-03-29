@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from bookclub.forms import ClubsSortForm, UsersSortForm, BooksSortForm
 from bookclub.models import User, Club, Book
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 from system import settings
@@ -13,6 +14,11 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('search_page')
         self.BOOKS_PER_PAGE = 15
 
+        self.invalid_form_input = {
+            'sort': 'name', 
+            'category': 'club-name',
+            'searched':'The',
+            }
         self.user_name_form_input = {
             'category': 'user-name',
             'searched':'joe',
@@ -134,6 +140,16 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
         self.assertContains(response, "You forgot to search!")
+        self.assert_menu(response)
+
+    def test_search_with_invalid_sort_form(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.user_name_form_input['searched'] = ''
+        response = self.client.get(self.url, self.invalid_form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'search_page.html')
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
         self.assert_menu(response)
 
 
