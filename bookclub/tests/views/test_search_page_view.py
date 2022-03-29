@@ -47,7 +47,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
        self.assert_redirects_when_not_logged_in()
 
     def test_search_page_url(self):
-        self.assertEqual(self.url,f'/search_page')
+        self.assertEqual(self.url,f'/search_page/')
 
     def test_search_users_with_name(self):
         self._create_test_users()

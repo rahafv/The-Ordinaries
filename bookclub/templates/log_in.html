@@ -21,7 +21,7 @@
                                     <input type="hidden" name="next" value="{{ next }}">
                                     <input type="submit" class="btn bg-dark-blue mb-3; text-white" style = "font-size:16px" value="Log in">
                                     {% if form.is_valid %}
-                                    <a href='{% url 'send_verification' user.id %}' class="btn btn-outline-secondary " style="color: grey" >Resend verification</a>  
+                                    <a href='{% url 'send_activation' user.id %}' class="btn btn-outline-secondary " style="color: grey" >Resend verification</a>  
                                     {% endif %}
                                 </form>
                             </div>

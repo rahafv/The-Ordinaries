@@ -4,7 +4,6 @@ from django.urls import reverse
 from bookclub.models import User
 from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin
 
-
 class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Tests of the log out view."""
     
@@ -14,7 +13,7 @@ class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTeste
         self.url = reverse('log_out')
 
     def test_log_out_url(self):
-        self.assertEqual(self.url,'/log_out/')
+        self.assertEqual(self.url,'/LogOut/')
 
     def test_get_log_out(self):
         self.client.login(username='johndoe', password='Password123')

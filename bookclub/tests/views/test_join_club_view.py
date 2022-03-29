@@ -22,9 +22,8 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.user = User.objects.get(username="edgaralen")
         self.applicant = User.objects.get(username = "willsmith")
 
-
     def test_join_url(self):
-        self.assertEqual(self.url, f"/club/{self.club.id}/join_club")
+        self.assertEqual(self.url, f"/club/{self.club.id}/join/")
 
     def test_owner_cannot_join_club(self):
         self.client.login(username=self.owner.username, password="Password123")
@@ -37,7 +36,6 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.assert_error_message(response)
         self.assert_menu(response)
         
-
     def test_member_cannot_join_club(self):
         self.client.login(username=self.member.username, password="Password123")
         before_count = self.club.member_count()
@@ -106,6 +104,5 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.assertEqual(response.status_code, 404)
         self.assertFalse(self.club.is_member(self.user))
 
-  
     def test_join_club_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
