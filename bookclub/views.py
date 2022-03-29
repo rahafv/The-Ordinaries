@@ -912,7 +912,7 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
             rec_book = get_recommender_books(self.request, True, 1, club_id=meeting.club.id)[0]
                         
             deadline = timedelta(7).total_seconds()  # 0.00069444
-            Timer(deadline, MeetingHelper().assign_rand_book,[meeting, rec_book, self.request]).start()
+            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, rec_book, self.request]).start()
 
         notify.send(self.club, recipient=self.club.members.all(), verb=NotificationHelper().NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
         messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")

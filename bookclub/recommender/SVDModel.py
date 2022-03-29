@@ -1,3 +1,5 @@
+from datetime import timedelta
+from threading import Timer
 import pandas as pd
 from bookclub.models import Rating, User
 from surprise import Dataset, SVD, Reader
@@ -7,21 +9,27 @@ from operator import itemgetter
 import heapq
 
 
-class ItemBasedModel:
+class SVDModel:
     def __init__(self, recHelper):
-        print("here: ", recHelper.counter)
+        self.trainset = recHelper.trainset
+        self.similarity_matrix = recHelper.similarity_matrix
+
         if recHelper.counter == 0:
-            self.trainset = self.load_dataset().build_full_trainset()
-            recHelper.set_trainset(self.trainset)
+            if self.trainset == None:
+                self.train(recHelper)
+            else:
+                print("here")
+                startTime = timedelta(0.00001157).total_seconds()
+                Timer(startTime, self.train, [recHelper]).start()
+                
+            recHelper.increment_counter()   
 
-            self.similarity_matrix = SVD().fit(self.trainset).compute_similarities()
-            recHelper.set_similarity_matrix(self.similarity_matrix)
+    def train(self, recHelper):
+        self.trainset = self.load_dataset().build_full_trainset()
+        recHelper.set_trainset(self.trainset)
 
-            recHelper.increment_counter()
-        
-        else:
-            self.trainset = recHelper.trainset
-            self.similarity_matrix = recHelper.similarity_matrix
+        self.similarity_matrix = SVD().fit(self.trainset).compute_similarities()
+        recHelper.set_similarity_matrix(self.similarity_matrix)         
 
     def load_dataset(self):
         

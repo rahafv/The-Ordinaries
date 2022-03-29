@@ -2,15 +2,15 @@ from collections import Counter
 from functools import reduce
 import random
 from bookclub.models import Book, Club, Rating, User
-from .itemBasedModel import ItemBasedModel
-from .contentBasedModel import ContentBasedModel
+from .SVDModel import SVDModel
+from .GenreSimilarityModel import GenreSimilarityModel
 
 
 class Recommendation:
     def __init__(self, isItemBased, recHelper):
         if isItemBased:
-            self.item_based = ItemBasedModel(recHelper)
-        self.content_based = ContentBasedModel()
+            self.item_based = SVDModel(recHelper)
+        self.content_based = GenreSimilarityModel()
 
     def get_recommendations(self, request, num_of_rec, user_id=None, book_id=None, club_id=None):
         recommendations = []

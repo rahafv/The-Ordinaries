@@ -3,7 +3,7 @@ import math
 from bookclub.models import Book, User
 
 
-class ContentBasedModel:
+class GenreSimilarityModel:
     
     def get_recommendations_for_book(self, user_id, book_id):
         book = Book.objects.get(id=book_id)
