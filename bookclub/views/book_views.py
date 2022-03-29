@@ -1,24 +1,27 @@
 from bookclub.forms import BookForm, RatingForm , EditRatingForm, BooksSortForm
-from bookclub.helpers import create_event, SortHelper
-from bookclub.models import User, Book, Event, Rating, Club
+from bookclub.helpers import SortHelper
+from bookclub.models import User, Book, Rating, Club
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from system import settings
 from django.utils.decorators import method_decorator
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
-class AddBookView(FormView):
+class AddBookView(LoginRequiredMixin, FormView):
+    """Add a book to the site."""
+
     form_class = BookForm
     template_name = 'add_book.html'
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    # @method_decorator(login_required)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.book = form.save()
@@ -27,18 +30,21 @@ class AddBookView(FormView):
     def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
-class BookDetailsView(DetailView, FormMixin):
+class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
+    """Show individual book details."""
+
     model = Book
     template_name = 'book_details.html'
     context_object_name = 'book'
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    # @method_decorator(login_required)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
@@ -55,18 +61,20 @@ class BookDetailsView(DetailView, FormMixin):
         context['numberOfRatings'] = book.ratings.all().count()
         return context
 
-class BookListView(ListView):
+class BookListView(LoginRequiredMixin, ListView):
+    """Show a list of books in book list / club / user."""
+
     model = Book
     template_name = 'books.html'
     form_class = BooksSortForm()
     paginate_by = settings.BOOKS_PER_PAGE
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    # @method_decorator(login_required)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
+        """Retrieves the club_id and user_id from url and stores them in self for later use."""
         self.club_id = kwargs.get('club_id')
         self.user_id = kwargs.get('user_id')
         return super().get(request, *args, **kwargs)
@@ -99,34 +107,17 @@ class BookListView(ListView):
         context['count'] = books_queryset.count()
         return context
 
-@login_required
-def add_book_to_list(request, book_id):
-    book = get_object_or_404(Book.objects, id=book_id)
-    user = request.user
-    if book.is_reader(user):
-        book.remove_reader(user)
-        messages.add_message(request, messages.SUCCESS, "Book Removed!")
-    else:
-        book.add_reader(user)
-        request.user.add_book_to_all_books(book)
-        create_event('U', 'B', Event.EventType.ADD, user=user, book=book)
-        messages.add_message(request, messages.SUCCESS, "Book Added!")
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+class AddReviewView(LoginRequiredMixin, FormView):
+    """View to Add a book review."""
 
-class AddReviewView(FormView):
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
-    context_object_name = 'book'
     form_class = RatingForm
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
+    def get(self, *args, **kwargs):
         """Retrieves the book_id from url and stores it in self for later use."""
         self.book_id = kwargs.get('book_id')
-        return super().get(self, request, *args, **kwargs)
+        return super().get(self, *args, **kwargs)
 
     def form_valid(self, form):
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
@@ -139,7 +130,6 @@ class AddReviewView(FormView):
         form.save(self.review_user, self.reviewed_book)
         self.review_user.add_book_to_all_books(self.reviewed_book)
 
-        create_event('U', 'B', Event.EventType.REVIEW, user=self.review_user, book=self.reviewed_book)
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
 
         self.reviewed_book.calculate_average_rating()
@@ -153,32 +143,7 @@ class AddReviewView(FormView):
     def get_success_url(self):
         return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
-@login_required
-def add_review(request, book_id):
-    reviewed_book = get_object_or_404(Book.objects, id=book_id)
-    review_user = request.user
-    if reviewed_book.ratings.all().filter(user=review_user).exists():
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            form.instance.user = review_user
-            form.instance.book = reviewed_book
-            form.save(review_user, reviewed_book)
-            review_user.add_book_to_all_books(reviewed_book)
-            create_event('U', 'B', Event.EventType.REVIEW, user=review_user, book=reviewed_book)
-            messages.add_message(request, messages.SUCCESS, "you successfully submitted the review.")
-
-            reviewed_book.calculate_average_rating()
-
-            return redirect('book_details', book_id=reviewed_book.id)
-
-    messages.add_message(request, messages.ERROR,
-                         "Review cannot be over 250 characters.")
-    return render(request, 'book_details.html', {'book': reviewed_book})
-
-class EditReviewView(UpdateView):
+class EditReviewView(LoginRequiredMixin, UpdateView):
     """View to edit the user's review."""
 
     model = Rating
@@ -186,9 +151,9 @@ class EditReviewView(UpdateView):
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    # @method_decorator(login_required)
+    # def dispatch(self, request, *args, **kwargs):
+    #     return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

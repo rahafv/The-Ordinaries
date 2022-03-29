@@ -1183,7 +1183,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
+        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 @login_required
 def add_review(request, book_id):
