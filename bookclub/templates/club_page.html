@@ -104,7 +104,7 @@
 
                 <!-- JOIN BUTTON -->
                   {% if not user == club.owner and not is_member and not is_applicant%}
-                      {% if user.city == club.city or not request.user.is_authenticated%}
+                      {% if user.city == club.city  or user.city == None  or club.city == "" or not request.user.is_authenticated  %}
 
                         <a  class="list-group-item join" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
                           <i class="fe-icon-map-pin"></i>Join club
