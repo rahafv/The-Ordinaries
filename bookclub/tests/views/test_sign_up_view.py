@@ -37,7 +37,6 @@ class SignUpViewTestCase(TestCase, LogInTester,MenuTestMixin):
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertFalse(form.is_bound)
-        self.assert_no_menu(response)
 
     def test_unsuccesful_sign_up(self):
         self.form_input['email'] = 'bademail'
@@ -51,7 +50,6 @@ class SignUpViewTestCase(TestCase, LogInTester,MenuTestMixin):
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertTrue(form.is_bound)
         self.assertFalse(self._is_logged_in())
-        self.assert_no_menu(response)
 
     def test_succesful_sign_up(self):
         before_count = User.objects.count()

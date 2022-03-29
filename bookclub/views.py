@@ -38,21 +38,23 @@ from django.views.generic.base import TemplateView
 from django.views.generic import ListView
 
 
-@login_prohibited
-def welcome(request):
-    return render(request, 'welcome.html')
 
 
-@login_required
 def home(request):
     current_user = request.user
-    notifications = current_user.notifications.unread()
-    user_events = notifications.filter(description__contains ='user-event')[:25]
-    club_events = notifications.filter(description__contains='club-event')[:10]
-
-    already_selected_books = current_user.books.all()
-    my_books = Book.objects.all().exclude(id__in=already_selected_books)
-    top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+    if current_user.is_authenticated:
+        notifications = current_user.notifications.unread()
+        user_events = notifications.filter(description__contains ='user-event')[:25]
+        club_events = notifications.filter(description__contains='club-event')[:10]
+        already_selected_books = current_user.books.all()
+        my_books = Book.objects.all().exclude(id__in=already_selected_books)
+        top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+    else: 
+        notifications = None
+        user_events = []
+        club_events = []
+        books = Book.objects.all()
+        top_rated_books = books.order_by('-average_rating','-readers_count')[:3]
 
     return render(request, 'home.html', {'user': current_user, 'user_events': list(user_events), 'club_events': list(club_events), 'club_events_length': len(club_events), 'books':top_rated_books})
 
@@ -204,7 +206,7 @@ def handler404(request, exception):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "You've been logged out!")
-    return redirect('welcome')
+    return redirect('home')
 
 
 class PasswordView(LoginRequiredMixin, FormView):
@@ -280,7 +282,7 @@ def add_review(request, book_id):
     return render(request, 'book_details.html', {'book': reviewed_book})
 
 
-class ClubPageView(LoginRequiredMixin, DetailView):
+class ClubPageView(DetailView):
     """Show individual club details."""
 
     model = Club
@@ -316,18 +318,25 @@ def add_book(request):
     return render(request, "add_book.html", {"form": form})
 
 
-@login_required
 def book_details(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     numberOfRatings=book.ratings.all().count()
     form = RatingForm()
     user = request.user
     check_reader = book.is_reader(user)
-    reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
-    rating = book.ratings.all().filter(user=request.user)
+    if user.is_authenticated:
+        reviews = book.ratings.all().exclude(review="").exclude(user=request.user)
+        rating = book.ratings.all().filter(user=request.user)
+        reviews_count = book.ratings.all().exclude(
+        review="").exclude(user=request.user).count()
+    else: 
+        reviews = book.ratings.all()
+        rating =[]
+        reviews_count = book.ratings.all().exclude(
+        review="").count()
+
     if rating:
         rating = rating[0]
-    reviews_count = book.ratings.all().count()
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
@@ -488,7 +497,6 @@ def withdraw_club(request, club_id):
     return redirect('club_page', club_id)
 
 
-@login_required
 def books_list(request, club_id=None, user_id=None):
     books_queryset = Book.objects.all()
     general = True
@@ -514,7 +522,7 @@ def books_list(request, club_id=None, user_id=None):
     return render(request, 'books.html', {'books': books, 'general': general, 'count': count, 'form': form})
 
 
-class ClubsListView(LoginRequiredMixin, ListView):
+class ClubsListView(ListView):
     """Display list of clubs."""
     
     model = Club

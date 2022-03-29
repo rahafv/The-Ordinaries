@@ -65,8 +65,7 @@ class MenuTestMixin(AssertHTMLMixin):
 
     def assert_menu(self,response):
         for url in self.menu_urls:
-            with self.assertHTML(response , f'a[href="{url}"]'):
-                pass
+            self.assertHTML(response , f'a[href="{url}"]')
 
     def assert_no_menu(self , response):
         for url in self.menu_urls:
