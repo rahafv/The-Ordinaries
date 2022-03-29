@@ -84,7 +84,7 @@ class LogInView(LoginProhibitedMixin, FormView):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, 'You have been logged out!')
-    return redirect('welcome')
+    return redirect('home')
 
 
 def send_activiation_email(request, user_id):

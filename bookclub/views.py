@@ -66,11 +66,7 @@ class LoginProhibitedMixin:
             return self.redirect_when_logged_in_url
 
 
-
-def welcome(request):
-    return render(request, 'welcome.html')
-
-class HomeView(LoginRequiredMixin, TemplateView):
+class HomeView(TemplateView):
 
     template_name = 'home.html'
 
@@ -78,16 +74,25 @@ class HomeView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
         context['user'] = current_user
-        notifications = current_user.notifications.unread()
-        user_events = notifications.filter(description__contains ='user-event')[:25]
-        club_events = notifications.filter(description__contains='club-event')[:10]
+        
+        if current_user.is_authenticated:
+            notifications = current_user.notifications.unread()
+            user_events = notifications.filter(description__contains ='user-event')[:25]
+            club_events = notifications.filter(description__contains='club-event')[:10]
+            already_selected_books = current_user.books.all()
+            my_books = Book.objects.all().exclude(id__in=already_selected_books)
+            top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+        else:
+            notifications = None
+            user_events = []
+            club_events = []
+            books = Book.objects.all()
+            top_rated_books = books.order_by('-average_rating','-readers_count')[:3]
 
-        already_selected_books = current_user.books.all()
-        my_books = Book.objects.all().exclude(id__in=already_selected_books)
         context['club_events'] = list(club_events)
         context['club_events_length'] = len(club_events)
         context['user_events'] = list(user_events)
-        context['books'] = my_books.order_by('-average_rating','-readers_count')[:3]
+        context['books'] = top_rated_books
         return context
 
 
@@ -253,7 +258,7 @@ def handler404(request, exception):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "You've been logged out!")
-    return redirect('welcome')
+    return redirect('home')
 
 
 class PasswordView(LoginRequiredMixin, FormView):
@@ -347,7 +352,7 @@ class ClubPageView(LoginRequiredMixin, DetailView):
 
         return context
 
-class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
+class BookDetailsView(DetailView, FormMixin):
     """Show individual book details."""
 
     model = Book
@@ -361,15 +366,24 @@ class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
-        rating = book.ratings.all().filter(user=user)
+
+        if user.is_authenticated:
+            reviews = book.ratings.all().exclude(review='').exclude(user=user)
+            rating = book.ratings.all().filter(user=user)
+            reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
+        else:
+            reviews = book.ratings.all()
+            rating = []
+            reviews_count = book.ratings.all().exclude(review='').count()
+
         if rating:
             rating = rating[0]
 
         context['book'] = book
         context['form'] = RatingForm()
         context['rating'] = rating
-        context['reviews'] = book.ratings.all().exclude(review='').exclude(user=user)
-        context['reviews_count'] = book.ratings.all().exclude(review='').exclude(user=user).count()
+        context['reviews'] = reviews
+        context['reviews_count'] = reviews_count
         context['reader'] = book.is_reader(user)
         context['numberOfRatings'] = book.ratings.all().count()
         return context

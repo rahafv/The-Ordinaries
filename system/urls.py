@@ -28,7 +28,7 @@ urlpatterns = [
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
 
     path('admin/', admin.site.urls),
-    path('', views.welcome,  name='welcome'),
+    path('', views.HomeView.as_view(),  name='home'),
     path('sign_up/', views.SignUpView.as_view(),  name='sign_up'),
     path('send_verification/<int:user_id>', views.send_activiation_email,  name='send_verification'),
     #path('activate_user/<uidb64>/<token>', views.activate_user,  name='activate'),
@@ -53,7 +53,8 @@ urlpatterns = [
     path('add_book/', views.AddBookView.as_view(), name ='add_book'),
     path('book/<int:book_id>/book_details', views.BookDetailsView.as_view(), name ='book_details'),
     path('book/<int:book_id>/add_review', views.AddReviewView.as_view(), name ='add_review'),
-        
+    path('book/<int:book_id>/post_progress', views.post_book_progress, name ='post_progress'),
+
     path('initial_genres/', views.InitialGenresView.as_view(), name ='initial_genres'),
     path('initial_genres/books', views.InitialBookListView.as_view(), name ='initial_book_list'),
     
