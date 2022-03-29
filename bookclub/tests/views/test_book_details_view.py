@@ -40,3 +40,8 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.assertTrue(isinstance(form, RatingForm))
         self.assertFalse(form.is_bound)
 
+    def test_book_details_with_no_authenticated_user(self): 
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'book_details.html')
+
