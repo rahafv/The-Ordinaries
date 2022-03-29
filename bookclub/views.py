@@ -19,7 +19,7 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
@@ -837,11 +837,13 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         'club':self.club
         })
 
-        email_to_members = self.club.members.exclude(id=member.id).values_list('email', flat=True)
-        email_to_owner = [member.email]
+        members_emails = self.club.members.exclude(id=member.id).values_list('email', flat=True)
+        owner_email = [member.email]
 
-        send_mail(subject, members_email_body, email_from, email_to_members)
-        send_mail(subject, owner_email_body, email_from, email_to_owner)
+        message=(subject, members_email_body, email_from, members_emails)
+        owner_message=(subject, owner_email_body, email_from, owner_email)
+
+        send_mass_mail((message,owner_message),fail_silently=False)
 
         messages.add_message(self.request, messages.SUCCESS, "Ownership transferred!")
         return super().form_valid(form)

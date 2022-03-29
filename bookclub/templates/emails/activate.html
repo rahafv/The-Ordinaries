@@ -1,14 +1,18 @@
 {% autoescape off %}
 
-
 Hello {{user.username}},
 
+Thank you for joining The Ordinaries community.
 
-Use the link below to verify your account.
+We're happy you're here. Let's get your email address verified.
 
-
+Click the link below.
 http://{{domain}}{% url 'activate' uid token %}
 
+Verifying your account enables you to have full access to the website's features.
 
+If you didn't ask to verify this account, you can ignore this email.
 
+Thanks,
+The Ordinaries team
 {% endautoescape %} 

@@ -1,5 +1,6 @@
 {% autoescape off %}
-Dear members of the {{meeting.club.name}},
+
+Greetings {{meeting.club.name}} members,
 
 A new meeting has been scheduled on {{meeting.time}}, and it will be {{meeting.club.meeting_type}}. 
 
@@ -9,7 +10,11 @@ Notes: {{meeting.notes}}
 {% endif %}
 Meeting: {{meeting.link}}
 
-The Ordinaries Book Clubs,
+
+Thanks,
+The Ordinaries team
+
 Club page: http://{{domain}}{% url 'club_page' meeting.club.id %}
+
 
 {% endautoescape %} 

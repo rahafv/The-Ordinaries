@@ -1,13 +1,17 @@
 {% autoescape off %}
-Dear members of the {{meeting.club.name}},
+
+Greetings {{meeting.club.name}} members,
 
 We would like to inform you that {{meeting.title}} meeting has been cancelled. 
 
-To see the upcoming meetings please visit the club page. 
+To view the upcoming meetings, please visit the club page. 
 
 We apologize for any inconvenience this has caused our readers.
 
-The Ordinaries Book Clubs,
+
+Thanks,
+The Ordinaries team
+
 Club page: http://{{domain}}{% url 'club_page' meeting.club.id %}
 
 {% endautoescape %} 
