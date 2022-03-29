@@ -44,4 +44,6 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'book_details.html')
-
+        form = response.context['form']
+        self.assertTrue(isinstance(form, RatingForm))
+        self.assertFalse(form.is_bound)
