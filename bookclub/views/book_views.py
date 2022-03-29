@@ -2,7 +2,6 @@ from bookclub.forms import BookForm, RatingForm , EditRatingForm, BooksSortForm
 from bookclub.helpers import SortHelper
 from bookclub.models import User, Book, Rating, Club
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseForbidden
@@ -10,7 +9,6 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from system import settings
-from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy, reverse
 
 class AddBookView(LoginRequiredMixin, FormView):
