@@ -5,10 +5,9 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from .Evaluator import Evaluator
-from surprise import KNNBasic, SVD, NormalPredictor
-from .book_rating import BookRatings
-from .genreKNN import GenreKNNAlgorithm
+from Evaluator import Evaluator
+from surprise import KNNBasic, NormalPredictor,SVD, SVDpp, KNNWithMeans, KNNWithZScore
+from book_rating import BookRatings
 
 import random
 import numpy as np
@@ -41,9 +40,17 @@ class RecModelsBakeOff:
         ItemKNN = KNNBasic(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNN")
 
-        # Content KNN
-        # genreKNN = GenreKNNAlgorithm()
-        # evaluator.AddAlgorithm(genreKNN, "Content KNN")
+        # Item-based KNNWithMeans
+        ItemKNN = KNNWithMeans(sim_options = {'name': 'cosine', 'user_based': False})
+        evaluator.AddAlgorithm(ItemKNN, "Item KNNWithMeans")
+
+        # Item-based KNNWithZScore
+        ItemKNN = KNNWithZScore(sim_options = {'name': 'cosine', 'user_based': False})
+        evaluator.AddAlgorithm(ItemKNN, "Item KNNWithZScore")
+
+        # SVD pp
+        svd = SVDpp()
+        evaluator.AddAlgorithm(svd, "SVD pp")
 
         # SVD
         svd = SVD()
@@ -54,7 +61,13 @@ class RecModelsBakeOff:
         evaluator.AddAlgorithm(Random, "Random")
 
         # Fight!
-        print('here--------------')
-        evaluator.Evaluate(False)
+        evaluator.Evaluate(True)
 
         evaluator.SampleTopNRecs(bookRatings)
+
+def main():
+    recommendations = RecModelsBakeOff()
+    recommendations.evaluate()
+
+if __name__ == "__main__":
+    main()

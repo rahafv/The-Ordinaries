@@ -5,8 +5,8 @@ import pandas as pd
 from surprise import Dataset, Reader
 
 class BookRatings:
-    ratings_path = os.path.abspath('book-review-dataset/ratings-evaluator.csv')
-    books_path = os.path.abspath('book-review-dataset/books.csv')
+    ratings_path = os.path.abspath('../book-review-dataset/ratings-evaluator.csv')
+    books_path = os.path.abspath('../book-review-dataset/books.csv')
     
     def load_dataset(self):
 

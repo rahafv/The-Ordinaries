@@ -4,8 +4,8 @@ Created on Thu May  3 10:22:34 2018
 
 @author: Frank
 """
-from .EvaluationData import EvaluationData
-from .EvaluatedAlgorithm import EvaluatedAlgorithm
+from EvaluationData import EvaluationData
+from EvaluatedAlgorithm import EvaluatedAlgorithm
 
 class Evaluator:
     
@@ -20,6 +20,8 @@ class Evaluator:
         self.algorithms.append(alg)
         
     def Evaluate(self, doTopN):
+        print("\n")
+
         results = {}
         for algorithm in self.algorithms:
             print("Evaluating ", algorithm.GetName(), "...")
@@ -36,10 +38,10 @@ class Evaluator:
                         name, metrics["RMSE"], metrics["MAE"], metrics["HR"], metrics["cHR"], metrics["ARHR"],
                                       metrics["Coverage"], metrics["Diversity"], metrics["Novelty"]))
         else:
-            print("{:<11}          {:<10}          {:<10}".format("Algorithm", "RMSE", "MAE"))
-            print("-"*51)
+            print("{:<20}          {:<10}          {:<10}".format("Algorithm", "RMSE", "MAE"))
+            print("-"*60)
             for (name, metrics) in results.items():
-                print("{:<11}          {:<10.4f}          {:<10.4f}".format(name, metrics["RMSE"], metrics["MAE"]))
+                print("{:<20}          {:<10.4f}          {:<10.4f}".format(name, metrics["RMSE"], metrics["MAE"]))
                 
 
         print("\nLegend:\n")
