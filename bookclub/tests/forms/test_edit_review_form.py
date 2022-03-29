@@ -46,21 +46,19 @@ class EditRatingFormTestCase(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_edit_review_form_must_save_correctly_but_no_new_object_created(self):
-        form = EditRatingForm(data=self.form_input)
+        form = EditRatingForm(review=self.review, data=self.form_input)
         before_count = Rating.objects.count() 
         user = User.objects.get(id=1)
         book = Book.objects.get(id=1)
-        form.save(user, book)
+        form.save()
         after_count = Rating.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(self.review.user, user)
         self.assertEqual(self.review.book, book)
 
     def test_edit_review_form_must_save_correctly_and_rating_can_be_empty(self):
-        form = EditRatingForm(data=self.updated_form_input)
-        user = User.objects.get(id=1)
-        book = Book.objects.get(id=1)
-        form.save(user, book)
+        form = EditRatingForm(review=self.review, data=self.updated_form_input)
+        form.save()
         self.assertTrue(form.is_valid())
 
       
