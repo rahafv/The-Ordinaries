@@ -32,10 +32,10 @@
                                     <td style="width: 20%; text-align:center">
                                         {% if applicant != current_user%}
                                         <td >
-                                            <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-success" style="color: green" >Accept</a> 
+                                            <a href='{% url 'accept_applicant' club.id applicant.id %}' class="btn btn-outline-success" style="color: black" >Accept</a> 
                                         </td>
                                         <td>
-                                            <a href='{% url 'reject_applicant' club.id applicant.id %}' class="btn btn-outline-danger" style="color: red" >Reject</a>   
+                                            <a href='{% url 'reject_applicant' club.id applicant.id %}' class="btn btn-outline-danger" style="color: black" >Reject</a>   
                                         </td>
                                         {% endif %}
                                     </td>

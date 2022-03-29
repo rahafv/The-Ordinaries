@@ -71,29 +71,31 @@
     
   {% else %}
   <div style="float: right; margin-top: 2rem;">
-    {% if general %}
-    <form method=GET action="{% url 'clubs_list'%}">
-      {% else %}
-      <form method=GET action="{% url 'clubs_list' user.id%}">
-        {% endif %}
-        <div style="text-align:left;">
-        Privacy:
-        <select id="privacy" name="privacy" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
-          <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
-          <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
-          <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
-        </select>
-      </div>
-      <div style="text-align:left;">
-        Ownership:
-        <select id="ownership" name="ownership" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
-          <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
-          <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
-        </select>
-      </div>
-        {% include 'partials/bootstrap_form.html' with form=form %}
-        <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; margin-left:1em"> Filter </button>
-    </form>
+    {%if request.user.is_authenticated%}
+      {% if general %}
+          <form method=GET action="{% url 'clubs_list'%}">
+            {% else %}
+            <form method=GET action="{% url 'clubs_list' user.id%}">
+              {% endif %}
+              <div style="text-align:left;">
+              Privacy:
+              <select id="privacy" name="privacy" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+                <option selected value="all" {% if privacy == 'all' %}selected{% endif %}>All</option>
+                <option value="public" {% if privacy == 'public' %}selected{% endif %}>public</option>
+                <option value="private" {% if privacy == 'private' %}selected{% endif %}>private</option>
+              </select>
+            </div>
+            <div style="text-align:left;">
+              Ownership:
+              <select id="ownership" name="ownership" size="1" style="overflow:auto;  Border: none;" class="form-control mb-3">
+                <option selected value="all" {% if ownership == 'all' %}selected{% endif %}>All</option>
+                <option value="owned" {% if ownership == 'owned' %}selected{% endif %}>Owned</option>
+              </select>
+            </div>
+              {% include 'partials/bootstrap_form.html' with form=form %}
+              <button class="btn btn-outline-dark mt-1" type="submit" style="color: light-grey; height: 35px; margin-left:1em"> Filter </button>
+          </form>
+      {%endif%}
   </div>
 
     {% include 'partials/clubs_list.html' with clubs=clubs %}
