@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 """Tests of the book details view."""
-=======
-from cProfile import label
->>>>>>> d507b0778ec7a07923d50cef6ded09539fb305f6
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Book

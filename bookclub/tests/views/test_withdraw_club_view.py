@@ -4,8 +4,6 @@ from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-
-
 class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the withdraw club view."""
 
@@ -20,14 +18,10 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.owner = User.objects.get(username="janedoe")
         self.member = User.objects.get(username="peterpickles")
         self.user = User.objects.get(username="edgaralen")
-<<<<<<< HEAD
-=======
         self.follower = User.objects.get(username="willsmith")
         self.follower.toggle_follow(self.user)
         self.follower.toggle_follow(self.member)
         
->>>>>>> d507b0778ec7a07923d50cef6ded09539fb305f6
-
     def test_withdarw_url(self):
         self.assertEqual(self.url, f"/club/{self.club.id}/withdraw/")
 
