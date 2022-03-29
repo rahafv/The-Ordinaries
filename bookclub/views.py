@@ -285,7 +285,7 @@ class PasswordView(LoginRequiredMixin, FormView):
 
     def get_success_url(self):
         """Redirect the user after successful password change."""
-        messages.add_message(self.request, messages.SUCCESS, "Password updated!")
+        messages.add_message(self.request, messages.SUCCESS, 'Password updated!')
         return reverse('home')
 
 class CreateClubView(LoginRequiredMixin, CreateView):
@@ -335,17 +335,6 @@ class ClubPageView(LoginRequiredMixin, DetailView):
             context['upcoming_meeting']=None
 
         return context
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        self.book = form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 class BookDetailsView(DetailView, FormMixin):
     """Show individual book details."""
@@ -1297,36 +1286,36 @@ class SearchPageView(TemplateView):
         context['current_user'] = self.request.user
         return context
 
-@login_required
-def search_page(request):
-    if request.method == 'GET':
-        searched = request.GET.get('searched')
-        category = request.GET.get('category')
-        label = category
+# @login_required
+# def search_page(request):
+#     if request.method == 'GET':
+#         searched = request.GET.get('searched')
+#         category = request.GET.get('category')
+#         label = category
 
-        # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
-        category = search_page_results["category"]
-        filtered_list = search_page_results["filtered_list"]
+#         # method in helpers to return a dictionary with a list of users, clubs or books searched
+#         search_page_results = get_list_of_objects(
+#             searched=searched, label=label)
+#         category = search_page_results["category"]
+#         filtered_list = search_page_results["filtered_list"]
 
-        sortForm = ""
-        if(category == "Clubs"):
-            sortForm = ClubsSortForm(request.GET or None)
+#         sortForm = ""
+#         if(category == "Clubs"):
+#             sortForm = ClubsSortForm(request.GET or None)
 
-        elif(category == "Books"):
-            sortForm = BooksSortForm(request.GET or None)
-        else:
-            sortForm = UsersSortForm(request.GET or None)
+#         elif(category == "Books"):
+#             sortForm = BooksSortForm(request.GET or None)
+#         else:
+#             sortForm = UsersSortForm(request.GET or None)
 
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
-        current_user=request.user
-        return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
+#         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
+#         page_number = request.GET.get('page')
+#         filtered_list = pg.get_page(page_number)
+#         current_user=request.user
+#         return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
 
-    else:
-        return render(request, 'search_page.html', {})
+#     else:
+#         return render(request, 'search_page.html', {})
 
 class ShowSortedView(LoginRequiredMixin, ListView):
     template_name = 'search_page.html'

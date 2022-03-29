@@ -53,7 +53,7 @@ urlpatterns = [
 	
 	path('add_book/', views.AddBookView.as_view(), name ='add_book'),
 	path('book/<int:book_id>/book_details', views.BookDetailsView.as_view(), name ='book_details'),
-	path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
+	path('book/<int:book_id>/add_review', views.AddReviewView.as_view(), name ='add_review'),
 	    
 	path('initial_genres/', views.InitialGenresView.as_view(), name ='initial_genres'),
 	path('initial_genres/books', views.InitialBookListView.as_view(), name ='initial_book_list'),
@@ -79,7 +79,7 @@ urlpatterns = [
 	
 	path('followings/<int:user_id>/', views.FollowingListView.as_view(), name='following_list'),
 	path('followers/<int:user_id>/', views.FollowersListView.as_view(), name='followers_list'),
-	path('search_page', views.search_page, name='search_page'),
+	path('search_page', views.SearchPageView.as_view(), name='search_page'),
 	path('search_page/<str:searched>/<str:label>/', views.ShowSortedView.as_view(), name = "show_sorted"),
 	
 	path('delete_club/<int:club_id>', views.delete_club, name='delete_club'),

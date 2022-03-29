@@ -129,7 +129,8 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
 
     def test_search_with_empty_str(self):
         self.client.login(username=self.user.username, password='Password123')
-        response = self.client.post(self.url)
+        self.user_name_form_input['searched'] = ''
+        response = self.client.get(self.url, self.user_name_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'search_page.html')
         self.assertContains(response, "You forgot to search!")
