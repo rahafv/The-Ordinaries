@@ -1158,8 +1158,19 @@ class AddReviewView(LoginRequiredMixin, FormView):
 
     def get(self, *args, **kwargs):
         """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id')
+        self.book_id = self.kwargs.get('book_id', None)
         return super().get(self, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        return context
 
     def form_valid(self, form):
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
@@ -1167,9 +1178,9 @@ class AddReviewView(LoginRequiredMixin, FormView):
         if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
             return HttpResponseForbidden()
 
-        form.instance.user = self.review_user
-        form.instance.book = self.reviewed_book
-        form.save(self.review_user, self.reviewed_book)
+        # form.instance.user = self.review_user
+        # form.instance.book = self.reviewed_book
+        form.save()
         self.review_user.add_book_to_all_books(self.reviewed_book)
 
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
@@ -1183,7 +1194,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
+        return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 @login_required
 def add_review(request, book_id):

@@ -297,8 +297,12 @@ class RatingForm(forms.ModelForm):
             'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.book = kwargs.pop('book', None)
+        self.user = kwargs.pop('user', None)
+        super(RatingForm, self).__init__(*args, **kwargs)
 
-    def save(self, reviwer, reviewedBook):
+    def save(self):
         """Create a new rating."""
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
@@ -307,8 +311,8 @@ class RatingForm(forms.ModelForm):
         review = Rating.objects.create(
             rating = self.calculate_rating(rate),
             review = self.cleaned_data.get('review'),
-            book = reviewedBook,
-            user = reviwer,
+            book = self.book,
+            user = self.user,
         )
         return review
 
