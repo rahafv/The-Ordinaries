@@ -1,9 +1,10 @@
 """Unit tests for the Club model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Club, Meeting, Book
+from bookclub.models import User, Club
 
 class ClubModelTestCase(TestCase):
+    """Unit tests for the Club model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',

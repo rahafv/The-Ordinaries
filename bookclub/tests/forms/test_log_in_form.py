@@ -5,7 +5,8 @@ from bookclub.forms import LogInForm
 from bookclub.models import User
 
 class LogInFormTestCase(TestCase):
-    
+    """Unit tests of the log in form."""
+
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):

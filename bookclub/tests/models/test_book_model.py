@@ -1,4 +1,4 @@
-"""Unit tests for the User model."""
+"""Unit tests for the Book model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from bookclub.models import User, Book, Club, Rating
