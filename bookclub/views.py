@@ -98,7 +98,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
-        return reverse('send_verification', kwargs={'user_id':self.user.id})
+        return reverse('send_activation', kwargs={'user_id':self.user.id})
 
 
 
@@ -1045,7 +1045,7 @@ def edit_review(request, review_id):
         else:
             form = EditRatingForm(instance = review)
         
-        return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
+        return render(request, 'edit_review.html', {'form':form , 'review':review })
 
     
     return render(request, '404_page.html', status=404)
@@ -1064,7 +1064,6 @@ def follow_toggle(request, user_id):
     else:
         
         notificationHelper.delete_notifications(current_user, [followee], notificationHelper.NotificationMessages.FOLLOW )
-
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
@@ -1266,6 +1265,7 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
 
 class ChatRoomView(LoginRequiredMixin, TemplateView):
     template_name = "chat_room.html"
+    pk_url_kwarg = "club_id"
 
     def get(self, *args, **kwargs):
         """Handle get request and perform checks on whether a user is a member
@@ -1274,8 +1274,13 @@ class ChatRoomView(LoginRequiredMixin, TemplateView):
         club = get_object_or_404(Club, id=kwargs['club_id']) if 'club_id' in kwargs else None
 
         if club:
-            if not club.is_member(user) or club.members.count() <= 1:
+            if not club.is_member(user):
                 raise Http404
+
+            if club.members.count() <= 1:
+                messages.add_message(self.request, messages.INFO, "This club have one member only. More members should join to start a conversation")
+                return redirect('club_page' , club_id = club.id)
+                
         else:
             clubs = user.clubs.all()
             if clubs:

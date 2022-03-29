@@ -5,7 +5,7 @@ from bookclub.models import Book, User
 from bookclub.tests.helpers import LoginRedirectTester,MenuTestMixin
 
 class ProfilePageWithReadingListViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
-    """Tests of the looged in user's profile page view."""
+    """Tests of the logged in user's profile page with reading list view."""
 
     fixtures = [ 'bookclub/tests/fixtures/default_user.json',
                 'bookclub/tests/fixtures/other_users.json',
@@ -26,7 +26,7 @@ class ProfilePageWithReadingListViewTestsCase(TestCase, LoginRedirectTester,Menu
        
     def test_profile_page_with_reading_list_url(self):
         self.client.login(username = self.user.username, password = "Password123")
-        self.assertEqual(self.url,'/profile/2/reading_list')
+        self.assertEqual(self.url,'/profile/2/reading_list/')
 
     def test_get_valid_user_profile_page_with_reading_list(self):
         self.client.login(username=self.user.username, password='Password123')

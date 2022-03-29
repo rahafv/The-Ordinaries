@@ -92,8 +92,6 @@ class MeetingFormTestCase(TestCase):
         form = MeetingForm(self.club, self.sec_form_input)
         self.assertFalse(form.is_valid())
 
-
-
     def test_form_saves_correctly(self):
         count_clubs_before = Meeting.objects.count()
         form = MeetingForm(self.club, self.form_input)

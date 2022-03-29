@@ -1,9 +1,10 @@
 """Unit tests for the Chat model."""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Chat, Meeting, Book
+from bookclub.models import User, Chat
 
 class ChatModelTestCase(TestCase):
+    """Unit tests for the Chat model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',

@@ -12,14 +12,30 @@
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
-    <h1 class="fw-light bg-purple center" style="text-align: center;">Welcome {{user.first_name}}</h1>
+
     <div class="carousel-inner" style="top: -8px;">
       <div class="carousel-item active">
         <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
           <rect width="100%" height="100%" fill="#faf3ee"/>
-          <image width="100%" height="100%"  xlink:href="{% static '/images/welcome_page.png' %}"  />
+          {%if request.user.is_authenticated%}
+            <image width="100%" height="100%"  xlink:href="{% static '/images/welcome_page.png' %}"/>
+            </svg>
+          {%else%}
+            <image width="100%" height="100%"  xlink:href="{% static '/images/welcome_page_unautharized.png' %}"  />
+            </svg>
+            <div class="container row py-lg-1" style = "position:relative; left:730px; bottom:330px;">
+              <div>
+                  <div class="col-sm-6 col-md-3 col-lg-4">
+                    <h1 style="color: #000000; font-size: 2.5rem" class="fw-light center">Not a member? join our community!</h1>
+                    <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'sign_up' %}'>Sign up</a></p>
+                    <h6 style="color:grey"> Already have an account? <a href={% url 'log_in' %}>log in</a> </h6>
+                  </div>
+                </div>
+              </div>
+          {%endif%}
     
-        </svg>
+        
+          
           <div class="container">
           <div class="carousel-caption">
           </div>

@@ -359,7 +359,7 @@ class Book(models.Model):
             sum = 0
             for rating in self.ratings.all():
                 sum+= rating.rating
-            self.average_rating = sum/self.ratings.all().count()
+            self.average_rating = round(sum/self.ratings.all().count(), 2)
             self.save()
 
 

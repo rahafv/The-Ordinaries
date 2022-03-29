@@ -1,11 +1,11 @@
-"""Tests of the sign up view."""
+"""Tests of the add review view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Book, Rating, User
 from bookclub.tests.helpers import LoginRedirectTester
 
 class AddReviewViewTestCase(TestCase, LoginRedirectTester):
-    """Tests of the add bookview."""
+    """Tests of the add review view."""
 
     fixtures = ["bookclub/tests/fixtures/default_book.json", 
                 'bookclub/tests/fixtures/default_user.json', 
@@ -25,7 +25,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         self.follower.toggle_follow(self.user)
 
     def test_add_review_url(self):
-        self.assertEqual(self.url,f"/book/{self.book.id}/add_review")
+        self.assertEqual(self.url,f"/book/{self.book.id}/review/")
 
     def test_get_rating_form(self):
         self.client.login(username=self.user.username, password="Password123")

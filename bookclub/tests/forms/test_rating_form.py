@@ -4,7 +4,7 @@ from bookclub.models import User, Book, Rating
 from bookclub.forms import RatingForm
 
 class RatingFormTestCase(TestCase):
-    """Unit tests of the review form."""
+    """Unit tests of the rating form."""
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
             'bookclub/tests/fixtures/default_user.json']
