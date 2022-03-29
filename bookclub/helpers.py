@@ -10,15 +10,6 @@ from .models import User, Club, Book
 from django.db.models.functions import Lower
 
 
-# def login_prohibited(view_function):
-#     def modified_view_function(request):
-#         if request.user.is_authenticated:
-#             return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-#         else:
-#             return view_function(request)
-#     return modified_view_function
-
-
 class MeetingHelper:
     def assign_rand_book(self, meeting, request=None):
         if not meeting.book and request:

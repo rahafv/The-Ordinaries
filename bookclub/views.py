@@ -23,7 +23,6 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
 from notifications.signals import notify
 from notifications.utils import slug2id
 from notifications.models import Notification
