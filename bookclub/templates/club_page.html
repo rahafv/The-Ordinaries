@@ -9,8 +9,8 @@
           <!-- Club Sidebar-->
           <div class="club-details-card pb-3">
               <div class="club-details-card-cover mb-3">
-                <svg class="bd-placeholder-img" alt="club page card background" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-                  <a width="100%" height="100%" href="/images/clubPage.svg"></a>
+                <svg class="bd-placeholder-img" alt="club page card background"  aria-hidden="true" focusable="false" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                  <image width="100%" height="100%" src="/images/clubPage.svg" focusable="false">
                 </svg>
               </div>
               <div class="club-details-card-profile">
@@ -19,7 +19,7 @@
                       <h3 class="club-details-card-name  mt-3 text-lg ps-2">{{club.name}} 
                         {% if user == club.owner %}
                         <span>
-                          <a href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square mb-3"
+                          <a  aria-label="edit club information" href='{% url 'edit_club' club_id=club.id %}' class="bi-pencil-square mb-3"
                           style="font-size: 1.3rem; color: grey;"></a>
                         </span>
                         {% else %}
@@ -138,7 +138,7 @@
                       </a>
                   {% endif %}
                   
-                  <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner">
+                  <a class="list-group-item button" data-bs-toggle="collapse" data-bs-target="#owner" aria-expanded="false" aria-controls="owner" href="#">
                     <span class = "d-inline-block font-weight-medium text-uppercase ms-2"> 
                       Owner
                     </span>

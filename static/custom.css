@@ -89,7 +89,7 @@
 .list-group-item.stand-out:not(.disabled):hover {
   border-color: #ddd;
   background: #fff;
-  color: #74a5b4;
+  color: #0F3471;
   cursor: default;
 }
 
@@ -113,19 +113,19 @@
 .list-group-item.join:not(.active) {
   border-color: #ddd;
   background: #fff;
-  color: rgb(110, 177, 65);
+  color: #2e8540;
   cursor: default;
 }
 
 .list-group-item.join:not(.active):hover {
   border-color: #ddd;
   background: #fff;
-  color: #74a5b4;
+  color: #0F3471;
   cursor: default;
 }
 
 .list-group-item.join:not(.active)::before {
-  background-color: rgb(110, 177, 65);
+  background-color: #2e8540;
 }
 
 
@@ -134,19 +134,19 @@
 .list-group-item.withdraw:not(.active) {
   border-color: #ddd;
   background: #fff;
-  color: rgb(207, 114, 114);
+  color: #cd2026;
   cursor: default;
 }
 
 .list-group-item.withdraw:not(.active):hover {
   border-color: #ddd;
   background: #fff;
-  color: #74a5b4;
+  color: #0F3471;
   cursor: default;
 }
 
 .list-group-item.withdraw:not(.active)::before {
-  background-color: rgb(207, 114, 114);
+  background-color: #cd2026 ;
 }
 
 /* Transfer ownership button club page */
@@ -154,19 +154,19 @@
 .list-group-item.transfer:not(.active) {
   border-color: #ddd;
   background: #fff;
-  color: rgb(236, 177, 82);
+  color: #4c2c92;
   cursor: default;
 }
 
 .list-group-item.transfer:not(.active):hover {
   border-color: #ddd;
   background: #fff;
-  color: #74a5b4;
+  color: #0F3471;
   cursor: default;
 }
 
 .list-group-item.transfer:not(.active)::before {
-  background-color: rgb(236, 177, 82);
+  background-color: #4c2c92;
 }
 
 /**/
@@ -612,7 +612,7 @@ a{
 /* mouse over link */
 a:hover {
   /* color:rgb(214, 196, 195); */
-  color: #74a5b4;
+  color: #0F3471;
 }
 
 a:link {
@@ -1061,6 +1061,7 @@ body {
   font-family: 'Lato', sans-serif;
   background: #eceae8;
   color: #25211e;
+  font-display: swap;
 }  
 
 header {
