@@ -287,8 +287,13 @@ def post_book_progress(request, book_id):
         progress = request.POST.get('progress')
         if progress != '':
             comment = request.POST.get("comment")
+            fullcomment=""
+            if comment:
+                fullcomment = f" commented:   \"{comment}\" for "
+            else: 
+                fullcomment = " has read"
             label = request.POST.get('label')
-            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f'commented: "{comment}"  for  {progress} {label} of '), action_object=book, description='user-event-B' ) 
+            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f' {fullcomment} {progress} {label} of '), action_object=book, description='user-event-B' ) 
             messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
         else:
             messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
