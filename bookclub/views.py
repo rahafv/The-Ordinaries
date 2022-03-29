@@ -647,7 +647,7 @@ def withdraw_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
-class BookListView(LoginRequiredMixin, ListView):
+class BookListView(ListView):
     model = Book
     template_name = 'books.html'
     form_class = BooksSortForm()
@@ -688,7 +688,7 @@ class BookListView(LoginRequiredMixin, ListView):
         context['count'] = books_queryset.count()
         return context
 
-class ClubsListView(LoginRequiredMixin, ListView):
+class ClubsListView(ListView):
     """Display list of clubs."""
 
     model = Club
