@@ -1151,20 +1151,15 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
-class AddReviewView(CreateView):
+class AddReviewView(LoginRequiredMixin, FormView):
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
-    context_object_name = 'book'
     form_class = RatingForm
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
+    def get(self, *args, **kwargs):
         """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id', None)
-        return super().get(self, request, *args, **kwargs)
+        self.book_id = kwargs.get('book_id')
+        return super().get(self, *args, **kwargs)
 
     def form_valid(self, form):
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
@@ -1188,7 +1183,7 @@ class AddReviewView(CreateView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
+        return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 @login_required
 def add_review(request, book_id):
