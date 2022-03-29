@@ -1,12 +1,12 @@
-from cProfile import label
+"""Tests of the book details view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Book
 from bookclub.forms import RatingForm
 from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
 
-
 class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
+    """Tests of the book details view."""
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
               'bookclub/tests/fixtures/default_user.json']
@@ -17,7 +17,7 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.url = reverse('book_details', kwargs={'book_id': self.target_book.id})
        
     def test_book_details_url(self):
-        self.assertEqual(self.url,f'/book/{self.target_book.id}/book_details')
+        self.assertEqual(self.url,f'/book/{self.target_book.id}/book_details/')
 
     def test_get_book_details_with_valid_ISBN(self):
         self.client.login(username=self.user.username, password='Password123')

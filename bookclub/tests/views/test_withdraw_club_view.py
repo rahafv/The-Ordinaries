@@ -4,16 +4,13 @@ from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
-
-
 class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',
         'bookclub/tests/fixtures/other_club.json',
-        'bookclub/tests/fixtures/default_club.json'
-    ]
+        'bookclub/tests/fixtures/default_club.json']
 
     def setUp(self):
         self.club = Club.objects.get(id=1)
@@ -25,9 +22,8 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.follower.toggle_follow(self.user)
         self.follower.toggle_follow(self.member)
         
-
     def test_withdarw_url(self):
-        self.assertEqual(self.url, f"/club/{self.club.id}/withdraw_club")
+        self.assertEqual(self.url, f"/club/{self.club.id}/withdraw/")
 
     def test_owner_cannot_withdraw_club(self):
         self.client.login(username=self.owner.username, password="Password123")
@@ -75,7 +71,6 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.assertEqual(events_after_joining_count, 1)
         self.assertEqual(events_after_withdrawing_count, 2)
   
-
     def test_withdraw_club_with_invalid_id(self):
         self.client.login(username=self.member.username, password="Password123")
         url = reverse("withdraw_club", kwargs={"club_id": self.club.id + 9999})
@@ -83,6 +78,5 @@ class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,Menu
         self.assertEqual(response.status_code, 404)
         self.assertFalse(self.club.is_member(self.user))
 
-  
     def test_withdraw_club_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

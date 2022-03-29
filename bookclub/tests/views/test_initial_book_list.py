@@ -4,8 +4,8 @@ from django.urls import reverse
 from bookclub.models import User , Book
 from bookclub.tests.helpers import LoginRedirectTester
 
-
 class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
+    """Tests of the initial book list view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']  
    
@@ -14,7 +14,7 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         self.user = User.objects.get(id=1)
 
     def test_initial_book_list_url(self):
-        self.assertEqual(self.url,'/initial_genres/books') 
+        self.assertEqual(self.url,'/initial_genres/books/') 
 
     def create_test_books(self, book_count=10):
         isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
@@ -40,7 +40,6 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
 
-    
     def test_display_books_on_page_filtered_by_genre(self):
         self.client.login(username=self.user.username, password='Password123')
         self.create_test_books(10)
@@ -51,7 +50,6 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
         self.assertTemplateUsed(response, 'initial_book_list.html')
         self.assertEqual(len(response.context['my_books']),num_of_public_clubs)
 
-    
     def test_initial_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 

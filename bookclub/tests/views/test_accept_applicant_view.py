@@ -22,10 +22,8 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
         self.url = reverse("accept_applicant", kwargs={"club_id": self.club.id, "user_id":self.user.id })
         self.club.add_applicant(self.user)
 
-
-
     def test_accept_applicant_url(self):
-        self.assertEqual(self.url, f"/club/{self.club.id}/applicants/accept/{self.user.id}")
+        self.assertEqual(self.url, f"/club/{self.club.id}/applicants/accept/{self.user.id}/")
 
     def test_member_cannot_accept_user(self):
         self.client.login(username=self.member.username, password="Password123")
@@ -41,7 +39,6 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
         self.assert_error_message(response)
         self.assert_menu(response)
         
-
     def test_user_cannot_accept_user(self):
         self.client.login(username=self.user.username, password="Password123")
         before_count = self.club.member_count()
@@ -82,6 +79,5 @@ class AcceptApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,M
         self.assertEqual(response.status_code, 404)
         self.assertFalse(self.club.is_member(self.user))
 
-  
     def test_accept_applicant_view_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

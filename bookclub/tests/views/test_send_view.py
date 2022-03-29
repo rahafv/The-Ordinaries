@@ -1,9 +1,11 @@
+"""Tests of the send view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Chat, User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 
 class SendTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
+    """Tests of the send view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 
