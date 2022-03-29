@@ -36,13 +36,13 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
         self.client.login(username=self.sec_user.username, password='Password123')
         response = self.client.get(self.sec_url)
         response_url = reverse('choice_book_list', kwargs={'meeting_id': self.sec_meeting.id})
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=404)
+        self.assertEqual(response.status_code, 404)
 
     def test_cant_access_when_not_chooser(self):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.sec_url)
         response_url = reverse('choice_book_list', kwargs={'meeting_id': self.sec_meeting.id})
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=404)
+        self.assertEqual(response.status_code, 404)
 
     def test_search_books_with_title(self):
         self.client.login(username=self.user.username, password='Password123')

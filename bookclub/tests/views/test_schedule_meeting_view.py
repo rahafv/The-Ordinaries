@@ -3,7 +3,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Meeting, User, Club, Event
+from bookclub.models import Book, Meeting, User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 import pytz
 
@@ -59,10 +59,10 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
     def test_schedule_meeting_successful_when_cont(self):
         self.client.login(username=self.owner.username, password="Password123")
         count_meetings_before = Meeting.objects.count()
-        count_events_before = Event.objects.count() 
+        count_events_before = self.owner.notifications.unread().count()
         response = self.client.post(self.url, self.sec_form_input, follow=True)
         self.assertEqual(count_meetings_before + 1, Meeting.objects.count())
-        self.assertEqual(count_events_before + 1, Event.objects.count())
+        self.assertEqual(count_events_before + 1, self.owner.notifications.unread().count())
         target_url = reverse("club_page", kwargs={"club_id": self.club.id})
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "club_page.html")
@@ -90,7 +90,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
     def test_only_owner_can_schedule(self):
         self.client.login(username=self.user.username, password="Password123")
         count_meetings_before = Meeting.objects.count()
-        response = self.client.post(self.url, self.form_input)
+        response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(count_meetings_before, Meeting.objects.count())
 
@@ -116,13 +116,14 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
         meeting = Meeting.objects.get(id=3)
         self.assertEqual(meeting.book, None)
         request = RequestFactory().get(self.url)
-        MeetingHelper().assign_rand_book(meeting, request)
-        self.assertNotEqual(meeting.book, None)
+        MeetingHelper().assign_rand_book(meeting, Book.objects.get(id=1), request)
+        self.assertEqual(meeting.book, Book.objects.get(id=1))
 
     def test_assign_book_when_book(self):
         meeting = Meeting.objects.get(id=1)
         self.assertEqual(meeting.book, Book.objects.get(id=1))
-        MeetingHelper().assign_rand_book(meeting)
+        MeetingHelper().assign_rand_book(meeting, None)
+        self.assertEqual(meeting.book, Book.objects.get(id=1))
 
     def test_get_schedule_meeting_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

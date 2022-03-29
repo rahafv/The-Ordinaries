@@ -8,28 +8,28 @@
   
 
 {% if general %}
-<h1 class="fw-light center bg-purple" style="text-align: center;">Books</h1>
-<div class="carousel-inner" style="top: -8px;">
-  <div class="carousel-item active">
-    
+  <h1 class="fw-light center bg-purple" style="text-align: center;">Books</h1>
+  <div class="carousel-inner" style="top: -8px;">
+    <div class="carousel-item active">
+      
 
-    <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-      <rect width="100%" height="120%" fill="#faf3ee"/>
-      <image width="100%" height="100%"  xlink:href="{% static '/images/book_page4.png' %}"  />
+      <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+        <rect width="100%" height="120%" fill="#faf3ee"/>
+        <image width="100%" height="100%"  xlink:href="{% static '/images/book_page4.png' %}"  />
 
-    </svg>
+      </svg>
 
-    
-    <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
-      <div class="carousel-caption">
-          <div class="col-sm-6 col-md-3 col-lg-4">
-            <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Add your favourite books.</h1>
-            <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'add_book' %}'>Add Book</a></p>
-          </div>
+      
+      <div class="container row py-lg-1" style = "position:relative; right:50px; bottom:100px;">
+        <div class="carousel-caption">
+            <div class="col-sm-6 col-md-3 col-lg-4">
+              <h1 style="color: #000000; font-size: 3rem" class="fw-light center">Add your favourite books.</h1>
+              <p><a class="btn btn-lg btn-outline-dark fw-light center mt-2" href='{% url 'add_book' %}'>Add Book</a></p>
+            </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <div class="container">
@@ -45,19 +45,19 @@
 <div class="container">
   {% if count == 0 %}
     {% if general %}
-      <div style="text-align: center;   padding-top: 50px;">
+      <div style="text-align: center; padding-top: 50px;">
         <h4 class="lead ">There are no books, want to add one?</h4>
         <a href={% url 'add_book' %} class="btn my-2 btn-outline-secondary">Add a book</a>
       </div>
     {% else %}
-      <div style="text-align: center;   padding-top: 50px;">
+      <div style="text-align: center; padding-top: 50px;">
         <h4 class="lead ">The book list is empty! find more book you might like.</h4>
         <a href='/books' class="btn my-2 btn-outline-secondary">More books</a>
       </div>
     {% endif %}
             
   {% else %}
-    <div class = "col-12">
+    <div class = "col-12 mt-5">
       {% if general %}
         <form class="d-flex" method=GET action='{% url 'books_list' %}'> 
       {% else %}
@@ -68,11 +68,11 @@
           <button class="mt-2 ms-2 btn btn-outline-dark " type="submit" style="color: light-grey;">Sort</button>
       </form>
     </div>
-    <div class="row">
+    <div class="row justify-content-center">
        {% for book in books %}
-          <div class="col-sm-6 col-md-3">
+          <div class="col-sm-6 col-md-3 text-center">
             {% include 'partials/book_card.html' with book=book %}
-            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark" style="margin-left:6em"  role="button" > View &raquo;</a>
+            <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark ms-2" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>
         {% endfor %}
     </div>
