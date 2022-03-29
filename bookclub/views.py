@@ -6,7 +6,7 @@ from django.contrib.auth import login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm, BookForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import get_list_of_objects, login_prohibited, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
+from .helpers import get_list_of_objects, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating
 from django.urls import reverse, reverse_lazy
@@ -262,7 +262,7 @@ def handler404(request, exception):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "You've been logged out!")
-    return redirect('welcome')
+    return redirect('home')
 
 
 class PasswordView(LoginRequiredMixin, FormView):
@@ -313,7 +313,30 @@ class CreateClubView(LoginRequiredMixin, CreateView):
         return redirect(reverse('log_in') + '?next=/create_club/')
 
 
-class ClubPageView(LoginRequiredMixin, DetailView):
+@login_required
+def post_book_progress(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    if request.method == "POST":
+        progress = request.POST.get('progress')
+        if progress != '':
+            comment = request.POST.get("comment")
+            fullcomment=""
+            if comment:
+                fullcomment = f" commented:   \"{comment}\" for "
+            else:
+                fullcomment = " has read"
+            label = request.POST.get('label')
+            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f' {fullcomment} {progress} {label} of '), action_object=book, description='user-event-B' )
+            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
+        else:
+            messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
+    return redirect('book_details', book_id=book.id)
+
+
+
+
+class ClubPageView(DetailView):
     """Show individual club details."""
 
     model = Club
@@ -395,7 +418,7 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         if self.user_id == self.request.user.id:
             return redirect('profile')
         return super().get(self.request, *args, **kwargs)
-        
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User.objects, id=self.request.user.id)
@@ -490,12 +513,11 @@ class ProfilePageClubsView(LoginRequiredMixin, ListView):
 #     following = request.user.is_following(user)
 #     followable = (request.user != user)
 
-#     # clubs_queryset = get_list_or_404(Club, owner = user )
-#     clubs_queryset = user.clubs.all()
-#     clubs_count = clubs_queryset.count()
-#     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-#     page_number = request.GET.get('page')
-#     clubs = clubs_pg.get_page(page_number)
+    # clubs_queryset = user.clubs.all()
+    # clubs_count = clubs_queryset.count()
+    # clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+    # page_number = request.GET.get('page')
+    # clubs = clubs_pg.get_page(page_number)
 
 #     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': clubs, 'items_count': clubs_count, 'is_clubs': True})
 
@@ -674,7 +696,7 @@ class BookListView(ListView):
         context['count'] = books_queryset.count()
         return context
 
-class ClubsListView(LoginRequiredMixin, ListView):
+class ClubsListView(ListView):
     """Display list of clubs."""
 
     model = Club

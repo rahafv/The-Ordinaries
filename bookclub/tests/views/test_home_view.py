@@ -36,8 +36,6 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin
         self.assertTemplateUsed(response, 'home.html')
         self.assert_menu(response)
     
-    def test_get_home_redirects_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()
 
     def test_feed_contains_events_by_self_and_followees(self):
         self.client.login(username=self.user.username, password='Password123')
