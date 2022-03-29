@@ -1,17 +1,18 @@
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Club
+from bookclub.models import Book, Club, Meeting
+from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.base import TemplateView
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from system import settings
+from notifications.signals import notify
+from threading import Timer
 
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
     template_name = "schedule_meeting.html"
