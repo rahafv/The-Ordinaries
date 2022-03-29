@@ -67,17 +67,12 @@ class LoginProhibitedMixin:
 
 
 
-@login_prohibited
 def welcome(request):
     return render(request, 'welcome.html')
 
-class HomeView(TemplateView):
+class HomeView(LoginRequiredMixin, TemplateView):
 
     template_name = 'home.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -96,17 +91,13 @@ class HomeView(TemplateView):
         return context
 
 
-class EditReviewView(UpdateView):
+class EditReviewView(LoginRequiredMixin, UpdateView):
     """View to edit the user's review."""
 
     model = Rating
     template_name = 'edit_review.html'
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -262,7 +253,7 @@ def handler404(request, exception):
 def log_out(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "You've been logged out!")
-    return redirect('home')
+    return redirect('welcome')
 
 
 class PasswordView(LoginRequiredMixin, FormView):
@@ -312,7 +303,6 @@ class CreateClubView(LoginRequiredMixin, CreateView):
         """If there is no permission, redirect to log in."""
         return redirect(reverse('log_in') + '?next=/create_club/')
 
-
 @login_required
 def post_book_progress(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
@@ -334,9 +324,7 @@ def post_book_progress(request, book_id):
     return redirect('book_details', book_id=book.id)
 
 
-
-
-class ClubPageView(DetailView):
+class ClubPageView(LoginRequiredMixin, DetailView):
     """Show individual club details."""
 
     model = Club
@@ -359,7 +347,7 @@ class ClubPageView(DetailView):
 
         return context
 
-class BookDetailsView(DetailView, FormMixin):
+class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
     """Show individual book details."""
 
     model = Book
@@ -367,10 +355,6 @@ class BookDetailsView(DetailView, FormMixin):
     context_object_name = 'book'
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """Generate context data to be shown in the template."""
@@ -390,13 +374,9 @@ class BookDetailsView(DetailView, FormMixin):
         context['numberOfRatings'] = book.ratings.all().count()
         return context
 
-class AddBookView(FormView):
+class AddBookView(LoginRequiredMixin, FormView):
     form_class = BookForm
     template_name = 'add_book.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.book = form.save()
@@ -418,7 +398,7 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         if self.user_id == self.request.user.id:
             return redirect('profile')
         return super().get(self.request, *args, **kwargs)
-
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User.objects, id=self.request.user.id)
@@ -513,11 +493,12 @@ class ProfilePageClubsView(LoginRequiredMixin, ListView):
 #     following = request.user.is_following(user)
 #     followable = (request.user != user)
 
-    # clubs_queryset = user.clubs.all()
-    # clubs_count = clubs_queryset.count()
-    # clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-    # page_number = request.GET.get('page')
-    # clubs = clubs_pg.get_page(page_number)
+#     # clubs_queryset = get_list_or_404(Club, owner = user )
+#     clubs_queryset = user.clubs.all()
+#     clubs_count = clubs_queryset.count()
+#     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
+#     page_number = request.GET.get('page')
+#     clubs = clubs_pg.get_page(page_number)
 
 #     return render(request, 'profile_page.html', {'current_user': request.user, 'user': user, 'following': following, 'followable': followable, 'items': clubs, 'items_count': clubs_count, 'is_clubs': True})
 
@@ -652,15 +633,12 @@ def withdraw_club(request, club_id):
     messages.add_message(request, messages.SUCCESS, "Withdrew from club!")
     return redirect('club_page', club_id)
 
-class BookListView(ListView):
+class BookListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'books.html'
     form_class = BooksSortForm()
     paginate_by = settings.BOOKS_PER_PAGE
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """Retrieves the club_id from url and stores it in self for later use."""
@@ -696,7 +674,7 @@ class BookListView(ListView):
         context['count'] = books_queryset.count()
         return context
 
-class ClubsListView(ListView):
+class ClubsListView(LoginRequiredMixin, ListView):
     """Display list of clubs."""
 
     model = Club
@@ -1263,10 +1241,6 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
 
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
