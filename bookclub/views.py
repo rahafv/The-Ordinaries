@@ -1237,7 +1237,7 @@ def follow_toggle(request, user_id):
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
-class SearchPageView(TemplateView):
+class SearchPageView(LoginRequiredMixin, TemplateView):
 
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
