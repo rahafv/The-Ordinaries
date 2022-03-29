@@ -10,12 +10,7 @@ class Recommendation:
     def __init__(self, isItemBased, recHelper):
         if isItemBased:
             self.item_based = ItemBasedModel(recHelper)
-        else:
-            self.content_based = ContentBasedModel()
-
-    # def train(self):
-    #     self.item_based = ItemBasedModel()
-    #     self.content_based = ContentBasedModel()
+        self.content_based = ContentBasedModel()
 
     def get_recommendations(self, request, num_of_rec, user_id=None, book_id=None, club_id=None):
         recommendations = []
@@ -52,7 +47,7 @@ class Recommendation:
         for mem in members:
             recommendations.append(self.get_recommendations(request, num_of_rec, mem.id))
 
-        all_recommendations = reduce(lambda z, y :z + y, recommendations)
+        all_recommendations = reduce(lambda z, y :z | y, recommendations)
         filtered_rec = [book for book in all_recommendations if book not in books]
         random.shuffle(filtered_rec)
         counter = Counter(filtered_rec)

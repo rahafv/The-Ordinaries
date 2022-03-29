@@ -713,7 +713,7 @@ def schedule_meeting(request, club_id):
                                                    all_mem=False
                                                    )
                         
-                        rec_book = Recommendation(True).get_recommendations(request, 1, club_id=meeting.club.id)[0]
+                        rec_book = get_recommender_books(request, True, 1, club_id=meeting.club.id)[0]
                         
                         deadline = timedelta(7).total_seconds()  # 0.00069444
                         Timer(deadline, MeetingHelper().assign_rand_book,
@@ -739,7 +739,7 @@ def schedule_meeting(request, club_id):
 def choice_book_list(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
     if request.user == meeting.chooser and not meeting.book:
-        rec_books = Recommendation(True).get_recommendations(request, 8, club_id=meeting.club.id)
+        rec_books = get_recommender_books(request, True, 8, club_id=meeting.club.id)
         return render(request, 'choice_book_list.html', {'rec_books':rec_books, 'meeting_id':meeting.id})
     else:
         return render(request, '404_page.html', status=404)
@@ -834,8 +834,8 @@ def follow_toggle(request, user_id):
 
 @login_required
 def search_page(request):
-    recommendations = RecModelsBakeOff()
-    recommendations.evaluate()
+    # recommendations = RecModelsBakeOff()
+    # recommendations.evaluate()
 
     # recommendations = Recommendation(True)
     # print("----------------------------------------------------------------------------------------------")

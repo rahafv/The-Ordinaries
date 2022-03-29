@@ -41,8 +41,8 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
         response = self.client.get(self.sec_url)
         self.assertEqual(response.status_code, 200) 
         self.assertTemplateUsed(response, 'choice_book_list.html')
-        self.assertEqual(len(response.context['rec_books']), 11)
-        for book_id in range(10):
+        self.assertEqual(len(response.context['rec_books']), 7)
+        for book_id in range(6):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
         self.assert_menu(response)
@@ -50,7 +50,7 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
     def test_choice_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
-    def create_test_books(self, book_count=10):
+    def create_test_books(self, book_count=6):
         isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
                     ,'155061224','446520802', '380000059','380711524']
         ctr = 0
