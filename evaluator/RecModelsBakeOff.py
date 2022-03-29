@@ -5,10 +5,9 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from .Evaluator import Evaluator
+from Evaluator import Evaluator
 from surprise import KNNBasic, NormalPredictor,SVD, SVDpp, KNNWithMeans, KNNWithZScore
-from .book_rating import BookRatings
-from .genreKNN import GenreKNNAlgorithm
+from book_rating import BookRatings
 
 import random
 import numpy as np
@@ -65,3 +64,10 @@ class RecModelsBakeOff:
         evaluator.Evaluate(True)
 
         evaluator.SampleTopNRecs(bookRatings)
+
+def main():
+    recommendations = RecModelsBakeOff()
+    recommendations.evaluate()
+
+if __name__ == "__main__":
+    main()

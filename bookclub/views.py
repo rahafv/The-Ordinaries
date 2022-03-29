@@ -23,8 +23,6 @@ from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
 import humanize
-from evaluator.RecModelsBakeOff import RecModelsBakeOff
-
 
 @login_prohibited
 def welcome(request):
