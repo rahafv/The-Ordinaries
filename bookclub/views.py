@@ -283,7 +283,6 @@ def add_review(request, book_id):
 def post_book_progress(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
     user = request.user
-    print(f'{request.content_params}')
     if request.method == "POST":
         progress = request.POST.get('progress')
         if progress != '':
