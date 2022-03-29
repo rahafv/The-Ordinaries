@@ -98,7 +98,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
-        return reverse('send_verification', kwargs={'user_id':self.user.id})
+        return reverse('send_activation', kwargs={'user_id':self.user.id})
 
 
 

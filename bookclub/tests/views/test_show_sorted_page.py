@@ -1,3 +1,4 @@
+"""Tests of the sorted search page view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import ClubsSortForm, UsersSortForm, BooksSortForm
@@ -6,6 +7,7 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 from system import settings
 
 class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
+    """Tests of the sorted search page view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json']
 
@@ -43,7 +45,6 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         }
         
         self.url = reverse('show_sorted', kwargs={"searched": self.user_name_form_input["searched"], "label":self.user_name_form_input["category"]})
-
 
     def test_get_show_sorted_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
@@ -228,7 +229,6 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertTemplateUsed(response, 'search_page.html')
         form = response.context['form']
         self.assertFalse(form.is_valid())
-
 
     def _create_test_users(self, user_count=6):
         for user_id in range(user_count):

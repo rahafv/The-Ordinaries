@@ -1,3 +1,4 @@
+"""Test suite for the followings list view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User 
@@ -6,6 +7,7 @@ from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTest
 from system import settings
 
 class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin):
+    """Test suite for the followings list view."""
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
@@ -17,7 +19,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         self.url = reverse('following_list', kwargs={'user_id': self.user.id})
 
     def test_user_list_url(self):
-         self.assertEqual(self.url, f"/followings/{self.user.id}/")
+         self.assertEqual(self.url, f"/{self.user.id}/followings/")
 
     def test_get_members_page_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
