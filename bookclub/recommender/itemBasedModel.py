@@ -9,6 +9,7 @@ import heapq
 
 class ItemBasedModel:
     def __init__(self, recHelper):
+        print("here: ", recHelper.counter)
         if recHelper.counter == 0:
             self.trainset = self.load_dataset().build_full_trainset()
             recHelper.set_trainset(self.trainset)
@@ -56,7 +57,7 @@ class ItemBasedModel:
             try:
                 similaritities = self.similarity_matrix[itemID]
                 for innerID, score in enumerate(similaritities):
-                    candidates[innerID] += score * (rating / 10.0)
+                    candidates[innerID] += score
             except:
                 continue
 

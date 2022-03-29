@@ -7,6 +7,7 @@ import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 import pytz
 
+
 class User(AbstractUser):
     """User model used for authentication."""
 
@@ -90,6 +91,9 @@ class User(AbstractUser):
     def full_name(self):
         """Return full name."""
         return f'{self.first_name} {self.last_name}'
+
+    def get_notifications(self):
+        return self.notifications.unread().filter(description__contains ='notification')
 
     def location(self):
         checked = [self.city, self.country, self.region]
@@ -297,7 +301,7 @@ class Book(models.Model):
         blank=True
     )
 
-    describtion = models.CharField(
+    description = models.CharField(
         max_length=500,
         unique=False,
         blank=True
@@ -360,6 +364,7 @@ class Book(models.Model):
 
     def clubs_count(self):
         return self.clubs.all().count()
+     
 
     def calculate_average_rating(self):
         if self.ratings.all().count() != 0:
@@ -474,113 +479,6 @@ class Meeting(models.Model):
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
-        
-ACTOR_CHOICES = (
-    ('U', 'User'),
-    ('C', 'Club'),
-)
-ACTION_CHOICES = (
-    ('B', 'Book'),
-    ('C', 'Club'),
-    ('M', 'Meeting'),
-    ('R', 'Rating'),
-    ('U', 'Action_User')
-)
-
-class Event(models.Model):
-    """Events by users or clubs."""
-
-    """To allow to types of actors of the event"""
-    type_of_actor = models.CharField(max_length=1, choices=ACTOR_CHOICES)
-
-    """To identify the type of action the actor is responsible for"""
-    type_of_action = models.CharField(max_length=1, choices=ACTION_CHOICES)
-
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name='events')
-    club = models.ForeignKey(Club, blank=True, null=True, on_delete=models.CASCADE , related_name='events')
-    
-    meeting = models.ForeignKey(Meeting, blank=True, null=True, on_delete=models.CASCADE)
-    book = models.ForeignKey(Book, blank=True, null=True, on_delete=models.CASCADE)
-    rating = models.ForeignKey(Rating, blank=True, null=True, on_delete=models.CASCADE)
-    message = models.CharField(max_length=200)
-    action_user =  models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-    class Meta:
-        """Model options."""
-
-        ordering = ['-created_at']
-
-    def clean(self):
-
-        super().clean()
-
-        """ checks that the type of actor and the object are correct """
-        if self.type_of_actor == 'U' and not self.user:
-            raise ValidationError('Actor must be User')
-        if self.type_of_actor == 'C' and not self.club:
-            raise ValidationError('Actor must be Club')
-
-
-        """Restrictions on the actors and their allowed actions"""
-        if self.type_of_actor == 'U' and self.type_of_action == 'M':
-            raise ValidationError('User cannot generate a meeting')
-
-        if self.type_of_actor == 'C' and self.type_of_action == 'R':
-            raise ValidationError('Club cannot rate')
-        if self.type_of_actor == 'C' and self.type_of_action == 'C':
-            raise ValidationError('Club cannot create club')
-        if self.type_of_actor == 'C' and self.type_of_action == 'U' and self.message != self.EventType.TRANSFER:
-            raise ValidationError('Club cannot join and withdraw from clubs')
-
-        """ checks that the type of actor and the object are correct """
-        if self.type_of_action == 'B' and not self.book:
-            raise ValidationError('Action must be Book')
-        if self.type_of_action == 'C' and not self.club:
-            raise ValidationError('Action must be Club')
-        if self.type_of_action == 'M' and not self.meeting:
-            raise ValidationError('Action must be meeting')
-        if self.type_of_action == 'R' and not self.rating:
-            raise ValidationError('Action must be rating')
-        if self.type_of_action == 'U' and not self.action_user:
-            raise ValidationError('Action must be user')
-
-
-    def save(self, **kwargs):
-        self.clean()
-        return super(Event, self).save(**kwargs)
-
-    class EventType(models.TextChoices):
-
-        JOIN = " joined "
-        WITHDRAW = " withdrew from "
-        FOLLOW =  " followed "
-        CREATE = " created "
-        REVIEW = " reviewed "
-        ADD = " added "
-        SCHEDULE = " scheduled a meeting about "
-        TRANSFER = " ownership is transfered to "
-        
-    def get_actor(self):
-        """Return the actor of a given event."""
-        if self.type_of_actor == 'U':
-            return self.user.username
-        else:
-            return self.club.name
-
-    def get_action(self):
-        """Return the actor of a given event."""
-        if self.type_of_action == 'C':
-            return self.club.name
-        elif self.type_of_action == 'B':
-            return self.book.title
-        elif self.type_of_action == 'U':
-            return self.action_user.username
-        elif self.type_of_action == 'M':
-            return self.meeting.title
-        else:
-            return self.rating.book.title
 
 class Chat(models.Model):
     

@@ -3,29 +3,35 @@
     {% if club_events_length == 0  %}
         <p> No Club Updates Yet! </p>
     {% else %}
-        {% if event.type_of_action == 'M'  %}
+        {% with event.description|last as last%}
+            {% if last == 'M'  %}
+                <li class="post-text">
+                    <a href= {% url 'club_page' event.actor.id  %} style= "color: black">  {{ event.actor.name }}  </a>
+                    {{event.verb}}{{event.action_object.title}}  </a>
+                </li>
+                &emsp;
+            {%elif last == 'B' %}
+                <li class="post-text">
+                    <a href= {% url 'club_page' event.actor.club.id  %} style= "color: black">  {{ event.actor.club.name }}  </a>
+                    {{event.verb}}
+                    <a href= {% url 'book_details' event.action_object.id  %} style= "color: black">  {{event.action_object.title}}  </a>
+                    for meeting {{event.actor.title}} 
+
+                    
+                </li>
+                &emsp;
+            {%elif last == 'U' %}
             <li class="post-text">
-                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
-                {{ event.message }}
-                {{ event.get_action }}
+
+                <a href= {% url 'club_page' event.actor.id  %} style= "color: black">  {{ event.actor.name }}  </a>
+                {{event.verb}}
+                <a href= {% url 'profile' event.action_object.id  %} style= "color: black">  {{event.action_object.full_name}}  </a>
             </li>
             &emsp;
-        {%elif event.type_of_action == 'B' %}
-            <li class="post-text">
-                <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
-                {{ event.message }}
-                <a href= {% url 'book_details' event.book.id  %} style= "color: black">  {{ event.get_action }}  </a>
-             </li>
-             &emsp;
-        {%elif event.type_of_action == 'U' %}
-        <li class="post-text">
-            <a href= {% url 'club_page' event.club.id %} style= "color: black">  {{ event.get_actor }}  </a>
-            {{ event.message }}
-            <a href= {% url 'profile' event.action_user.id  %} style= "color: black">  {{ event.get_action }}  </a>
-         </li>
-         &emsp;
+            {% endif %}
+        {%endwith%}
     {% endif %}
-    {% endif %}
+    
     
 {% endfor %}
 

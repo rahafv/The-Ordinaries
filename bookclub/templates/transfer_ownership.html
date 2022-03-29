@@ -1,20 +1,17 @@
 {% extends 'base_content.html' %}
 {% block title %}{{ club.name }}{% endblock %}
 {% block content %}
-{% comment %} <form action="{% url 'transfer_ownership' %}" method="post"> {% endcomment %}
-<form method="post">
-    {% csrf_token %}
-    <select id="selected_member" name="selected_member">
-        {% for member in memberlist %}
-        <option value={{member.id}}> {{member.username}} </option>
-        {% endfor %}
-    </select>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="checked" id="defaultCheck" required>
-        <label class="form-check-label" for="defaultCheck">
-          Please confirm by checking this box
-        </label>
-      </div>
-    <input type="submit" class="btn btn-primary mb-3" value="Save" id="submit">
-</form>
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1 style="text-align:center;" class="mt-3">Transfer Ownership</h1>
+      <form method="post">
+          {% csrf_token %}
+                {% include 'partials/bootstrap_form.html' with form=form %}
+          <input id="form_button" type="submit" value="Transfer" class="btn btn-lg btn-outline-dark">
+          <button onclick="history.back()" class="btn btn-lg btn-outline-dark">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
