@@ -279,6 +279,24 @@ def add_review(request, book_id):
                          "Review cannot be over 250 characters!")
     return render(request, 'book_details.html', {'book': reviewed_book})
 
+@login_required
+def post_book_progress(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    print(f'{request.content_params}')
+    if request.method == "POST":
+        progress = request.POST.get('progress')
+        if progress != '':
+            comment = request.POST.get("comment")
+            label = request.POST.get('label')
+            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f'commented: "{comment}"  for  {progress} {label} of '), action_object=book, description='user-event-B' ) 
+            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
+        else:
+            messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
+    return redirect('book_details', book_id=book.id)
+
+
+
 
 class ClubPageView(LoginRequiredMixin, DetailView):
     """Show individual club details."""
@@ -328,30 +346,10 @@ def book_details(request, book_id):
     if rating:
         rating = rating[0]
     reviews_count = book.ratings.all().count()
-    
-    user_progress = False
-    
-    if request.method == "POST":
-        progress_pages = request.POST.get('progress-pages', None)
-        if progress_pages != '' and progress_pages != None:
-            comment = request.POST.get("progress-comment-pages")
-            user_progress = {'comment': comment, 'progress': progress_pages, 'label': "Pages"}
-            notify.send(request.user, recipient=request.user.followers.all()+request.user, verb=(f'commented: "{comment}"  for  {progress_pages} pages of '), action_object=book, description='user-event-B' ) 
-            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
-        else:
-            progress_percent = request.POST.get('progress-percent', None)
-
-            if progress_percent != None:
-                comment = request.POST.get("progress-comment-percent")
-                user_progress = {'comment': comment, 'progress': progress_percent, 'label': "Percent"}
-                notify.send(request.user, recipient=request.user.followers.all()+request.user, verb=(f' commented: "{comment}"  for {progress_percent}% of '), action_object=book, description='user-event-B') 
-                messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
-            else:
-                messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
 
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
-               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings, 'user_progress':user_progress}
+               'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
         
     return render(request, "book_details.html", context)
 
