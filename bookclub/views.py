@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, BookForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import get_list_of_objects, login_prohibited, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
+from .helpers import get_list_of_objects, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating
 from django.urls import reverse
@@ -23,7 +23,6 @@ from django.core.mail import send_mail
 from system import settings
 from threading import Timer
 from django.core.paginator import Paginator
-from django.db.models.functions import Lower
 from notifications.signals import notify
 from notifications.utils import slug2id
 from notifications.models import Notification
@@ -281,6 +280,28 @@ def add_review(request, book_id):
                          "Review cannot be over 250 characters!")
     return render(request, 'book_details.html', {'book': reviewed_book})
 
+@login_required
+def post_book_progress(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    if request.method == "POST":
+        progress = request.POST.get('progress')
+        if progress != '':
+            comment = request.POST.get("comment")
+            fullcomment=""
+            if comment:
+                fullcomment = f" commented:   \"{comment}\" for "
+            else: 
+                fullcomment = " has read"
+            label = request.POST.get('label')
+            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f' {fullcomment} {progress} {label} of '), action_object=book, description='user-event-B' ) 
+            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
+        else:
+            messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
+    return redirect('book_details', book_id=book.id)
+
+
+
 
 class ClubPageView(DetailView):
     """Show individual club details."""
@@ -337,9 +358,12 @@ def book_details(request, book_id):
 
     if rating:
         rating = rating[0]
+    reviews_count = book.ratings.all().count()
+
     context = {'book': book, 'form': form,
                'rating': rating, 'reviews': reviews,
                'reviews_count': reviews_count, 'user': user, 'reader': check_reader, 'numberOfRatings':numberOfRatings}
+        
     return render(request, "book_details.html", context)
 
 
@@ -384,7 +408,6 @@ def show_profile_page_clubs(request, user_id=None):
     following = request.user.is_following(user)
     followable = (request.user != user)
 
-    # clubs_queryset = get_list_or_404(Club, owner = user )
     clubs_queryset = user.clubs.all()
     clubs_count = clubs_queryset.count()
     clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)

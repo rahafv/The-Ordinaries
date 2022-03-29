@@ -41,30 +41,10 @@
                 <hr class="m-0"/>
                 <nav class="list-group list-group-flush">
                   {% if not rating %}
-                  <div class="list-group-item button" style="text-align: center;">
-                    <form action="{% url 'add_review' book.id %}" method="post" class = "text-black">
-                      {% csrf_token %}
-                      <h5 class = " mt-2 mb-3" style="font-size: 16px;">How do you rate this book? 
-                        
-                        <div class="justify-content-center">
-                          <div class="rate mb-2 mt-2">
-                            <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
-                            <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating8" value="4" /><label for="rating8" title="4"></label>
-                            <input type="radio" name="rating" id="rating7" value="3.5" /><label for="rating7" title="3.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating6" value="3" /><label for="rating6" title="3"></label>
-                            <input type="radio" name="rating" id="rating5" value="2.5" /><label for="rating5" title="2.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating4" value="2" /><label for="rating4" title="2"></label>
-                            <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
-                            <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
-                            <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
-                          </div>         
-                          <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
-                          <input type="submit" value="Submit Review" class="btn btn-dark mb-3">
-                        </div>
-                      </h5>
-                    </form>
-                  </div>
+                    <!-- REVIEW BOOK BUTTON-->
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
+                    </a>
                   {%else%}
                   <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
                     <div class='reviews-heading mt-3'>
@@ -76,7 +56,7 @@
                       <p class="review-info-alternate-heading mt-1" >
                         <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
                       </p>
-                      <div class="rating-star">
+                      <div class="rating-star" style="font-size:14px;">
                     
                         <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
                         <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
@@ -92,7 +72,26 @@
                     </div>
                   </div>
                   {% endif %}
+                  {% if reader %}
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
+                        Post your progress
+                      </span>
+                    </a>
+                  {% endif %}
                 </nav>
+                <!-- COLLAPSE FOR REVIEW -->
+                <div class="collapse" id="leave-review">
+                  <div class="card card-body mb-3 pb-0">
+                      {% include 'partials/book_review_form.html' with book_id=book.id%}
+                  </div>
+                </div>
+                <!-- COLLAPSE FOR PROGRESS -->
+                <div class="collapse" id="update-progress">
+                 <div class="card card-body mb-3 pb-0 ">
+                  {% include 'partials/book_progress_form.html' with book_id=book.id%}
+                 </div> 
+                </div>
               </div>
             </div>    
         </div>
@@ -225,4 +224,11 @@
 </div>
 <br/> 
 <br/> 
+
+<script>
+  function updateTextInput(val) {
+    document.getElementById('textInput').value=val; 
+  }
+</script>
+
 {% endblock %}

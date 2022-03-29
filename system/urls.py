@@ -56,6 +56,8 @@ urlpatterns = [
     path('add_book/', views.add_book, name ='add_book'),
     path('book/<int:book_id>/book_details', views.book_details, name ='book_details'),
     path('book/<int:book_id>/add_review', views.add_review, name ='add_review'),
+    path('book/<int:book_id>/post_progress', views.post_book_progress, name ='post_progress'),
+
     
     path('initial_genres/', views.initial_genres, name ='initial_genres'),
     path('initial_genres/books', views.initial_book_list, name ='initial_book_list'),
