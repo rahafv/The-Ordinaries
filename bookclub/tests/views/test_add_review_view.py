@@ -1,14 +1,15 @@
 """Tests of the add review view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Book, Rating, User, Event
+from bookclub.models import Book, Rating, User
 from bookclub.tests.helpers import LoginRedirectTester
 
 class AddReviewViewTestCase(TestCase, LoginRedirectTester):
     """Tests of the add review view."""
 
     fixtures = ["bookclub/tests/fixtures/default_book.json", 
-                'bookclub/tests/fixtures/default_user.json']
+                'bookclub/tests/fixtures/default_user.json', 
+                'bookclub/tests/fixtures/other_users.json']
 
     def setUp(self):
         self.book = Book.objects.get(ISBN='0195153448')
@@ -20,6 +21,8 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
             'review': 'Great book',
             'rating': 4.0,
         }
+        self.follower =  User.objects.get(id=2)
+        self.follower.toggle_follow(self.user)
 
     def test_add_review_url(self):
         self.assertEqual(self.url,f"/book/{self.book.id}/review/")
@@ -43,13 +46,13 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
     def test_add_review_successful(self):
         self.client.login(username=self.user.username, password="Password123")
         count_rating_before = Rating.objects.count()
-        count_events_before = Event.objects.count()
+        count_events_before = self.follower.notifications.unread().count()
         target_url = reverse("book_details",  kwargs={"book_id": self.book.id})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "book_details.html")
-        self.assertEqual(count_rating_before + 1, Rating.objects.count())
-        self.assertEqual(count_events_before + 1, Rating.objects.count())
+        self.assertEqual(count_rating_before + 1, self.follower.notifications.unread().count())
+        self.assertEqual(count_events_before + 1, self.follower.notifications.unread().count())
         user = User.objects.get(id=1)
         book = Book.objects.get(id=1)
         rating = Rating.objects.get(user=user.id, book=book.id)

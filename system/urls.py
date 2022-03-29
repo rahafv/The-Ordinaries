@@ -14,20 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from bookclub import views
 from django.conf.urls import url , handler404
 from django.conf import settings
 from django.views.static import serve
+import notifications.urls
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve,
         {'document_root': settings.MEDIA_ROOT}),
     url(r'^static/(?P<path>.*)$', serve,
         {'document_root': settings.STATIC_ROOT}),
+    url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
 
     path('admin/', admin.site.urls),
-    path('', views.welcome,  name='welcome'),
+    path('', views.home,  name='home'),
     path('SignUp/', views.SignUpView.as_view(),  name='sign_up'),
     path('send_activation/<int:user_id>/', views.send_activiation_email,  name='send_activation'),
     path('activate/<uidb64>/<token>/', views.ActivateUserView.as_view(),  name='activate'),
@@ -49,7 +51,9 @@ urlpatterns = [
 
     path('add_book/', views.add_book, name ='add_book'),
     path('book/<int:book_id>/book_details/', views.book_details, name ='book_details'),
-    path('book/<int:book_id>/review/', views.add_review, name ='add_review'),
+    path('book/<int:book_id>/add_review/', views.add_review, name ='add_review'),
+    path('book/<int:book_id>/post_progress', views.post_book_progress, name ='post_progress'),
+
     
     path('initial_genres/', views.initial_genres, name ='initial_genres'),
     path('initial_genres/books/', views.initial_book_list, name ='initial_book_list'),
@@ -91,6 +95,7 @@ urlpatterns = [
     path('club/<int:club_id>/meetings/', views.MeetingsListView.as_view(), name='meetings_list'),
     path('club/<int:club_id>/previous_meetings/', views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
     path('meeting/<int:meeting_id>/cancel/', views.cancel_meeting, name='cancel_meeting'),
+    path(r'mark-as-read/(<slug>[-\w]+)', views.mark_as_read, name='mark_as_read'),
 ]
 
 handler404 = 'bookclub.views.handler404'

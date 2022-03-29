@@ -1,6 +1,7 @@
 from django.urls import reverse
 from django.contrib.messages import ERROR, SUCCESS, WARNING, INFO
 from with_asserts.mixin import AssertHTMLMixin
+from notifications.signals import notify
 
 def reverse_with_next(url_name, next_url):
     url = reverse(url_name)
@@ -64,10 +65,13 @@ class MenuTestMixin(AssertHTMLMixin):
 
     def assert_menu(self,response):
         for url in self.menu_urls:
-            with self.assertHTML(response , f'a[href="{url}"]'):
-                pass
+            self.assertHTML(response , f'a[href="{url}"]')
 
     def assert_no_menu(self , response):
         for url in self.menu_urls:
             self.assertNotHTML(response , f'a[href="{url}"]')
 
+class NotificationsTester(): 
+    def sendNotification(self, userActor, receptient_user, clubActor): 
+        notify.send(userActor, recipient=receptient_user, verb= "test user", description='user-event')      
+        notify.send(clubActor, recipient=receptient_user, verb= "test club", action_object=userActor, description='club-event-U' )

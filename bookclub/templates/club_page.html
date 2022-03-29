@@ -37,14 +37,16 @@
           <div class="wizard">
               <nav class="list-group list-group-flush">
                 <!-- BOOKS LIST BUTTON -->
-                  <a class="list-group-item button" href="books/">
-                      <div class="d-flex justify-content-between align-items-center">
-                          <div><i class="fe-icon-shopping-bag mr-1 text-muted"></i>
-                              <div class="d-inline-block font-weight-medium text-uppercase">Books</div>
+                  {%if is_member%}
+                    <a class="list-group-item button" href="books/">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div><i class="fe-icon-shopping-bag mr-1 text-muted"></i>
+                                <div class="d-inline-block font-weight-medium text-uppercase">Books</div>
+                            </div>
+                            <span class = "badge badge-pill" style="background-color: #284664; font-size: x-small;">{{club.books.count}}</span>
                           </div>
-                          <span class = "badge badge-pill" style="background-color: #284664; font-size: x-small;">{{club.books.count}}</span>
-                        </div>
-                  </a>
+                    </a>
+                  {%endif%}
                   <!-- MEMBERS LIST BUTTON-->
                   {% if is_member %}
                     <a class="list-group-item button" href='{% url "members_list" club.id %}'>
@@ -61,9 +63,15 @@
                   <!--APPLICANTS LIST BUTTON-->
                   {% if user == club.owner %}
                     {% if club.club_type == "Private"%}
-                      <a class="list-group-item button" href="{% url 'applicants_list' club.id %}">
-                        <i class="fe-icon-map-pin text-muted"></i>Applicants 
-                      </a>
+                    <a class="list-group-item button" href="{% url 'applicants_list' club.id %}">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <i class="fe-icon-map-pin text-muted"></i>
+                          <div class="d-inline-block font-weight-medium text-uppercase">Applicants</div>
+                        </div>
+                        <span class="badge badge-pill" style="background-color: #284664; font-size: x-small;">{{club.applicants_count}}</span>
+                      </div>
+                    </a>
                     {% endif %}
                       <!-- SCHEDULE A MEETING FOR CLUB OWNERS -->
                     <a class="list-group-item button" href="{% url 'schedule_meeting' club_id=club.id %}"> 
@@ -74,7 +82,7 @@
                   <!-- CHAT ROOM BUTTON -->
                   
                   {% if club.members.count > 1 and is_member %}                    
-                      <a class = "list-group-item chat " href='{% url "chat_room" club_id=club.id %}'> 
+                      <a class = "list-group-item stand-out " href='{% url "chat_room" club_id=club.id %}'> 
                         <i class="fe-icon-map-pin"></i>Chat Room
                       </a>
                     
@@ -96,7 +104,7 @@
 
                 <!-- JOIN BUTTON -->
                   {% if not user == club.owner and not is_member and not is_applicant%}
-                      {% if user.city == club.city %}
+                      {% if user.city == club.city  or user.city == None  or club.city == "" or not request.user.is_authenticated  %}
 
                         <a  class="list-group-item join" href="{% url 'join_club' club_id=club.id %}" id = "join_club_button">
                           <i class="fe-icon-map-pin"></i>Join club
