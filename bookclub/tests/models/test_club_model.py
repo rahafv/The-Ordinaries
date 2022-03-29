@@ -29,7 +29,7 @@ class ClubModelTestCase(TestCase):
             self.club.full_clean()
 
     def test_club_created(self):
-        self.assertEqual(3, Club.objects.count())
+        self.assertEqual(4, Club.objects.count())
 
     def test_valid_club(self):
         self._assert_club_is_valid()

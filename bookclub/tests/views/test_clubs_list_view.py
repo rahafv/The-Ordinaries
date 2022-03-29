@@ -175,7 +175,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'clubs.html')
-        self.assertEqual(len(response.context['clubs']), 6)
+        self.assertEqual(len(response.context['clubs']), 8)
         page_obj = response.context['clubs']
         self.assertTrue(page_obj.has_previous())
         self.assertFalse(page_obj.has_next())

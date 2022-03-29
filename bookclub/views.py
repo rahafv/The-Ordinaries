@@ -1270,7 +1270,6 @@ class ChatRoomView(LoginRequiredMixin, TemplateView):
         of a club and if the club has more than one member before displaying chats. """
         user = self.request.user
         club = get_object_or_404(Club, id=kwargs['club_id']) if 'club_id' in kwargs else None
-        print("inside the view:" , self.request.META.get('HTTP_REFERER') )
 
         if club:
             if not club.is_member(user):
