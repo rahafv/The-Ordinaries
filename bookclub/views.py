@@ -1043,7 +1043,7 @@ def edit_review(request, review_id):
         else:
             form = EditRatingForm(instance = review)
         
-        return render(request, 'edit_review.html', {'form':form , 'review_id':review.id })
+        return render(request, 'edit_review.html', {'form':form , 'review':review })
 
     
     return render(request, '404_page.html', status=404)

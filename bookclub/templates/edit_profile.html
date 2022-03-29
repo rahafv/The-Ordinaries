@@ -11,7 +11,7 @@
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
         <input type="submit" value="Update" class="btn btn-lg btn-outline-dark">
-        <button onclick="history.back()" class="btn btn-lg btn-outline-dark">Cancel</button>
+        <a href='{% url 'profile' request.user.id %}' class="btn btn-lg btn-outline-dark" >cancel</a> 
       </form>
     </div>
   </div>
