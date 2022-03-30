@@ -384,6 +384,7 @@ def show_profile_page(request, user_id=None, is_clubs=False):
     items = ""
     items_count = 0
 
+
     if user_id is not None:
         books_queryset = User.objects.get(id=user_id).books.all()
         books_count = books_queryset.count()
