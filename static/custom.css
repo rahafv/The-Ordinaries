@@ -237,6 +237,18 @@
   background-color: #324655;
 }
 
+.opacity-80{
+  opacity: .8;
+}
+
+.opacity-75 {
+  opacity: .75 ;
+}
+
+.opacity-60{
+  opacity: 0.6;
+}
+
 /*
  * Alerts
  */
@@ -244,81 +256,6 @@
   .alert {
   border-radius: 0px;
 }
-
-/*
-  * Welcome page
-*/
-
-.card-welcome {
-  background-color: rgba(245, 245, 245, 0.6);
-  max-width: 25rem;
-  border: none;
-  opacity: 0.25;
-}
-
-
-
-/* 
-* Welcome animation
-*/
-
-.slide-left {
-  width: 300%;
-  margin-left: 100px;
-  max-width: 300px
-}
-
-@media (min-width: 60em) {
-  .slide-left {
-    animation: 2s slide-left 0s forwards;
-    transform:translateX(110%);
-    -webkit-transform: translateX(110%);
-    -moz-transform:translateX(110%); 
-    -o-transform: translateX(110%); 
-    -ms-transform :translateX(110%);
-  }
-}
-
-
-@media (min-width: 60em){
-  @keyframes slide-left {
-    to {
-      transform:translateX(0%);
-      -webkit-transform: translateX(0%);
-      -moz-transform:translateX(0%); 
-      -o-transform: translateX(0%); 
-      -ms-transform :translateX(0%);
-    }
-  }
-}
-
-
-.slide-up {
-  height: 300%;
-  margin-top: 15px;
-  max-height:20px
-}
-
-.slide-up a {
-  animation: 1.5s slide-up 0s forwards;
-  transform:translateY(1000%);
-  -webkit-transform: translateY(1000%);
-  -moz-transform:translateY(1000%); 
-  -o-transform: translateY(1000%); 
-  -ms-transform :translateY(1000%);
-}
-@media screen{
-  @keyframes slide-up {
-    to {
-      transform:translateY(-10%);
-      -webkit-transform: translateY(-10%);
-      -moz-transform:translateY(-10%); 
-      -o-transform: translateY(-10%); 
-      -ms-transform :translateY(-10%);
-    }
-  }   
-}
-
 
 
 
@@ -375,7 +312,7 @@ body {
 }
 .account-block {
     padding: 0;
-    background-image: url(images/signupgradient.jpeg);
+    background-image: url(images/signupgradient.webp);
     background-repeat: no-repeat;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -611,7 +548,6 @@ a{
 
 /* mouse over link */
 a:hover {
-  /* color:rgb(214, 196, 195); */
   color: #0F3471;
 }
 
@@ -691,23 +627,15 @@ a:link {
 .font-weight-bold {
   font-weight: 700 ;
 }
-.opacity-75 {
-  opacity: .75 ;
-}
 
-.opacity-60{
-  opacity: 0.6;
-}
-
+ 
 .profile-statistics {
   font-weight: 300;
-  color: white;
-  opacity: 0.75;
 }
 
 .profile-statistics-item {
   font-weight: 400;
-}
+} 
 
 .bio-text{
   text-overflow: ellipsis;
@@ -732,9 +660,12 @@ a:link {
   background-color: transparent ;
 }
 
-.nav-tabs .nav-link.active {
+.nav-tabs .nav-link:not(.active):hover {
   border-bottom-color: #fff;
+  -webkit-box-shadow: 0 -2px 0 #324655 inset;
+  box-shadow: 0 -2px 0 #324655 inset;
 }
+
 
 
 /*
