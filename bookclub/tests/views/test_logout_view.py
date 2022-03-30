@@ -10,12 +10,13 @@ class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTeste
 
     def setUp(self):
         self.url = reverse('log_out')
+        self.user = User.objects.get(id=1)
 
     def test_log_out_url(self):
         self.assertEqual(self.url,'/LogOut/')
 
     def test_get_log_out(self):
-        self.client.login(username='johndoe', password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
         self.assertTrue(self._is_logged_in())
         response = self.client.get(self.url, follow=True)
         response_url = reverse('home')
