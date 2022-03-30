@@ -1,3 +1,4 @@
+"""Tests of the chatroom view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club

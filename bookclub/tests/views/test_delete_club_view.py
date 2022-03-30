@@ -4,7 +4,9 @@ from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester 
 
-class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
+class DeleteClubViewTestCase(TestCase, LoginRedirectTester, MessageTester):
+    """Tests of the delete club view."""
+    
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',
         'bookclub/tests/fixtures/default_club.json'

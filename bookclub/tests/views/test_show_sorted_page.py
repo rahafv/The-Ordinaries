@@ -4,7 +4,6 @@ from django.urls import reverse
 from bookclub.forms import ClubsSortForm, UsersSortForm, BooksSortForm
 from bookclub.models import User, Club, Book
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
-from system import settings
 
 class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
     """Tests of the sorted search page view."""

@@ -1,9 +1,11 @@
+"""Tests of choosing the from the booklist view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Book, Club, Meeting, User
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 
 class ChooseBookViewTest(TestCase, LoginRedirectTester, MessageTester):
+    """Tests of choosing the from the booklist view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

@@ -1,11 +1,11 @@
-"""Tests of the logged in user profile view."""
+"""Tests of the logged in user's profile page with clubs list view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester,MenuTestMixin
 
 class ProfilePageWithClubsListViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
-    """Tests of the logged in user's profile page view."""
+    """Tests of the logged in user's profile page with clubs list view."""
 
     fixtures = [ 'bookclub/tests/fixtures/default_user.json',
                 'bookclub/tests/fixtures/other_users.json',

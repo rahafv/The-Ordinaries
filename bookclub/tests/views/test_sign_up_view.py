@@ -9,6 +9,7 @@ from datetime import date
 
 class SignUpViewTestCase(TestCase, LogInTester,MenuTestMixin):
     """Tests of the sign up view."""
+    
     fixtures = ['bookclub/tests/fixtures/default_user.json']
 
     def setUp(self):
