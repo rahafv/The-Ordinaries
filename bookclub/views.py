@@ -418,7 +418,7 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         if self.user_id:
             user = get_object_or_404(User.objects, id=self.user_id)
             
-        if self.request.GET.get('filter') == 'books':
+        if self.request.GET.get('filter') == 'Reading list':
             books_queryset = User.objects.get(id=user.id).books.all()
             books_count = books_queryset.count()
             books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
@@ -428,7 +428,7 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
             context['items_count'] = books_count
             context['is_clubs'] = False
 
-        if self.request.GET.get('filter') == 'clubs':
+        if self.request.GET.get('filter') == 'Clubs':
             clubs_queryset = User.objects.get(id=user.id).clubs.all()
             clubs_count = clubs_queryset.count()
             clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)

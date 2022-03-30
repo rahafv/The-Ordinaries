@@ -67,7 +67,7 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile_page.html')
-        self.form_input = {'filter': 'books'}
+        self.form_input = {'filter': 'Reading list'}
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile_page.html')
@@ -92,7 +92,7 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile_page.html')
-        self.form_input = {'filter': 'clubs'}
+        self.form_input = {'filter': 'Clubs'}
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile_page.html')
