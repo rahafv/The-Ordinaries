@@ -1,11 +1,9 @@
 """Tests of the mark as read view."""
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from notifications.signals import notify
 from bookclub.models import User, Club
 from bookclub.helpers import NotificationHelper
-from bookclub.views import mark_as_read
-
 
 class MarkAsReadViewTestCase(TestCase):
     """Tests of the mark_as_read view."""

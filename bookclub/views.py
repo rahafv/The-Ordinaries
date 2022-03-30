@@ -303,6 +303,8 @@ class CreateClubView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
+        messages.add_message(
+            self.request, messages.SUCCESS, "Club created succesfully!")
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
     def handle_no_permission(self):
@@ -398,6 +400,8 @@ class AddBookView(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
+        messages.add_message(
+            self.request, messages.SUCCESS, "Book added succesfully!")
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
 

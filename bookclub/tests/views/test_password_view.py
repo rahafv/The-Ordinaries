@@ -2,7 +2,6 @@
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.tests.helpers import reverse_with_next
 from bookclub.forms import PasswordForm
 from bookclub.models import User
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester,MenuTestMixin

@@ -1,4 +1,4 @@
-"""Tests of the initial book list view."""
+"""Tests of the choice book list view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Book, Meeting
@@ -6,7 +6,8 @@ from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
 
 
 class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
-
+    """Tests of the choice book list view."""
+    
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 
         'bookclub/tests/fixtures/default_club.json',

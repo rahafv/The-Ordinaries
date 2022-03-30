@@ -1,4 +1,4 @@
-"""Tests of the add book view."""
+"""Tests of the add book to the website view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import BookForm
@@ -6,7 +6,7 @@ from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 
 class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
-    """Tests of the add bookview."""
+    """Tests of the add book to the website view."""
 
     fixtures = ["bookclub/tests/fixtures/default_user.json"]
 

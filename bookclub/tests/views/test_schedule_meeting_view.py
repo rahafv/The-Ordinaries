@@ -1,3 +1,4 @@
+"""Test suite for the schedule meeting view."""
 from datetime import datetime, timedelta
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -8,6 +9,7 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageT
 import pytz
 
 class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
+    """Test suite for the schedule meeting view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

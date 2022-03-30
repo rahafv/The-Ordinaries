@@ -1,11 +1,12 @@
+"""Test suite for the initial genre view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.forms import ClubsSortForm, UsersSortForm, BooksSortForm
-from bookclub.models import User, Club, Book
+from bookclub.models import User, Book
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
-from system import settings
+
 
 class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
+    """Test suite for the initial genre view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json'] 
 

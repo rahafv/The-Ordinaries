@@ -1,13 +1,13 @@
-from multiprocessing.sharedctypes import Value
+"""Tests of the members list view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.forms import UsersSortForm
-from bookclub.tests.helpers import reverse_with_next
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from system import settings
 
 class MembersListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
+    """Tests of the members list view."""
 
     fixtures=[
                 'bookclub/tests/fixtures/default_club.json',

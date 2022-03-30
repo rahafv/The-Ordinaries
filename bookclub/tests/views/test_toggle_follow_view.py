@@ -1,12 +1,11 @@
-import profile
-from django import http
+"""Tests of the show user view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
+from bookclub.models import User
 from bookclub.tests.helpers import reverse_with_next
 
 class ShowUserTest(TestCase):
-
+    """Tests of the show user view."""
     fixtures = [
         'bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',

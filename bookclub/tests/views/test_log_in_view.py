@@ -6,7 +6,8 @@ from bookclub.models import User
 from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenuTestMixin
 
 class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
-
+    """Tests of the log in view."""
+    
     fixtures = ['bookclub/tests/fixtures/default_user.json' , 
                 'bookclub/tests/fixtures/other_users.json' , 
                  'bookclub/tests/fixtures/default_book.json',
