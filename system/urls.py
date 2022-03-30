@@ -38,9 +38,6 @@ urlpatterns = [
 
     path('profile/', views.ProfilePageView.as_view() , name='profile'),
     path('profile/<int:user_id>', views.ProfilePageView.as_view() , name='profile'),
-    path('profile/<int:user_id>/reading_list/', views.ProfilePageReadingListView.as_view(), name='profile_reading_list'),
-    path('profile/<int:user_id>/clubs/', views.ProfilePageClubsView.as_view(), name='profile_clubs'),
-    path('profile/<int:user_id>/<is_clubs>/', views.ProfilePageView.as_view() , name='profile'),
 
     path('edit_profile/', views.ProfileUpdateView.as_view(), name='edit_profile'),
     path('edit_review/<int:review_id>', views.EditReviewView.as_view(), name='edit_review'),

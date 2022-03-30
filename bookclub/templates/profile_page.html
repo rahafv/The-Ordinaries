@@ -66,15 +66,12 @@
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
             <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent me-4">
-                <form action="{% url 'profile' %}" method="post">
-                    {% csrf_token %}
+                <form action="{% url 'profile' user.id %}" method=GET>
                 <li class="nav-item">
-                    <a class="nav-link text-white py-3" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
-                    <input id="form_button" type="submit" value="books" class="btn btn-lg btn-outline-dark">
+                    <input type="submit" name='filter' value="books" class="nav-link text-white py-3">
                 </li>
                 <li class="nav-item">
-                    <input id="form_button" type="submit" value="clubs" class="btn btn-lg btn-outline-dark">
-                    <a class="nav-link text-white py-3" href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
+                    <input type="submit" name='filter' value="clubs" class="nav-link text-white py-3">
                 </li>
                 </form>
             </ul>
