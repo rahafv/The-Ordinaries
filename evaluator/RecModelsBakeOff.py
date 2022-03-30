@@ -48,13 +48,13 @@ class RecModelsBakeOff:
         ItemKNN = KNNWithZScore(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNNWithZScore")
 
-        # SVD pp
-        svd = SVDpp()
-        evaluator.AddAlgorithm(svd, "SVD pp")
-
         # SVD
         svd = SVD()
         evaluator.AddAlgorithm(svd, "SVD")
+
+        # SVD pp
+        svd = SVDpp()
+        evaluator.AddAlgorithm(svd, "SVD pp")
 
         # Random recommendations
         Random = NormalPredictor()
