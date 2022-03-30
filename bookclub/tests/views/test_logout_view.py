@@ -1,6 +1,7 @@
 """Tests of the log out view."""
 from django.test import TestCase
 from django.urls import reverse
+from bookclub.models import User
 from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin
 
 class LogOutViewTestCase(TestCase,LogInTester, LoginRedirectTester, MessageTester,MenuTestMixin):
