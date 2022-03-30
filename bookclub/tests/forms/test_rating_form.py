@@ -4,7 +4,7 @@ from bookclub.models import User, Book, Rating
 from bookclub.forms import RatingForm
 
 class RatingFormTestCase(TestCase):
-    """Unit tests of the review form."""
+    """Unit tests of the rating form."""
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
             'bookclub/tests/fixtures/default_user.json']
@@ -35,11 +35,11 @@ class RatingFormTestCase(TestCase):
         self.assertIn('rating', form.fields)
 
     def test_club_form_must_save_correctly(self):
-        form = RatingForm(data=self.form_input)
         before_count = Rating.objects.count() 
         user = User.objects.get(id=1)
         book = Book.objects.get(id=1)
-        rating = form.save(user, book)
+        form = RatingForm(book=book, user=user, data=self.form_input)
+        rating = form.save()
         after_count = Rating.objects.count()
         self.assertEqual(after_count, before_count+1)
         self.assertEqual(rating.user, user)
@@ -48,10 +48,10 @@ class RatingFormTestCase(TestCase):
         self.assertEqual(rating.rating, 4*2)
  
     def test_review_form_must_save_correctly_and_rating_can_be_empty(self):
-        form = RatingForm(data=self.empty_rating_form_input)
         user = User.objects.get(id=1)
         book = Book.objects.get(id=1)
-        form.save(user, book)
+        form = RatingForm(book=book, user=user, data=self.empty_rating_form_input)
+        form.save()
         self.assertTrue(form.is_valid())
         
 

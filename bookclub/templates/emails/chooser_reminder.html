@@ -1,13 +1,17 @@
 {% autoescape off %}
-Dear {{meeting.chooser.full_name}},
+Greetings {{meeting.chooser.full_name}},
 
 It is your turn to choose a book for {{meeting.club.name}}'s next meeting.
 The meeting is scheduled to be on {{meeting.time}}; therefore you have a week to choose your favorite book for everyone to start reading. 
 
-Choice page: http://{{domain}}{% url 'choice_book_list' meeting.id %}
+Click the link below to explore the choices.
+http://{{domain}}{% url 'choice_book_list' meeting.id %}
 
 Choose wisely!!
-The Ordinaries Book Clubs,
+
+Thanks,
+The Ordinaries team
+
 Club page: http://{{domain}}{% url 'club_page' meeting.club.id %}
 
 {% endautoescape %} 

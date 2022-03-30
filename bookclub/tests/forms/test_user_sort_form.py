@@ -4,7 +4,7 @@ from bookclub.models import User, Club
 from bookclub.forms import UsersSortForm
 
 class UserSortFormTestCase(TestCase):
-    """Unit tests of the review form."""
+    """Unit tests of the sort form."""
 
     fixtures=[
         'bookclub/tests/fixtures/default_user.json',

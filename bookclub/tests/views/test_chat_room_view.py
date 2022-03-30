@@ -1,10 +1,10 @@
-from datetime import datetime, timedelta
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
 
 class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
+    """Tests of the chatroom view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',
@@ -71,7 +71,6 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         self.client.login(username=self.fourth_user.username, password='Password123')
         self.url = reverse('chat_room' ,kwargs={'club_id': self.second_club.id})
         response = self.client.get(self.url, follow=True)
-        #response_url = reverse('club_page' , kwargs={'club_id': self.second_club.id})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_page.html')
         self.assert_info_message(response)

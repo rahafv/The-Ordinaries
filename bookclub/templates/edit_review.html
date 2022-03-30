@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-12">
       <h1>Edit Review</h1>
-      <form action='{% url 'edit_review' review_id=review.id %}' method="post">
+      <form action='{% url 'edit_review' review_id=review_id %}' method="post">
         {% csrf_token %}
         <div>
             <div class="rate mb-2">
