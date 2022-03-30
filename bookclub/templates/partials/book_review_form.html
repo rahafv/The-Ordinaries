@@ -2,7 +2,7 @@
     {% csrf_token %}
     <h5 class = "mt-2 mb-3" style="font-size: 16px;">&emsp; How do you rate this book? 
       
-      <div class="justify-content-center">
+      <div class="justify-content-center" style="max-width: 10px">
         <div class="rate mb-2 mt-2 ms-2">
           <input class="rate" type="radio" name="rating" id="rating10" value="5" /><label for="rating10" title="5"></label>
           <input type="radio" name="rating" id="rating9" value="4.5" /><label for="rating9" title="4.5" class="half"></label>
@@ -14,7 +14,7 @@
           <input type="radio" name="rating" id="rating3" value="1.5" /><label for="rating3" title="1.5" class="half"></label>
           <input type="radio" name="rating" id="rating2" value="1" /><label for="rating2" title="1"></label>
           <input type="radio" name="rating" id="rating1" value="0.5" /><label for="rating1" title="0.5" class="half"></label>
-        </div>         
+        </div>  
         <textarea name="review" rows="4" class="form-control mx-2 ps-3 mb-3"style = "max-width: 330px" placeholder="Write your review"></textarea>
         <input type="submit" value="Submit Review" class="btn btn-dark mb-3 ms-2">
       </div>
