@@ -2,10 +2,10 @@
     
     <ul class="navbar-nav mr-auto">
         <li class="nav-item nav-item active">
-            <a class="nav-link" id="clubs_list" href="{% url 'clubs_list' %}"> Clubs </a>
+            <a class="nav-link" href="{% url 'clubs_list' %}"> Clubs </a>
         </li>
         <li>
-            <a class="nav-link" id="books_list" href="{% url 'books_list' %}"> Books </a>
+            <a class="nav-link" href="{% url 'books_list' %}"> Books </a>
         </li>
     </ul>  
     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -15,30 +15,28 @@
             {% include 'partials/notifications.html' with user=request.user%}
         
             <li class="nav-item dropdown">
-                <ul aria-label="navProfileItems">
-                    <a class="nav-link" href="#" aria-label="navbarDropdownMenu" id="navbarDropdownMenu" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <span class="bi-person-circle"></span>
-                    </a>
-                </ul>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenu">
-                    <li><a class="dropdown-item" id="user_profile" href="{% url 'profile' %}">My profile</a></li>
-                    <li><a class="dropdown-item" id="user_books" href={% url 'books_list' request.user.id %}>My books</a></li>
-                    <li><a class="dropdown-item" id="user_clubs" href={% url 'clubs_list' request.user.id %}>My clubs</a></li>
+                <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <span class="bi-person-circle"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{% url 'profile' %}">My profile</a></li>
+                    <li><a class="dropdown-item" href={% url 'books_list' request.user.id %}>My books</a></li>
+                    <li><a class="dropdown-item" href={% url 'clubs_list' request.user.id %}>My clubs</a></li>
                     {% if user.clubs.all %}
-                        <li><a class="dropdown-item" id="user_chats" href={% url 'chat_room' %}>My chats</a></li>
+                        <li><a class="dropdown-item" href={% url 'chat_room' %}>My chats</a></li>
                     {% endif %}
                     <hr>
-                    <li><a class="dropdown-item" id="change_password" href="{% url 'password' %}">Change password</a></li>
-                    <li><a class="dropdown-item"id="log_out" href="{% url 'log_out' %}">Log out</a></li>
+                    <li><a class="dropdown-item" href="{% url 'password' %}">Change password</a></li>
+                    <li><a class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
                 </ul>
             </li>
         {%else%}
             <li class="nav-item nav-item active">
-                <a class="nav-link" id="sign_up" href="{% url 'sign_up' %}"> Sign up </a>
+                <a class="nav-link" href="{% url 'sign_up' %}"> Sign up </a>
             </li>
             <li class="nav-item nav-item active">
-                <a class="nav-link" id="log_in" href="{% url 'log_in' %}"> Login </a>
+                <a class="nav-link" href="{% url 'log_in' %}"> Login </a>
             </li>
         {%endif%}
     </ul>
