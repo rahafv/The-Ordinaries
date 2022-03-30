@@ -292,7 +292,7 @@ class RatingForm(forms.ModelForm):
         model = Rating
         fields = ['rating', 'review']
         widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+            'review': forms.Textarea(attrs={'cols': 20, 'rows': 15}),
         }
 
     def __init__(self, *args, **kwargs):
