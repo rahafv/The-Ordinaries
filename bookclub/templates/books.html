@@ -8,7 +8,7 @@
   
 
 {% if general %}
-  <h1 class="fw-light center bg-purple" style="text-align: center;">Books</h1>
+  <h1 class="fw-light center bg-purple text-white" style="text-align: center;">Books</h1>
   <div class="carousel-inner" style="top: -8px;">
     <div class="carousel-item active">
       
@@ -35,7 +35,7 @@
   <div class="container">
     <div class="row py-lg-5">
       <div class="col-lg-6 col-md-8 mx-auto">
-        <p class="lead text-muted" style="text-align: center">Explore The ordinaries’s ever-expanding collection of book of different categories and genres. Find your next great adventure!</p>
+        <p class="lead" style="text-align: center; color: #464C51;">Explore The ordinaries’s ever-expanding collection of book of different categories and genres. Find your next great adventure!</p>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@
     </div>
     <div class="row justify-content-center">
        {% for book in books %}
-          <div class="col-sm-6 col-md-3 text-center">
+          <div class="col-sm-6 col-md-4 col-lg-3 text-center">
             {% include 'partials/book_card.html' with book=book %}
             <a href={% url "book_details" book_id=book.id %} class="btn btn-outline-dark ms-2" style="margin-left:6em"  role="button" > View &raquo;</a>
           </div>
