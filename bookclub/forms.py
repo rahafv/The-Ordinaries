@@ -257,12 +257,15 @@ class UserForm(forms.ModelForm):
         return self.log_in_user
 
 class EditRatingForm(forms.ModelForm):
-    """Form to update club information."""
+    """Form to update review."""
 
     class Meta:
 
         model = Rating
         fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
 
     def __init__(self, *args, **kwargs):
         self.review = kwargs.pop('review', None)
@@ -377,7 +380,7 @@ class BooksSortForm(forms.Form):
     )
 
 class MeetingForm(forms.ModelForm):
-    """Form to update club information."""
+    """Form to create meeting information."""
 
     class Meta:
         """Form options."""
