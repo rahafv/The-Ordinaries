@@ -15,10 +15,12 @@
             {% include 'partials/notifications.html' with user=request.user%}
         
             <li class="nav-item dropdown">
-                <a class="nav-link" href="#" aria-label="navbarDropdownMenu" id="navbarDropdownMenu" role="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    <span class="bi-person-circle"></span>
-                </a>
+                <ul aria-label="navProfileItems">
+                    <a class="nav-link" href="#" aria-label="navbarDropdownMenu" id="navbarDropdownMenu" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <span class="bi-person-circle"></span>
+                    </a>
+                </ul>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenu">
                     <li><a class="dropdown-item" id="user_profile" href="{% url 'profile' %}">My profile</a></li>
                     <li><a class="dropdown-item" id="user_books" href={% url 'books_list' request.user.id %}>My books</a></li>
