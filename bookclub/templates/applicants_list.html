@@ -22,7 +22,7 @@
                             {% for applicant in applicants %}
                                 <tr>
                                     <td>
-                                        <img src="{{ applicant.gravatar }}" alt="Gravatar of {{ applicant.full_name }}" class="rounded-circle profile-image" >
+                                        <img src="{{ applicant.gravatar }}" loading="lazy" alt="Gravatar of {{ applicant.full_name }}" class="rounded-circle profile-image" >
                                         <span style="width: 180px;"class="user-link">{{applicant.full_name}}</span>
                                         <a href='{% url 'profile' applicant.id %}' style="color: grey; font-style: italic;" >{{applicant.username}}</a>
                                     </td>

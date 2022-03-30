@@ -8,7 +8,7 @@
                         {% for user in Users %}
                             <tr>
                                 <td>
-                                    <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle profile-image" >
+                                    <img src="{{ user.gravatar }}" loading="lazy" alt="Gravatar of {{ user.username }}" class="rounded-circle profile-image" >
                                     <span style="width: 180px;"class="user-link">{{user.full_name}}</span>
                                     <a href='{% url 'profile' user.id %}' style="color: #4E4E4E; font-style: italic;" >{{user.username}}</a>
                                 </td>

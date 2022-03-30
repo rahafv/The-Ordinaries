@@ -17,7 +17,7 @@
       <div class="carousel-item active">
         <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
           <rect width="100%" height="100%" fill="#faf3ee"/>
-          <image width="100%" height="100%"  alt="welcome page carousel page1 background image" xlink:href="{% static '/images/welcome_page.png' %}"  />
+          <image width="100%" height="100%" loading="lazy"  alt="welcome page carousel page1 background image" xlink:href="{% static '/images/welcome_page.png' %}"  />
     
         </svg>
           <div class="container">
@@ -27,7 +27,7 @@
       </div>
 
       <div class="carousel-item">
-        <svg class="bd-placeholder-img" width="100%"  alt="welcome page carousel page2 background" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#64505a"/></svg>
+        <svg class="bd-placeholder-img" width="100%"  alt="" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#64505a"/></svg>
         <div class="container">
           <div class="carousel-caption">
             <h1>Add your favourite books here!</h1>
@@ -38,7 +38,7 @@
       </div>
 
       <div class="carousel-item">
-        <svg class="bd-placeholder-img" width="100%" height="100%"  alt="welcome page carousel page2 background" xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">  <rect width="100%" height="100%" fill="#dac3c3"/>  </svg>
+        <svg class="bd-placeholder-img" width="100%" height="100%"  alt="" xmlns="http://www.w3.org/2000/svg"  aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">  <rect width="100%" height="100%" fill="#dac3c3"/>  </svg>
         <div class="container">
           <div class="carousel-caption">
             <h1> Be a book club leader now!</h1>
@@ -65,7 +65,7 @@
     <div class="row text-center" style = "text-align:center;">
       {%for book in books%}
       <div class="col-lg-4 justify-content-center">
-        <img width="140" height="200" alt="recommended {{book.title}} cover image" src="{{ book.image_url }}"</img>
+        <img width="140" height="200" loading="lazy" alt="recommended {{book.title}} cover image" src="{{ book.image_url }}"</img>
         
         <p class="mt-4"style=" display: -webkit-box; max-width: 350px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 25px; text-align: center;">{{book.title}}</p>
         <p style=" display: -webkit-box; max-width: 300px; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px; text-align: center;">{{book.description}}</p>
