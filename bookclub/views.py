@@ -79,8 +79,6 @@ class HomeView(TemplateView):
             notifications = current_user.notifications.unread()
             user_events = notifications.filter(description__contains ='user-event')[:25]
             club_events = notifications.filter(description__contains='club-event')[:10]
-            already_selected_books = current_user.books.all()
-            my_books = Book.objects.all().exclude(id__in=already_selected_books)
             top_rated_books = get_recommender_books(self.request, True, 3, user_id=current_user.id)
         else:
             notifications = None
