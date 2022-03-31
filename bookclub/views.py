@@ -1083,7 +1083,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
         form.save()
         self.review_user.add_book_to_all_books(self.reviewed_book)
         notify.send(self.review_user, recipient=self.review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=self.reviewed_book, description='user-event-B' )
-        messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
+        messages.add_message(self.request, messages.SUCCESS, 'You successfully submitted the review.')
 
         self.reviewed_book.calculate_average_rating()
         return super().form_valid(form)
