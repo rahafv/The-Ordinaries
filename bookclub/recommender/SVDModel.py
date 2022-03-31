@@ -10,8 +10,12 @@ import heapq
 
 class SVDModel:
     def __init__(self, recHelper):
+     
         self.trainset = recHelper.trainset
         self.similarity_matrix = recHelper.similarity_matrix
+
+        if self.trainset == None:
+            self.train(recHelper)
 
         if recHelper.counter == 0:
             if self.trainset == None:
