@@ -15,7 +15,7 @@
                             {% for book in Books %}
                                 <tr> 
                                     <td  style="width: 30%;" > 
-                                        <img  src="{{ book.image_url }}" style="height:80px; width:65px;">
+                                        <img  src="{{ book.image_url }}" loading="lazy" alt="{{book.title}} cover image" style="height:80px; width:65px;">
                                         <a style=" display: -webkit-box; max-width: 200px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' book.id %}'  >{{book.title}}</a>
                                         <span style=" display: -webkit-box; max-width: 180px; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;  font-style: italic; font-size: 15px;"class="user-link">{{book.author}}</span>
                                     </td>

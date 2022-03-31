@@ -17,14 +17,14 @@
     </div>
 
     <div class="col-sm-8 mx-auto text-center text-white">
-        <p class="lead text-center " style="color:white;"> Select your favourtie </p>
+        <p class="lead text-center " style="color:white;"> Select your favourite </p>
         <form method=GET action="{% url 'initial_book_list'%}">
             {% for genre in genres %}
                 <label id="genre">
                     <input type="checkbox" id="genre" name="genre" value="{{genre}}" style="opacity:0">
                     <span class="checkmark">{{genre}}</span>
-                  </label>
-                {% endfor %}
+                </label>
+            {% endfor %}
     </div>
             <div class="text-center">
                 {% include 'partials/bootstrap_form.html' with form=form %}

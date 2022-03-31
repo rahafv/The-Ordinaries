@@ -9,34 +9,34 @@
     <div class="ui-bg-overlay bg-dark-purple opacity-25"></div>
     <div class="row" style="margin:0px">
             <div class= "text-center py-3">
-                <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
+                <img src="{{ user.gravatar }}" loading="lazy" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
 
                 <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
                     <div class =  "text-center name-and-edit">
                         <h3 class= "my-4 user-name">{{ user.full_name }}</h3>
                         &emsp;
                         {% if current_user == user %}
-                            <a class = "edit-pencil text-white bi-pencil-square" href ="{% url 'edit_profile'%}"></a>
+                            <a class = "edit-pencil text-white bi-pencil-square"  aria-label="edit profile button" href ="{% url 'edit_profile'%}"></a>
                         {% endif %}
 
                     </div>
-                    <div class="opacity-75 mb-3">
-                        <span class = "profile-username">{{user.username}}</span>
+                    <div class="mb-3">
+                        <span class = "profile-username opacity-80">{{user.username}}</span>
                         {% if current_user == user %}
                         <br/>
                             <span class = "profile-email">{{user.email}}</span>
                         {% endif %}
                     </div>
                     {% if user.age or user.location %}
-                        <div class="opacity-60 mb-2"> 
+                        <div class="mb-2 "> 
                                 {% if user.age %}
-                                    <span class="profile-statistics">Age: </span>
-                                    <span class = "profile-statistics-item">{{user.age}}</span>
+                                    <span class="profile-statistics opacity-80">Age: </span>
+                                    <span class = "profile-statistics-item opacity-80">{{user.age}}</span>
                                 {% endif %}
                                 &emsp;
                                 {% if user.location %}
-                                    <span class="profile-statistics">Location:</span>
-                                    <span class = "profile-statistics-item">{{user.location}}</span>
+                                    <span class="profile-statistics opacity-80">Location:</span>
+                                    <span class = "profile-statistics-item opacity-80">{{user.location}}</span>
                                 {% endif %}
                         </div>
                     {% endif %}
@@ -48,16 +48,16 @@
 
                 </div>
                 <div class="text-center pt-2 pb-1.7">
-                    <a href="{% url 'following_list' user_id=user.id %}"  class = "d-inline-block text-white"> {{ user.followee_count }}  <span class= "opacity-75">following</span></a>
+                    <a href="{% url 'following_list' user_id=user.id %}"  class = "d-inline-block text-white"> {{ user.followee_count }}  <span class= "opacity-80">following</span></a>
                     &emsp;
-                    <a href="{% url 'followers_list' user_id=user.id %}" class = "d-inline-block text-white" > {{ user.follower_count }} <span class="opacity-75">followers</span></a>
+                    <a href="{% url 'followers_list' user_id=user.id %}" class = "d-inline-block text-white" > {{ user.follower_count }} <span class="opacity-80">followers</span></a>
                     &emsp;
                     <div class="float d-inline-flex">
                         {% if followable %}
                             {% if following %}
                                 <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-secondary text-white"> Unfollow </a> 
                             {% else %}
-                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn  bg-light-blue opacity-100 text-white"> Follow </a> 
+                                <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn opacity-100 text-white" style="background-color: #18708B;"> Follow </a> 
                             {% endif %}
                         {% endif %}
                     </div> 
@@ -65,12 +65,12 @@
             </div> 
         <div class="ui-bg-overlay-container">
             <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
-            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent me-4">
-                <li class="nav-item">
-                    <a class="nav-link text-white py-3" href = '{% url 'profile_reading_list' user.id %}'> Reading lists</a>
+            <ul class="nav nav-tabs tabs-alt justify-content-center d-flex border-transparent me-4" style="font-weight: 500; font-size: 18px;">
+                <li class="nav-item" id="books">
+                    <a class="nav-link text-black py-3" href='{% url 'profile_reading_list' user.id %}'> Reading lists</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white py-3" href = '{% url 'profile_clubs' user.id %}'>Clubs</a>
+                <li class="nav-item" id="clubs">
+                    <a class="nav-link  text-black py-3"  href='{% url 'profile_clubs' user.id %}'>Clubs</a>
                 </li>
             </ul>
         </div>
