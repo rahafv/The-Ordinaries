@@ -18,10 +18,7 @@ class SVDModel:
             self.train(recHelper)
 
         if recHelper.counter == 0:
-            if self.trainset == None:
-                self.train(recHelper)
-            else:
-                Timer(3, self.train, [recHelper]).start()
+            Timer(3, self.train, [recHelper]).start()
                 
             recHelper.increment_counter()   
 
