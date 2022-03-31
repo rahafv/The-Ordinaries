@@ -7,10 +7,10 @@
     <div class = "d-flex justify-content-center text-black name-and-edit mb-3 mt-3">
       <h2 class = "me-2 " style = "text-align:center">{{ book.title }}</h2> 
         {% if reader %}
-          <a  href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-check-fill float-left"
+          <a  href='{% url 'add_book_to_list' book_id=book.id %}' aria-label="remove book to favorites button"  class="bi-bookmark-check-fill float-left"
           style="font-size: 2.3rem; color: green;"></a>
         {% else %}
-          <a href='{% url 'add_book_to_list' book_id=book.id %}' class="bi-bookmark-plus"
+          <a href='{% url 'add_book_to_list' book_id=book.id %}' aria-label="add book to favorites button" class="bi-bookmark-plus"
           style="font-size: 2.3rem; color: grey;"></a>
         {% endif %}
     </div>
@@ -34,7 +34,7 @@
                   </div>
                 </h5>
                 <div class="text-center">
-                  <img src= "{{ book.image_url }}" class="image-thumbnail mb-2 img-fluid" width="330" height="460" />
+                  <img src= "{{ book.image_url }}" loading="lazy" alt="{{book.title}} cover image" class="image-thumbnail mb-2 img-fluid" width="330" height="460" />
                 </div>
               </div>
               <div class="wizard">
@@ -42,7 +42,7 @@
                 <nav class="list-group list-group-flush">
                   {% if not rating %}
                     <!-- REVIEW BOOK BUTTON-->
-                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
                       <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
                     </a>
                   {%else%}
@@ -73,7 +73,7 @@
                   </div>
                   {% endif %}
                   {% if reader %}
-                    <a class="list-group-item stand-out" data-bs-toggle="collapse" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
                       <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
                         Post your progress
                       </span>
@@ -128,7 +128,7 @@
                     </div>
                   
                   <div class="bio-row px-3" style="text-align: right;">
-                    <label class="mb-3"></label>Pages:</label>&emsp;
+                    <label class="mb-3">Pages:</label>&emsp;
                     {% if book.pages_num %}
                       <p>{{book.pages_num}}</p>
                     {%else%}
@@ -160,8 +160,9 @@
                             <div class="bio-chart">
                                 <div style="display:inline; width:50px;height:90px;">
                                     <canvas width="20px" height="90px"></canvas>
-                                    <input disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                                    value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                                    <!-- <label for="readers_statistics" hidden aria-label="readers count">Readers count</label> -->
+                                      <input disabled readonly class="knob count-canvas" aria-label="readers count"  id="readers_statistics" style = "color:#eceae8;" 
+                                       value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
                                 </div>
                             </div>
                             <div class="bio-desk mt-4 pt-2">
@@ -176,8 +177,8 @@
                         <div class="bio-chart">
                             <div style="display:inline; width:50px;height:90px;">
                                 <canvas width="20px" height="90px"></canvas>
-                                <input  disabled readonly class="knob count-canvas" style = "color:#eceae8;" 
-                                value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                                  <input  disabled readonly class="knob count-canvas"  aria-label="readers count" id="reviews_statistics" style = "color:#eceae8;" 
+                                  value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
                             </div>
                         </div>
                         <div class="bio-desk mt-4 pt-2">
