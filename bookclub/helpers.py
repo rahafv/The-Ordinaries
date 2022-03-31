@@ -12,15 +12,6 @@ from .models import User, Club, Book
 from django.db.models.functions import Lower
 
 
-def login_prohibited(view_function):
-    def modified_view_function(request):
-        if request.user.is_authenticated:
-            return redirect(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            return view_function(request)
-    return modified_view_function
-
-
 class MeetingHelper:
     def assign_rand_book(self, meeting, book, request=None):
         if not meeting.book and request:
@@ -127,6 +118,7 @@ class NotificationHelper:
             CREATE = " created "
             REVIEW = " reviewed "
             ADD = " added "
+            # PROGRESS = " has read  "
 
             #club-events
             SCHEDULE = " scheduled a meeting about "
@@ -183,8 +175,7 @@ def getGenres():
     return genres
 
 def get_recommender_books(request, is_item_based, numOfRecs, user_id=None, book_id=None, club_id=None):
-    print(rec_helper.counter)
-    if rec_helper.counter >= 10:
+    if rec_helper.counter >= User.objects.count()/10:
         rec_helper.reset_counter()
 
     rec = Recommendation(is_item_based, rec_helper)  

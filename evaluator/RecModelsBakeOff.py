@@ -48,7 +48,7 @@ class RecModelsBakeOff:
         ItemKNN = KNNWithZScore(sim_options = {'name': 'cosine', 'user_based': False})
         evaluator.AddAlgorithm(ItemKNN, "Item KNNWithZScore")
 
-        # SVD 
+        # SVD
         svd = SVD()
         evaluator.AddAlgorithm(svd, "SVD")
 

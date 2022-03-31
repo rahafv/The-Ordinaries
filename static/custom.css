@@ -86,14 +86,14 @@
 }
 
 /* Chat room */
-.list-group-item.chat:not(.disabled):hover {
+.list-group-item.stand-out:not(.disabled):hover {
   border-color: #ddd;
   background: #fff;
   color: #74a5b4;
   cursor: default;
 }
 
-.list-group-item.active:not(.disabled)::before, .list-group-item.chat:not(.disabled)::before {
+.list-group-item.active:not(.disabled)::before, .list-group-item.stand-out:not(.disabled)::before {
   background-color: #284664;
 }
 

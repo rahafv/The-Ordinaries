@@ -1,4 +1,3 @@
-from datetime import timedelta
 from threading import Timer
 import pandas as pd
 from bookclub.models import Rating, User
@@ -18,9 +17,7 @@ class SVDModel:
             if self.trainset == None:
                 self.train(recHelper)
             else:
-                print("here")
-                startTime = timedelta(0.00001157).total_seconds()
-                Timer(startTime, self.train, [recHelper]).start()
+                Timer(3, self.train, [recHelper]).start()
                 
             recHelper.increment_counter()   
 
@@ -55,7 +52,6 @@ class SVDModel:
 
     def generateCandidates(self, user_id, k=20):
         
-
         user_iid = self.trainset.to_inner_uid(user_id)
         user_ratings = self.trainset.ur[user_iid]
         k_neighbors = heapq.nlargest(k, user_ratings, key=lambda t: t[1])
@@ -65,13 +61,14 @@ class SVDModel:
             try:
                 similaritities = self.similarity_matrix[itemID]
                 for innerID, score in enumerate(similaritities):
-                    candidates[innerID] += score
+                    candidates[innerID] += score * (rating/10)
             except:
                 continue
 
         return candidates
 
     def get_recommendations(self, user_id, num_of_rec):
+        
         recommendations = []
         candidates = self.generateCandidates(user_id)
         user = User.objects.get(id =user_id )

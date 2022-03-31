@@ -1,12 +1,12 @@
 """Tests of the Home view."""
-from urllib import response
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Club , Book
-from bookclub.tests.helpers import LogInTester, LoginRedirectTester, reverse_with_next , MenuTestMixin, NotificationsTester
+from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MenuTestMixin, NotificationsTester
+from bookclub.recommender.SVDModel import SVDModel
 from bookclub.helpers import rec_helper
 
-class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin, NotificationsTester):
+class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixin, NotificationsTester):
     """Tests of the Home view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
@@ -21,7 +21,9 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin
         self.url = reverse('home')
         self.user = User.objects.get(id=1)
         self.second_user = User.objects.get(id=2)
-     
+        
+        SVDModel(rec_helper).train(rec_helper)
+
         self.first_club = Club.objects.get(id=1)
         self.second_club = Club.objects.get(id=2)
 
@@ -32,7 +34,6 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin
 
     def test_get_home(self):
         self.client.login(username='johndoe', password='Password123')
-        rec_helper.reset_counter()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
@@ -41,7 +42,6 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin
 
     def test_feed_contains_events_by_self_and_followees(self):
         self.client.login(username=self.user.username, password='Password123')
-        rec_helper.reset_counter()
         self.user.toggle_follow(self.second_user)
         self.sendNotification(self.user, self.user, self.first_club)
         self.sendNotification(self.second_user, self.user, self.first_club)
@@ -52,7 +52,6 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester,MenuTestMixin
 
     def test_updates_contains_events_related_to_clubs_user_is_member_in(self):
         self.client.login(username=self.user.username, password='Password123')
-        rec_helper.reset_counter()
         self.user.toggle_follow(self.second_user)
         self.second_user.toggle_follow(self.user)
         self.sendNotification(self.user, self.user, self.first_club)
