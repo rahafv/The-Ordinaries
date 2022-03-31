@@ -212,6 +212,8 @@
                 <div class="card card-body  pb-0">
                   <div class = "row justify-content-around">
 
+                   
+
                       <!-- UPCOMING MEETING WITH SELECTED BOOK -->
                       {%if upcoming_meeting %}
                         <div class = "col-md-6">
@@ -221,6 +223,12 @@
                             Link: <a href="{{upcoming_meeting.link}}"> meeting link </a>
                           </p>
                           <p>Notes: {{ upcoming_meeting.notes }}</p>
+                          {% if user.id == club.owner.id %}
+                          Book Chooser: @ 
+                          <a href='{% url 'profile' upcoming_meeting.chooser.id %}' style = "color:black;"> 
+                            {{upcoming_meeting.chooser.username}}
+                          </a>
+                          {%endif%}
                         </div>
                         <div class = "col-md-6">
                           {% if upcoming_meeting.book %}
@@ -234,6 +242,7 @@
                             <!-- UPCOMING MEETING WITHOUT A SELECTED BOOK YET -->
 
                           {% else %}
+                        
                             <!--BOOK CHOOSING LINK FOR MEMBER WHOSE TURN IT IS -->
                             Book:
                             {%if user != upcoming_meeting.chooser%}
@@ -246,6 +255,7 @@
 
                             {% endif %} 
                           {% endif %}
+
                         </div>
 
                       {%else %}
