@@ -369,16 +369,17 @@ class BookDetailsView(DetailView, FormMixin):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
+        reviews_count = book.ratings.all().exclude(review='').count()
+
 
         if user.is_authenticated:
             reviews = book.ratings.all().exclude(review='').exclude(user=user)
             rating = book.ratings.all().filter(user=user)
-            reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
+          
         else:
             reviews = book.ratings.all()
             rating = []
-            reviews_count = book.ratings.all().exclude(review='').count()
-
+           
         if rating:
             rating = rating[0]
 
