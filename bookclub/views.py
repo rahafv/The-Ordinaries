@@ -6,7 +6,7 @@ from django.contrib.auth import login, logout
 from .forms import SignUpForm, LogInForm, CreateClubForm, PasswordForm, UserForm, RatingForm , EditRatingForm, MeetingForm, BooksSortForm, UsersSortForm, ClubsSortForm, TransferOwnershipForm, BookForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .helpers import get_list_of_objects, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres
+from .helpers import get_list_of_objects, generate_token, MeetingHelper, SortHelper, NotificationHelper, getGenres, get_recommender_books, rec_helper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Chat, Meeting, User, Club, Book , Rating
 from django.urls import reverse, reverse_lazy
@@ -79,9 +79,7 @@ class HomeView(TemplateView):
             notifications = current_user.notifications.unread()
             user_events = notifications.filter(description__contains ='user-event')[:25]
             club_events = notifications.filter(description__contains='club-event')[:10]
-            already_selected_books = current_user.books.all()
-            my_books = Book.objects.all().exclude(id__in=already_selected_books)
-            top_rated_books = my_books.order_by('-average_rating','-readers_count')[:3]
+            top_rated_books = get_recommender_books(self.request, True, 3, user_id=current_user.id)
         else:
             notifications = None
             user_events = []
@@ -124,6 +122,7 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
+        rec_helper.increment_counter()
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
         return super().form_valid(form)
 
@@ -371,10 +370,12 @@ class BookDetailsView(DetailView, FormMixin):
             reviews = book.ratings.all().exclude(review='').exclude(user=user)
             rating = book.ratings.all().filter(user=user)
             reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
+            recs = get_recommender_books(self.request, False, 6, user_id=self.request.user.id, book_id=book.id)
         else:
             reviews = book.ratings.all()
             rating = []
             reviews_count = book.ratings.all().exclude(review='').count()
+            recs = []
 
         if rating:
             rating = rating[0]
@@ -386,6 +387,7 @@ class BookDetailsView(DetailView, FormMixin):
         context['reviews_count'] = reviews_count
         context['reader'] = book.is_reader(user)
         context['numberOfRatings'] = book.ratings.all().count()
+        context['recs'] = recs
         return context
 
 class AddBookView(LoginRequiredMixin, FormView):
@@ -1071,8 +1073,11 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
                 letter='emails/chooser_reminder.html',
                 all_mem=False
             )
-            deadline = timedelta(7).total_seconds() #0.00069444
-            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, self.request]).start()
+
+            rec_book = get_recommender_books(self.request, True, 1, club_id=meeting.club.id)[0]
+                        
+            deadline = timedelta(7).total_seconds()  # 0.00069444
+            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, rec_book, self.request]).start()
 
         notify.send(self.club, recipient=self.club.members.all(), verb=NotificationHelper().NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )
         messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")
@@ -1088,9 +1093,7 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         meeting = get_object_or_404(Meeting.objects, id=kwargs["meeting_id"])
         if self.request.user == meeting.chooser and not meeting.book:
-            read_books = meeting.club.books.all()
-            my_books =  Book.objects.all().exclude(id__in = read_books)
-            context["rec_books"] = my_books.order_by('-average_rating','-readers_count')[0:24]
+            context["rec_books"] = get_recommender_books(self.request, True, 24, club_id=meeting.club.id)
             return context
         else:
             raise Http404
@@ -1132,6 +1135,7 @@ def choose_book(request, book_id, meeting_id):
     if request.user == meeting.chooser and not meeting.book:
         book = get_object_or_404(Book.objects, id=book_id)
         meeting.assign_book(book)
+        rec_helper.increment_counter()
 
         #send email to member who has to choose a book
         MeetingHelper().send_email(request=request,
@@ -1163,17 +1167,13 @@ def add_book_to_list(request, book_id):
         notificationHelper.delete_notifications(user, user.followers.all(), notificationHelper.NotificationMessages.ADD, book )
         notify.send(user, recipient=user.followers.all(), verb=notificationHelper.NotificationMessages.ADD, action_object=book, description='user-event-B' )
         messages.add_message(request, messages.SUCCESS, "Book Added!")
+    rec_helper.increment_counter()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 class AddReviewView(LoginRequiredMixin, FormView):
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
-
-    # def get(self, *args, **kwargs):
-    #     """Retrieves the book_id from url and stores it in self for later use."""
-    #     self.book_id = self.kwargs.get('book_id', None)
-    #     return super().get(self, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -1194,6 +1194,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
 
         form.save()
         self.review_user.add_book_to_all_books(self.reviewed_book)
+        rec_helper.increment_counter()
         notify.send(self.review_user, recipient=self.review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=self.reviewed_book, description='user-event-B' )
         messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
 
@@ -1207,32 +1208,6 @@ class AddReviewView(LoginRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
-
-# @login_required
-# def add_review(request, book_id):
-#     reviewed_book = get_object_or_404(Book.objects, id=book_id)
-#     review_user = request.user
-#     if reviewed_book.ratings.all().filter(user=review_user).exists():
-#         return HttpResponseForbidden()
-
-#     if request.method == 'POST':
-#         form = RatingForm(request.POST)
-#         if form.is_valid():
-#             form.instance.user = review_user
-#             form.instance.book = reviewed_book
-#             form.save(review_user, reviewed_book)
-#             review_user.add_book_to_all_books(reviewed_book)
-#             notify.send(review_user, recipient=review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=reviewed_book, description='user-event-B' )
-#             messages.add_message(request, messages.SUCCESS, "You successfully submitted the review!")
-
-#             reviewed_book.calculate_average_rating()
-
-#             return redirect('book_details', book_id=reviewed_book.id)
-
-#     messages.add_message(request, messages.ERROR,
-#                          "Review cannot be over 250 characters!")
-#     return render(request, 'book_details.html', {'book': reviewed_book})
-
 
 """Enable user to follow and unfollow other users."""
 @login_required
@@ -1299,37 +1274,6 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
         context['form'] = sortForm
         context['current_user'] = self.request.user
         return context
-
-# @login_required
-# def search_page(request):
-#     if request.method == 'GET':
-#         searched = request.GET.get('searched')
-#         category = request.GET.get('category')
-#         label = category
-
-#         # method in helpers to return a dictionary with a list of users, clubs or books searched
-#         search_page_results = get_list_of_objects(
-#             searched=searched, label=label)
-#         category = search_page_results["category"]
-#         filtered_list = search_page_results["filtered_list"]
-
-#         sortForm = ""
-#         if(category == "Clubs"):
-#             sortForm = ClubsSortForm(request.GET or None)
-
-#         elif(category == "Books"):
-#             sortForm = BooksSortForm(request.GET or None)
-#         else:
-#             sortForm = UsersSortForm(request.GET or None)
-
-#         pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-#         page_number = request.GET.get('page')
-#         filtered_list = pg.get_page(page_number)
-#         current_user=request.user
-#         return render(request, 'search_page.html', {'searched': searched, 'category': category, 'label': label, "filtered_list": filtered_list, "form": sortForm, "current_user":current_user})
-
-#     else:
-#         return render(request, 'search_page.html', {})
 
 class ShowSortedView(LoginRequiredMixin, ListView):
     template_name = 'search_page.html'

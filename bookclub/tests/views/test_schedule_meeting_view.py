@@ -116,13 +116,14 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
         meeting = Meeting.objects.get(id=3)
         self.assertEqual(meeting.book, None)
         request = RequestFactory().get(self.url)
-        MeetingHelper().assign_rand_book(meeting, request)
-        self.assertNotEqual(meeting.book, None)
+        MeetingHelper().assign_rand_book(meeting, Book.objects.get(id=1), request)
+        self.assertEqual(meeting.book, Book.objects.get(id=1))
 
     def test_assign_book_when_book(self):
         meeting = Meeting.objects.get(id=1)
         self.assertEqual(meeting.book, Book.objects.get(id=1))
-        MeetingHelper().assign_rand_book(meeting)
+        MeetingHelper().assign_rand_book(meeting, None)
+        self.assertEqual(meeting.book, Book.objects.get(id=1))
 
     def test_get_schedule_meeting_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

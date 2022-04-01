@@ -3,6 +3,18 @@
 {% block content %}
 
 <div class="container">
+  <div id='recommendations' class="row mt-3" style='display:none; background-color:gainsboro;'>
+    <h5 style='padding-top: 30px; padding-left: 60px;'>You might also like.. </h5>
+    <div class='row mb-4 text-center' style=" text-align:center">
+      {% for rec in recs %}
+        <div class="col-sm-5 col-md-2 mb-2 mt-2 text-center" style=" text-align:center">
+              <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
+              <a style="  max-width: 3000px; -webkit-line-clamp: 4; -webkit-box-orient: horizontal; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
   <div class="row mt-3">
     <div class = "d-flex justify-content-center text-black name-and-edit mb-3 mt-3">
       <h2 class = "me-2 " style = "text-align:center">{{ book.title }}</h2> 
@@ -10,7 +22,7 @@
           <a  href='{% url 'add_book_to_list' book_id=book.id %}' aria-label="remove book to favorites button"  class="bi-bookmark-check-fill float-left"
           style="font-size: 2.3rem; color: green;"></a>
         {% else %}
-          <a href='{% url 'add_book_to_list' book_id=book.id %}' aria-label="add book to favorites button" class="bi-bookmark-plus"
+          <a href='{% url 'add_book_to_list' book_id=book.id %}#recommendations' aria-label="add book to favorites button" class="bi-bookmark-plus"
           style="font-size: 2.3rem; color: grey;"></a>
         {% endif %}
     </div>
@@ -45,6 +57,12 @@
                     <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
                       <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
                     </a>
+                    <!-- COLLAPSE FOR REVIEW -->
+                    <div class="collapse" id="leave-review">
+                      <div class="card card-body pb-0">
+                          {% include 'partials/book_review_form.html' with book_id=book.id%}
+                      </div>
+                    </div>
                   {%else%}
                   <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
                     <div class='reviews-heading mt-3'>
@@ -78,20 +96,14 @@
                         Post your progress
                       </span>
                     </a>
+                    <!-- COLLAPSE FOR PROGRESS -->
+                    <div class="collapse" id="update-progress">
+                      <div class="card card-body mb-3 pb-0 ">
+                      {% include 'partials/book_progress_form.html' with book_id=book.id%}
+                      </div> 
+                    </div>
                   {% endif %}
                 </nav>
-                <!-- COLLAPSE FOR REVIEW -->
-                <div class="collapse" id="leave-review">
-                  <div class="card card-body mb-3 pb-0">
-                      {% include 'partials/book_review_form.html' with book_id=book.id%}
-                  </div>
-                </div>
-                <!-- COLLAPSE FOR PROGRESS -->
-                <div class="collapse" id="update-progress">
-                 <div class="card card-body mb-3 pb-0 ">
-                  {% include 'partials/book_progress_form.html' with book_id=book.id%}
-                 </div> 
-                </div>
               </div>
             </div>    
         </div>
@@ -227,6 +239,15 @@
 <br/> 
 
 <script>
+  var currentPath = window.location.hash;
+  if(currentPath.substring(1) == 'recommendations'){
+    const targetDiv = document.getElementById(currentPath.substring(1));
+
+    if (targetDiv.style.display === "none") {
+    targetDiv.style.display = "block";
+    }
+  }
+
   function updateTextInput(val) {
     document.getElementById('textInput').value=val; 
   }
