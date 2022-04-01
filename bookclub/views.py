@@ -1355,7 +1355,9 @@ class MeetingsListView(LoginRequiredMixin, ListView):
         context['meetings_list'] = context['page_obj']
         context['user'] = self.user
         context['club'] = self.club
-
+        context['is_owner'] = False
+        if self.request.user == self.club.owner:
+            context['is_owner'] = True
         return context
 
 
@@ -1395,6 +1397,9 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
         context['meetings_list'] = context['page_obj']
         context['user'] = self.user
         context['is_previous'] = True
+        context['is_owner'] = False
+        if self.request.user == self.club.owner:
+            context['is_owner'] = True
         context['club'] = self.club
 
         return context
