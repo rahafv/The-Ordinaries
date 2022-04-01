@@ -65,6 +65,12 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.assertContains(response, self.user.username)
         self.assert_menu(response)
 
+    def test_home_recommendation_with_invalid_user_id(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        Recommendation(True,rec_helper).get_recommendations(response.wsgi_request, 1)
+        
+
     def create_test_books(self, book_count=6):
         isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
                     ,'155061224','446520802', '380000059','380711524']
