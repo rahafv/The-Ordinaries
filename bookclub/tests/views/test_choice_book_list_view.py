@@ -38,6 +38,8 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
     def test_access_successful(self):
         self.client.login(username=self.sec_user.username, password='Password123')
         self.create_test_books()
+        self.book = Book.objects.get(id=1)
+        self.book.add_reader(self.sec_user)
         response = self.client.get(self.sec_url)
         self.assertEqual(response.status_code, 200) 
         self.assertTemplateUsed(response, 'choice_book_list.html')
@@ -58,7 +60,8 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
             Book.objects.create(
                 ISBN = isbn_num[ctr],
                 title = f'book{book_id} title',
-                author = f'book{book_id} author'
+                author = f'book{book_id} author',
+                genre = "Classics,European Literature,Czech Literature"
             )
             ctr+=1
 

@@ -359,6 +359,7 @@ class Book(models.Model):
             self.clubs.add(club)
             for member in club.members.all():
                 self.add_reader(member)
+                member.add_book_to_all_books(Book.objects.get(id=self.id))
 
             self.save()
 

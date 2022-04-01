@@ -396,7 +396,6 @@ class AddBookView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         self.book = form.save()
-        rec_helper.increment_counter()
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -1094,9 +1093,7 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         meeting = get_object_or_404(Meeting.objects, id=kwargs["meeting_id"])
         if self.request.user == meeting.chooser and not meeting.book:
-            read_books = meeting.club.books.all()
-            my_books =  Book.objects.all().exclude(id__in = read_books)
-            context["rec_books"] = my_books.order_by('-average_rating','-readers_count')[0:24]
+            context["rec_books"] = get_recommender_books(self.request, True, 24, club_id=meeting.club.id)
             return context
         else:
             raise Http404
@@ -1138,6 +1135,7 @@ def choose_book(request, book_id, meeting_id):
     if request.user == meeting.chooser and not meeting.book:
         book = get_object_or_404(Book.objects, id=book_id)
         meeting.assign_book(book)
+        rec_helper.increment_counter()
 
         #send email to member who has to choose a book
         MeetingHelper().send_email(request=request,
@@ -1176,11 +1174,6 @@ class AddReviewView(LoginRequiredMixin, FormView):
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
-
-    # def get(self, *args, **kwargs):
-    #     """Retrieves the book_id from url and stores it in self for later use."""
-    #     self.book_id = self.kwargs.get('book_id', None)
-    #     return super().get(self, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

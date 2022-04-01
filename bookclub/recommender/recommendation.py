@@ -16,7 +16,7 @@ class Recommendation:
         recommendations = []
         if book_id:
             recommendations = list(self.content_based.get_recommendations_for_book(user_id, book_id).keys())[:num_of_rec]
-        
+            
         elif club_id:
             recommendations = self.get_recommendations_for_club(request, num_of_rec, club_id)
 
@@ -26,11 +26,11 @@ class Recommendation:
             except:
                 user = request.user
 
-            if Rating.objects.filter(user_id=user_id):
-                recommendations = self.item_based.get_recommendations(user_id, num_of_rec)
+            if Rating.objects.filter(user_id=user.id):
+                recommendations = self.item_based.get_recommendations(user.id, num_of_rec)
                 
             elif user.books.count() >= 1:
-                recommendations = self.content_based.get_genre_recommendations(user_id)[:num_of_rec]
+                recommendations = self.content_based.get_genre_recommendations(user.id)[:num_of_rec]
 
             else:
                 books = Book.objects.all()
@@ -45,9 +45,9 @@ class Recommendation:
 
         recommendations =  []
         for mem in members:
-            recommendations.append(self.get_recommendations(request, num_of_rec, mem.id))
+            recommendations.append(list(self.get_recommendations(request, num_of_rec, mem.id)))
 
-        all_recommendations = reduce(lambda z, y :z | y, recommendations)
+        all_recommendations = reduce(lambda z, y :z + y, recommendations)
         filtered_rec = [book for book in all_recommendations if book not in books]
         random.shuffle(filtered_rec)
         counter = Counter(filtered_rec)
