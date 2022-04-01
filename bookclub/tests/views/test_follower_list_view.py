@@ -2,7 +2,6 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User 
-from bookclub.tests.helpers import reverse_with_next
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from system import settings
 

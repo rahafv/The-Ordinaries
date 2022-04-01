@@ -34,6 +34,7 @@
                                             {% endif %} 
                                         {% endif %}
                                     </td>
+                                    
                                     <td  style="width: 15%;"> 
                                         <a href={{meeting.link}}>{{meeting.link}}</a>
                                     </td>
@@ -45,6 +46,15 @@
                                     
                                     {%if user == meeting.club.owner %}
                                     {%if not is_previous  %}
+                                    <tr>
+                                        <th><span>Book Chooser</span></th>
+                                        
+                                    </tr>
+
+                                    <td  style="width: 18%;"> 
+                                        <a>@{{meeting.chooser.username}}</a>
+                                    </td>
+                              
                                     
                                     <td>
                                         <button type="button" class="btn btn-lg btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Cancel</button>

@@ -1,11 +1,9 @@
 """Tests of the mark as read view."""
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from notifications.signals import notify
 from bookclub.models import User, Club
 from bookclub.helpers import NotificationHelper
-from bookclub.views import mark_as_read
-
 
 class MarkAsReadViewTestCase(TestCase):
     """Tests of the mark_as_read view."""
@@ -71,7 +69,7 @@ class MarkAsReadViewTestCase(TestCase):
         slug2 = self.user.notifications.unread()[0].slug
         url = reverse('mark_as_read', kwargs={'slug': slug2})
         response = self.client.get(url, follow=True)
-        response_url = reverse('profile')
+        response_url = reverse('profile',kwargs={'user_id':self.user.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
     def test_get_appropriate_redirect_wrong_verb(self): 

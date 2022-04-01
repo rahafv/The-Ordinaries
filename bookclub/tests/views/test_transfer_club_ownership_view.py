@@ -4,6 +4,7 @@ from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 class TransferClubOwnershipTestCase(TestCase, MessageTester, MenuTestMixin, LoginRedirectTester):
+    """Tests of the transfer ownership user view."""
 
     fixtures = [
         'bookclub/tests/fixtures/default_club.json',
@@ -35,7 +36,6 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenuTestMixin, Logi
         response = self.client.post(self.url, self.form_input, follow=True)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        # self.assertEqual(self.club.owner, self.member)
         self.assert_menu(response)
 
     def test_ownership_transfer_with_empty_club(self):

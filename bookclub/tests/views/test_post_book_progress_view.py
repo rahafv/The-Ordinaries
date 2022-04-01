@@ -1,12 +1,12 @@
-from cProfile import label
+"""Test suite for the post progress view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Book
-from bookclub.forms import RatingForm
 from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 
 
 class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMixin):
+    """Test suite for the post progress view."""
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
               'bookclub/tests/fixtures/default_user.json']

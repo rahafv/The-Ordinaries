@@ -1,3 +1,4 @@
+"""Tests of the meeting list view."""
 from datetime import datetime, timedelta
 from django.test import TestCase
 from django.urls import reverse
@@ -7,6 +8,7 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageT
 from system import settings
 
 class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTester):
+    """Tests of the meeting list view."""
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',

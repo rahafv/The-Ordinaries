@@ -257,25 +257,32 @@ class UserForm(forms.ModelForm):
         return self.log_in_user
 
 class EditRatingForm(forms.ModelForm):
-    """Form to update club information."""
+    """Form to update review."""
 
     class Meta:
 
         model = Rating
         fields = ['rating', 'review']
+        widgets = {
+            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.review = kwargs.pop('review', None)
+        super(EditRatingForm, self).__init__(*args, **kwargs)
 
     def calculate_rating(self, rating):
         return rating*2
 
-    def save(self , reviwer, reviewedBook):
+    def save(self):
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
         if not rate:
             rate = 0
-        review_obj = Rating.objects.get(user=reviwer , book=reviewedBook)
-        review_obj.rating=self.calculate_rating(rate)
-        review_obj.review=self.cleaned_data.get('review')
-        review_obj.save()    
+
+        self.review.rating=self.calculate_rating(rate)
+        self.review.review=self.cleaned_data.get('review')
+        self.review.save()    
          
 class RatingForm(forms.ModelForm):
     """Form to post a review."""
@@ -285,10 +292,15 @@ class RatingForm(forms.ModelForm):
         model = Rating
         fields = ['rating', 'review']
         widgets = {
-            'review': forms.Textarea(attrs={'cols': 40, 'rows': 15}),
+            'review': forms.Textarea(attrs={'cols': 20, 'rows': 15}),
         }
 
-    def save(self, reviwer, reviewedBook):
+    def __init__(self, *args, **kwargs):
+        self.book = kwargs.pop('book', None)
+        self.user = kwargs.pop('user', None)
+        super(RatingForm, self).__init__(*args, **kwargs)
+
+    def save(self):
         """Create a new rating."""
         super().save(commit=False)
         rate = self.cleaned_data.get('rating')
@@ -297,8 +309,8 @@ class RatingForm(forms.ModelForm):
         review = Rating.objects.create(
             rating = self.calculate_rating(rate),
             review = self.cleaned_data.get('review'),
-            book = reviewedBook,
-            user = reviwer,
+            book = self.book,
+            user = self.user,
         )
         return review
 
@@ -368,7 +380,7 @@ class BooksSortForm(forms.Form):
     )
 
 class MeetingForm(forms.ModelForm):
-    """Form to update club information."""
+    """Form to create meeting information."""
 
     class Meta:
         """Form options."""

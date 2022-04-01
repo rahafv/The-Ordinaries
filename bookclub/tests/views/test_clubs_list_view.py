@@ -1,3 +1,4 @@
+"""Tests of the club list view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
@@ -6,6 +7,7 @@ from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
 from system import settings
 
 class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
+    """Tests of the club list view."""
 
     fixtures=[
                 'bookclub/tests/fixtures/default_user.json',
