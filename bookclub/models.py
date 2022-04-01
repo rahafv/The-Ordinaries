@@ -13,6 +13,11 @@ class User(AbstractUser):
 
     email_verified = models.BooleanField(default=False)
 
+    # training_counter = models.PositiveSmallIntegerField(
+    #     null=False,
+    #     blank=False
+    # )
+
     username = models.CharField(
         max_length=30,
         unique=True,
@@ -147,7 +152,14 @@ class User(AbstractUser):
     def add_book_to_all_books(self , book):
         if book not in self.all_books.all():
             self.all_books.add(book)
-       
+
+    # def increment_counter(self):
+    #     self.training_counter += 1
+    #     self.save()
+
+    # def reset_counter(self):
+    #     self.training_counter = 0
+    #     self.save()  
 
 
 class Club(models.Model):
@@ -347,6 +359,7 @@ class Book(models.Model):
             self.clubs.add(club)
             for member in club.members.all():
                 self.add_reader(member)
+                member.add_book_to_all_books(Book.objects.get(id=self.id))
 
             self.save()
 
@@ -462,11 +475,7 @@ class Meeting(models.Model):
         self.chooser = mem
         Meeting.objects.filter(id = self.id).update(chooser=mem)
 
-    def assign_book(self, book_in=None):
-        if not book_in:
-            read_books = self.club.books.all()
-            book_in = Book.objects.all().exclude(id__in = read_books).order_by("?")[0]
-            
+    def assign_book(self, book_in):
         book_in.add_club(self.club)
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)

@@ -63,10 +63,6 @@ class MeetingModelTestCase(TestCase):
         self._assert_meeting_is_valid()
 
     def test_assign_book(self):
-        self.sec_meeting.assign_book()
-        self._assert_meeting_is_valid()
-
-    def test_assign_book_with_input(self):
         self.sec_meeting.assign_book(self.book)
         self._assert_meeting_is_valid()
         

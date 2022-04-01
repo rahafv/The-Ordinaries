@@ -8,9 +8,9 @@
                         {% for user in Users %}
                             <tr>
                                 <td>
-                                    <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle profile-image" >
+                                    <img src="{{ user.gravatar }}" loading="lazy" alt="Gravatar of {{ user.username }}" class="rounded-circle profile-image" >
                                     <span style="width: 180px;"class="user-link">{{user.full_name}}</span>
-                                    <a href='{% url 'profile' user.id %}' style="color: grey; font-style: italic;" >{{user.username}}</a>
+                                    <a href='{% url 'profile' user.id %}' style="color: #4E4E4E; font-style: italic;" >{{user.username}}</a>
                                 </td>
                                 <td>
                                     <div style="display: -webkit-box; max-width: 400px; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"> {{user.bio}} </div>
@@ -20,7 +20,7 @@
                                         {% if user in current_user.followees.all  %}
                                             <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary text-white" style="width:90px">Unfollow</a> 
                                         {% else %}
-                                            <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary text-white bg-light-blue"  style="width:90px;">Follow</a> 
+                                            <a href="{% url 'follow_toggle' user_id=user.id  %}" class="btn btn-secondary text-white"  style="width:90px; background-color: #18708B;">Follow</a> 
                                         {% endif %}
                                     {% endif %} 
                                 </td>
