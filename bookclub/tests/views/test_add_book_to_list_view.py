@@ -7,8 +7,7 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
     
     fixtures = ['bookclub/tests/fixtures/default_user.json',
                 'bookclub/tests/fixtures/other_users.json',
-                'bookclub/tests/fixtures/default_book.json',
-                 'bookclub/tests/fixtures/other_books.json']
+                'bookclub/tests/fixtures/default_book.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -37,7 +36,6 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
         self.assertContains(response, 'You might also like..')
         self.assertEqual(len(response.context['recs']),6)
 
-
     def test_successful_book_removal(self):
         self.client.login(username=self.user.username, password='Password123')
         self.book.add_reader(self.user)
@@ -56,16 +54,20 @@ class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, Me
     def test_add_to_list_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
-    def _create_test_books(self, book_count=6):
+    def _create_test_books(self, book_count=7):
         isbn_num = [ '425115801','449006522','553561618', '055356451X','786013990','786014512','60517794','451192001','609801279',
                     '671537458','679776818','943066433','1570231028','1885408226','747558167','3442437407','033390804X','3596218098','684867621',
                     '451166892','8440682697','034544003X','380000059','380711524']
         ctr = 0
         for book_id in range(book_count):
+            genre = "Classics,European Literature,Czech Literature"
+            if ctr == 0:
+                genre = ""
+
             Book.objects.create(
                 ISBN = isbn_num[ctr],
                 title = f'book{book_id} title',
                 author = f'book{book_id} author',
-                genre = "Classics,European Literature,Czech Literature"
+                genre = genre
             )
             ctr+=1

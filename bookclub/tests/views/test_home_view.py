@@ -1,7 +1,8 @@
 """Tests of the Home view."""
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User , Club , Book
+from bookclub.models import Rating, User , Club , Book
+from bookclub.recommender.recommendation import Recommendation
 from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MenuTestMixin, NotificationsTester
 from bookclub.recommender.SVDModel import SVDModel
 from bookclub.helpers import rec_helper
@@ -14,8 +15,10 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
                 'bookclub/tests/fixtures/other_users.json',
                 'bookclub/tests/fixtures/other_club.json',
                 'bookclub/tests/fixtures/default_book.json',
+                 'bookclub/tests/fixtures/other_books.json',
                 'bookclub/tests/fixtures/default_meeting.json',
-                'bookclub/tests/fixtures/default_rating.json']
+                'bookclub/tests/fixtures/default_rating.json',
+                 'bookclub/tests/fixtures/other_ratings.json']
 
     def setUp(self):
         self.url = reverse('home')
@@ -33,13 +36,14 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.assertEqual(self.url,'/home/')
 
     def test_get_home(self):
-        self.client.login(username='johndoe', password='Password123')
+        self.client.login(username=self.user.username, password='Password123')
+        self.user.add_book_to_all_books(self.first_book)
+        self.create_test_books()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
         self.assert_menu(response)
     
-
     def test_feed_contains_events_by_self_and_followees(self):
         self.client.login(username=self.user.username, password='Password123')
         self.user.toggle_follow(self.second_user)
@@ -61,9 +65,24 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.assertContains(response, self.user.username)
         self.assert_menu(response)
 
+    def create_test_books(self, book_count=6):
+        isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
+                    ,'155061224','446520802', '380000059','380711524']
+        ctr = 0
+        for book_id in range(book_count):
+            book = Book.objects.create(
+                ISBN = isbn_num[ctr],
+                title = f'book{book_id} title',
+                author = f'book{book_id} author',
+                genre = "Classics,European Literature,Czech Literature"
+            )
 
-        
-
+            Rating.objects.create(
+                user=self.second_user,
+                book = book,
+                rating = 5
+            )
+            ctr+=1
 
 
         
