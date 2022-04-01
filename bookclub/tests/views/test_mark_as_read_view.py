@@ -80,6 +80,12 @@ class MarkAsReadViewTestCase(TestCase):
         response = self.client.get(url, follow=True)
         response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        
+    def test_delete_notification_does_not_delete_request_user_notifications(self):
+        self.client.login(username=self.user.username, password="Password123")
+        notify.send(self.user, recipient=self.user, verb=self.notificationHelper.NotificationMessages.FOLLOW, action_object=self.club, description='notification')
+
+        self.notificationHelper.delete_notifications(self.user,[self.user,self.sec_user], self.notificationHelper.NotificationMessages.FOLLOW)
 
 
     

@@ -12,16 +12,11 @@
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
       <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
-<<<<<<< HEAD
-
-=======
     <h1 class="fw-light bg-light-pinkish center" style="text-align: center;">Welcome {{user.first_name}}</h1>
->>>>>>> 0551951742e5c230987abb0791edd102213a5991
     <div class="carousel-inner" style="top: -8px;">
       <div class="carousel-item active">
         <svg class="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
           <rect width="100%" height="100%" fill="#faf3ee"/>
-<<<<<<< HEAD
           {%if request.user.is_authenticated%}
             <image width="100%" height="100%"  xlink:href="{% static '/images/welcome_page.png' %}"/>
             </svg>
@@ -38,9 +33,6 @@
                 </div>
               </div>
           {%endif%}
-=======
-          <image width="100%" height="100%" loading="lazy"  alt="welcome page carousel page1 background image" xlink:href="{% static '/images/welcome_page.png' %}"  />
->>>>>>> 0551951742e5c230987abb0791edd102213a5991
     
         
           
@@ -105,13 +97,22 @@
         <div class="col-md-8">
           
           <h1>Feed</h1>
+          {% if user_events %}
               {% include 'partials/events_as_table.html' with user_events=user_events%}
+              {% else %}
+              <br>
+              Try following other users to get their updates
+              {% endif %}
         </div>
         <div class="col-md-4">
           <div class="position-sticky" style="top: 10rem;">
             <div class="p-4 mb-3 bg-light-blue rounded">
               <h4 class="fst-italic mb-3">Club Updates</h4>
-              {% include 'partials/events_as_list.html' with club_events=club_events%} 
+              {% if club_events %}
+                {% include 'partials/events_as_list.html' with club_events=club_events%} 
+                {% else %}
+                No new updates
+              {% endif %}
             </div>
           </div>
         </div>

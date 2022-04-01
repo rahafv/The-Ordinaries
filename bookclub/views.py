@@ -772,7 +772,6 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        context['is_owner'] = self.club.owner == self.request.user
         context['club'] = self.club
         context['current_user'] = self.request.user
         context['form'] = self.form
@@ -1300,9 +1299,6 @@ class MeetingsListView(LoginRequiredMixin, ListView):
         context['meetings_list'] = context['page_obj']
         context['user'] = self.user
         context['club'] = self.club
-        context['is_owner'] = False
-        if self.request.user == self.club.owner:
-            context['is_owner'] = True
         return context
 
 
@@ -1342,9 +1338,6 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
         context['meetings_list'] = context['page_obj']
         context['user'] = self.user
         context['is_previous'] = True
-        context['is_owner'] = False
-        if self.request.user == self.club.owner:
-            context['is_owner'] = True
         context['club'] = self.club
 
         return context
