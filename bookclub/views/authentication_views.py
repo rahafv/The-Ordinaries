@@ -1,4 +1,4 @@
-from bookclub.forms import LogInForm
+from bookclub.forms import LogInForm, SignUpForm
 from bookclub.helpers import generate_token
 from bookclub.models import User
 from django.contrib import messages
@@ -41,6 +41,24 @@ class LoginProhibitedMixin:
         else:
             return self.redirect_when_logged_in_url
 
+
+class SignUpView(LoginProhibitedMixin, FormView):
+    """Handles user sign up."""
+
+    form_class = SignUpForm
+    template_name = "sign_up.html"
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    user = None
+
+    def form_valid(self, form):
+        """Saves the user when form is validated."""
+        self.user = form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
+        return reverse('send_activation', kwargs={'user_id':self.user.id})
+
 class LogInView(LoginProhibitedMixin, FormView):
     """Handle log in attempt."""
 
@@ -60,7 +78,7 @@ class LogInView(LoginProhibitedMixin, FormView):
 
         if user and not user.email_verified:
             messages.add_message(request, messages.ERROR,
-                'Email is not verified, please check your email inbox!')
+                "Email is not verified, please check your email inbox!")
             return render(request, 'log_in.html', {'form': form, 'next': self.next, 'request': request, 'user': user})
 
         if user:
@@ -71,7 +89,7 @@ class LogInView(LoginProhibitedMixin, FormView):
                 redirect_url = self.next or 'home'
             return redirect(redirect_url)
 
-        messages.add_message(request, messages.ERROR, 'The credentials provided were invalid!')
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()
 
     def render(self):
@@ -79,13 +97,14 @@ class LogInView(LoginProhibitedMixin, FormView):
         form = LogInForm()
         return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
 
+
+
 """Handle log out attempt."""
 @login_required
 def log_out(request):
     logout(request)
-    messages.add_message(request, messages.SUCCESS, 'You have been logged out!')
+    messages.add_message(request, messages.SUCCESS, "You've been logged out!")
     return redirect('home')
-
 
 def send_activiation_email(request, user_id):
 
@@ -113,23 +132,31 @@ def send_activiation_email(request, user_id):
 
     return redirect('log_in')
 
+
 class ActivateUserView(TemplateView):
     """Handles activation of a user after their email is verified."""
 
-    template_name = 'activate-fail.html'
+    template_name = "activate-fail.html"
 
     def get(self, *args, **kwargs):
         """Retrieves user if valid and sets its email verified field to true."""
         try:
-            uid = force_text(urlsafe_base64_decode(kwargs['uidb64']))
+            uid = force_text(urlsafe_base64_decode(kwargs["uidb64"]))
             self.user = User.objects.get(pk=uid)
         except:
             self.user = None
 
-        if self.user and generate_token.check_token(self.user, kwargs['token']):
+        if self.user and generate_token.check_token(self.user, kwargs["token"]):
             self.user.email_verified = True
             self.user.save()
             messages.add_message(self.request, messages.SUCCESS, 'Account verified!')
             return redirect(reverse('log_in'))
 
         return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template"""
+        context = super().get_context_data(**kwargs)
+        context["user"] = self.user
+        return context
+

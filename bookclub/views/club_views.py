@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -14,6 +13,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from notifications.signals import notify
 from system import settings
+from django.core.mail import send_mail, send_mass_mail
 
 
 class CreateClubView(LoginRequiredMixin, CreateView):
@@ -34,14 +34,15 @@ class CreateClubView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
+        messages.add_message(
+            self.request, messages.SUCCESS, "Club created succesfully!")
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
     def handle_no_permission(self):
         """If there is no permission, redirect to log in."""
         return redirect(reverse('log_in') + '?next=/create_club/')
 
-
-class ClubPageView(LoginRequiredMixin, DetailView):
+class ClubPageView(DetailView):
     """Show individual club details."""
 
     model = Club
@@ -64,8 +65,7 @@ class ClubPageView(LoginRequiredMixin, DetailView):
 
         return context
 
-
-class ClubsListView(LoginRequiredMixin, ListView):
+class ClubsListView(ListView):
     """Display list of clubs."""
 
     model = Club
@@ -125,7 +125,6 @@ class ClubsListView(LoginRequiredMixin, ListView):
         context['count'] = self.object_list.count()
 
         return context
-
 
 class MembersListView(LoginRequiredMixin, ListView):
     """Display list of members."""
@@ -200,7 +199,6 @@ def join_club(request, club_id):
 
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
-
 
 """Enable a user to withdraw from a club."""
 @login_required
@@ -359,11 +357,13 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         'club':self.club
         })
 
-        email_to_members = self.club.members.exclude(id=member.id).values_list('email', flat=True)
-        email_to_owner = [member.email]
+        members_emails = self.club.members.exclude(id=member.id).values_list('email', flat=True)
+        owner_email = [member.email]
 
-        send_mail(subject, members_email_body, email_from, email_to_members)
-        send_mail(subject, owner_email_body, email_from, email_to_owner)
+        message=(subject, members_email_body, email_from, members_emails)
+        owner_message=(subject, owner_email_body, email_from, owner_email)
+
+        send_mass_mail((message,owner_message),fail_silently=False)
 
         messages.add_message(self.request, messages.SUCCESS, "Ownership transferred!")
         return super().form_valid(form)
@@ -371,7 +371,6 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
         return reverse('club_page', kwargs={"club_id": self.club.id})
-
 
 class EditClubInformationView(LoginRequiredMixin, UpdateView):
     """View that handles club information change requests."""

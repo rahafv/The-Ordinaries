@@ -1,5 +1,5 @@
 from bookclub.forms import BookForm, RatingForm , EditRatingForm, BooksSortForm
-from bookclub.helpers import SortHelper
+from bookclub.helpers import NotificationHelper, SortHelper, get_recommender_books, rec_helper
 from bookclub.models import User, Book, Rating, Club
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,25 +10,23 @@ from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from system import settings
 from django.urls import reverse_lazy, reverse
+from notifications.signals import notify
 
 class AddBookView(LoginRequiredMixin, FormView):
-    """Add a book to the site."""
-
     form_class = BookForm
     template_name = 'add_book.html'
-
-    # @method_decorator(login_required)
-    # def dispatch(self, request, *args, **kwargs):
-    #     return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.book = form.save()
         return super().form_valid(form)
 
     def get_success_url(self):
+        messages.add_message(
+            self.request, messages.SUCCESS, "Book added succesfully!")
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
 
-class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
+
+class BookDetailsView(DetailView, FormMixin):
     """Show individual book details."""
 
     model = Book
@@ -37,42 +35,47 @@ class BookDetailsView(LoginRequiredMixin, DetailView, FormMixin):
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
 
-    # @method_decorator(login_required)
-    # def dispatch(self, request, *args, **kwargs):
-    #     return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, *args, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
-        rating = book.ratings.all().filter(user=user)
+        reviews_count = book.ratings.all().exclude(review='').count()
+
+
+        if user.is_authenticated:
+            reviews = book.ratings.all().exclude(review='').exclude(user=user)
+            rating = book.ratings.all().filter(user=user)
+            reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
+            recs = get_recommender_books(self.request, False, 6, user_id=self.request.user.id, book_id=book.id)
+        else:
+            reviews = book.ratings.all()
+            rating = []
+            reviews_count = book.ratings.all().exclude(review='').count()
+            recs = []
+
         if rating:
             rating = rating[0]
 
         context['book'] = book
         context['form'] = RatingForm()
         context['rating'] = rating
-        context['reviews'] = book.ratings.all().exclude(review='').exclude(user=user)
-        context['reviews_count'] = book.ratings.all().exclude(review='').exclude(user=user).count()
+        context['reviews'] = reviews
+        context['reviews_count'] = reviews_count
         context['reader'] = book.is_reader(user)
         context['numberOfRatings'] = book.ratings.all().count()
+        context['recs'] = recs
         return context
 
-class BookListView(LoginRequiredMixin, ListView):
-    """Show a list of books in book list / club / user."""
-
+class BookListView(ListView):
     model = Book
     template_name = 'books.html'
     form_class = BooksSortForm()
     paginate_by = settings.BOOKS_PER_PAGE
 
-    # @method_decorator(login_required)
-    # def dispatch(self, request, *args, **kwargs):
-    #     return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the club_id and user_id from url and stores them in self for later use."""
+        """Retrieves the club_id from url and stores it in self for later use."""
         self.club_id = kwargs.get('club_id')
         self.user_id = kwargs.get('user_id')
         return super().get(request, *args, **kwargs)
@@ -106,16 +109,20 @@ class BookListView(LoginRequiredMixin, ListView):
         return context
 
 class AddReviewView(LoginRequiredMixin, FormView):
-    """View to Add a book review."""
-
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
 
-    def get(self, *args, **kwargs):
-        """Retrieves the book_id from url and stores it in self for later use."""
-        self.book_id = kwargs.get('book_id')
-        return super().get(self, *args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
+        return context
 
     def form_valid(self, form):
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
@@ -123,12 +130,11 @@ class AddReviewView(LoginRequiredMixin, FormView):
         if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
             return HttpResponseForbidden()
 
-        form.instance.user = self.review_user
-        form.instance.book = self.reviewed_book
-        form.save(self.review_user, self.reviewed_book)
+        form.save()
         self.review_user.add_book_to_all_books(self.reviewed_book)
-
-        messages.add_message(self.request, messages.SUCCESS, 'you successfully submitted the review.')
+        rec_helper.increment_counter()
+        notify.send(self.review_user, recipient=self.review_user.followers.all(), verb=NotificationHelper().NotificationMessages.REVIEW, action_object=self.reviewed_book, description='user-event-B' )
+        messages.add_message(self.request, messages.SUCCESS, 'You successfully submitted the review.')
 
         self.reviewed_book.calculate_average_rating()
         return super().form_valid(form)
@@ -139,7 +145,7 @@ class AddReviewView(LoginRequiredMixin, FormView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('book_details', kwargs = {'book_id': self.kwargs['book_id']})
+        return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 class EditReviewView(LoginRequiredMixin, UpdateView):
     """View to edit the user's review."""
@@ -148,10 +154,6 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     template_name = 'edit_review.html'
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
-
-    # @method_decorator(login_required)
-    # def dispatch(self, request, *args, **kwargs):
-    #     return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -169,10 +171,12 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['review_id'] = self.get_object().id
+        context['review'] = self.get_object()
         return context
 
     def form_valid(self, form):
         form.save()
+        rec_helper.increment_counter()
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
         return super().form_valid(form)
 
