@@ -13,12 +13,12 @@ class FollowingListView(LoginRequiredMixin, ListView):
     """Display following list of a user."""
 
     model = User
-    template_name = 'follow_list.html'
+    template_name = "follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         """Retrieves the user_id from url and stores it in self for later use."""
-        self.user_id = kwargs.get('user_id')
+        self.user_id = kwargs.get("user_id")
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -29,22 +29,23 @@ class FollowingListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        context['follow_list'] = context['page_obj']
+        context['follow_list'] = context["page_obj"]
         context['user'] =self.user
         context['is_following'] = True
         context['current_user'] = self.request.user
         return context
 
+
 class FollowersListView(LoginRequiredMixin, ListView):
     """Displays followers list of a user."""
 
     model = User
-    template_name = 'follow_list.html'
+    template_name = "follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         """Retrieves the user_id from url and stores it in self for later use."""
-        self.user_id = kwargs.get('user_id')
+        self.user_id = kwargs.get("user_id")
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -55,12 +56,11 @@ class FollowersListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        context['follow_list'] = context['page_obj']
+        context['follow_list'] = context["page_obj"]
         context['user'] = self.user
         context['is_following'] = False
         context['current_user'] = self.request.user
         return context
-
 
 """Enable user to follow and unfollow other users."""
 @login_required
@@ -75,6 +75,6 @@ def follow_toggle(request, user_id):
     else:
 
         notificationHelper.delete_notifications(current_user, [followee], notificationHelper.NotificationMessages.FOLLOW )
-
     current_user.toggle_follow(followee)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
+

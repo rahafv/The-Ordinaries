@@ -2,10 +2,7 @@ from bookclub.forms import PasswordForm, UserForm
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
-from django.shortcuts import redirect
 from django.views.generic import FormView, UpdateView
-from system import settings
 from django.urls import reverse
 
 class PasswordView(LoginRequiredMixin, FormView):

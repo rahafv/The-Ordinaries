@@ -13,7 +13,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from notifications.signals import notify
 from system import settings
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import send_mass_mail
 
 
 class CreateClubView(LoginRequiredMixin, CreateView):

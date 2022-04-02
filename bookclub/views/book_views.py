@@ -5,12 +5,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
 from system import settings
 from django.urls import reverse_lazy, reverse
 from notifications.signals import notify
+from django.contrib.auth.decorators import login_required
 
 class AddBookView(LoginRequiredMixin, FormView):
     form_class = BookForm
@@ -187,3 +188,24 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('book_details', kwargs = {'book_id': self.get_object().book.id})
+
+@login_required
+def post_book_progress(request, book_id):
+    book = get_object_or_404(Book.objects, id=book_id)
+    user = request.user
+    if request.method == "POST":
+        progress = request.POST.get('progress')
+        if progress != '':
+            comment = request.POST.get("comment")
+            fullcomment=""
+            if comment:
+                fullcomment = f" commented:   \"{comment}\" for "
+            else:
+                fullcomment = " has read"
+            label = request.POST.get('label')
+            notify.send(user, recipient=[user] + list(user.followers.all()), verb=(f' {fullcomment} {progress} {label} of '), action_object=book, description='user-event-B' )
+            messages.add_message(request, messages.SUCCESS,"Successfully updated progress!")
+        else:
+            messages.add_message(request, messages.ERROR,"Progress cannot be updated with invalid value!")
+    return redirect('book_details', book_id=book.id)
+
