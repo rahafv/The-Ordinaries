@@ -13,32 +13,6 @@ from notifications.signals import notify
 from system import settings
 from django.utils.decorators import method_decorator
 
-class HomeView(TemplateView):
-
-    template_name = 'home.html'
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        current_user = self.request.user
-        context['user'] = current_user
-        
-        if current_user.is_authenticated:
-            notifications = current_user.notifications.unread()
-            user_events = notifications.filter(description__contains ='user-event')[:25]
-            club_events = notifications.filter(description__contains='club-event')[:10]
-            top_rated_books = get_recommender_books(self.request, True, 3, user_id=current_user.id)
-        else:
-            notifications = None
-            user_events = []
-            club_events = []
-            books = Book.objects.all()
-            top_rated_books = books.order_by('-average_rating','-readers_count')[:3]
-
-        context['club_events'] = list(club_events)
-        context['club_events_length'] = len(club_events)
-        context['user_events'] = list(user_events)
-        context['books'] = top_rated_books
-        return context
 
 class ProfilePageView(LoginRequiredMixin, TemplateView):
     model = User
@@ -100,56 +74,6 @@ def add_book_to_list(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Book Added!")
     rec_helper.increment_counter()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
-
-class SearchPageView(LoginRequiredMixin, TemplateView):
-
-    template_name = 'search_page.html'
-    paginate_by = settings.MEMBERS_PER_PAGE
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        searched = self.request.GET.get('searched')
-        category = self.request.GET.get('category')
-
-        label = category
-
-        # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
-        category = search_page_results["category"]
-        filtered_list = search_page_results["filtered_list"]
-
-        sortForm = ""
-        if(category == "Clubs"):
-            sortForm = ClubsSortForm(self.request.GET or None)
-        elif(category == "Books"):
-            sortForm = BooksSortForm(self.request.GET or None)
-        else:
-            sortForm = UsersSortForm(self.request.GET or None)
-
-        if (sortForm.is_valid()):
-            sort = sortForm.cleaned_data.get('sort')
-            sort_helper = SortHelper(sort, filtered_list)
-
-            if(category == "Clubs"):
-                filtered_list = sort_helper.sort_clubs()
-            elif(category == "Books"):
-                filtered_list = sort_helper.sort_books()
-            else:
-                filtered_list = sort_helper.sort_users()
-
-        context['searched'] = searched
-        context['category'] = category
-        context['label'] = label
-        pg = Paginator(filtered_list, settings.MEMBERS_PER_PAGE)
-        page_number = self.request.GET.get('page')
-        filtered_list = pg.get_page(page_number)
-        context['filtered_list'] = filtered_list
-        context['form'] = sortForm
-        context['current_user'] = self.request.user
-        return context
-
 
 class InitialBookListView(TemplateView):
     template_name = 'initial_book_list.html'
