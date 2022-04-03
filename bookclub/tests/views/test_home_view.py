@@ -33,7 +33,7 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.first_book = Book.objects.get(id=1)
 
     def test_home_url(self):
-        self.assertEqual(self.url,'/home/')
+        self.assertEqual(self.url,'/')
 
     def test_get_home(self):
         self.client.login(username=self.user.username, password='Password123')

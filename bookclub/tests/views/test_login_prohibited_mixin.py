@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User
 from bookclub.tests.helpers import LoginRedirectTester, LogInTester
-from bookclub.views import LogInView
+from bookclub.views.authentication_views import LogInView
 from django.core.exceptions import ImproperlyConfigured
 
 class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
@@ -26,7 +26,6 @@ class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
         response = self.client.get(sign_up_url)
         target_url = reverse("home")
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-
 
     def test_handle_improperly_configured_view(self):
         LogInView.redirect_when_logged_in_url = None

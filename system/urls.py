@@ -90,4 +90,4 @@ urlpatterns = [
     path('send', chat_views.send, name='send'),
     ]
     
-handler404 = 'bookclub.views.handler404'
+handler404 = 'bookclub.views.static_views.handler404'
