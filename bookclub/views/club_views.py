@@ -254,7 +254,6 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        context['applicants'] = context["page_obj"]
         context['club'] = self.club
         context['form'] = self.form
         return context
