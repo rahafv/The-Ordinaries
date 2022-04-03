@@ -5,7 +5,7 @@ from bookclub.models import User, Club
 from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 
 class withdrawClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
-    """Test suite for the withdraw club view."""
+    """Tests of the withdraw club view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json',

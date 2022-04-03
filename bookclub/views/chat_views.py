@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 
 class ChatRoomView(LoginRequiredMixin, TemplateView):
+    """Display user chats."""
     template_name = "chat_room.html"
     pk_url_kwarg = "club_id"
 
@@ -42,7 +43,7 @@ class ChatRoomView(LoginRequiredMixin, TemplateView):
                 return redirect('clubs_list')
         return render(self.request, "chat_room.html", {"club":club})
 
-
+"""Get club's chat messages."""
 @login_required
 def getMessages(request, club_id):
     if request.is_ajax():
@@ -59,7 +60,8 @@ def getMessages(request, club_id):
 
         return JsonResponse({"chats":chats, "modifiedItems":modifiedItems, "user_id":current_user.id})
     raise Http404
-
+    
+"""Send a message in the chat."""
 @login_required
 def send(request):
     if request.method == "POST":

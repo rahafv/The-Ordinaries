@@ -36,6 +36,7 @@ class PasswordView(LoginRequiredMixin, FormView):
         return reverse('home')
 
 class ProfilePageView(LoginRequiredMixin, TemplateView):
+    """Show user profile page."""
     model = User
     template_name = 'profile_page.html'
     pk_url_kwarg = "user_id"
@@ -46,6 +47,7 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
         return super().get(self.request, *args, **kwargs)
         
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template"""
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User.objects, id=self.request.user.id)
 

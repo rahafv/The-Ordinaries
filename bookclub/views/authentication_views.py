@@ -27,6 +27,7 @@ class LoginProhibitedMixin:
         return super().dispatch(*args, **kwargs)
 
     def handle_already_logged_in(self, *args, **kwargs):
+        """Redirect if user is already logged in."""
         url = self.get_redirect_when_logged_in_url()
         return redirect(url)
 
@@ -43,7 +44,7 @@ class LoginProhibitedMixin:
 
 
 class SignUpView(LoginProhibitedMixin, FormView):
-    """Handles user sign up."""
+    """Handle user sign up."""
 
     form_class = SignUpForm
     template_name = "sign_up.html"
@@ -51,7 +52,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     user = None
 
     def form_valid(self, form):
-        """Saves the user when form is validated."""
+        """Save the user when form is validated."""
         self.user = form.save()
         return super().form_valid(form)
 
@@ -106,6 +107,7 @@ def log_out(request):
     messages.add_message(request, messages.SUCCESS, "You've been logged out!")
     return redirect('home')
 
+"""Send account activation email after sign-up."""
 def send_activiation_email(request, user_id):
 
     user = get_object_or_404(User, id=user_id)

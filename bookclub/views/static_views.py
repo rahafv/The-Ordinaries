@@ -12,10 +12,11 @@ from system import settings
 from notifications.models import Notification
 
 class HomeView(TemplateView):
-
+    """Display home view."""
     template_name = 'home.html'
 
     def get_context_data(self, *args, **kwargs):
+        """Genarate context data to be shown in the template."""
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
         
@@ -38,6 +39,7 @@ class HomeView(TemplateView):
         return context
 
 class ShowSortedView(LoginRequiredMixin, ListView):
+    """Display sorted results of search."""
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -91,16 +93,15 @@ class ShowSortedView(LoginRequiredMixin, ListView):
         return context
 
 class SearchPageView(LoginRequiredMixin, TemplateView):
-
+    """Enable user to search for books, clubs, and users."""
     template_name = 'search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-
         searched = self.request.GET.get('searched')
         category = self.request.GET.get('category')
-
         label = category
 
         # method in helpers to return a dictionary with a list of users, clubs or books searched
@@ -138,9 +139,11 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
         context['form'] = sortForm
         return context
 
+"""Handle 404"""
 def handler404(request, exception):
     return render(exception, '404_page.html', status=404)
 
+"""Mark notification as read."""
 @login_required
 def mark_as_read(request, slug=None):
     notification_id = slug2id(slug)

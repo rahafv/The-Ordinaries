@@ -14,14 +14,17 @@ from notifications.signals import notify
 from django.contrib.auth.decorators import login_required
 
 class AddBookView(LoginRequiredMixin, FormView):
+    """Handle add book."""
     form_class = BookForm
     template_name = 'add_book.html'
 
     def form_valid(self, form):
+        """Save book after form is validated."""
         self.book = form.save()
         return super().form_valid(form)
 
     def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
         messages.add_message(
             self.request, messages.SUCCESS, "Book added succesfully!")
         return reverse_lazy('book_details', kwargs = {'book_id': self.book.id})
@@ -69,6 +72,7 @@ class BookDetailsView(DetailView, FormMixin):
         return context
 
 class BookListView(ListView):
+    """Show book lst."""
     model = Book
     template_name = 'books.html'
     form_class = BooksSortForm()
@@ -82,6 +86,7 @@ class BookListView(ListView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(*args, **kwargs)
         books_queryset = Book.objects.all()
         general = True
@@ -110,22 +115,26 @@ class BookListView(ListView):
         return context
 
 class AddReviewView(LoginRequiredMixin, FormView):
+    """Add review to a book."""
     template_name = 'book_details.html'
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
 
     def get_form_kwargs(self):
+        """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
         kwargs['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         kwargs['user'] = self.request.user
         return kwargs
 
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
         context['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         return context
 
     def form_valid(self, form):
+        """Process valid form."""
         self.reviewed_book = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         self.review_user = self.request.user
         if self.reviewed_book.ratings.all().filter(user=self.review_user).exists():
@@ -141,15 +150,17 @@ class AddReviewView(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        """Process invalid form"""
         messages.add_message(self.request, messages.ERROR,
                          "Review cannot be over 250 characters.")
         return super().form_invalid(form)
 
     def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
         return reverse('book_details', kwargs = {'book_id': self.kwargs['book_id']})
 
 class EditReviewView(LoginRequiredMixin, UpdateView):
-    """View to edit the user's review."""
+    """Edit the user's review."""
 
     model = Rating
     template_name = 'edit_review.html'
@@ -157,12 +168,13 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     form_class = EditRatingForm
 
     def get_form_kwargs(self):
+        """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
         kwargs['review'] = self.get_object()
         return kwargs
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the review_id from url and stores it in self for later use."""
+        """Retrieve the review_id from url and store it in self for later use."""
         self.review_id = kwargs.get('review_id')
         self.review = get_object_or_404(Rating.objects, id=self.review_id)
         if self.request.user != self.review.user:
@@ -170,25 +182,30 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
         context['review_id'] = self.get_object().id
         context['review'] = self.get_object()
         return context
 
     def form_valid(self, form):
+        """Process valid form."""
         form.save()
         rec_helper.increment_counter()
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated your review!")
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        """Process invalid form."""
         messages.add_message(self.request, messages.ERROR,
                          "Review cannot be over 250 characters.")
         return super().form_invalid(form)
 
     def get_success_url(self):
+        """Return URL to redirect the user to after valid form handling."""
         return reverse('book_details', kwargs = {'book_id': self.get_object().book.id})
 
+"""Post user's progress of reading a book."""
 @login_required
 def post_book_progress(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)

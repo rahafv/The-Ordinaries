@@ -11,18 +11,17 @@ from system import settings
 
 class FollowingListView(LoginRequiredMixin, ListView):
     """Display following list of a user."""
-
     model = User
     template_name = "follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the user_id from url and stores it in self for later use."""
+        """Retrieve the user_id from url and store it in self for later use."""
         self.user_id = kwargs.get("user_id")
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        """Returns following list of a user."""
+        """Return following list of a user."""
         self.user = get_object_or_404(User, id=self.user_id)
         return self.user.followees.all()
 
@@ -35,19 +34,18 @@ class FollowingListView(LoginRequiredMixin, ListView):
         return context
 
 class FollowersListView(LoginRequiredMixin, ListView):
-    """Displays followers list of a user."""
-
+    """Display followers list of a user."""
     model = User
     template_name = "follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the user_id from url and stores it in self for later use."""
+        """Retrieve the user_id from url and store it in self for later use."""
         self.user_id = kwargs.get("user_id")
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        """Returns followers list of a user."""
+        """Return followers list of a user."""
         self.user = get_object_or_404(User, id=self.user_id)
         return self.user.followers.all()
 

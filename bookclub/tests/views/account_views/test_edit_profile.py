@@ -1,4 +1,4 @@
-"""Tests for the profile view."""
+"""Tests for the edit profile view."""
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.forms import UserForm
@@ -7,8 +7,8 @@ from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTest
 from datetime import date 
 
 
-class ProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
-    """Test suite for the profile view."""
+class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
+    """Test suite for the edit profile view."""
 
     fixtures = [
         'bookclub/tests/fixtures/default_user.json',

@@ -5,7 +5,7 @@ from bookclub.models import Club, User, Book
 from bookclub.tests.helpers import LoginRedirectTester,MenuTestMixin
 
 class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
-    """Tests of the looged in user's profile page view."""
+    """Tests of the logged in user's profile page view."""
 
     fixtures = [ 'bookclub/tests/fixtures/default_user.json',
                     'bookclub/tests/fixtures/other_users.json',

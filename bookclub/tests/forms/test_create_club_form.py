@@ -1,4 +1,4 @@
-"""Tests of the club form."""
+"""Unit tests of the create club form."""
 from django.test import TestCase
 from bookclub.forms import CreateClubForm
 from bookclub.models import Club, User

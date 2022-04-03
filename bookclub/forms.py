@@ -12,7 +12,6 @@ class SignUpForm(forms.ModelForm):
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
         widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'})}
@@ -37,7 +36,6 @@ class SignUpForm(forms.ModelForm):
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
-
         super().clean()
 
         self.DOB = self.cleaned_data.get('DOB')
@@ -68,7 +66,6 @@ class SignUpForm(forms.ModelForm):
 
     def save(self):
         """Create a new user."""
-
         super().save(commit=False)
         user = User.objects.create_user(
             self.cleaned_data.get('username'),
@@ -86,12 +83,13 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class LogInForm(forms.Form):
+    """Form enabling users to sign up."""
+
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'placeholder': '*******'}))
 
     def get_user(self):
         """Returns authenticated user if possible."""
-    
         user = None
         if self.is_valid():
             username = self.cleaned_data.get('username')
@@ -104,7 +102,6 @@ class CreateClubForm(forms.ModelForm):
 
     class Meta:
         """Form options."""
-
         model = Club
         fields = ['name', 'theme', 'meeting_type', 'club_type', 'city', 'country']
         widgets = {"meeting_type": forms.Select(), "club_type":forms.Select()}
@@ -131,8 +128,7 @@ class NewPasswordMixin(forms.Form):
     password_confirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
     def clean(self):
-        """Form mixing for new_password and password_confirmation fields."""
-
+        """Clean the data and generate messages for any errors."""
         super().clean()
         password = self.cleaned_data.get('password')
         new_password = self.cleaned_data.get('new_password')
@@ -148,14 +144,12 @@ class PasswordForm(NewPasswordMixin):
     password = forms.CharField(label='Current password', widget=forms.PasswordInput())
 
     def __init__(self, user=None, **kwargs):
-        """Construct new form instance with a user instance."""
-
+        """Construct new form with a user instance."""
         super().__init__(**kwargs)
         self.user = user
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
-
         super().clean()
         password = self.cleaned_data.get('password')
         if self.user:
@@ -168,7 +162,6 @@ class PasswordForm(NewPasswordMixin):
 
     def save(self):
         """Save the user's new password."""
-
         new_password = self.cleaned_data['new_password']
         self.user.set_password(new_password)
         self.user.save()
@@ -191,7 +184,6 @@ class BookForm(forms.ModelForm):
 
     def save(self):
         """Create a new book."""
-
         super().save(commit=False)
 
         book = Book.objects.create(
@@ -205,28 +197,24 @@ class BookForm(forms.ModelForm):
         return book
 
 class UserForm(forms.ModelForm):
-    """Form to update user profile."""
+    """Form enabling a user toupdate their profile."""
 
     class Meta:
         """Form options."""
-
         model = User
         fields = ['first_name', 'last_name', 'username', 'email','DOB', 'city', 'region', 'country', 'bio']
         widgets = { 'bio': forms.Textarea(), 'DOB': forms.DateInput(attrs={'type': 'date'})}
         labels = {'DOB': 'Date of birth'}
 
     def __init__(self, *args, **kwargs):
-        """ Grants access to the request object so that the date of birth can be changed"""
-
+        """Grant access to the request object so that the date of birth can be changed"""
         self.log_in_user = kwargs.pop('user',None)
         super(UserForm, self).__init__(*args, **kwargs)
         self.fields['region'].widget.attrs['placeholder'] = 'State, Province or County'
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
-
         super().clean()
-
         self.DOB = self.cleaned_data.get('DOB')
 
         if not self.check_age(self.DOB):
@@ -257,10 +245,10 @@ class UserForm(forms.ModelForm):
         return self.log_in_user
 
 class EditRatingForm(forms.ModelForm):
-    """Form to update review."""
+    """Form enabling a user update their book review."""
 
     class Meta:
-
+        """Form options."""
         model = Rating
         fields = ['rating', 'review']
         widgets = {
@@ -268,11 +256,14 @@ class EditRatingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """Initialse the form with the review."""
         self.review = kwargs.pop('review', None)
         super(EditRatingForm, self).__init__(*args, **kwargs)
 
     def calculate_rating(self, rating):
-        return rating*2
+        """Calculate book rating."""
+        #multipy rating /5 by 2 (dataset ratings out of 10)
+        return rating*2 
 
     def save(self):
         super().save(commit=False)
@@ -285,7 +276,7 @@ class EditRatingForm(forms.ModelForm):
         self.review.save()    
          
 class RatingForm(forms.ModelForm):
-    """Form to post a review."""
+    """Form to post a review of a book."""
     
     class Meta:
 
@@ -296,6 +287,7 @@ class RatingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """Initialse form with a book and user."""
         self.book = kwargs.pop('book', None)
         self.user = kwargs.pop('user', None)
         super(RatingForm, self).__init__(*args, **kwargs)
@@ -315,9 +307,12 @@ class RatingForm(forms.ModelForm):
         return review
 
     def calculate_rating(self, rating): 
+        """Calculate book rating."""
+         #multipy rating /5 by 2 (dataset ratings out of 10)
         return rating*2
 
 class UsersSortForm(forms.Form):
+    """Form to sort users."""
     
     ASCENDING = 'name_asc'
     DESCENDING = 'name_desc'
@@ -336,6 +331,7 @@ class UsersSortForm(forms.Form):
     widgets = {'sort': forms.Select()}       
     
 class ClubsSortForm(forms.Form):
+    """Form to sort clubs."""
 
     ASC_DATE = "date_asc"
     DESC_DATE = "date_desc"
@@ -358,6 +354,7 @@ class ClubsSortForm(forms.Form):
     )
 
 class BooksSortForm(forms.Form):
+    """Form to sort books."""
 
     ASC_NAME = 'name_asc'
     DESC_NAME = 'name_desc'
@@ -402,11 +399,13 @@ class MeetingForm(forms.ModelForm):
     )
 
     def __init__(self, club, *args, **kwargs):
+        """Initialise form with a club and a link place holder."""
         self.club = club
         super(MeetingForm, self).__init__(*args, **kwargs)
         self.fields['link'].widget.attrs['placeholder'] = 'Online Meeting Link or Meeting Location Link'
         
     def clean(self):
+        """Clean the data and generate messages for any errors."""
         super().clean()
         if not self.cleaned_data.get('link'):
             if self.club.meeting_type == Club.MeetingType.ONLINE:
@@ -468,6 +467,8 @@ class MeetingForm(forms.ModelForm):
         return meeting
 
 class TransferOwnershipForm(forms.Form):
+    """Form enabling owner to transfer club ownership."""
+
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop("club_id")
         user_id = kwargs.pop("user_id")

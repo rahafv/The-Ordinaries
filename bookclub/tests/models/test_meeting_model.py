@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 class MeetingModelTestCase(TestCase):
-    """Unit tests for the meeting model."""
+    """Unit tests for the Meeting model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

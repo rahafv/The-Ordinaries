@@ -9,6 +9,7 @@ from django.views.generic.base import TemplateView
 from notifications.signals import notify
 from django.utils.decorators import method_decorator
 
+"""Enable user to add/remove books from their reading list."""
 @login_required
 def add_book_to_list(request, book_id):
     book = get_object_or_404(Book.objects, id=book_id)
@@ -26,7 +27,9 @@ def add_book_to_list(request, book_id):
     rec_helper.increment_counter()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
+
 class InitialBookListView(TemplateView):
+    """Display initial book list to the user."""
     template_name = 'initial_book_list.html'
 
     @method_decorator(login_required)
@@ -34,6 +37,7 @@ class InitialBookListView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
         current_user = self.request.user
         already_selected_books = current_user.books.all()
@@ -51,7 +55,9 @@ class InitialBookListView(TemplateView):
         context['genres'] = genres
         return context
 
+
 class InitialGenresView(TemplateView):
+    """Display initial genres to the user."""
     template_name = 'initial_genres.html'
 
     @method_decorator(login_required)
@@ -59,6 +65,7 @@ class InitialGenresView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
         genres = getGenres()
         context['genres'] = sorted(genres, reverse=True, key=genres.get)[0:40]

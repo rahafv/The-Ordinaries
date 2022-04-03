@@ -15,6 +15,7 @@ from notifications.signals import notify
 from threading import Timer
 
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
+    """Enable club owner to schedule a meeting."""
     template_name = "schedule_meeting.html"
     form_class = MeetingForm
 
@@ -25,13 +26,13 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
         return context
 
     def get_form_kwargs(self):
-        """Generates data that the form needs to initialise."""
+        """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
         kwargs["club"] = get_object_or_404(Club.objects, id=self.club_id)
         return kwargs
 
     def get(self, *args, **kwargs):
-        """Extracts club id and stores it in self for later use."""
+        """Extract club id and store it in self for later use."""
         self.club_id = kwargs["club_id"]
         self.club = get_object_or_404(Club.objects, id=self.club_id)
         if self.request.user != self.club.owner:
@@ -84,6 +85,7 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
         return redirect('club_page', club_id=self.club_id)
 
 class ChoiceBookListView(LoginRequiredMixin, TemplateView):
+    """Enable chosen user to choose a book for a club meeting."""
     template_name = "choice_book_list.html"
     model = Book
 
@@ -98,19 +100,20 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
             raise Http404
 
 class SearchBookView(LoginRequiredMixin, ListView):
+    """Enable user to search for specific books."""
     template_name = "choice_book_list.html"
     model = Book
     paginate_by = settings.BOOKS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the searched term from the query string and stores it in self for later use."""
+        """Retrieve the searched term from the query string and store it in self for later use."""
         self.searched = self.request.GET.get('searched', '')
         self.meeting_id = kwargs["meeting_id"]
         return super().get(request, *args, **kwargs)
 
 
     def get_queryset(self):
-        """Returns filtered book list based on the searched term."""
+        """Return filtered book list based on the searched term."""
         books = Book.objects.filter(title__contains=self.searched)
         return books
 
@@ -127,6 +130,7 @@ class SearchBookView(LoginRequiredMixin, ListView):
             raise Http404
 
 class MeetingsListView(LoginRequiredMixin, ListView):
+    """Display club's upcoming meetings list."""
     model = Meeting
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -138,11 +142,10 @@ class MeetingsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Return club's upcoming meetings."""
-        
         return self.club.get_upcoming_meetings()
 
     def get_template_names(self):
-        """Returns a different template name if the user does not have access rights."""
+        """Return a different template name if the user does not have access rights."""
         if self.club.is_member(self.user):
             return ['meetings_list.html']
         else:
@@ -160,6 +163,7 @@ class MeetingsListView(LoginRequiredMixin, ListView):
         return context
 
 class PreviousMeetingsList(LoginRequiredMixin, ListView):
+    """Display list of club's previous meetings."""
     model = Meeting
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -174,7 +178,7 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
         return self.club.get_previous_meetings()
 
     def get_template_names(self):
-        """Returns a different template name if the user does not have access rights."""
+        """Return a different template name if the user does not have access rights."""
         
         if self.club.is_member(self.user):
             return ['meetings_list.html']
@@ -217,6 +221,7 @@ def choose_book(request, book_id, meeting_id):
     else:
         raise Http404
 
+"""Enable club owner to cancel an upcoming meeting."""
 @login_required
 def cancel_meeting(request, meeting_id):
     meeting = get_object_or_404(Meeting.objects, id=meeting_id)
