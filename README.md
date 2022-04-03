@@ -14,14 +14,6 @@ The members of the team are:
 ## Project structure
 The project is called `system`.  It consists of a single app `bookclub`.
 
-## Deployed version of the application
-The deployed version of the application can be found at [link](link).
-
-The administrative interface of the application can be found at [link](link).  
-This can be accessed with the following login information:
-- Email: `email`
-- Password: `Password123`
-
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
 
