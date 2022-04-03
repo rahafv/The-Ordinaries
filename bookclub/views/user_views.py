@@ -1,62 +1,13 @@
-from bookclub.forms import BooksSortForm, ClubsSortForm, UsersSortForm
-from bookclub.helpers import get_list_of_objects, get_recommender_books, getGenres, NotificationHelper, SortHelper, rec_helper
-from bookclub.models import User, Book
+from bookclub.helpers import getGenres, NotificationHelper, rec_helper
+from bookclub.models import Book
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
-from system import settings
 from django.utils.decorators import method_decorator
-
-
-class ProfilePageView(LoginRequiredMixin, TemplateView):
-    model = User
-    template_name = 'profile_page.html'
-    pk_url_kwarg = "user_id"
-
-    def get(self, *args, **kwargs):
-        """Retrieves the user_id and is_clubs from url and stores it in self for later use."""
-        self.user_id = kwargs.get('user_id', None)
-        return super().get(self.request, *args, **kwargs)
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = get_object_or_404(User.objects, id=self.request.user.id)
-
-        if self.user_id:
-            user = get_object_or_404(User.objects, id=self.user_id)
-            
-        if self.request.GET.get('filter') == 'Reading list':
-            books_queryset = User.objects.get(id=user.id).books.all()
-            books_count = books_queryset.count()
-            books_pg = Paginator(books_queryset, settings.BOOKS_PER_PAGE)
-            page_number = self.request.GET.get('page')
-            books = books_pg.get_page(page_number)
-            context['items'] = books
-            context['items_count'] = books_count
-            context['is_clubs'] = False
-
-        if self.request.GET.get('filter') == 'Clubs':
-            clubs_queryset = User.objects.get(id=user.id).clubs.all()
-            clubs_count = clubs_queryset.count()
-            clubs_pg = Paginator(clubs_queryset, settings.CLUBS_PER_PAGE)
-            page_number = self.request.GET.get('page')
-            clubs = clubs_pg.get_page(page_number)
-            context['items'] = clubs
-            context['items_count'] = clubs_count
-            context['is_clubs'] = True
-
-        context['current_user'] = self.request.user
-        context['user'] = user
-        context['following'] = self.request.user.is_following(user)
-        context['followable'] = (self.request.user != user)
-
-        return context
 
 @login_required
 def add_book_to_list(request, book_id):
