@@ -175,7 +175,11 @@ def getGenres():
     return genres
 
 def get_recommender_books(request, is_item_based, numOfRecs, user_id=None, book_id=None, club_id=None):
-    if rec_helper.counter >= rec_helper.get_limit():
+    user_count = User.objects.count()
+    limit = user_count/10
+    if user_count < 10:
+        limit = 5
+    if rec_helper.counter >= limit:
         rec_helper.reset_counter()
 
     rec = Recommendation(is_item_based, rec_helper)  
