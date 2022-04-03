@@ -26,6 +26,7 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.second_user = User.objects.get(id=2)
         
         SVDModel(rec_helper).train(rec_helper)
+        rec_helper.limit = 10
 
         self.first_club = Club.objects.get(id=1)
         self.second_club = Club.objects.get(id=2)
