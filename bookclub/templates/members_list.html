@@ -18,6 +18,7 @@
             <ul class="pagination justify-content-center">
                 {% bootstrap_paginate members show_prev_next="false"  show_first_last="true" range=5  %}
             </ul>
+            <a href='{% url 'club_page' club.id %}' class="btn btn-outline-dark mt-3 mb-2">Back to club</a>
         </div>
     </div>
 </div>  

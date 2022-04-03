@@ -12,7 +12,7 @@
                                 <th><span>Book</span></th>
                                 <th><span>link</span></th>
                                 <th><span>Notes</span></th>
-                                {%if user == meeting.club.owner%}
+                                {%if is_owner%}
                                     <th><span>Chooser</span></th>
                                 {% endif %}
                             </tr>
@@ -30,7 +30,7 @@
                                         {% if meeting.book %}
                                             <a href='{% url 'book_details' meeting.book.id %}' style = "color:black;"> {{meeting.book.title}}</a>
                                         {% else %}
-                                            {%if user != meeting.chooser%}
+                                            {%if request.user != meeting.chooser%}
                                                 <a> No book has been chosen yet.. </a> 
                                             {% else %}
                                                 <a href="{% url 'choice_book_list' meeting_id=meeting.id  %}" class="btn btn-outline-info"> Choose book</a>
@@ -46,7 +46,7 @@
                                         <p>{{meeting.notes}}</p> 
                                        
                                     </td>
-                                    {%if user == meeting.club.owner%}
+                                    {%if is_owner %}
                                         <td  style="width: 18%;">
                                             {% if meeting.chooser %}
                                             <a href={% url 'profile' meeting.chooser.id %}>{{meeting.chooser.username}}</a>
