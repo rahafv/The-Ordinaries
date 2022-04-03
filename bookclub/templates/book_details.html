@@ -91,6 +91,7 @@
                   </div>
                   {% endif %}
                   {% if reader %}
+                    <!-- PROGRESS BOOK BUTTON-->
                     <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
                       <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
                         Post your progress
@@ -104,18 +105,6 @@
                     </div>
                   {% endif %}
                 </nav>
-                <!-- COLLAPSE FOR REVIEW -->
-                <div class="collapse" id="leave-review">
-                  <div class="card card-body mb-3 pb-0">
-                      {% include 'partials/book_review_form.html' with book_id=book.id%}
-                  </div>
-                </div>
-                <!-- COLLAPSE FOR PROGRESS -->
-                <div class="collapse" id="update-progress">
-                  <div class="card card-body mb-3 pb-0 ">
-                    {% include 'partials/book_progress_form.html' with book_id=book.id%}
-                  </div> 
-                </div> 
               </div>
             </div>    
         </div>
@@ -259,7 +248,7 @@
     targetDiv.style.display = "block";
     }
   }
-
+  
   function updateTextInput(val) {
     document.getElementById('textInput').value=val; 
   }
