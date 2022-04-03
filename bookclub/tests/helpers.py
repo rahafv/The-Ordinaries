@@ -60,6 +60,7 @@ class MenuTestMixin(AssertHTMLMixin):
       reverse('profile') ,
       reverse('books_list') , 
       reverse('clubs_list'),
+      reverse('chat_room'),
       reverse('log_out')
       ]
 

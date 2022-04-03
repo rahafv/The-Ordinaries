@@ -6,10 +6,10 @@ from bookclub.helpers import NotificationHelper, SortHelper, get_list_of_objects
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from bookclub.models import Book
-from bookclub.tests.helpers import NotificationsTester
 from notifications.utils import slug2id
 from django.core.paginator import Paginator
 from system import settings
+from notifications.models import Notification
 
 class HomeView(TemplateView):
 
@@ -146,6 +146,6 @@ def handler404(request, exception):
 @login_required
 def mark_as_read(request, slug=None):
     notification_id = slug2id(slug)
-    notification = get_object_or_404(NotificationsTester, recipient=request.user, id=notification_id)
+    notification = get_object_or_404(Notification, recipient=request.user, id=notification_id)
     notification.mark_as_read()
     return NotificationHelper().get_appropriate_redirect(notification)
