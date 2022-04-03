@@ -32,9 +32,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
         context['follow_list'] = context["page_obj"]
         context['user'] =self.user
         context['is_following'] = True
-        context['current_user'] = self.request.user
         return context
-
 
 class FollowersListView(LoginRequiredMixin, ListView):
     """Displays followers list of a user."""
@@ -59,7 +57,6 @@ class FollowersListView(LoginRequiredMixin, ListView):
         context['follow_list'] = context["page_obj"]
         context['user'] = self.user
         context['is_following'] = False
-        context['current_user'] = self.request.user
         return context
 
 """Enable user to follow and unfollow other users."""

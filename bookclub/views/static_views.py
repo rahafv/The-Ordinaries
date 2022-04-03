@@ -18,7 +18,6 @@ class HomeView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
-        context['user'] = current_user
         
         if current_user.is_authenticated:
             notifications = current_user.notifications.unread()
@@ -137,7 +136,6 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
         filtered_list = pg.get_page(page_number)
         context['filtered_list'] = filtered_list
         context['form'] = sortForm
-        context['current_user'] = self.request.user
         return context
 
 def handler404(request, exception):

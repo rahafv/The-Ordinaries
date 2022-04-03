@@ -48,7 +48,7 @@ class BookDetailsView(DetailView, FormMixin):
             reviews = book.ratings.all().exclude(review='').exclude(user=user)
             rating = book.ratings.all().filter(user=user)
             reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
-            recs = get_recommender_books(self.request, False, 6, user_id=self.request.user.id, book_id=book.id)
+            recs = get_recommender_books(self.request, False, 6, user_id=user.id, book_id=book.id)
         else:
             reviews = book.ratings.all()
             rating = []

@@ -225,11 +225,12 @@
                           <p>Notes: {{ upcoming_meeting.notes }}</p>
                           {% if user.id == club.owner.id %}
                           {% if upcoming_meeting.chooser %}
-
+                          <p>
                             Book Chooser:   
                             <a href={% url 'profile' upcoming_meeting.chooser.id %} style = "color:grey;"> 
                                {{upcoming_meeting.chooser.username}}
                             </a>
+                          </p>
                           {%endif%}
 
                           {%endif%}

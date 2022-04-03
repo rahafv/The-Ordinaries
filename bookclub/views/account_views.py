@@ -72,7 +72,6 @@ class ProfilePageView(LoginRequiredMixin, TemplateView):
             context['items_count'] = clubs_count
             context['is_clubs'] = True
 
-        context['current_user'] = self.request.user
         context['user'] = user
         context['following'] = self.request.user.is_following(user)
         context['followable'] = (self.request.user != user)

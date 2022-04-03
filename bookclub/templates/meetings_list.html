@@ -16,9 +16,9 @@
             {%endif%}
             {%if meetings_list %}
                 {%include 'partials/meetings_information_table.html' with meetings_list=meetings_list is_previous=is_previous user=user %}
-            <ul class="pagination justify-content-center">
-                {% bootstrap_paginate meetings_list show_prev_next="false"  show_first_last="true" range=5  %}
-            </ul>
+                <ul class="pagination justify-content-center">
+                    {% bootstrap_paginate meetings_list show_prev_next="false"  show_first_last="true" range=5  %}
+                </ul>
             {%else%}
                 {%if is_previous %}
                     <h3 class = "mt-3 mb-3"> 
@@ -26,10 +26,11 @@
                     </h3>
                 {%else%}
                     <h3 class = "mt-3 mb-3"> 
-                    There are no scheduled meetings 
+                        There are no scheduled meetings 
                     </h3>
                 {% endif %}
             {%endif%}
+            <a href='{% url 'club_page' club.id %}' class="btn btn-outline-dark mt-3 mb-2">Back to club</a>
         </div>
     </div>
 </div>  

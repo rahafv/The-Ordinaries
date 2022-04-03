@@ -164,7 +164,6 @@ class MembersListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['members'] = context["page_obj"]
         context['club'] = self.club
-        context['current_user'] = self.request.user
         context['form'] = self.form
         return context
 
@@ -261,8 +260,8 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
+        context['applicants'] = context["page_obj"]
         context['club'] = self.club
-        context['current_user'] = self.request.user
         context['form'] = self.form
         return context
 
