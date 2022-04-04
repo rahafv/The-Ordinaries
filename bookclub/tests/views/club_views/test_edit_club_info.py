@@ -27,7 +27,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         }
 
     def test_edit_club_page_url(self):
-        self.assertEqual(self.url, f"/club/{self.club.id}/edit_club/")
+        self.assertEqual(self.url, f"/club/{self.club.id}/edit/")
 
 
     def test_get_edit_club(self):

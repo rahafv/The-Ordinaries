@@ -30,7 +30,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTest
         }
   
     def test_edit_review_url(self):
-        self.assertEqual(self.url, f"/edit_review/{self.rating.id}")
+        self.assertEqual(self.url, f"/{self.rating.id}/edit/")
 
     def test_get_edit_review(self):
         self.client.login(username=self.rating.user.username, password='Password123')

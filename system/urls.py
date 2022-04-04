@@ -30,8 +30,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', static_views.HomeView.as_view(),  name='home'),
-    path('search_page/', static_views.SearchPageView.as_view(), name='search_page'),
-    path('search_page/<str:searched>/<str:label>/', static_views.ShowSortedView.as_view(), name = "show_sorted"),
+    path('search/', static_views.SearchPageView.as_view(), name='search_page'),
+    path('search/<str:searched>/<str:label>/', static_views.ShowSortedView.as_view(), name = "show_sorted"),
     path(r'mark-as-read/(<slug>[-\w]+)', static_views.mark_as_read, name='mark_as_read'),
 
     path('SignUp/', authentication_views.SignUpView.as_view(),  name='sign_up'),
@@ -49,7 +49,7 @@ urlpatterns = [
     path('initial_genres/books/', user_views.InitialBookListView.as_view(), name ='initial_book_list'),
     path('book/<int:book_id>/add_to_list/', user_views.add_book_to_list, name ='add_book_to_list'),
 
-    path('follow_toggle/<int:user_id>/', follow_views.follow_toggle, name='follow_toggle'),
+    path('follow/<int:user_id>/', follow_views.follow_toggle, name='follow_toggle'),
     path('<int:user_id>/follow_list/', follow_views.FollowListView.as_view(), name='follow_list'),
     
     path('add_book/', book_views.AddBookView.as_view(), name ='add_book'),
@@ -58,12 +58,12 @@ urlpatterns = [
     path('<int:user_id>/books/', book_views.BookListView.as_view(), name ='books_list'),
     path('book/<int:book_id>/book_details/', book_views.BookDetailsView.as_view(), name ='book_details'),
     path('book/<int:book_id>/review/', book_views.AddReviewView.as_view(), name ='add_review'),
-    path('edit_review/<int:review_id>', book_views.EditReviewView.as_view(), name='edit_review'),
+    path('<int:review_id>/edit/', book_views.EditReviewView.as_view(), name='edit_review'),
     path('book/<int:book_id>/post_progress', book_views.post_book_progress, name ='post_progress'),
     
     path('create_club/', club_views.CreateClubView.as_view() , name='create_club'),
     path('club/<int:club_id>/', club_views.ClubPageView.as_view(), name="club_page"),
-    path('club/<int:club_id>/edit_club/', club_views.EditClubInformationView.as_view(), name='edit_club'),
+    path('club/<int:club_id>/edit/', club_views.EditClubInformationView.as_view(), name='edit_club'),
     path('club/<int:club_id>/join/', club_views.join_club, name ='join_club'),
     path('club/<int:club_id>/withdraw/', club_views.withdraw_club, name ='withdraw_club'),
     path('clubs/', club_views.ClubsListView.as_view(), name ='clubs_list'),
@@ -81,7 +81,6 @@ urlpatterns = [
     path('meeting/<int:meeting_id>/search/', meeting_views.SearchBookView.as_view(), name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', meeting_views.choose_book, name='choose_book'),
     path('club/<int:club_id>/meetings/', meeting_views.MeetingsListView.as_view(), name='meetings_list'),
-    # path('club/<int:club_id>/previous_meetings/', meeting_views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
     
     path('chat_room/', chat_views.ChatRoomView.as_view(), name='chat_room'),
     path('club/<int:club_id>/chat_room/', chat_views.ChatRoomView.as_view(), name='chat_room'),

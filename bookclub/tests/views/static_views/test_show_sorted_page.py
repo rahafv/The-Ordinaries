@@ -49,7 +49,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
        self.assert_redirects_when_not_logged_in()
 
     def test_show_sorted_page_url(self):
-        self.assertEqual(self.url,f'/search_page/{"joe"}/{"user-name"}/')
+        self.assertEqual(self.url,f'/search/{"joe"}/{"user-name"}/')
 
     def test_sort_users_with_name_asc_by_name(self):
         self._create_test_users()
