@@ -3,10 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User, Club
 from bookclub.forms import ClubsSortForm
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
 from system import settings
 
-class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
+class ClubsListTest(TestCase, LoginRedirectTester , MenuTestMixin, ObjectsCreator):
     """Tests of the club list view."""
 
     fixtures=[
@@ -53,7 +53,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
 
     def test_get_clubs_list(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -72,7 +72,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_clubs_list_descending_date(self):
         self.form_input['sort'] = ClubsSortForm.DESC_DATE
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -91,7 +91,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_clubs_list_ascending_date(self):
         self.form_input['sort'] = ClubsSortForm.ASC_DATE
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -111,7 +111,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_clubs_list_ascending_name(self):
         self.form_input['sort'] = ClubsSortForm.ASC_NAME
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -130,7 +130,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_clubs_list_descending_name(self):
         self.form_input['sort'] = ClubsSortForm.DESC_NAME
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -148,7 +148,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
 
     def test_get_clubs_list_with_pagination(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE*2+self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE*2+self.num_of_clubs)
         response = self.client.get(self.url)
         self.assert_menu(response)
         self.assertEqual(response.status_code, 200)
@@ -183,20 +183,10 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self.assertFalse(page_obj.has_next())
         self.assert_menu(response)
 
-
-    def _create_test_clubs(self, club_count=10):
-        for club_id in range(club_count):
-            Club.objects.create(owner = self.user,
-                name =f'club{club_id}',
-                theme=f'theme{club_id}',
-                city=f'city{club_id}',
-                country=f'country {club_id}',
-            )
-
     def test_get_private_clubs_list(self):
         self.form_input['privacy'] = 'private'
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -210,7 +200,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_public_clubs_list(self):
         self.form_input['privacy'] = 'public'
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_search_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')
@@ -224,7 +214,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
     def test_get_owned_clubs_list(self):
         self.form_input['ownership'] = 'owned'
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
+        self.create_test_search_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/clubs.html')

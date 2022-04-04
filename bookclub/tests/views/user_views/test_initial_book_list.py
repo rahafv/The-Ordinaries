@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Book
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, ObjectsCreator
 
-class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
+class InitialBookListViewTestCase(TestCase, LoginRedirectTester, ObjectsCreator):
     """Tests of the initial book list view."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json']  
@@ -15,19 +15,6 @@ class InitialBookListViewTestCase(TestCase, LoginRedirectTester ):
 
     def test_initial_book_list_url(self):
         self.assertEqual(self.url,'/initial_genres/books/') 
-
-    def create_test_books(self, book_count=10):
-        isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
-                    ,'155061224','446520802', '380000059','380711524']
-        ctr = 0
-        for book_id in range(book_count):
-            Book.objects.create(
-                ISBN = isbn_num[ctr],
-                title = f'book{book_id} title',
-                author = f'book{book_id} author',
-                genre = f'book{book_id} genre'
-            )
-            ctr+=1
 
     def test_display_only_eight_books_on_page(self):
         self.client.login(username=self.user.username, password='Password123')

@@ -2,10 +2,10 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import User , Book, Meeting
-from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 
 
-class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
+class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):
     """Tests of the choice book list view."""
     
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
@@ -52,19 +52,3 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
         
     def test_choice_book_list_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
-
-    def create_test_books(self, book_count=6):
-        isbn_num = ['0425176428', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
-                    ,'155061224','446520802', '380000059','380711524']
-        ctr = 0
-        for book_id in range(book_count):
-            Book.objects.create(
-                ISBN = isbn_num[ctr],
-                title = f'book{book_id} title',
-                author = f'book{book_id} author',
-                genre = "Classics,European Literature,Czech Literature"
-            )
-            ctr+=1
-
-
-

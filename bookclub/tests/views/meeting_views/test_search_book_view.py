@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Meeting, User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
 
-class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
+class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):
     """Test suite for the search page view."""
 
     fixtures=['bookclub/tests/fixtures/default_user.json', 
@@ -48,7 +48,7 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
 
     def test_search_books_with_title(self):
         self.client.login(username=self.user.username, password='Password123')
-        self._create_test_books()
+        self.create_test_search_books()
         response = self.client.get(self.url, self.book_title_form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'meeting_templates/choice_book_list.html')
@@ -65,27 +65,4 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
         self.assert_menu(response)
 
     def test_choice_book_list_when_not_logged_in(self):
-        self.assert_redirects_when_not_logged_in()
-
-    def _create_test_books(self, book_count=6):
-        isbn_num = ['0425176428', '0002005018', '0060973129','0374157065', '0393045218', '0399135782','034545104X'
-                    ,'155061224','446520802','052165615X','521795028', '2080674722','3257224281','600570967','038550120X',
-                    '342310538', '425115801','449006522','553561618', '055356451X','786013990','786014512','60517794','451192001','609801279',
-                    '671537458','679776818','943066433','1570231028','1885408226','747558167','3442437407','033390804X','3596218098','684867621',
-                    '451166892','8440682697','034544003X','380000059','380711524']
-        for book_id in range(book_count):
-            if book_id < 3: 
-                title = 'uio'
-                author = 'James'
-            else: 
-                title = 'xyz'
-                author = 'joe'
-
-            Book.objects.create(
-                ISBN = isbn_num[book_id],
-                title =title,
-                author = author, 
-            )
-
-
-    
+        self.assert_redirects_when_not_logged_in()   
