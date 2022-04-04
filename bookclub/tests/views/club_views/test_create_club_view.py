@@ -34,7 +34,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "create_club.html")
+        self.assertTemplateUsed(response, "club_templates/create_club.html")
         form = response.context["form"]
         self.assertTrue(isinstance(form, CreateClubForm))
         self.assertFalse(form.is_bound)
@@ -49,7 +49,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertEqual(count_clubs_before + 1, Club.objects.count())
         self.assertEqual(count_events_before + 1, self.follower.notifications.unread().count())
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         club = Club.objects.get(name="Club1")
         self.assertEqual(club.name, "Club1")
         self.assertEqual(club.theme, "Fiction")
@@ -70,7 +70,7 @@ class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertEqual(response.status_code, 200)
         form = response.context["form"]
         self.assertTrue(form.is_bound)
-        self.assertTemplateUsed(response, "create_club.html")
+        self.assertTemplateUsed(response, "club_templates/create_club.html")
         self.assertTrue(isinstance(form, CreateClubForm))
         self.assert_menu(response)
 

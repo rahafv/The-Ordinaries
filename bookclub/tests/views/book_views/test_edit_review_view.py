@@ -36,7 +36,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.client.login(username=self.rating.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_review.html')
+        self.assertTemplateUsed(response, 'book_templates/edit_review.html')
         review_id = response.context['review_id']
         form= response.context['form']
         self.assertTrue(isinstance(form, EditRatingForm)) 
@@ -51,7 +51,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTest
         response = self.client.post(self.url, self.form_input)
         self.assertEqual(count_clubs_before, Rating.objects.count())
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "edit_review.html")
+        self.assertTemplateUsed(response, "book_templates/edit_review.html")
         self.assert_error_message(response)
 
     def test_successful_review_update(self):
@@ -60,7 +60,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTest
         target_url = reverse("book_details", kwargs={"book_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "book_details.html")
+        self.assertTemplateUsed(response, "book_templates/book_details.html")
         self.assertEqual(count_ratings_before, Rating.objects.count())
         self.assert_success_message(response)
         self.rating.refresh_from_db()
@@ -75,7 +75,7 @@ class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.assertNotEquals(logged_in_user , self.other_rating.user.username)
         response = self.client.get(self.other_url)
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, '404_page.html')
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
 
     def test_get_profile_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()

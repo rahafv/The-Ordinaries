@@ -40,7 +40,7 @@ class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMix
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         self.assert_success_message(response)
     
     def test_post_update_progress_form_with_empty_comment(self):
@@ -49,7 +49,7 @@ class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMix
         self.form_input['progress-comment-pages']= ''
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         self.assert_success_message(response)
 
     def test_post_update_progress_form_with_empty_pages(self):
@@ -57,7 +57,7 @@ class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMix
         self.form_input['progress']=''
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         self.assert_error_message(response)
 
 

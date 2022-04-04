@@ -16,7 +16,7 @@ from threading import Timer
 
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
     """Enable club owner to schedule a meeting."""
-    template_name = "schedule_meeting.html"
+    template_name = "meeting_templates/schedule_meeting.html"
     form_class = MeetingForm
 
     def get_context_data(self, **kwargs):
@@ -86,7 +86,7 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
 
 class ChoiceBookListView(LoginRequiredMixin, TemplateView):
     """Enable chosen user to choose a book for a club meeting."""
-    template_name = "choice_book_list.html"
+    template_name = "meeting_templates/choice_book_list.html"
     model = Book
 
     def get_context_data(self, *args, **kwargs):
@@ -101,7 +101,7 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
 
 class SearchBookView(LoginRequiredMixin, ListView):
     """Enable user to search for specific books."""
-    template_name = "choice_book_list.html"
+    template_name = "meeting_templates/choice_book_list.html"
     model = Book
     paginate_by = settings.BOOKS_PER_PAGE
 
@@ -147,10 +147,10 @@ class MeetingsListView(LoginRequiredMixin, ListView):
     def get_template_names(self):
         """Return a different template name if the user does not have access rights."""
         if self.club.is_member(self.user):
-            return ['meetings_list.html']
+            return ['meeting_templates/meetings_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
     
 
     def get_context_data(self, **kwargs):
@@ -181,10 +181,10 @@ class PreviousMeetingsList(LoginRequiredMixin, ListView):
         """Return a different template name if the user does not have access rights."""
         
         if self.club.is_member(self.user):
-            return ['meetings_list.html']
+            return ['meeting_templates/meetings_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
 
     def get_context_data(self, **kwargs):
         """Retrieve context data to be shown on the template."""

@@ -38,7 +38,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self.url = reverse('clubs_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertContains(response, f'club1')
         self.assertContains(response, f'Crime')
         self.assertContains(response, f'club2')
@@ -56,7 +56,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
@@ -75,7 +75,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
@@ -94,7 +94,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
@@ -114,7 +114,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
@@ -133,7 +133,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         for club_id in range(settings.CLUBS_PER_PAGE-self.num_of_clubs):
             self.assertContains(response, f'club{club_id}')
@@ -152,7 +152,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         response = self.client.get(self.url)
         self.assert_menu(response)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         page_obj = response.context['clubs']
         self.assertFalse(page_obj.has_previous())
@@ -160,7 +160,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         page_one_url = reverse('clubs_list') + '?page=1'
         response = self.client.get(page_one_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         page_obj = response.context['clubs']
         self.assertFalse(page_obj.has_previous())
@@ -168,7 +168,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         page_two_url = reverse('clubs_list') + '?page=2'
         response = self.client.get(page_two_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), settings.CLUBS_PER_PAGE)
         page_obj = response.context['clubs']
         self.assertTrue(page_obj.has_previous())
@@ -176,7 +176,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         page_three_url = reverse('clubs_list') + '?page=3'
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assertEqual(len(response.context['clubs']), 8)
         page_obj = response.context['clubs']
         self.assertTrue(page_obj.has_previous())
@@ -199,7 +199,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         form = response.context['form']
         num_of_private_clubs = Club.objects.filter(club_type='Private').count()
         self.assertEqual(len(response.context['clubs']), num_of_private_clubs)
@@ -213,7 +213,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         form = response.context['form']
         num_of_public_clubs = Club.objects.filter(club_type='Public').count()
         self.assertEqual(len(response.context['clubs']), num_of_public_clubs)
@@ -227,7 +227,7 @@ class ClubsListTest(TestCase, LoginRedirectTester ,MenuTestMixin ):
         self._create_test_clubs(settings.CLUBS_PER_PAGE-self.num_of_clubs)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         form = response.context['form']
         num_of_owned_clubs = Club.objects.filter(owner=self.user).count()
         self.assertEqual(len(response.context['clubs']), num_of_owned_clubs)

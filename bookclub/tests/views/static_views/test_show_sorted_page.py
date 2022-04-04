@@ -56,7 +56,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.user_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, UsersSortForm)) 
         self.assertTrue(form.is_valid())
@@ -74,7 +74,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.user_country_form_input['searched'], "label": self.user_country_form_input["category"]})
         response = self.client.get(target_url,self.user_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, UsersSortForm)) 
         self.assertTrue(form.is_valid())
@@ -91,7 +91,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.club_name_form_input['searched'], "label": self.club_name_form_input["category"]})
         response = self.client.get(target_url,self.clubs_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
@@ -109,7 +109,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.club_location_form_input['searched'], "label": self.club_location_form_input["category"]})
         response = self.client.get(target_url,self.clubs_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
@@ -125,7 +125,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.club_location_form_input['searched'], "label": self.club_location_form_input["category"]})
         response = self.client.get(target_url,self.clubs_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
@@ -141,7 +141,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.club_location_form_input['searched'], "label": self.club_location_form_input["category"]})
         response = self.client.get(target_url,self.clubs_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, ClubsSortForm)) 
         self.assertTrue(form.is_valid())
@@ -157,7 +157,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.book_title_form_input['searched'], "label": self.book_title_form_input["category"]})
         response = self.client.get(target_url,self.books_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, BooksSortForm)) 
         self.assertTrue(form.is_valid())
@@ -173,7 +173,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.book_author_form_input['searched'], "label": self.book_author_form_input["category"]})
         response = self.client.get(target_url,self.books_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, BooksSortForm)) 
         self.assertTrue(form.is_valid())
@@ -189,7 +189,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.book_title_form_input['searched'], "label": self.book_title_form_input["category"]})
         response = self.client.get(target_url,self.books_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, BooksSortForm)) 
         self.assertTrue(form.is_valid())
@@ -203,7 +203,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.book_title_form_input['searched'], "label": self.book_title_form_input["category"]})
         response = self.client.get(target_url,self.books_sort_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, BooksSortForm)) 
         self.assertTrue(form.is_valid())
@@ -215,7 +215,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         url = reverse('show_sorted', kwargs={"searched": self.book_author_form_input['searched'], "label": self.book_author_form_input["category"]})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "You forgot to search!")
         self.assert_menu(response)
 
@@ -225,7 +225,7 @@ class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse('show_sorted', kwargs={"searched": self.book_author_form_input['searched'], "label": self.book_author_form_input["category"]})
         response = self.client.get(target_url,self.invalid_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form = response.context['form']
         self.assertFalse(form.is_valid())
 

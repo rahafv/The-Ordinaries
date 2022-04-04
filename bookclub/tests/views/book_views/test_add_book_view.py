@@ -28,7 +28,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'add_book.html')
+        self.assertTemplateUsed(response, 'book_templates/add_book.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, BookForm))
         self.assertFalse(form.is_bound)
@@ -43,7 +43,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         after_count = Book.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'add_book.html')
+        self.assertTemplateUsed(response, 'book_templates/add_book.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, BookForm))
         self.assertTrue(form.is_bound)
@@ -55,7 +55,7 @@ class AddBookViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
         target_url = reverse("book_details", kwargs={"book_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "book_details.html")
+        self.assertTemplateUsed(response, "book_templates/book_details.html")
         self.assertEqual(count_books_before + 1, Book.objects.count())
         club = Book.objects.get(ISBN="0195153448")
         self.assertEqual(club.title, "Classical")

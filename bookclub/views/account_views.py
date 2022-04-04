@@ -15,7 +15,7 @@ from system import settings
 class PasswordView(LoginRequiredMixin, FormView):
     """Handle password change requests."""
 
-    template_name = 'password.html'
+    template_name = 'account_templates/password.html'
     form_class = PasswordForm
 
     def get_form_kwargs(self, **kwargs):
@@ -38,7 +38,7 @@ class PasswordView(LoginRequiredMixin, FormView):
 class ProfilePageView(LoginRequiredMixin, TemplateView):
     """Show user profile page."""
     model = User
-    template_name = 'profile_page.html'
+    template_name = 'account_templates/profile_page.html'
     pk_url_kwarg = "user_id"
 
     def get(self, *args, **kwargs):
@@ -84,7 +84,7 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     """View to update logged-in user's profile."""
 
     model = UserForm
-    template_name = "edit_profile.html"
+    template_name = "account_templates/edit_profile.html"
     form_class = UserForm
 
     def get_form_kwargs(self):

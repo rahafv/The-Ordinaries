@@ -30,7 +30,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.url = reverse('applicants_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'applicants_list.html')
+        self.assertTemplateUsed(response, 'club_templates/applicants_list.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, UsersSortForm))  
         self.assert_menu(response)
@@ -40,7 +40,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self._create_test_applicants(15)
         response = self.client.get(self.url,self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'applicants_list.html')
+        self.assertTemplateUsed(response, 'club_templates/applicants_list.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, UsersSortForm))
         self.assertEqual(form.cleaned_data.get('sort'), 'name_asc')
@@ -73,7 +73,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self._create_test_applicants(15)
         response = self.client.get(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'applicants_list.html')
+        self.assertTemplateUsed(response, 'club_templates/applicants_list.html')
 
         form = response.context['form']
         self.assertTrue(isinstance(form, UsersSortForm))
@@ -107,7 +107,7 @@ class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.client.login(username=self.non_owner.username, password='Password123')
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assert_error_message(response)
         self.assert_menu(response)
     

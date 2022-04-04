@@ -51,7 +51,7 @@ class TransferClubOwnershipTestCase(TestCase, MessageTester, MenuTestMixin, Logi
     def test_ownership_transfer_with_invalid_input(self):
         self.client.login(username=self.owner.username, password="Password123")
         response = self.client.post(self.url,{'selected_member':'', 'defaultCheck':'checked'})
-        self.assertTemplateUsed(response, 'transfer_ownership.html')
+        self.assertTemplateUsed(response, 'club_templates/transfer_ownership.html')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.club.owner, self.owner)
         self.assert_menu(response)

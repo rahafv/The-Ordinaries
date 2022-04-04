@@ -27,7 +27,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'password.html')
+        self.assertTemplateUsed(response, 'account_templates/password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
         self.assert_menu(response)
@@ -40,7 +40,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         response = self.client.post(self.url, self.form_input, follow=True)
         response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'home.html')
+        self.assertTemplateUsed(response, 'static_templates/home.html')
         self.user.refresh_from_db()
         is_password_correct = check_password('NewPassword123', self.user.password)
         self.assertTrue(is_password_correct)
@@ -52,7 +52,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         self.form_input['password'] = 'WrongPassword123'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'password.html')
+        self.assertTemplateUsed(response, 'account_templates/password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
         self.user.refresh_from_db()
@@ -65,7 +65,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         self.form_input['password'] = 'WrongPassword123'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'password.html')
+        self.assertTemplateUsed(response, 'account_templates/password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
         self.user.refresh_from_db()
@@ -78,7 +78,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         self.form_input['password_confirmation'] = 'WrongPassword123'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'password.html')
+        self.assertTemplateUsed(response, 'account_templates/password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
         self.user.refresh_from_db()
@@ -92,7 +92,7 @@ class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixi
         self.form_input['password_confirmation'] = '1234567890'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'password.html')
+        self.assertTemplateUsed(response, 'account_templates/password.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, PasswordForm))
         self.user.refresh_from_db()

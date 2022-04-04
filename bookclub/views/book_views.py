@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 class AddBookView(LoginRequiredMixin, FormView):
     """Handle add book."""
     form_class = BookForm
-    template_name = 'add_book.html'
+    template_name = 'book_templates/add_book.html'
 
     def form_valid(self, form):
         """Save book after form is validated."""
@@ -34,7 +34,7 @@ class BookDetailsView(DetailView, FormMixin):
     """Show individual book details."""
 
     model = Book
-    template_name = 'book_details.html'
+    template_name = 'book_templates/book_details.html'
     context_object_name = 'book'
     form_class = RatingForm
     pk_url_kwarg = 'book_id'
@@ -74,7 +74,7 @@ class BookDetailsView(DetailView, FormMixin):
 class BookListView(ListView):
     """Show book lst."""
     model = Book
-    template_name = 'books.html'
+    template_name = 'book_templates/books.html'
     form_class = BooksSortForm()
     paginate_by = settings.BOOKS_PER_PAGE
 
@@ -116,7 +116,7 @@ class BookListView(ListView):
 
 class AddReviewView(LoginRequiredMixin, FormView):
     """Add review to a book."""
-    template_name = 'book_details.html'
+    template_name = 'book_templates/book_details.html'
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
 
@@ -163,7 +163,7 @@ class EditReviewView(LoginRequiredMixin, UpdateView):
     """Edit the user's review."""
 
     model = Rating
-    template_name = 'edit_review.html'
+    template_name = 'book_templates/edit_review.html'
     pk_url_kwarg = 'review_id'
     form_class = EditRatingForm
 

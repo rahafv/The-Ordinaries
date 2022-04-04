@@ -37,7 +37,7 @@ class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestM
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'account_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, UserForm)) 
         self.assertEqual(form.instance, self.user)
@@ -51,7 +51,7 @@ class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestM
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'account_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, UserForm))
         self.assertTrue(form.is_bound)
@@ -76,7 +76,7 @@ class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestM
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'account_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, UserForm))
         self.assertTrue(form.is_bound)
@@ -100,7 +100,7 @@ class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestM
         self.assertEqual(after_count, before_count)
         response_url = reverse('profile')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.assert_success_message(response)
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'johndoe2')

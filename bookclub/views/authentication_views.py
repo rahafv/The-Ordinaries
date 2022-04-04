@@ -47,7 +47,7 @@ class SignUpView(LoginProhibitedMixin, FormView):
     """Handle user sign up."""
 
     form_class = SignUpForm
-    template_name = "sign_up.html"
+    template_name = "authentication_templates/sign_up.html"
     redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
     user = None
 
@@ -80,7 +80,7 @@ class LogInView(LoginProhibitedMixin, FormView):
         if user and not user.email_verified:
             messages.add_message(request, messages.ERROR,
                 "Email is not verified, please check your email inbox!")
-            return render(request, 'log_in.html', {'form': form, 'next': self.next, 'request': request, 'user': user})
+            return render(request, 'authentication_templates/log_in.html', {'form': form, 'next': self.next, 'request': request, 'user': user})
 
         if user:
             login(request, user)
@@ -96,7 +96,7 @@ class LogInView(LoginProhibitedMixin, FormView):
     def render(self):
         """Render log in template with blank log in form."""
         form = LogInForm()
-        return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
+        return render(self.request, 'authentication_templates/log_in.html', {'form': form, 'next': self.next})
 
 
 
@@ -138,7 +138,7 @@ def send_activiation_email(request, user_id):
 class ActivateUserView(TemplateView):
     """Handles activation of a user after their email is verified."""
 
-    template_name = "activate-fail.html"
+    template_name = "authentication_templates/activate_fail.html"
 
     def get(self, *args, **kwargs):
         """Retrieves user if valid and sets its email verified field to true."""

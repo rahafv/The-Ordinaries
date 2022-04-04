@@ -61,7 +61,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.user_name_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         for user_id in range(3):
             self.assertContains(response, f'joelast{user_id}')
         for user_id in range(3, 6): 
@@ -74,7 +74,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.user_country_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         for user_id in range(3):
             self.assertContains(response, f'joelast{user_id}')
         for user_id in range(3, 6): 
@@ -87,7 +87,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.club_name_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         for club_id in range(3):
             self.assertContains(response, f'The{club_id}')
         for club_id in range(3, 6):
@@ -99,7 +99,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.club_location_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "uk")
         self.assertNotContains(response, "usa")
         self.assert_menu(response)
@@ -109,7 +109,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.book_title_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "uio")
         self.assertNotContains(response, "xyz")
         self.assert_menu(response)
@@ -119,7 +119,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.book_author_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "James")
         self.assertNotContains(response, "joe")
         self.assert_menu(response)
@@ -129,7 +129,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url,self.book_genre_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "fiction")
         self.assertNotContains(response, "non fiction")
         self.assert_menu(response)
@@ -139,7 +139,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.user_name_form_input['searched'] = ''
         response = self.client.get(self.url, self.user_name_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         self.assertContains(response, "You forgot to search!")
         self.assert_menu(response)
 
@@ -148,7 +148,7 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.user_name_form_input['searched'] = ''
         response = self.client.get(self.url, self.invalid_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'search_page.html')
+        self.assertTemplateUsed(response, 'static_templates/search_page.html')
         form = response.context['form']
         self.assertFalse(form.is_valid())
         self.assert_menu(response)

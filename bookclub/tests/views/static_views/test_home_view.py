@@ -41,7 +41,7 @@ class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixi
         self.create_test_books()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'home.html')
+        self.assertTemplateUsed(response, 'static_templates/home.html')
         self.assert_menu(response)
     
     def test_feed_contains_events_by_self_and_followees(self):

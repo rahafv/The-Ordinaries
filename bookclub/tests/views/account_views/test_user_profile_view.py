@@ -41,7 +41,7 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.assert_menu(response)  
    
     def test_get_valid_user_profile_page(self):
@@ -49,7 +49,7 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('profile', kwargs={'user_id': self.sec_user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.assertContains(response, self.sec_user.username)    
         self.assertContains(response, self.sec_user.full_name())  
 
@@ -66,11 +66,11 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.form_input = {'filter': 'Reading list'}
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.assert_menu(response)  
         self.assertContains(response, self.user.username)    
         self.assertContains(response, self.user.full_name())  
@@ -91,11 +91,11 @@ class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.form_input = {'filter': 'Clubs'}
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
         self.assert_menu(response)  
         self.assertContains(response, self.user.username)    
         self.assertContains(response, self.user.full_name())  

@@ -34,7 +34,7 @@ class ShowUserTest(TestCase):
         self.assertEqual(user_followers_before, user_followers_after)
         self.assertEqual(followee_followers_before, followee_followers_after+1)
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
        
 
     def test_get_follow_toggle_for_non_followee(self):
@@ -50,7 +50,7 @@ class ShowUserTest(TestCase):
         self.assertEqual(followee_followers_before+1, followee_followers_after)
         self.assertEqual(events_before_count + 1, self.followee.notifications.unread().count())
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'profile_page.html')
+        self.assertTemplateUsed(response, 'account_templates/profile_page.html')
 
    
     def test_get_follow_toggle_with_invalid_user_id(self):

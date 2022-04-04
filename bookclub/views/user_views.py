@@ -30,7 +30,7 @@ def add_book_to_list(request, book_id):
 
 class InitialBookListView(TemplateView):
     """Display initial book list to the user."""
-    template_name = 'initial_book_list.html'
+    template_name = 'user_templates/initial_book_list.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -58,7 +58,7 @@ class InitialBookListView(TemplateView):
 
 class InitialGenresView(TemplateView):
     """Display initial genres to the user."""
-    template_name = 'initial_genres.html'
+    template_name = 'user_templates/initial_genres.html'
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):

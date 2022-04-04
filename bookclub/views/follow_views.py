@@ -12,7 +12,7 @@ from system import settings
 class FollowingListView(LoginRequiredMixin, ListView):
     """Display following list of a user."""
     model = User
-    template_name = "follow_list.html"
+    template_name = "follow_templates/follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
@@ -36,7 +36,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
 class FollowersListView(LoginRequiredMixin, ListView):
     """Display followers list of a user."""
     model = User
-    template_name = "follow_list.html"
+    template_name = "follow_templates/follow_list.html"
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):

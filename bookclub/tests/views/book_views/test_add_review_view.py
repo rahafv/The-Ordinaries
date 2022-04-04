@@ -31,7 +31,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
 
     def test_user_cannot_rate_twice(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -50,7 +50,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         target_url = reverse("book_details",  kwargs={"book_id": self.book.id})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "book_details.html")
+        self.assertTemplateUsed(response, "book_templates/book_details.html")
         self.assertEqual(count_rating_before + 1, self.follower.notifications.unread().count())
         self.assertEqual(count_events_before + 1, self.follower.notifications.unread().count())
         user = User.objects.get(id=1)
@@ -68,7 +68,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         response = self.client.post(self.url, self.form_input)
         self.assertEqual(count_clubs_before, Rating.objects.count())
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "book_details.html")
+        self.assertTemplateUsed(response, "book_templates/book_details.html")
 
     def test_get_add_book_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()

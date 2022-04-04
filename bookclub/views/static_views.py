@@ -13,7 +13,7 @@ from notifications.models import Notification
 
 class HomeView(TemplateView):
     """Display home view."""
-    template_name = 'home.html'
+    template_name = 'static_templates/home.html'
 
     def get_context_data(self, *args, **kwargs):
         """Genarate context data to be shown in the template."""
@@ -40,12 +40,12 @@ class HomeView(TemplateView):
 
 class ShowSortedView(LoginRequiredMixin, ListView):
     """Display sorted results of search."""
-    template_name = 'search_page.html'
+    template_name = 'static_templates/search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def post(self, *args, **kwargs):
         """Handle post request."""
-        return render(self.request, 'search_page.html', {})
+        return render(self.request, 'static_templates/search_page.html', {})
 
     def get(self, *args, **kwargs):
         """Handle get request."""
@@ -94,7 +94,7 @@ class ShowSortedView(LoginRequiredMixin, ListView):
 
 class SearchPageView(LoginRequiredMixin, TemplateView):
     """Enable user to search for books, clubs, and users."""
-    template_name = 'search_page.html'
+    template_name = 'static_templates/search_page.html'
     paginate_by = settings.MEMBERS_PER_PAGE
 
     def get_context_data(self, **kwargs):
@@ -141,7 +141,7 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
 
 """Handle 404"""
 def handler404(request, exception):
-    return render(exception, '404_page.html', status=404)
+    return render(exception, 'static_templates/404_page.html', status=404)
 
 """Mark notification as read."""
 @login_required

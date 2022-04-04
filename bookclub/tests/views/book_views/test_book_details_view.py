@@ -23,7 +23,7 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         self.assert_menu(response)
 
     def test_get_book_details_with_invalid_id(self):
@@ -36,7 +36,7 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, RatingForm))
         self.assertFalse(form.is_bound)
@@ -44,7 +44,7 @@ class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
     def test_book_details_with_no_authenticated_user(self): 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'book_details.html')
+        self.assertTemplateUsed(response, 'book_templates/book_details.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, RatingForm))
         self.assertFalse(form.is_bound)

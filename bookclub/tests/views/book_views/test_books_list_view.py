@@ -32,7 +32,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('books_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
+        self.assertTemplateUsed(response, 'book_templates/books.html')
         form= response.context['form']
         self.assertTrue(isinstance(form, BooksSortForm)) 
         self.assertTrue(form.is_valid())
@@ -45,7 +45,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self._create_test_books(self.BOOKS_PER_PAGE-1)
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
+        self.assertTemplateUsed(response, 'book_templates/books.html')
         self.assertEqual(len(response.context['books']),self.BOOKS_PER_PAGE)
         for book_id in range(self.BOOKS_PER_PAGE-1):
             self.assertContains(response, f'book{book_id} title')
@@ -64,7 +64,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('books_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
+        self.assertTemplateUsed(response, 'book_templates/books.html')
         self.assertContains(response, f'The book list is empty! find more book you might like.')
         self.assertContains(response, f'More books')
         books_url = reverse('books_list')
@@ -80,7 +80,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('books_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
+        self.assertTemplateUsed(response, 'book_templates/books.html')
         for book_id in range(2):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')
@@ -100,7 +100,7 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.url = reverse('books_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'books.html')
+        self.assertTemplateUsed(response, 'book_templates/books.html')
         for book_id in range(2):
             self.assertContains(response, f'book{book_id} title')
             self.assertContains(response, f'book{book_id} author')

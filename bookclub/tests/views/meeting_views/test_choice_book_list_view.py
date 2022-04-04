@@ -43,7 +43,7 @@ class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
         self.book.add_reader(self.sec_user)
         response = self.client.get(self.sec_url)
         self.assertEqual(response.status_code, 200) 
-        self.assertTemplateUsed(response, 'choice_book_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/choice_book_list.html')
         self.assertEqual(len(response.context['rec_books']), 7)
         for book_id in range(6):
             self.assertContains(response, f'book{book_id} title')

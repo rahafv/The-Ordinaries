@@ -40,7 +40,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self.url = reverse('meetings_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assert_menu(response)
         
     def test_get_meetings_list(self):
@@ -48,7 +48,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self._create_test_meetings(12)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), 14)
         for meeting_id in range(11):
             self.assertContains(response, f'meeting {meeting_id}')
@@ -62,7 +62,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         response = self.client.get(self.url)
         self.assert_menu(response)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['meetings_list']
         self.assertFalse(page_obj.has_previous())
@@ -70,7 +70,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         page_one_url = reverse('meetings_list', kwargs={'club_id': self.club.id}) + '?page=1'
         response = self.client.get(page_one_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['meetings_list']
         self.assertFalse(page_obj.has_previous())
@@ -78,7 +78,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         page_two_url = reverse('meetings_list', kwargs={'club_id': self.club.id}) + '?page=2'
         response = self.client.get(page_two_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['meetings_list']
         self.assertTrue(page_obj.has_previous())
@@ -86,7 +86,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         page_three_url = reverse('meetings_list', kwargs={'club_id': self.club.id}) + '?page=3'
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), 2)
         page_obj = response.context['meetings_list']
         self.assertTrue(page_obj.has_previous())
@@ -99,7 +99,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self._create_test_meetings()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assert_error_message(response)
         self.assert_menu(response)
 

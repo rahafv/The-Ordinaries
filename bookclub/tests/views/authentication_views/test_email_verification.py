@@ -31,14 +31,14 @@ class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
         self.assertTrue(self.user.email_verified)
         response_url = reverse('log_in')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'log_in.html')
+        self.assertTemplateUsed(response, 'authentication_templates/log_in.html')
         self.assert_success_message(response)
 
     def test_invalid_verification_link(self):
         User.objects.get(id = self.user.id).delete()
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'activate-fail.html')
+        self.assertTemplateUsed(response, 'authentication_templates/activate_fail.html')
         self.assertContains(response, "The link is invalid")
 
     def test_expired_verification_link(self):
@@ -47,7 +47,7 @@ class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
         self.user.save()
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'activate-fail.html')
+        self.assertTemplateUsed(response, 'authentication_templates/activate_fail.html')
         self.assertContains(response, "The link has expired")
 
     def test_verification_email_is_not_sent_when_already_logged_in(self):
@@ -58,11 +58,11 @@ class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
         response = self.client.get(self.url, follow=True)
         response_url = reverse('home')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'home.html')
+        self.assertTemplateUsed(response, 'static_templates/home.html')
         self.assert_warning_message(response)
 
     def test_verification_email_shows_404page_for_non_existing_users(self):
         self.url = reverse('send_activation', kwargs={'user_id': 1})
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, '404_page.html')
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')

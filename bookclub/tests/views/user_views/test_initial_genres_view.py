@@ -25,7 +25,7 @@ class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'initial_genres.html')
+        self.assertTemplateUsed(response, 'user_templates/initial_genres.html')
         for book_id in range(4):
             self.assertContains(response, f'genre {book_id}')  
         initial_books_url = reverse('initial_book_list')
@@ -38,7 +38,7 @@ class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'initial_genres.html')
+        self.assertTemplateUsed(response, 'user_templates/initial_genres.html')
         self.assertEqual(len(response.context['genres']), 4)  
     
     def test_initial_genres_does_not_contain_repeated_genres(self):
@@ -48,7 +48,7 @@ class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'initial_genres.html')
+        self.assertTemplateUsed(response, 'user_templates/initial_genres.html')
         self.assertEqual(len(response.context['genres']), 4)  
 
     def test_initial_genres_is_sorted_by_frequency(self):
@@ -58,7 +58,7 @@ class InitialGenresViewTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'initial_genres.html')
+        self.assertTemplateUsed(response, 'user_templates/initial_genres.html')
         self.assertEqual(len(response.context['genres']), 4) 
         self.assertEqual(response.context['genres'][0], 'genre 2') 
 

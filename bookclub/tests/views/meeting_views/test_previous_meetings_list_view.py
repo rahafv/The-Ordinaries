@@ -39,7 +39,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self.url = reverse('previous_meetings_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assert_menu(response)
         
     def test_get_previous_meetings_list(self):
@@ -48,7 +48,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self._create_test_previous_meetings()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meetings_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']),14)
         for meeting_id in range(10):
             self.assertContains(response, f'meeting {meeting_id}')
@@ -61,7 +61,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self._create_test_previous_meetings()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assert_error_message(response)
         self.assert_menu(response)
 

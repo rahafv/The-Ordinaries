@@ -51,7 +51,7 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
         self._create_test_books()
         response = self.client.get(self.url, self.book_title_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'choice_book_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/choice_book_list.html')
         self.assertContains(response, "uio")
         self.assertNotContains(response, "xyz")
         self.assert_menu(response)
@@ -60,7 +60,7 @@ class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url, self.empty_form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'choice_book_list.html')
+        self.assertTemplateUsed(response, 'meeting_templates/choice_book_list.html')
         self.assertContains(response, "You forgot to search!")
         self.assert_menu(response)
 

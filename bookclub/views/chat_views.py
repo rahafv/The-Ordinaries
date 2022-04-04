@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 class ChatRoomView(LoginRequiredMixin, TemplateView):
     """Display user chats."""
-    template_name = "chat_room.html"
+    template_name = "chat_templates/chat_room.html"
     pk_url_kwarg = "club_id"
 
     def get(self, *args, **kwargs):
@@ -41,7 +41,7 @@ class ChatRoomView(LoginRequiredMixin, TemplateView):
             else:
                 messages.add_message(self.request, messages.INFO, "You do not have any chats! Join clubs and be part of a community.")
                 return redirect('clubs_list')
-        return render(self.request, "chat_room.html", {"club":club})
+        return render(self.request, "chat_templates/chat_room.html", {"club":club})
 
 """Get club's chat messages."""
 @login_required

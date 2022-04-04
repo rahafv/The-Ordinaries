@@ -34,7 +34,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.client.login(username=self.owner.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_club_info.html')
+        self.assertTemplateUsed(response, 'club_templates/edit_club_info.html')
         club_id = response.context['club_id']
         form= response.context['form']
         #self.assertTrue(isinstance(form, ClubForm)) 
@@ -51,7 +51,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         after_count = Club.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_club_info.html')
+        self.assertTemplateUsed(response, 'club_templates/edit_club_info.html')
         form = response.context['form']
         #self.assertTrue(isinstance(form, ClubForm))
         self.assertTrue(form.instance, self.club)
@@ -72,7 +72,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         target_url = reverse("club_page", kwargs={"club_id": 1})
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assertEqual(count_clubs_before, Club.objects.count())
         self.assert_success_message(response)
         self.club.refresh_from_db()

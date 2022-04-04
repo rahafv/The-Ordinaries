@@ -19,7 +19,7 @@ from django.core.mail import send_mass_mail
 class CreateClubView(LoginRequiredMixin, CreateView):
     """Handle creation of new club."""
     model = Club
-    template_name = 'create_club.html'
+    template_name = 'club_templates/create_club.html'
     form_class = CreateClubForm
 
     def form_valid(self, form):
@@ -44,7 +44,7 @@ class CreateClubView(LoginRequiredMixin, CreateView):
 class ClubPageView(DetailView):
     """Show individual club details."""
     model = Club
-    template_name = 'club_page.html'
+    template_name = 'club_templates/club_page.html'
     pk_url_kwarg = 'club_id'
     context_object_name = 'club'
 
@@ -66,7 +66,7 @@ class ClubPageView(DetailView):
 class ClubsListView(ListView):
     """Display list of clubs."""
     model = Club
-    template_name = "clubs.html"
+    template_name = "club_templates/clubs.html"
     paginate_by = settings.CLUBS_PER_PAGE
 
 
@@ -149,10 +149,10 @@ class MembersListView(LoginRequiredMixin, ListView):
     def get_template_names(self):
         """Return a different template name if the user does not have access rights."""
         if self.club.is_member(self.request.user):
-            return ['members_list.html']
+            return ['club_templates/members_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the members list!" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
@@ -221,7 +221,7 @@ def withdraw_club(request, club_id):
 class ApplicantsListView(LoginRequiredMixin, ListView):
     """Display applicants list of a club."""
     model = User
-    template_name = "applicants_list.html"
+    template_name = "club_templates/applicants_list.html"
     context_object_name = "applicants"
 
     def get(self, request, *args, **kwargs):
@@ -246,10 +246,10 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
     def get_template_names(self):
         """Return a different template name if the user is not owner."""
         if self.club.owner == self.request.user:
-            return ['applicants_list.html']
+            return ['club_templates/applicants_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the applicants list!" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
@@ -294,7 +294,7 @@ def reject_applicant(request, club_id, user_id):
 
 class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin):
     """Enable club owner to transfer ownership to another member."""
-    template_name = "transfer_ownership.html"
+    template_name = "club_templates/transfer_ownership.html"
     form_class = TransferOwnershipForm
     pk_url_kwarg = "club_id"
     context_object_name = "club"
@@ -368,7 +368,7 @@ class EditClubInformationView(LoginRequiredMixin, UpdateView):
     """Handle club information change requests."""
     model = Club
     fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
-    template_name = "edit_club_info.html"
+    template_name = "club_templates/edit_club_info.html"
     pk_url_kwarg = "club_id"
 
     def get_context_data(self, **kwargs):

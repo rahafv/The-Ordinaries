@@ -19,7 +19,7 @@ class LoginRedirectTester:
         self.assertRedirects(
             response, target_url, status_code=302, target_status_code=200
         )
-        self.assertTemplateUsed(response, "log_in.html")
+        self.assertTemplateUsed(response, "authentication_templates/log_in.html")
 
     def assert_post_redirects_when_not_logged_in(self):
         target_url = reverse_with_next("log_in", self.url)
@@ -27,7 +27,7 @@ class LoginRedirectTester:
         self.assertRedirects(
             response, target_url, status_code=302, target_status_code=200
         )
-        self.assertTemplateUsed(response, "log_in.html")
+        self.assertTemplateUsed(response, "authentication_templates/log_in.html")
 
 class MessageTester:
     def assert_error_message(self, response):

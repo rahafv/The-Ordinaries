@@ -31,7 +31,7 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'chat_room.html')
+        self.assertTemplateUsed(response, 'chat_templates/chat_room.html')
         self.assert_menu(response)
     
     def test_get_chat_room_with_no_club_id(self):
@@ -39,14 +39,14 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         self.url = reverse('chat_room')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'chat_room.html')
+        self.assertTemplateUsed(response, 'chat_templates/chat_room.html')
         self.assert_menu(response)
         
     def test_get_chat_room_for_non_members(self):
         self.client.login(username=self.sec_user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, '404_page.html')
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
 
     def test_get_chat_room_for_no_clubs(self):
         self.client.login(username=self.sec_user.username, password='Password123')
@@ -54,7 +54,7 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         response = self.client.get(self.url, follow=True)
         response_url = reverse('clubs_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assert_info_message(response)
         self.assert_menu(response)
 
@@ -64,7 +64,7 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         response = self.client.get(self.url, follow=True)
         response_url = reverse('clubs_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'clubs.html')
+        self.assertTemplateUsed(response, 'club_templates/clubs.html')
         self.assert_info_message(response)
         self.assert_menu(response)
 
@@ -73,7 +73,7 @@ class ChatRoomTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
         self.url = reverse('chat_room' ,kwargs={'club_id': self.second_club.id})
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'club_page.html')
+        self.assertTemplateUsed(response, 'club_templates/club_page.html')
         self.assert_info_message(response)
         self.assert_menu(response)
 

@@ -28,7 +28,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         self.url = reverse('following_list', kwargs={'user_id': self.user.id})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assert_menu(response)
 
     def test_get_followings_list(self):
@@ -36,7 +36,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         self._create_test_followings(settings.MEMBERS_PER_PAGE)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assertEqual(len(response.context['follow_list']), settings.MEMBERS_PER_PAGE)
         for user_id in range(settings.MEMBERS_PER_PAGE-1):
             self.assertContains(response, f'user{user_id}')
@@ -54,7 +54,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         response = self.client.get(self.url)
         self.assert_menu(response)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assertEqual(len(response.context['follow_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['follow_list']
         self.assertFalse(page_obj.has_previous())
@@ -62,7 +62,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         page_one_url = reverse('following_list', kwargs={'user_id': self.user.id}) + '?page=1'
         response = self.client.get(page_one_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assertEqual(len(response.context['follow_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['follow_list']
         self.assertFalse(page_obj.has_previous())
@@ -70,7 +70,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         page_two_url = reverse('following_list', kwargs={'user_id': self.user.id}) + '?page=2'
         response = self.client.get(page_two_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assertEqual(len(response.context['follow_list']), settings.MEMBERS_PER_PAGE)
         page_obj = response.context['follow_list']
         self.assertTrue(page_obj.has_previous())
@@ -78,7 +78,7 @@ class FollowingsListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestM
         page_three_url = reverse('following_list', kwargs={'user_id': self.user.id}) + '?page=3'
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'follow_list.html')
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assertEqual(len(response.context['follow_list']), 3)
         page_obj = response.context['follow_list']
         self.assertTrue(page_obj.has_previous())

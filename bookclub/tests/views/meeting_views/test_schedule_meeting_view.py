@@ -52,7 +52,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
         self.client.login(username=self.owner.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "schedule_meeting.html")
+        self.assertTemplateUsed(response, "meeting_templates/schedule_meeting.html")
         form = response.context["form"]
         self.assertTrue(isinstance(form, MeetingForm))
         self.assertFalse(form.is_bound)
@@ -67,7 +67,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
         self.assertEqual(count_events_before + 1, self.owner.notifications.unread().count())
         target_url = reverse("club_page", kwargs={"club_id": self.club.id})
         self.assertRedirects(response, target_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, "club_page.html")
+        self.assertTemplateUsed(response, "club_templates/club_page.html")
         meeting = Meeting.objects.get(title="meeting2")
         self.assertEqual(meeting.title, "meeting2")
         self.assertEqual(meeting.time, self.date)
@@ -85,7 +85,7 @@ class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageT
         self.assertEqual(response.status_code, 200)
         form = response.context["form"]
         self.assertTrue(form.is_bound)
-        self.assertTemplateUsed(response, "schedule_meeting.html")
+        self.assertTemplateUsed(response, "meeting_templates/schedule_meeting.html")
         self.assertTrue(isinstance(form, MeetingForm))
         self.assert_menu(response)
 

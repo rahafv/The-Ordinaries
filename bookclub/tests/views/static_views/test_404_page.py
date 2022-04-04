@@ -10,4 +10,4 @@ class handler404ViewTestCase(TestCase):
     def test_get_404_page(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, '404_page.html')
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
