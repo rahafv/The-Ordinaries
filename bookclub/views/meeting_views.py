@@ -141,7 +141,12 @@ class MeetingsListView(LoginRequiredMixin, ListView):
         return super().get(*args, **kwargs)
 
     def get_queryset(self):
-        """Return club's upcoming meetings."""
+        """Return club's meetings."""
+        self.is_previous = False
+        if self.request.GET.get('filter') == 'Previous meetings': 
+            self.is_previous = True
+            return self.club.get_previous_meetings()
+
         return self.club.get_upcoming_meetings()
 
     def get_template_names(self):
@@ -152,7 +157,6 @@ class MeetingsListView(LoginRequiredMixin, ListView):
             messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
             return ['club_templates/club_page.html']
     
-
     def get_context_data(self, **kwargs):
         """Retrieve context data to be shown on the template."""
         context = super().get_context_data(**kwargs)
@@ -160,39 +164,7 @@ class MeetingsListView(LoginRequiredMixin, ListView):
         context['user'] = self.user
         context['club'] = self.club
         context['is_owner'] = self.request.user == self.club.owner
-        return context
-
-class PreviousMeetingsList(LoginRequiredMixin, ListView):
-    """Display list of club's previous meetings."""
-    model = Meeting
-    paginate_by = settings.MEMBERS_PER_PAGE
-
-    def get(self, *args, **kwargs):
-        """Store user and club in self."""
-        self.user = get_object_or_404(User, id=self.request.user.id)
-        self.club = get_object_or_404(Club, id=kwargs['club_id'])
-        return super().get(*args, **kwargs)
-
-    def get_queryset(self):
-        """Return club's previous meetings."""
-        return self.club.get_previous_meetings()
-
-    def get_template_names(self):
-        """Return a different template name if the user does not have access rights."""
-        
-        if self.club.is_member(self.user):
-            return ['meeting_templates/meetings_list.html']
-        else:
-            messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
-            return ['club_templates/club_page.html']
-
-    def get_context_data(self, **kwargs):
-        """Retrieve context data to be shown on the template."""
-        context = super().get_context_data(**kwargs)
-        context['meetings_list'] = context['page_obj']
-        context['user'] = self.user
-        context['is_previous'] = True
-        context['club'] = self.club
+        context['is_previous'] = self.is_previous
 
         return context
 

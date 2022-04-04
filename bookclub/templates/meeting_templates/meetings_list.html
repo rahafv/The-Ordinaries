@@ -9,11 +9,14 @@
     <div class="row">
         <div class="col-12">
             <h1 class="mb-3 mt-3">Meetings of {{club.name}} </h1> 
-            {%if is_previous %}
-                <a href='{% url "meetings_list" club.id %}' class="btn btn-outline-dark mt-2 mb-3"> Upcoming meetings </a> 
-            {%else %}
-                <a href='{% url "previous_meetings_list" club.id %}' class="btn btn-outline-dark mt-2 mb-3"> Previous meetings </a>
-            {%endif%}
+            <form action="{% url 'meetings_list' club.id %}" method=GET>
+                <div class='tabs-alt justify-content-center d-flex'>
+                    <input type="submit" name='filter' value="Upcoming meetings" class="btn btn-outline-dark">
+                    &emsp;
+                    <input type="submit" name='filter' value="Previous meetings" class="btn btn-outline-dark">
+                    &emsp;
+                </div>
+            </form>
             {%if meetings_list %}
                 {%include 'partials/meetings_information_table.html' with meetings_list=meetings_list is_previous=is_previous is_owner=is_owner %}
                 <ul class="pagination justify-content-center">

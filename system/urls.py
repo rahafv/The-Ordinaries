@@ -81,7 +81,7 @@ urlpatterns = [
     path('meeting/<int:meeting_id>/search/', meeting_views.SearchBookView.as_view(), name='search_book'),
     path('meeting/<int:meeting_id>/choose/<int:book_id>', meeting_views.choose_book, name='choose_book'),
     path('club/<int:club_id>/meetings/', meeting_views.MeetingsListView.as_view(), name='meetings_list'),
-    path('club/<int:club_id>/previous_meetings/', meeting_views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
+    # path('club/<int:club_id>/previous_meetings/', meeting_views.PreviousMeetingsList.as_view(), name='previous_meetings_list'),
     
     path('chat_room/', chat_views.ChatRoomView.as_view(), name='chat_room'),
     path('club/<int:club_id>/chat_room/', chat_views.ChatRoomView.as_view(), name='chat_room'),

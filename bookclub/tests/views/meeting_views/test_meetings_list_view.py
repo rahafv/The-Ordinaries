@@ -35,15 +35,7 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
     def test_get_meetings_list_redirects_when_not_logged_in(self):
        self.assert_redirects_when_not_logged_in()
 
-    def test_get_club_meetings_list(self):
-        self.client.login(username=self.user.username, password='Password123')
-        self.url = reverse('meetings_list', kwargs={'club_id': self.club.id})
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
-        self.assert_menu(response)
-        
-    def test_get_meetings_list(self):
+    def test_get_upcoming_meetings_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_meetings(12)
         response = self.client.get(self.url)
@@ -54,9 +46,18 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
             self.assertContains(response, f'meeting {meeting_id}')
             self.assertContains(response, "https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1")
         self.assert_menu(response)
+        
+    def test_get_previous_meetings_list(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_meetings(12)
+        form_input = {'filter': 'Previous meetings'}
+        response = self.client.get(self.url, form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
+        self.assertEqual(len(response.context['meetings_list']), 4) #in fixtures
+        self.assert_menu(response)
 
-
-    def test_get_members_list_with_pagination(self):
+    def test_get_upcoming_meetings_list_with_pagination(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_meetings(settings.MEMBERS_PER_PAGE*2)
         response = self.client.get(self.url)
@@ -97,12 +98,12 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self.non_member = User.objects.get(id=4)
         self.client.login(username=self.non_member.username, password='Password123')
         self._create_test_meetings()
-        response = self.client.get(self.url)
+        form_input = {'filter': 'Previous meetings'}
+        response = self.client.get(self.url,form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assert_error_message(response)
         self.assert_menu(response)
-
 
     def _create_test_meetings(self, meetings_count=10):
         time = datetime.today()
