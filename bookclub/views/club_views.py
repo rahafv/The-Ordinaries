@@ -223,6 +223,7 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
     model = User
     template_name = "club_templates/applicants_list.html"
     context_object_name = "applicants"
+    paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         """Retrieve the club_id from url and store it in self for later use."""
@@ -256,6 +257,8 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['club'] = self.club
         context['form'] = self.form
+        context['applicants'] = context["page_obj"]
+
         return context
 
 """Enable club owner to accept club applicant."""
