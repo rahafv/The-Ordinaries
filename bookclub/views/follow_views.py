@@ -2,13 +2,12 @@ from bookclub.models import User
 from bookclub.helpers import NotificationHelper
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import ListView
 from notifications.signals import notify
 from system import settings
-from django.core.paginator import Paginator
 
 class FollowListView(LoginRequiredMixin, ListView):
     """Display following list of a user."""
@@ -24,15 +23,16 @@ class FollowListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         """Return following list of a user."""
         self.user = get_object_or_404(User, id=self.user_id)
-        followers = self.user.followers.all()
-        followees = self.user.followees.all()
-        self.is_following = False
-        if self.request.GET.get('filter') == 'followers' and followers: 
-            return followers
-        if self.request.GET.get('filter') == 'following' and followees: 
+        
+        if self.request.GET.get('filter') == 'followers': 
+            self.is_following = False
+            return self.user.followers.all()
+       
+        if self.request.GET.get('filter') == 'following': 
             self.is_following = True
-            return followees
-        return []
+            return self.user.followees.all()
+       
+        raise Http404
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""

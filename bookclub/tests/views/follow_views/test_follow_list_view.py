@@ -23,7 +23,15 @@ class FollowListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin
     def test_get_members_page_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
-    def test_get_user_follow_list(self):
+    def test_get_user_following_list(self):
+        self.client.login(username=self.user.username, password='Password123')
+        form_input = {'filter': 'following'}
+        response = self.client.get(self.url, form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
+        self.assert_menu(response)
+
+    def test_get_user_followers_list(self):
         self.client.login(username=self.user.username, password='Password123')
         form_input = {'filter': 'followers'}
         response = self.client.get(self.url, form_input)
@@ -31,10 +39,28 @@ class FollowListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin
         self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
         self.assert_menu(response)
 
-    def test_get_follow_list(self):
+    def test_get_following_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_followings(settings.MEMBERS_PER_PAGE)
         form_input = {'filter': 'following'}
+        response = self.client.get(self.url, form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
+        self.assertEqual(len(response.context['follow_list']), settings.MEMBERS_PER_PAGE)
+        for user_id in range(settings.MEMBERS_PER_PAGE-1):
+            self.assertContains(response, f'user{user_id}')
+            self.assertContains(response, f'First{user_id} Last{user_id}')
+
+        for user in self.user.followees.all():
+            if user.id != self.user.id:
+                member_profile_url = reverse('profile', kwargs={ 'user_id': user.id })
+                self.assertContains(response, member_profile_url)
+        self.assert_menu(response)
+
+    def test_get_followers_list(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self._create_test_followings(settings.MEMBERS_PER_PAGE)
+        form_input = {'filter': 'followers'}
         response = self.client.get(self.url, form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'follow_templates/follow_list.html')
@@ -87,6 +113,13 @@ class FollowListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin
         self.assertFalse(page_obj.has_next())
         self.assert_menu(response)
 
+    def test_get_follow_list_with_no_input(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
+        self.assert_menu(response)
+
     def _create_test_followings(self, user_count=10):
         for user_id in range(user_count):
             user = User.objects.create_user(f'@user{user_id}',
@@ -97,3 +130,4 @@ class FollowListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin
                 bio=f'Bio {user_id}',
             )
             self.user._follow(user)
+            user._follow(self.user)
