@@ -44,18 +44,16 @@ class BookDetailsView(DetailView, FormMixin):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         book = self.get_object()
-        reviews_count = book.ratings.all().exclude(review='').count()
+        reviews_count = book.ratings.all().count()
 
 
         if user.is_authenticated:
-            reviews = book.ratings.all().exclude(review='').exclude(user=user)
+            reviews = book.ratings.all().exclude(user=user)
             rating = book.ratings.all().filter(user=user)
-            reviews_count = book.ratings.all().exclude(review='').exclude(user=user).count()
             recs = get_recommender_books(self.request, False, 6, user_id=user.id, book_id=book.id)
         else:
             reviews = book.ratings.all()
             rating = []
-            reviews_count = book.ratings.all().exclude(review='').count()
             recs = []
 
         if rating:
@@ -120,6 +118,13 @@ class AddReviewView(LoginRequiredMixin, FormView):
     pk_url_kwarg = 'book_id'
     form_class = RatingForm
 
+    def get(self, *args, **kwargs):
+        user = self.request.user
+        book_id = self.kwargs['book_id']
+        if Rating.objects.filter(user_id=user.id, book_id=book_id).exists():
+            return redirect('book_details', book_id=book_id)
+        return super().get(*args, **kwargs)
+
     def get_form_kwargs(self):
         """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
@@ -130,11 +135,6 @@ class AddReviewView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        
-        user = self.request.user
-        if Rating.objects.filter(user_id=user.id, book_id=self.kwargs['book_id']).exists():
-            raise Http404
-
         context['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         return context
 

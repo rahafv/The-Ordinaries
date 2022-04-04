@@ -180,7 +180,7 @@ def get_recommender_books(request, is_item_based, numOfRecs, user_id=None, book_
     user_count = User.objects.count()
     limit = user_count/10
     if user_count < 10:
-        limit = 5
+        limit = 7
     if rec_helper.counter >= limit:
         rec_helper.reset_counter()
 

@@ -2,9 +2,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from bookclub.models import Book, Rating, User
-from bookclub.tests.helpers import LoginRedirectTester
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
 
-class AddReviewViewTestCase(TestCase, LoginRedirectTester):
+class AddReviewViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
     """Tests of the add review view."""
 
     fixtures = ["bookclub/tests/fixtures/default_book.json", 
@@ -32,6 +32,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'book_templates/book_details.html')
+        self.assert_menu(response)
 
     def test_user_cannot_rate_twice(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -42,6 +43,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         response = self.client.post(self.url, self.form_input)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(count_rating_before, Rating.objects.count())
+        self.assert_menu(response)
 
     def test_add_review_successful(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -69,6 +71,7 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(count_clubs_before, Rating.objects.count())
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "book_templates/book_details.html")
+        self.assert_menu(response)
 
     def test_get_rating_with_previous_rating(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -77,9 +80,11 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
             book=self.book,
             rating=5
         )
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, 'static_templates/404_page.html')
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse('book_details', kwargs = {'book_id': self.book.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, "book_templates/book_details.html")
+        self.assert_menu(response)
 
     def test_get_add_book_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
