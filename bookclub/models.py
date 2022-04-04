@@ -94,7 +94,7 @@ class User(AbstractUser):
 
     def location(self):
         """Return user's location"""
-        checked = [self.city, self.country, self.region]
+        checked = [self.city, self.region, self.country]
         location = []
         for state in checked:
             if state is not None:
