@@ -1,0 +1,20 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Create club
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1 style="text-align:center;" class="mt-3">Create club</h1>
+      <form action="{% url 'create_club' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type="submit" class="btn btn-lg btn-outline-dark" value="Create club">
+        <a href='{% url 'clubs_list' %}' class="btn btn-lg btn-outline-dark" >Cancel</a> 
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

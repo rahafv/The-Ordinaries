@@ -1,12 +1,13 @@
 """Unit tests for the Meeting model."""
+from datetime import datetime
+
+from bookclub.models import Book, Meeting
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import Book, Meeting
-from datetime import datetime
 
 
 class MeetingModelTestCase(TestCase):
-    """Unit tests for the meeting model."""
+    """Unit tests for the Meeting model."""
 
     fixtures = ['bookclub/tests/fixtures/default_user.json', 
         'bookclub/tests/fixtures/other_users.json', 

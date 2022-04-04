@@ -1,9 +1,10 @@
 """Unit tests of the user form."""
-from django import forms
-from django.test import TestCase
+from datetime import date
+
 from bookclub.forms import UserForm
 from bookclub.models import User
-from datetime import date 
+from django import forms
+from django.test import TestCase
 
 
 class UserFormTestCase(TestCase):

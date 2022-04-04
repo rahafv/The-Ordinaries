@@ -1,15 +1,17 @@
-from django.core.management.base import BaseCommand
-from bookclub.models import User, Club, Book , Rating, Meeting
-from faker import Faker
 import csv
-import time
 import os
-from .unseed import unseed
 import random
+import time
 from datetime import datetime, timedelta
+
 import pytz
-from notifications.signals import notify
 from bookclub.helpers import NotificationHelper
+from bookclub.models import Book, Club, Meeting, Rating, User
+from django.core.management.base import BaseCommand
+from faker import Faker
+from notifications.signals import notify
+
+from .unseed import unseed
 
 
 class Command(BaseCommand):
@@ -162,6 +164,10 @@ class Command(BaseCommand):
 
     def populate_clubs(self):
         count = int((self.users.count()-1)/10)
+        books = Book.objects.order_by('?')
+        MEETING_PROBABILITY = 0.6
+        ctr = 0
+
         for club in self.clubs:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?')[:rand_num]
@@ -170,20 +176,22 @@ class Command(BaseCommand):
             club.members.add(club.owner)
             notify.send(club.owner, recipient=club.owner.followers.all(), verb=self.notificationHelper.NotificationMessages.CREATE, action_object=club, description='user-event-C' ) 
             
-            self.create_meeting(club, club.owner)
+            if random.random() < MEETING_PROBABILITY:
+                self.create_meeting(club, club.owner, books[ctr])
+            ctr +=1
             
-
-    def create_meeting(self, club, chooser):
+        
+    def create_meeting(self, club, chooser, book):
         meeting = Meeting.objects.create(
             title = 'Meeting 1',
             club = club,
             chooser = chooser,
-            book = Book.objects.first(),
+            book = book,
             time = pytz.utc.localize(datetime.today()+timedelta(15)),
             link = 'https://us04web.zoom.us/j/74028123722?pwd=af96piEWRe9_XWlB1XnAjw4XDp4uk7.1'
-
         )
-        notify.send(club, recipient=club.members.all(), verb=self.notificationHelper.NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )      
+        book.add_club(club)
+        notify.send(club, recipient=club.members.all(), verb=self.notificationHelper.NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M')
 
     def create_books(self):
         MAX_BOOKS = 800

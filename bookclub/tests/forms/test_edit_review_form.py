@@ -1,7 +1,8 @@
 """Unit tests of the edit review form."""
-from django.test import TestCase
-from bookclub.models import User, Book, Rating
 from bookclub.forms import EditRatingForm
+from bookclub.models import Book, Rating, User
+from django.test import TestCase
+
 
 class EditRatingFormTestCase(TestCase):
     """Unit tests of the edit review form."""

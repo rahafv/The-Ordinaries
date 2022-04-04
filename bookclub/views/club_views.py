@@ -1,11 +1,11 @@
-from bookclub.forms import ClubsSortForm, CreateClubForm, TransferOwnershipForm, UsersSortForm
+from bookclub.forms import ClubsSortForm, CreateClubForm,TransferOwnershipForm, UsersSortForm
 from bookclub.helpers import NotificationHelper, SortHelper
 from bookclub.models import Club, User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
+from django.core.mail import send_mass_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -18,9 +18,8 @@ from system import settings
 
 class CreateClubView(LoginRequiredMixin, CreateView):
     """Handle creation of new club."""
-
     model = Club
-    template_name = 'create_club.html'
+    template_name = 'club_templates/create_club.html'
     form_class = CreateClubForm
 
     def form_valid(self, form):
@@ -34,18 +33,18 @@ class CreateClubView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
+        messages.add_message(
+            self.request, messages.SUCCESS, "Club created succesfully!")
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
     def handle_no_permission(self):
         """If there is no permission, redirect to log in."""
         return redirect(reverse('log_in') + '?next=/create_club/')
 
-
-class ClubPageView(LoginRequiredMixin, DetailView):
+class ClubPageView(DetailView):
     """Show individual club details."""
-
     model = Club
-    template_name = 'club_page.html'
+    template_name = 'club_templates/club_page.html'
     pk_url_kwarg = 'club_id'
     context_object_name = 'club'
 
@@ -64,12 +63,10 @@ class ClubPageView(LoginRequiredMixin, DetailView):
 
         return context
 
-
-class ClubsListView(LoginRequiredMixin, ListView):
+class ClubsListView(ListView):
     """Display list of clubs."""
-
     model = Club
-    template_name = "clubs.html"
+    template_name = "club_templates/clubs.html"
     paginate_by = settings.CLUBS_PER_PAGE
 
 
@@ -114,7 +111,6 @@ class ClubsListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
-
         context = super().get_context_data(**kwargs)
         context['general'] = self.general
         context['privacy'] = self.privacy
@@ -126,10 +122,8 @@ class ClubsListView(LoginRequiredMixin, ListView):
 
         return context
 
-
 class MembersListView(LoginRequiredMixin, ListView):
     """Display list of members."""
-
     model = User
     paginate_by = settings.MEMBERS_PER_PAGE
 
@@ -153,19 +147,18 @@ class MembersListView(LoginRequiredMixin, ListView):
         return self.model.objects.none()
 
     def get_template_names(self):
-        """Returns a different template name if the user does not have access rights."""
+        """Return a different template name if the user does not have access rights."""
         if self.club.is_member(self.request.user):
-            return ['members_list.html']
+            return ['club_templates/members_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the members list!" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
         context['members'] = context["page_obj"]
         context['club'] = self.club
-        context['current_user'] = self.request.user
         context['form'] = self.form
         return context
 
@@ -190,7 +183,7 @@ def join_club(request, club_id):
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
         else:
-            messages.add_message(request, messages.ERROR,
+            messages.add_message(request, messages.INFO,
                                  "Already applied, awaiting approval!")
             return redirect('club_page', club_id)
 
@@ -200,7 +193,6 @@ def join_club(request, club_id):
 
     messages.add_message(request, messages.SUCCESS, "Joined club!")
     return redirect('club_page', club_id)
-
 
 """Enable a user to withdraw from a club."""
 @login_required
@@ -227,14 +219,14 @@ def withdraw_club(request, club_id):
     return redirect('club_page', club_id)
 
 class ApplicantsListView(LoginRequiredMixin, ListView):
-    """Displays applicants list of a club."""
-
+    """Display applicants list of a club."""
     model = User
-    template_name = "applicants_list.html"
+    template_name = "club_templates/applicants_list.html"
     context_object_name = "applicants"
+    paginate_by = settings.MEMBERS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the club_id from url and stores it in self for later use."""
+        """Retrieve the club_id from url and store it in self for later use."""
         self.club_id = kwargs.get("club_id")
         return super().get(request, *args, **kwargs)
 
@@ -253,22 +245,23 @@ class ApplicantsListView(LoginRequiredMixin, ListView):
         return self.model.objects.none()
 
     def get_template_names(self):
-        """Returns a different template name if the user is not owner."""
+        """Return a different template name if the user is not owner."""
         if self.club.owner == self.request.user:
-            return ['applicants_list.html']
+            return ['club_templates/applicants_list.html']
         else:
             messages.add_message(self.request, messages.ERROR, "You cannot access the applicants list!" )
-            return ['club_page.html']
+            return ['club_templates/club_page.html']
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
-        context['is_owner'] = self.club.owner == self.request.user
         context['club'] = self.club
-        context['current_user'] = self.request.user
         context['form'] = self.form
+        context['applicants'] = context["page_obj"]
+
         return context
 
+"""Enable club owner to accept club applicant."""
 @login_required
 def accept_applicant(request, club_id, user_id):
     current_user = request.user
@@ -286,7 +279,7 @@ def accept_applicant(request, club_id, user_id):
                              "You cannot change applicant's status!")
         return redirect('club_page', club_id)
 
-
+"""Enable club owner to rejet club applicant."""
 @login_required
 def reject_applicant(request, club_id, user_id):
     current_user = request.user
@@ -303,16 +296,15 @@ def reject_applicant(request, club_id, user_id):
         return redirect('club_page', club_id)
 
 class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin):
-    """Enables owner to transfer ownership to another member."""
-
-    template_name = "transfer_ownership.html"
+    """Enable club owner to transfer ownership to another member."""
+    template_name = "club_templates/transfer_ownership.html"
     form_class = TransferOwnershipForm
     pk_url_kwarg = "club_id"
     context_object_name = "club"
     model = Club
 
     def get_form_kwargs(self):
-        """Generates data that the form needs to initialise."""
+        """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
         kwargs["club_id"] = self.get_object().id
         kwargs["user_id"] = self.request.user.id
@@ -338,7 +330,7 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         return super().get(*args, **kwargs)
 
     def form_valid(self, form):
-        """Changes the owner after the form is validated."""
+        """Process valid form; change the owner after the form is validated."""
         self.club = self.get_object()
         member = form.cleaned_data.get("new_owner")
         self.club.make_owner(member)
@@ -360,11 +352,13 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         'club':self.club
         })
 
-        email_to_members = self.club.members.exclude(id=member.id).values_list('email', flat=True)
-        email_to_owner = [member.email]
+        members_emails = self.club.members.exclude(id=member.id).values_list('email', flat=True)
+        owner_email = [member.email]
 
-        send_mail(subject, members_email_body, email_from, email_to_members)
-        send_mail(subject, owner_email_body, email_from, email_to_owner)
+        message=(subject, members_email_body, email_from, members_emails)
+        owner_message=(subject, owner_email_body, email_from, owner_email)
+
+        send_mass_mail((message,owner_message),fail_silently=False)
 
         messages.add_message(self.request, messages.SUCCESS, "Ownership transferred!")
         return super().form_valid(form)
@@ -373,12 +367,11 @@ class TransferClubOwnershipView(LoginRequiredMixin, FormView, SingleObjectMixin)
         """Return URL to redirect the user to after valid form handling."""
         return reverse('club_page', kwargs={"club_id": self.club.id})
 
-
 class EditClubInformationView(LoginRequiredMixin, UpdateView):
-    """View that handles club information change requests."""
+    """Handle club information change requests."""
     model = Club
     fields = ['name', 'theme', 'meeting_type', 'club_type','city','country']
-    template_name = "edit_club_info.html"
+    template_name = "club_templates/edit_club_info.html"
     pk_url_kwarg = "club_id"
 
     def get_context_data(self, **kwargs):
@@ -387,12 +380,22 @@ class EditClubInformationView(LoginRequiredMixin, UpdateView):
         context['club_id'] = self.object.id
         return context
 
+    def get(self, *args, **kwargs):
+        """Get method with additonal checks for permissions."""
+        club = get_object_or_404(Club, id = self.kwargs['club_id'])
+
+        if self.request.user !=  club.owner:
+            messages.add_message(self.request, messages.ERROR, "You are not permitted to access this page!")
+            return redirect('club_page', club_id = club.id)
+
+        return super().get(*args, **kwargs)
+
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""
         messages.add_message(self.request, messages.SUCCESS, "Successfully updated club information!")
         return reverse('club_page', args=[self.object.id])
 
-"""Enables an owner to delete their club."""
+"""Enable club owner to delete their club."""
 @login_required
 def delete_club(request, club_id):
     club = get_object_or_404(Club.objects, id=club_id)

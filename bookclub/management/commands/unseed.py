@@ -1,5 +1,6 @@
+from bookclub.models import Book, Club, Rating, User
 from django.core.management.base import BaseCommand
-from bookclub.models import User, Club, Book, Rating
+
 
 class Command(BaseCommand):
 

@@ -1,8 +1,7 @@
 """Tests of the transfer ownership form."""
-from django.test import TestCase
 from bookclub.forms import TransferOwnershipForm
-from bookclub.models import Club, User
-from django import forms
+from django.test import TestCase
+
 
 class TransferOwnershipFormTestCase(TestCase):
     """Test suite for the transfer ownership form."""

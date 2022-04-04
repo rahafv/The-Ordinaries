@@ -1,0 +1,112 @@
+{% extends 'base_content.html' %}
+{% load bootstrap_pagination %}
+{% block title %}
+| Profile
+{% endblock %}
+{% block content %}
+
+<div class="ui-bg-cover ui-bg-overlay-container text-white" style="background-color: #64505a">
+    <div class="ui-bg-overlay bg-dark-purple opacity-25"></div>
+    <div class="row" style="margin:0px">
+        <div class= "text-center py-3">
+            <img src="{{ user.gravatar }}" loading="lazy" alt="Gravatar of {{ user.username }}" class="ui-w-100 rounded-circle">
+
+            <div class="col-md-8 col-lg-6 col-xl-5 p-0 mx-auto">
+                <div class =  "text-center name-and-edit">
+                    <h3 class= "my-4 user-name">{{ user.full_name }}</h3>
+                    &emsp;
+                    {% if request.user == user %}
+                        <a class = "edit-pencil text-white bi-pencil-square"  aria-label="edit profile button" href ="{% url 'edit_profile'%}"></a>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <span class = "profile-username opacity-80">{{user.username}}</span>
+                    {% if current_user == user %}
+                    <br/>
+                        <span class = "profile-email">{{user.email}}</span>
+                    {% endif %}
+                </div>
+                {% if user.age or user.location %}
+                    <div class="mb-2 "> 
+                        {% if user.age %}
+                            <span class="profile-statistics opacity-80">Age: </span>
+                            <span class = "profile-statistics-item opacity-80">{{user.age}}</span>
+                        {% endif %}
+                        &emsp;
+                        {% if user.location %}
+                            <span class="profile-statistics opacity-80">Location:</span>
+                            <span class = "profile-statistics-item opacity-80">{{user.location}}</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if user.bio %}
+                    <div class="bio-text pt-2 pb-4 opacity-75">
+                        <span>{{user.bio}}</span> 
+                    </div>  
+                {% endif %}
+            </div>
+
+            <div class="text-center pt-2 pb-1.7 d-inline-flex">
+                <form action="{% url 'follow_list' user.id %}" method=GET>
+                    <div class='tabs-alt justify-content-center d-flex'>
+                        {{ user.followee_count }} <input type="submit" name='filter' value="following" class="follow text-white">
+                        &emsp;
+                        {{ user.follower_count }} <input type="submit" name='filter' value="followers" class="follow text-white">
+                        &emsp;
+                    </div>
+                </form>
+
+                {% if followable %}
+                    {% if following %}
+                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-secondary text-white"> Unfollow </a> 
+                    {% else %}
+                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn opacity-100 text-white" style="background-color: #18708B;"> Follow </a> 
+                    {% endif %}
+                {% endif %}
+            </div> 
+        </div> 
+            
+        <div class="ui-bg-overlay-container">
+            <div class="ui-bg-overlay bg-light-pink opacity-60"></div>
+                <form action="{% url 'profile' user.id %}" method=GET>
+                    <div class='nav nav-tabs tabs-alt justify-content-center d-flex'>
+                        <input type="submit" name='filter' value="Reading list" class="nav-link text-white py-3">
+                        <input type="submit" name='filter' value="Clubs" class="nav-link text-white py-3">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div style="background-color: #eceae8; padding-top:20px">
+            <div class = "col-12">
+                <div class=" ui-bg-cover ui-bg-overlay-container text-black">
+                    <div class="ui-bg-overlay bg-light-whitish opacity-75"></div>
+                    <div class="container text-center">
+                        {% if is_clubs is True %}
+                            {% if items_count != 0 %}
+                                {% include 'partials/clubs_list.html' with clubs=items %}
+                                <br/>
+                                <ul class="pagination justify-content-center">
+                                    {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
+                                </ul>
+                            {% else %}
+                                <h2 style = "font-size:2.5vw">No Clubs joined!</h2>
+                            {% endif %}
+                        {% elif is_clubs is False %}
+                            {% if items_count != 0  %}
+                                {%  include 'partials/books_list.html' with books=items %}
+                                <br/>
+                                <ul class="pagination justify-content-center">
+                                    {% bootstrap_paginate items show_prev_next="false"  show_first_last="true" range=5  %}
+                                </ul>
+                            {% else %}
+                                <h2 style = "font-size:2.5vw"> Reading list is empty!</h2>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+{% endblock %}

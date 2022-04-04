@@ -1,10 +1,11 @@
 """Unit tests of the rating form."""
-from django.test import TestCase
-from bookclub.models import User, Book, Rating
 from bookclub.forms import RatingForm
+from bookclub.models import Book, Rating, User
+from django.test import TestCase
+
 
 class RatingFormTestCase(TestCase):
-    """Unit tests of the review form."""
+    """Unit tests of the rating form."""
 
     fixtures=['bookclub/tests/fixtures/default_book.json',
             'bookclub/tests/fixtures/default_user.json']

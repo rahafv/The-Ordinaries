@@ -1,8 +1,8 @@
 """Unit tests of the password form."""
-from django.test import TestCase
-from bookclub.models import User
 from bookclub.forms import PasswordForm
+from bookclub.models import User
 from django.contrib.auth.hashers import check_password
+from django.test import TestCase
 
 
 class PasswordFormTestCase(TestCase):

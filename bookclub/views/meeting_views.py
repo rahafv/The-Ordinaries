@@ -1,21 +1,23 @@
-from bookclub.forms import MeetingForm
-from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Club, Meeting
 from datetime import timedelta
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import TemplateView
-from django.views.generic import FormView, ListView
-from system import settings
-from notifications.signals import notify
 from threading import Timer
 
+from bookclub.forms import MeetingForm
+from bookclub.helpers import MeetingHelper, NotificationHelper, get_recommender_books, rec_helper
+from bookclub.models import Book, Club, Meeting, User
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import FormView, ListView
+from django.views.generic.base import TemplateView
+from notifications.signals import notify
+from system import settings
+
+
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
-    template_name = "schedule_meeting.html"
+    """Enable club owner to schedule a meeting."""
+    template_name = "meeting_templates/schedule_meeting.html"
     form_class = MeetingForm
 
     def get_context_data(self, **kwargs):
@@ -25,13 +27,13 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
         return context
 
     def get_form_kwargs(self):
-        """Generates data that the form needs to initialise."""
+        """Generate data that the form needs to initialise."""
         kwargs = super().get_form_kwargs()
         kwargs["club"] = get_object_or_404(Club.objects, id=self.club_id)
         return kwargs
 
     def get(self, *args, **kwargs):
-        """Extracts club id and stores it in self for later use."""
+        """Extract club id and store it in self for later use."""
         self.club_id = kwargs["club_id"]
         self.club = get_object_or_404(Club.objects, id=self.club_id)
         if self.request.user != self.club.owner:
@@ -73,15 +75,19 @@ class ScheduleMeetingView(LoginRequiredMixin, FormView):
                 letter='emails/chooser_reminder.html',
                 all_mem=False
             )
-            deadline = timedelta(7).total_seconds() #0.00069444
-            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, self.request]).start()
+
+            rec_book = get_recommender_books(self.request, True, 1, club_id=meeting.club.id)[0]
+                        
+            deadline = timedelta(7).total_seconds()  # 0.00069444
+            Timer(deadline, MeetingHelper().assign_rand_book, [meeting, rec_book, self.request]).start()
 
         notify.send(self.club, recipient=self.club.members.all(), verb=NotificationHelper().NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M' )
         messages.add_message(self.request, messages.SUCCESS, "Meeting has been scheduled!")
         return redirect('club_page', club_id=self.club_id)
 
 class ChoiceBookListView(LoginRequiredMixin, TemplateView):
-    template_name = "choice_book_list.html"
+    """Enable chosen user to choose a book for a club meeting."""
+    template_name = "meeting_templates/choice_book_list.html"
     model = Book
 
     def get_context_data(self, *args, **kwargs):
@@ -89,27 +95,26 @@ class ChoiceBookListView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         meeting = get_object_or_404(Meeting.objects, id=kwargs["meeting_id"])
         if self.request.user == meeting.chooser and not meeting.book:
-            read_books = meeting.club.books.all()
-            my_books =  Book.objects.all().exclude(id__in = read_books)
-            context["rec_books"] = my_books.order_by('-average_rating','-readers_count')[0:24]
+            context["rec_books"] = get_recommender_books(self.request, True, 24, club_id=meeting.club.id)
             return context
         else:
             raise Http404
 
 class SearchBookView(LoginRequiredMixin, ListView):
-    template_name = "choice_book_list.html"
+    """Enable user to search for specific books."""
+    template_name = "meeting_templates/choice_book_list.html"
     model = Book
     paginate_by = settings.BOOKS_PER_PAGE
 
     def get(self, request, *args, **kwargs):
-        """Retrieves the searched term from the query string and stores it in self for later use."""
+        """Retrieve the searched term from the query string and store it in self for later use."""
         self.searched = self.request.GET.get('searched', '')
         self.meeting_id = kwargs["meeting_id"]
         return super().get(request, *args, **kwargs)
 
 
     def get_queryset(self):
-        """Returns filtered book list based on the searched term."""
+        """Return filtered book list based on the searched term."""
         books = Book.objects.filter(title__contains=self.searched)
         return books
 
@@ -125,6 +130,48 @@ class SearchBookView(LoginRequiredMixin, ListView):
         else:
             raise Http404
 
+class MeetingsListView(LoginRequiredMixin, ListView):
+    """Display club's upcoming meetings list."""
+    model = Meeting
+    paginate_by = settings.MEMBERS_PER_PAGE
+
+    def get(self, *args, **kwargs):
+        """Store user and club in self."""
+        self.user = get_object_or_404(User, id=self.request.user.id)
+        self.club = get_object_or_404(Club, id=kwargs['club_id'])
+        return super().get(*args, **kwargs)
+
+    def get_queryset(self):
+        """Return club's meetings."""
+        if self.request.GET.get('filter') == 'Previous meetings': 
+            self.is_previous = True
+            return self.club.get_previous_meetings()
+
+        if not self.request.GET.get('filter') or self.request.GET.get('filter') == 'Upcoming meetings':
+            self.is_previous = False
+            return self.club.get_upcoming_meetings()
+
+        raise Http404
+
+    def get_template_names(self):
+        """Return a different template name if the user does not have access rights."""
+        if self.club.is_member(self.user):
+            return ['meeting_templates/meetings_list.html']
+        else:
+            messages.add_message(self.request, messages.ERROR, "You cannot access the meetings of the club" )
+            return ['club_templates/club_page.html']
+    
+    def get_context_data(self, **kwargs):
+        """Retrieve context data to be shown on the template."""
+        context = super().get_context_data(**kwargs)
+        context['meetings_list'] = context['page_obj']
+        context['user'] = self.user
+        context['club'] = self.club
+        context['is_owner'] = self.request.user == self.club.owner
+        context['is_previous'] = self.is_previous
+
+        return context
+
 """Allow user to choose a book for a meeting."""
 @login_required
 def choose_book(request, book_id, meeting_id):
@@ -132,6 +179,7 @@ def choose_book(request, book_id, meeting_id):
     if request.user == meeting.chooser and not meeting.book:
         book = get_object_or_404(Book.objects, id=book_id)
         meeting.assign_book(book)
+        rec_helper.increment_counter()
 
         #send email to member who has to choose a book
         MeetingHelper().send_email(request=request,
@@ -148,3 +196,26 @@ def choose_book(request, book_id, meeting_id):
         return redirect('club_page', club_id=meeting.club.id)
     else:
         raise Http404
+
+"""Enable club owner to cancel an upcoming meeting."""
+@login_required
+def cancel_meeting(request, meeting_id):
+    meeting = get_object_or_404(Meeting.objects, id=meeting_id)
+    club = get_object_or_404(Club.objects, id=meeting.club.id)
+    user = request.user
+
+    if (user == club.owner ):
+        meeting.delete()
+        messages.add_message(request, messages.SUCCESS, "You cancelled the meeting successfully!")
+
+        """send email invites"""
+        MeetingHelper().send_email(request=request,
+                                    meeting=meeting,
+                                    subject='A meeting has been cancelled ',
+                                    letter='emails/meeting_cancelation_email.html',
+                                    all_mem=True)
+
+        return redirect('meetings_list', club.id)
+    else:
+        messages.add_message(request, messages.ERROR, "Must be owner to cancel a meeting!")
+        return redirect('meetings_list', club.id)

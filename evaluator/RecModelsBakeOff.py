@@ -5,12 +5,14 @@ Created on Thu May  3 11:11:13 2018
 @author: Frank
 """
 
-from Evaluator import Evaluator
-from surprise import KNNBasic, NormalPredictor,SVD, SVDpp, KNNWithMeans, KNNWithZScore
-from book_rating import BookRatings
-
 import random
+
 import numpy as np
+from surprise import SVD, KNNBasic, KNNWithMeans, KNNWithZScore, NormalPredictor, SVDpp
+
+from book_rating import BookRatings
+from Evaluator import Evaluator
+
 
 class RecModelsBakeOff:
 

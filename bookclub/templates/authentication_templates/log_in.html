@@ -1,0 +1,47 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Log in
+{% endblock %}
+{% block content %}
+<div id = "login-image" class = "bg obj-fit-cover">
+    <br>
+    <br>
+    <div class="container vh-100 ms-2">
+        <div class="row h-100 justify-content-center">
+            <div class="col-md-8">
+                <div class="card-group mb-0">
+                    <div class="card p-4">
+                        <div class="card-body">
+                            <h1>Login</h1>
+                            <p class="text-muted">Sign In to your account</p>
+                            <div class="input-group mb-3">
+                                <form action="{% url 'log_in' %}" method="POST">
+                                    {% csrf_token %}
+                                    {% include 'partials/bootstrap_form.html' with form=form %}
+                                    <input type="hidden" name="next" value="{{ next }}">
+                                    <input type="submit" class="btn bg-dark-blue mb-3; text-white" style = "font-size:16px" value="Log in">
+                                    {% if form.is_valid %}
+                                    <a href='{% url 'send_activation' user.id %}' class="btn btn-outline-secondary " style="color: grey" >Resend verification</a>  
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card text-white bg-dark-blue py-5 d-md-down-none" >
+                        <div class="card-body text-center text-white">
+                        <div>
+                            <h2>Sign up</h2>
+                            <p>Don't have an account yet?</p>  
+                            <br/>
+                            <a href="{% url 'sign_up' %}" role="button" class="btn btn-light active mt-3"> Register Now!</a>
+                        </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <br/>
+</div>
+
+{% endblock %}

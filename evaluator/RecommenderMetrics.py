@@ -1,7 +1,8 @@
 import itertools
+from collections import defaultdict
 
 from surprise import accuracy
-from collections import defaultdict
+
 
 class RecommenderMetrics:
 

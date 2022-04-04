@@ -1,0 +1,257 @@
+{% extends 'base_content.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div id='recommendations' class="row mt-3" style='display:none; background-color:gainsboro;'>
+    <h5 style='padding-top: 30px; padding-left: 60px;'>You might also like.. </h5>
+    <div class='row mb-4 text-center' style=" text-align:center">
+      {% for rec in recs %}
+        <div class="col-sm-5 col-md-2 mb-2 mt-2 text-center" style=" text-align:center">
+              <img  src="{{ rec.image_url }}" style="height:180px; width:120px;">
+              <a style="  max-width: 3000px; -webkit-line-clamp: 4; -webkit-box-orient: horizontal; overflow: hidden;  font-style: italic; font-size: 18px;" href='{% url 'book_details' rec.id %}'  >{{rec.title}}</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class = "d-flex justify-content-center text-black name-and-edit mb-3 mt-3">
+      <h2 class = "me-2 " style = "text-align:center">{{ book.title }}</h2> 
+        {% if reader %}
+          <a  href='{% url 'add_book_to_list' book_id=book.id %}' aria-label="remove book to favorites button"  class="bi-bookmark-check-fill float-left"
+          style="font-size: 2.3rem; color: green;"></a>
+        {% else %}
+          <a href='{% url 'add_book_to_list' book_id=book.id %}#recommendations' aria-label="add book to favorites button" class="bi-bookmark-plus"
+          style="font-size: 2.3rem; color: grey;"></a>
+        {% endif %}
+    </div>
+    <div class="book-nav col-md-4 col-sm-3 mb-3">
+        <div class="panel">
+            <div class="book-heading">
+              <div class="club-details-card pt-3 pb-3">
+                <h5>
+                  <div class="fw-light  text-black text-left ms-4 ps-3 mb-3">
+                  
+                    <i class="fa fa-star{% if book.average_rating < 1%}-o{% elif book.average_rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    <i class="fa fa-star{% if book.average_rating < 3%}-o{% elif book.average_rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if book.average_rating < 5%}-o{% elif book.average_rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if book.average_rating < 7%}-o{% elif book.average_rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if book.average_rating < 9%}-o{% elif book.average_rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    {%if numberOfRatings%}
+                      <span>({{book.average_rating}}/10.0)</span>
+                    {%else%} 
+                      <span>( - /10.0)</span>
+                    {%endif%}
+                  </div>
+                </h5>
+                <div class="text-center">
+                  <img src= "{{ book.image_url }}" loading="lazy" alt="{{book.title}} cover image" class="image-thumbnail mb-2 img-fluid" width="330" height="460" />
+                </div>
+              </div>
+              <div class="wizard">
+                <hr class="m-0"/>
+                <nav class="list-group list-group-flush">
+                  {% if not rating %}
+                    <!-- REVIEW BOOK BUTTON-->
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#leave-review" aria-expanded="false" aria-controls="leave-review">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">Leave your review</span>
+                    </a>
+                    <!-- COLLAPSE FOR REVIEW -->
+                    <div class="collapse" id="leave-review">
+                      <div class="card card-body pb-0">
+                          {% include 'partials/book_review_form.html' with book_id=book.id%}
+                      </div>
+                    </div>
+                  {%else%}
+                  <div class="list-group-item button" style="font-weight: 400;text-transform:none; letter-spacing: 0px;">
+                    <div class='reviews-heading mt-3'>
+                      <div class = "name-and-edit mb-2">
+                        <h5 class= "text-uppercase font-weight-bold">Your Review:</h5>
+                        &emsp; 
+                        <a href= '{% url 'edit_review' review_id=rating.id %}' class="edit-pencil text-black bi-pencil-square  mb-2" style = "font-size:1.3rem"> </a>
+                      </div>
+                      <p class="review-info-alternate-heading mt-1" >
+                        <i class= "fa fa-clock mr-1"> </i> {{rating.created_at}}
+                      </p>
+                      <div class="rating-star" style="font-size:14px;">
+                    
+                        <i class="fa fa-star{% if rating.rating < 1%}-o{% elif rating.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                        <i class="fa fa-star{% if rating.rating < 3%}-o{% elif rating.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 5%}-o{% elif rating.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 7%}-o{% elif rating.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if rating.rating < 9%}-o{% elif rating.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                    
+                        <span>( {{ rating.rating }}/10.0 )</span>
+                      </div>
+                    </div> 
+                    <div class= "review-body mt-2">
+                      <p style="font-size:16px;">{{rating.review}}</p> 
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if reader %}
+                    <!-- PROGRESS BOOK BUTTON-->
+                    <a class="list-group-item stand-out" data-bs-toggle="collapse" href="#" data-bs-target="#update-progress" aria-expanded="false" aria-controls="leave-review">
+                      <span class = "d-inline-block font-weight-medium text-uppercase ms-2">
+                        Post your progress
+                      </span>
+                    </a>
+                    <!-- COLLAPSE FOR PROGRESS -->
+                    <div class="collapse" id="update-progress">
+                      <div class="card card-body mb-3 pb-0 ">
+                      {% include 'partials/book_progress_form.html' with book_id=book.id%}
+                      </div> 
+                    </div>
+                  {% endif %}
+                </nav>
+              </div>
+            </div>    
+        </div>
+    </div>
+    <div class="book-info col-md-8 col-sm-9 max-width: 100%; and height: auto; mt-0">
+        <div class="panel">
+            <div class="bio-graph-heading">
+                <h3 class = "mb-3 me-5">About the book:</h3>
+                <div class="row overflow-text no-gutters ">
+                  
+                    <div class="bio-row" style="text-align: left;">
+                        <label class=" mb-3">Author:</label> &emsp;
+                        {% if book.author %}
+                          <p>{{book.author}}</p>
+                        {%else%}
+                          <p> -  </p>
+                        {%  endif %}
+                    </div>
+                  
+                  <div class="bio-row" style="text-align: right;">
+                      <label class="mb-3">ISBN:</label> &emsp;
+                      <p>{{book.ISBN}}</p>
+                  </div>
+                  
+                    <div class="bio-row" style="text-align: left; overflow-wrap: break-word;">
+                      <label class="mb-3">Genre:</label> &emsp13;
+                      <div style = "max-width: 15rem; min-width:6rem;overflow-wrap: break-word;">
+                        {% if book.genre %}
+                          <p style=" text-align: left;" class = "m-0">{{book.genre}}</p>
+                        {%else%}
+                          <p> -  </p>
+                        {%  endif %}
+                      </div>
+                    </div>
+                  
+                  <div class="bio-row px-3" style="text-align: right;">
+                    <label class="mb-3">Pages:</label>&emsp;
+                    {% if book.pages_num %}
+                      <p>{{book.pages_num}}</p>
+                    {%else%}
+                      <p> -  </p>
+                    {% endif %}
+                  </div>
+                  
+                </div>
+            </div>
+            {% if book.description %}
+            <hr class="my-4"/>
+              <div class="panel-body bio-graph-info">
+                <h4>Description:</h4>
+                  <p>{{ book.description }}</p>
+              </div>
+              <hr class="my-4"/>
+            {%else%}
+              <hr class="my-4"/>   
+            {% endif %}
+        </div>
+
+        <div class="w-100"></div>
+
+          <div class=" list-group-item active card card-body p-5 ">
+            <div class = "row justify-content-around">
+                <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="bio-chart">
+                                <div style="display:inline; width:50px;height:90px;">
+                                    <canvas width="20px" height="90px"></canvas>
+                                    <!-- <label for="readers_statistics" hidden aria-label="readers count">Readers count</label> -->
+                                      <input disabled readonly class="knob count-canvas" aria-label="readers count"  id="readers_statistics" style = "color:#eceae8;" 
+                                       value = " {{book.readers_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                                </div>
+                            </div>
+                            <div class="bio-desk mt-4 pt-2">
+                                <p>Readers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-7 canvas-statistics text-align:center mb-2 mt-2">
+                  <div class="panel">
+                    <div class="panel-body">
+                        <div class="bio-chart">
+                            <div style="display:inline; width:50px;height:90px;">
+                                <canvas width="20px" height="90px"></canvas>
+                                  <input  disabled readonly class="knob count-canvas"  aria-label="readers count" id="reviews_statistics" style = "color:#eceae8;" 
+                                  value = "{{reviews_count}}" data-width="80" data-height="100"  data-thickness=".2">
+                            </div>
+                        </div>
+                        <div class="bio-desk mt-4 pt-2">
+                            <p>Reviews</p>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>       
+    </div>
+      <div class="container mt-5">
+        <h5 class= "text-uppercase font-weight-bold">Reviews:</h5>
+        <hr class= "at-0 pt-0">
+        <div class="row">
+          <div class="col-sm-7 mt-2">
+            {% if reviews %}
+              {% for review in reviews %}
+              <div class='reviews-heading'>
+                <h6 class="review-info-alternate-heading">
+                  <i class= "fas fa-user mr-1"> <a href= {% url 'profile' review.user.id  %}> {{review.user.username}} </a></i>
+                  <i class= "fa fa-clock mr-1"> </i> {{review.created_at}}
+                </h6>
+                <div class="rating-star">
+                
+                      <i class="fa fa-star{% if review.rating < 1%}-o{% elif review.rating == 1 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                      <i class="fa fa-star{% if review.rating < 3%}-o{% elif review.rating == 3 %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if review.rating < 5%}-o{% elif review.rating == 5 %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if review.rating < 7%}-o{% elif review.rating == 7  %}-half-o{% endif %}" aria-hidden="true"></i>
+                      <i class="fa fa-star{% if review.rating < 9%}-o{% elif review.rating == 9 %}-half-o{% endif %}" aria-hidden="true"></i> 
+                  
+                  <span>( {{ review.rating }}/10.0 )</span>
+                </div>
+              </div> 
+            <div class= "review-body mt-2">
+              <p>{{review.review}}</p> 
+            </div>
+              {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+  </div>
+</div>
+<br/> 
+<br/> 
+
+<script>
+  var currentPath = window.location.hash;
+  if(currentPath.substring(1) == 'recommendations'){
+    const targetDiv = document.getElementById(currentPath.substring(1));
+
+    if (targetDiv.style.display === "none") {
+    targetDiv.style.display = "block";
+    }
+  }
+  
+  function updateTextInput(val) {
+    document.getElementById('textInput').value=val; 
+  }
+</script>
+
+{% endblock %}

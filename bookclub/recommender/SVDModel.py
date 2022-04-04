@@ -1,11 +1,11 @@
-from threading import Timer
-import pandas as pd
-from bookclub.models import Rating, User
-from surprise import Dataset, SVD, Reader
-
+import heapq
 from collections import defaultdict
 from operator import itemgetter
-import heapq
+from threading import Timer
+
+import pandas as pd
+from bookclub.models import Rating, User
+from surprise import SVD, Dataset, Reader
 
 
 class SVDModel:
@@ -18,7 +18,7 @@ class SVDModel:
             self.train(recHelper)
 
         if recHelper.counter == 0:
-            Timer(2, self.train, [recHelper]).start()
+            Timer(1, self.train, [recHelper]).start()
                 
             recHelper.increment_counter()   
 

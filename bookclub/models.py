@@ -1,22 +1,18 @@
+import datetime
+
+import pytz
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.forms import ValidationError
-from libgravatar import Gravatar
 from isbn_field import ISBNField
-import datetime
-from django.core.validators import MaxValueValidator, MinValueValidator
-import pytz
+from libgravatar import Gravatar
 
 
 class User(AbstractUser):
     """User model used for authentication."""
 
     email_verified = models.BooleanField(default=False)
-
-    # training_counter = models.PositiveSmallIntegerField(
-    #     null=False,
-    #     blank=False
-    # )
 
     username = models.CharField(
         max_length=30,
@@ -93,10 +89,12 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def get_notifications(self):
+        """Return user notifications."""
         return self.notifications.unread().filter(description__contains ='notification')
 
     def location(self):
-        checked = [self.city, self.country, self.region]
+        """Return user's location"""
+        checked = [self.city, self.region, self.country]
         location = []
         for state in checked:
             if state is not None:
@@ -111,11 +109,12 @@ class User(AbstractUser):
         return gravatar_url
 
     def set_age(self,new_age):
+        """Set user's age."""
         self.age = new_age
         return self.save()
 
     def toggle_follow(self, followee):
-        """Toggles whether self follows the given followee."""
+        """Toggle whether self follows the given followee."""
         #cant follow and unfollow self
         if followee==self:
             return
@@ -126,40 +125,33 @@ class User(AbstractUser):
             self._follow(followee)
 
     def _follow(self, user):
+        """Follow given user."""
         user.followers.add(self)
 
     def _unfollow(self, user):
+        """Unfollow given user."""
         user.followers.remove(self)
 
     def is_following(self, user):
-        """Returns whether self follows the given user."""
-
+        """Return whether self follows the given user."""
         return user in self.followees.all()
 
     def follower_count(self):
-        """Returns the number of followers of self."""
-
+        """Return the number of followers of self."""
         return self.followers.count()
 
     def followee_count(self):
-        """Returns the number of followees of self."""
-
+        """Return the number of followees of self."""
         return self.followees.count()
 
     def all_books_count(self):
+        """Return count of all of user's books."""
         return self.all_books.all().count()
 
     def add_book_to_all_books(self , book):
+        """Add book to user's books."""
         if book not in self.all_books.all():
             self.all_books.add(book)
-
-    # def increment_counter(self):
-    #     self.training_counter += 1
-    #     self.save()
-
-    # def reset_counter(self):
-    #     self.training_counter = 0
-    #     self.save()  
 
 
 class Club(models.Model):
@@ -235,34 +227,41 @@ class Club(models.Model):
         return f'{self.city}, {self.country}'
 
     def add_member(self, member):
+        """Add member to club."""
         if not self.members.all().filter(id=member.id).exists():
             self.members.add(member)
 
     def member_count(self):
+        """Return club members count."""
         return self.members.all().count()
 
     def is_member(self, user):
-        """ checks if the user is a member"""
+        """Check if the user is a member."""
         return self.members.all().filter(id=user.id).exists()
 
     def add_applicant(self, applicant):
+        """Add applicant to applicants of club."""
         self.applicants.add(applicant)
 
     def applicants_count(self):
+        """Return club applicant's count."""
         return self.applicants.all().count()
 
     def is_applicant(self, user):
-        """ checks if the user is a member"""
+        """Check if the user is an applicant. """
         return self.applicants.all().filter(id=user.id).exists()
 
     def get_club_type_display(self):
+        """Return whether a club is public or private."""
         return self.club_type
 
     def make_owner(self, new_owner):
+        """Set the owner of the club."""
         self.owner = new_owner
         self.save()
 
     def get_upcoming_meetings(self):
+        """Return club's upcoming meetings."""
         upcoming_meetings = []
         for meeting in self.meetings.all():
             if meeting.time >= pytz.utc.localize(datetime.datetime.now()):
@@ -270,6 +269,7 @@ class Club(models.Model):
         return upcoming_meetings
 
     def get_previous_meetings(self):
+        """Return club's previous meetings."""
         previous_meetings = []
         for meeting in self.meetings.all():
             if meeting.time < pytz.utc.localize(datetime.datetime.now()):
@@ -340,21 +340,25 @@ class Book(models.Model):
         ordering = ['title']
 
     def is_reader(self, reader):
+        """Return whether user is a reader of the book."""
         return self.readers.all().filter(id=reader.id).exists()
 
     def add_reader(self, reader):
+        """Add user to book's readers."""
         if not self.is_reader(reader):
             self.readers.add(reader)
             self.readers_count = self.readers.count()
             self.save()
 
     def remove_reader(self, reader):
+        """Remove user from book's readers."""
         if self.is_reader(reader):
             self.readers.remove(reader)
             self.readers_count = self.readers.count()
             self.save()
 
     def add_club(self, club):
+        """Add club to book's clubs."""
         if not self.clubs.all().filter(id=club.id).exists():
             self.clubs.add(club)
             for member in club.members.all():
@@ -364,20 +368,22 @@ class Book(models.Model):
             self.save()
 
     def clubs_count(self):
+        """Return number of clubs book is in."""
         return self.clubs.all().count()
      
 
     def calculate_average_rating(self):
+        """Calculate the book's average rating."""
         if self.ratings.all().count() != 0:
             sum = 0
             for rating in self.ratings.all():
                 sum+= rating.rating
-            self.average_rating = sum/self.ratings.all().count()
+            self.average_rating = round(sum/self.ratings.all().count(), 2)
             self.save()
 
 
 class Rating(models.Model):
-    """rating model."""
+    """Rating model."""
 
     user =  models.ForeignKey(
         User,
@@ -412,12 +418,13 @@ class Rating(models.Model):
 
 
     def save(self, *args, **kwargs):
+        """Save book's rating and recalculate average."""
         super(Rating, self).save(*args, **kwargs)
         self.book.calculate_average_rating()
 
 
 class Meeting(models.Model):
-    """ The meeting model."""
+    """ Meeting model."""
 
     title = models.CharField(
         max_length=50,
@@ -468,6 +475,7 @@ class Meeting(models.Model):
 
 
     def assign_chooser(self):
+        """Assign book chooser to the meeting."""
         members = self.club.members
         meeting_ind = list(self.club.meetings.values_list('id', flat=True)).index(self.id)
         id = meeting_ind%members.count()
@@ -476,13 +484,15 @@ class Meeting(models.Model):
         Meeting.objects.filter(id = self.id).update(chooser=mem)
 
     def assign_book(self, book_in):
+        """Assign book to meeting."""
         book_in.add_club(self.club)
         self.book = book_in
         Meeting.objects.filter(id = self.id).update(book=book_in)
 
 
 class Chat(models.Model):
-    
+    """Chat model."""
+
     club = models.ForeignKey(
         Club,
         on_delete=models.CASCADE,
@@ -512,6 +522,6 @@ class Chat(models.Model):
     def clean(self):
         super().clean()
 
-        """ checks that the user is a member of the club """
+        #Check that the user is a member of the club.
         if not self.user in self.club.members.all():
             raise ValidationError('User must be a member of the club')
