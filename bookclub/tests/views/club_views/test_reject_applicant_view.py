@@ -1,8 +1,9 @@
 """Tests of the reject applicant view."""
+from bookclub.models import Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
+
 
 class RejectApplicantViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the reject applicant view."""

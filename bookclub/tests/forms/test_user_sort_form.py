@@ -1,7 +1,8 @@
 """Unit tests of the sort form."""
-from django.test import TestCase
-from bookclub.models import User, Club
 from bookclub.forms import UsersSortForm
+from bookclub.models import Club, User
+from django.test import TestCase
+
 
 class UserSortFormTestCase(TestCase):
     """Unit tests of the sort form."""

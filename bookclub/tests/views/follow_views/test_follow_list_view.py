@@ -1,9 +1,10 @@
 """Test suite for the followings list view."""
+from bookclub.models import User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User 
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
 from system import settings
+
 
 class FollowListTest(TestCase, LoginRedirectTester, MessageTester, MenuTestMixin):
     """Test suite for the followings list view."""

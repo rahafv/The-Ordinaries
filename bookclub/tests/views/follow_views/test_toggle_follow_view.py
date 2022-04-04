@@ -1,8 +1,9 @@
 """Tests of the show user view."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.models import User
 from bookclub.tests.helpers import reverse_with_next
+from django.test import TestCase
+from django.urls import reverse
+
 
 class ShowUserTest(TestCase):
     """Tests of the show user view."""

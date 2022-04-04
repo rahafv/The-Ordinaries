@@ -1,16 +1,17 @@
-from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.views.generic.base import TemplateView
-from django.shortcuts import get_object_or_404, render
 from bookclub.forms import BooksSortForm, ClubsSortForm, UsersSortForm
-from bookclub.helpers import NotificationHelper, SortHelper, get_list_of_objects, get_recommender_books
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
+from bookclub.helpers import NotificationHelper, SortHelper,get_list_of_objects, get_recommender_books
 from bookclub.models import Book
-from notifications.utils import slug2id
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from system import settings
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import ListView
+from django.views.generic.base import TemplateView
 from notifications.models import Notification
+from notifications.utils import slug2id
+from system import settings
+
 
 class HomeView(TemplateView):
     """Display home view."""

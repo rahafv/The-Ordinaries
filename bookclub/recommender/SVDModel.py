@@ -1,11 +1,11 @@
-from threading import Timer
-import pandas as pd
-from bookclub.models import Rating, User
-from surprise import Dataset, SVD, Reader
-
+import heapq
 from collections import defaultdict
 from operator import itemgetter
-import heapq
+from threading import Timer
+
+import pandas as pd
+from bookclub.models import Rating, User
+from surprise import SVD, Dataset, Reader
 
 
 class SVDModel:

@@ -1,8 +1,9 @@
 """Tests of the initial book list view."""
+from bookclub.models import Book, User
+from bookclub.tests.helpers import LoginRedirectTester, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User , Book
-from bookclub.tests.helpers import LoginRedirectTester, ObjectsCreator
+
 
 class InitialBookListViewTestCase(TestCase, LoginRedirectTester, ObjectsCreator):
     """Tests of the initial book list view."""

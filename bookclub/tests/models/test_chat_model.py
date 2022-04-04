@@ -1,7 +1,8 @@
 """Unit tests for the Chat model."""
+from bookclub.models import Chat, User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from bookclub.models import User, Chat
+
 
 class ChatModelTestCase(TestCase):
     """Unit tests for the Chat model."""

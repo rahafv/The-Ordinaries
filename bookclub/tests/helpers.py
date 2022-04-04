@@ -1,9 +1,9 @@
-from django.urls import reverse
-from django.contrib.messages import ERROR, SUCCESS, WARNING, INFO
-from with_asserts.mixin import AssertHTMLMixin
-from notifications.signals import notify
-
 from bookclub.models import Book, Club, Rating, User
+from django.contrib.messages import ERROR, INFO, SUCCESS, WARNING
+from django.urls import reverse
+from notifications.signals import notify
+from with_asserts.mixin import AssertHTMLMixin
+
 
 def reverse_with_next(url_name, next_url):
     url = reverse(url_name)

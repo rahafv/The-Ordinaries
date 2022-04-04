@@ -1,11 +1,13 @@
 """Tests of the sign up view."""
+from datetime import date
+
+from bookclub.forms import SignUpForm
+from bookclub.models import User
+from bookclub.tests.helpers import LogInTester, MenuTestMixin
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.forms import SignUpForm
-from bookclub.models import User
-from bookclub.tests.helpers import LogInTester , MenuTestMixin
-from datetime import date 
+
 
 class SignUpViewTestCase(TestCase, LogInTester,MenuTestMixin):
     """Tests of the sign up view."""

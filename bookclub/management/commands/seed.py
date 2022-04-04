@@ -1,15 +1,17 @@
-from django.core.management.base import BaseCommand
-from bookclub.models import User, Club, Book , Rating, Meeting
-from faker import Faker
 import csv
-import time
 import os
-from .unseed import unseed
 import random
+import time
 from datetime import datetime, timedelta
+
 import pytz
-from notifications.signals import notify
 from bookclub.helpers import NotificationHelper
+from bookclub.models import Book, Club, Meeting, Rating, User
+from django.core.management.base import BaseCommand
+from faker import Faker
+from notifications.signals import notify
+
+from .unseed import unseed
 
 
 class Command(BaseCommand):

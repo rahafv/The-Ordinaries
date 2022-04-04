@@ -1,8 +1,9 @@
 """Tests of the add review view."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.models import Book, Rating, User
 from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
+from django.test import TestCase
+from django.urls import reverse
+
 
 class AddReviewViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin):
     """Tests of the add review view."""

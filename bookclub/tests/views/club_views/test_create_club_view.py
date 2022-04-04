@@ -1,9 +1,10 @@
 """Tests of the create club view."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.forms import CreateClubForm
 from bookclub.models import Club, User
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
+from django.test import TestCase
+from django.urls import reverse
+
 
 class CreateClubViewTestCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Test suite for the create club view."""

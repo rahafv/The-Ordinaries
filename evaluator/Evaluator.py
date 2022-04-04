@@ -4,8 +4,9 @@ Created on Thu May  3 10:22:34 2018
 
 @author: Frank
 """
-from EvaluationData import EvaluationData
 from EvaluatedAlgorithm import EvaluatedAlgorithm
+from EvaluationData import EvaluationData
+
 
 class Evaluator:
     

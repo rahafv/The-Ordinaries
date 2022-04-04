@@ -1,9 +1,10 @@
 """Tests for the edit view view."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.forms import EditRatingForm
 from bookclub.models import Rating
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
+from django.test import TestCase
+from django.urls import reverse
+
 
 class ReviewUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the edit review view."""

@@ -1,9 +1,10 @@
 """Tests of the sorted search page view."""
+from bookclub.forms import BooksSortForm, ClubsSortForm, UsersSortForm
+from bookclub.models import User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.forms import ClubsSortForm, UsersSortForm, BooksSortForm
-from bookclub.models import User, Club, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
+
 
 class SortedSearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin, ObjectsCreator):
     """Tests of the sorted search page view."""

@@ -1,10 +1,11 @@
 """Tests for the password view."""
+from bookclub.forms import PasswordForm
+from bookclub.models import User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.forms import PasswordForm
-from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester,MenuTestMixin
+
 
 class PasswordViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Test suite for the password view."""

@@ -1,13 +1,13 @@
-from bookclub.helpers import getGenres, NotificationHelper, rec_helper
+from bookclub.helpers import NotificationHelper, getGenres, rec_helper
 from bookclub.models import Book
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic.base import TemplateView
 from notifications.signals import notify
-from django.utils.decorators import method_decorator
 
 """Enable user to add/remove books from their reading list."""
 @login_required
@@ -28,13 +28,9 @@ def add_book_to_list(request, book_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('home')))
 
 
-class InitialBookListView(TemplateView):
+class InitialBookListView(LoginRequiredMixin, TemplateView):
     """Display initial book list to the user."""
     template_name = 'user_templates/initial_book_list.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
@@ -56,13 +52,9 @@ class InitialBookListView(TemplateView):
         return context
 
 
-class InitialGenresView(TemplateView):
+class InitialGenresView(LoginRequiredMixin, TemplateView):
     """Display initial genres to the user."""
     template_name = 'user_templates/initial_genres.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""

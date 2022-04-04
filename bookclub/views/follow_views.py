@@ -1,5 +1,5 @@
-from bookclub.models import User
 from bookclub.helpers import NotificationHelper
+from bookclub.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.views.generic import ListView
 from notifications.signals import notify
 from system import settings
+
 
 class FollowListView(LoginRequiredMixin, ListView):
     """Display following list of a user."""

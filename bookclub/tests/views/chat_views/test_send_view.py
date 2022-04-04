@@ -1,8 +1,9 @@
 """Tests of the send view."""
+from bookclub.models import Chat, Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Chat, User, Club
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
+
 
 class SendTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
     """Tests of the send view."""

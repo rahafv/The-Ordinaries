@@ -1,16 +1,15 @@
-from django.shortcuts import get_object_or_404
 from bookclub.forms import PasswordForm, UserForm
+from bookclub.models import User
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView, UpdateView
-from django.urls import reverse
-from django.views.generic.base import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-
-from bookclub.models import User
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
+from django.views.generic import FormView, UpdateView
+from django.views.generic.base import TemplateView
 from system import settings
+
 
 class PasswordView(LoginRequiredMixin, FormView):
     """Handle password change requests."""

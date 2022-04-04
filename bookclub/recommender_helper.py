@@ -1,4 +1,3 @@
-from bookclub.models import User
 
 class RecommenderHelper:
     

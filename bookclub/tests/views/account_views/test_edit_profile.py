@@ -1,10 +1,11 @@
 """Tests for the edit profile view."""
-from django.test import TestCase
-from django.urls import reverse
+from datetime import date
+
 from bookclub.forms import UserForm
 from bookclub.models import User
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
-from datetime import date 
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
+from django.test import TestCase
+from django.urls import reverse
 
 
 class EditProfileViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):

@@ -1,9 +1,10 @@
 """Tests of the applicant list view."""
+from bookclub.forms import UsersSortForm
+from bookclub.models import Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
-from bookclub.forms import UsersSortForm
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester , MenuTestMixin
+
 
 class ApplicantsListTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMixin):
     """Tests of the applicant list view."""

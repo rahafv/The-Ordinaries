@@ -1,11 +1,11 @@
-from django.contrib import messages
-from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.mixins import LoginRequiredMixin
 import humanize
 from bookclub.models import Chat, Club, User
-from django.views.generic.base import TemplateView
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic.base import TemplateView
 
 
 class ChatRoomView(LoginRequiredMixin, TemplateView):

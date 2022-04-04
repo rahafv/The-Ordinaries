@@ -1,10 +1,10 @@
 """Tests of the book list view."""
+from bookclub.forms import BooksSortForm
+from bookclub.models import Book, Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club, Book
-from bookclub.forms import BooksSortForm
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
-from system import settings
+
 
 class BooksListTest(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):
     """Tests of the book list view."""

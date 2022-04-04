@@ -1,10 +1,11 @@
 """Tests of the log in prohibited mixin."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.models import User
 from bookclub.tests.helpers import LoginRedirectTester, LogInTester
 from bookclub.views.authentication_views import LogInView
 from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase
+from django.urls import reverse
+
 
 class LoginProhibitedMixinTestCase(TestCase, LoginRedirectTester, LogInTester):
     """Test suite for the log in prohibited mixin."""

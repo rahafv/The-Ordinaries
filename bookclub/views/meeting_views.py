@@ -1,18 +1,19 @@
+from datetime import timedelta
+from threading import Timer
+
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper, NotificationHelper, get_recommender_books, rec_helper
 from bookclub.models import Book, Club, Meeting, User
-from datetime import timedelta
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic.base import TemplateView
 from django.views.generic import FormView, ListView
-from system import settings
+from django.views.generic.base import TemplateView
 from notifications.signals import notify
-from threading import Timer
+from system import settings
+
 
 class ScheduleMeetingView(LoginRequiredMixin, FormView):
     """Enable club owner to schedule a meeting."""

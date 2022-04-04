@@ -1,10 +1,12 @@
 """Tests of the meeting form."""
 from datetime import datetime, timedelta
-from django.test import TestCase
+
 import pytz
 from bookclub.forms import MeetingForm
 from bookclub.models import Club, Meeting
 from django import forms
+from django.test import TestCase
+
 
 class MeetingFormTestCase(TestCase):
     """Test suite for the meeting form."""

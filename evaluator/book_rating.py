@@ -1,8 +1,9 @@
-from collections import defaultdict
 import csv
 import os
-import pandas as pd
+from collections import defaultdict
+
 from surprise import Dataset, Reader
+
 
 class BookRatings:
     ratings_path = os.path.abspath('../book-review-dataset/ratings-evaluator.csv')

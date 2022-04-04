@@ -1,15 +1,16 @@
-from django.shortcuts import redirect
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail 
 import six
 from django.conf import settings
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.db.models.functions import Lower
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
 
 from bookclub.recommender.recommendation import Recommendation
 from bookclub.recommender_helper import RecommenderHelper
-from .models import User, Club, Book
-from django.db.models.functions import Lower
+
+from .models import Book, Club, User
 
 
 class MeetingHelper:

@@ -1,8 +1,8 @@
 """Test suite for the initial genre view."""
+from bookclub.models import Book, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
 
 
 class InitialGenresViewTest(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):

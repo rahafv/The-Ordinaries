@@ -1,9 +1,10 @@
 """Tests of the log in view."""
-from django.test import TestCase
-from django.urls import reverse
 from bookclub.forms import LogInForm
 from bookclub.models import User
-from bookclub.tests.helpers import LogInTester, MessageTester, reverse_with_next , MenuTestMixin
+from bookclub.tests.helpers import LogInTester, MenuTestMixin, MessageTester, reverse_with_next
+from django.test import TestCase
+from django.urls import reverse
+
 
 class LogInViewTestCase(TestCase, LogInTester, MessageTester,MenuTestMixin):
     """Tests of the log in view."""

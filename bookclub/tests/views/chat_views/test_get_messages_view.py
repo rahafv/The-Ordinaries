@@ -1,8 +1,9 @@
 """Test suite for the get messages view."""
+from bookclub.models import Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
+
 
 class GetMessagesTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
     """Test suite for the get messages view."""

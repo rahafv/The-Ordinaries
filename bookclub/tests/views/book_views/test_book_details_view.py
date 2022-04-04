@@ -1,9 +1,10 @@
 """Tests of the book details view."""
+from bookclub.forms import RatingForm
+from bookclub.models import Book, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book
-from bookclub.forms import RatingForm
-from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
+
 
 class BookDetailsTest(TestCase, LoginRedirectTester , MenuTestMixin):
     """Tests of the book details view."""

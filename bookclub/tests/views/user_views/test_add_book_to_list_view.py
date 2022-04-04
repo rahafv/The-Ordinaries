@@ -1,8 +1,9 @@
 """Tests of the add book to list view."""
+from bookclub.models import Book, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book
-from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester, ObjectsCreator
+
 
 class AddBookToListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester, ObjectsCreator):
     """Tests of the add book to list view."""

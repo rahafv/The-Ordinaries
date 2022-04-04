@@ -1,8 +1,8 @@
 """Tests of the choice book list view."""
+from bookclub.models import Book, Meeting, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User , Book, Meeting
-from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, ObjectsCreator
 
 
 class ChoiceBookListViewTestCase(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):

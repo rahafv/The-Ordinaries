@@ -1,11 +1,12 @@
-from cProfile import label
 from datetime import date, datetime, timedelta
-from xml.etree.ElementTree import Comment
-from django import forms
-from django.core.validators import RegexValidator
+
 import pytz
-from .models import Chat, User, Club, Book, Rating, Meeting
+from django import forms
 from django.contrib.auth import authenticate
+from django.core.validators import RegexValidator
+
+from .models import Book, Club, Meeting, Rating, User
+
 
 class SignUpForm(forms.ModelForm):
     """Form enabling unregistered users to sign up."""

@@ -1,11 +1,12 @@
+import datetime
+
+import pytz
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.forms import ValidationError
-from libgravatar import Gravatar
 from isbn_field import ISBNField
-import datetime
-from django.core.validators import MaxValueValidator, MinValueValidator
-import pytz
+from libgravatar import Gravatar
 
 
 class User(AbstractUser):

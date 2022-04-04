@@ -1,8 +1,8 @@
 """Test suite for the post progress view."""
+from bookclub.models import Book, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Book
-from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 
 
 class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMixin):

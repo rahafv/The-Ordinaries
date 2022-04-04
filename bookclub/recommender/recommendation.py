@@ -1,9 +1,11 @@
+import random
 from collections import Counter
 from functools import reduce
-import random
+
 from bookclub.models import Book, Club, Rating, User
-from .SVDModel import SVDModel
+
 from .GenreSimilarityModel import GenreSimilarityModel
+from .SVDModel import SVDModel
 
 
 class Recommendation:

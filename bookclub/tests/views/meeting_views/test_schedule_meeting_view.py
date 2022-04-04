@@ -1,12 +1,14 @@
 """Test suite for the schedule meeting view."""
 from datetime import datetime, timedelta
-from django.test import RequestFactory, TestCase
-from django.urls import reverse
+
+import pytz
 from bookclub.forms import MeetingForm
 from bookclub.helpers import MeetingHelper
-from bookclub.models import Book, Meeting, User, Club
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester
-import pytz
+from bookclub.models import Book, Club, Meeting, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
+
 
 class ScheduleMeetingTest(TestCase, LoginRedirectTester, MenuTestMixin, MessageTester):
     """Test suite for the schedule meeting view."""

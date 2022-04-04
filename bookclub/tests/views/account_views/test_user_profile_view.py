@@ -1,8 +1,9 @@
 """Tests of the logged in user profile view."""
+from bookclub.models import Book, Club, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Club, User, Book
-from bookclub.tests.helpers import LoginRedirectTester,MenuTestMixin
+
 
 class ProfilePageViewTestsCase(TestCase, LoginRedirectTester,MenuTestMixin):
     """Tests of the logged in user's profile page view."""

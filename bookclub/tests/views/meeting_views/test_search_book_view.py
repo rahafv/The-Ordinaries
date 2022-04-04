@@ -1,8 +1,9 @@
 """Test suite for the search page view."""
+from bookclub.models import Meeting, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin,ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Meeting, User, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, ObjectsCreator
+
 
 class SearchPageViewTest(TestCase, LoginRedirectTester, MenuTestMixin, ObjectsCreator):
     """Test suite for the search page view."""

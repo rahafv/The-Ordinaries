@@ -6,6 +6,7 @@ Created on Thu May  3 10:45:33 2018
 """
 from RecommenderMetrics import RecommenderMetrics
 
+
 class EvaluatedAlgorithm:
     
     def __init__(self, algorithm, name):

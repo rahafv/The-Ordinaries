@@ -1,11 +1,12 @@
 """Tests of the Home view."""
+from bookclub.helpers import rec_helper
+from bookclub.models import Book, Club, User
+from bookclub.recommender.recommendation import Recommendation
+from bookclub.recommender.SVDModel import SVDModel
+from bookclub.tests.helpers import LoginRedirectTester, LogInTester, MenuTestMixin, NotificationsTester,ObjectsCreator
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import Rating, User , Club , Book
-from bookclub.recommender.recommendation import Recommendation
-from bookclub.tests.helpers import LogInTester, LoginRedirectTester, MenuTestMixin, NotificationsTester, ObjectsCreator
-from bookclub.recommender.SVDModel import SVDModel
-from bookclub.helpers import rec_helper
+
 
 class HomeViewTestCase(TestCase , LogInTester, LoginRedirectTester, MenuTestMixin, NotificationsTester, ObjectsCreator):
     """Tests of the Home view."""

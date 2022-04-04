@@ -1,4 +1,3 @@
-from django.http import Http404
 from bookclub.forms import LogInForm, SignUpForm
 from bookclub.helpers import generate_token
 from bookclub.models import User
@@ -8,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -15,6 +15,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic import FormView, TemplateView
 from system import settings
+
 
 class LoginProhibitedMixin:
     """Mixin that redirects when a user is logged in."""

@@ -1,11 +1,13 @@
 """Tests of the meeting list view."""
 from datetime import datetime, timedelta
+
+import pytz
+from bookclub.models import Book, Club, Meeting, User
+from bookclub.tests.helpers import LoginRedirectTester, MenuTestMixin, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-import pytz
-from bookclub.models import User, Club, Meeting, Book
-from bookclub.tests.helpers import LoginRedirectTester , MenuTestMixin, MessageTester 
 from system import settings
+
 
 class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTester):
     """Tests of the meeting list view."""

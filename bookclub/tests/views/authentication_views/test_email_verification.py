@@ -1,11 +1,12 @@
 """Tests of the verfication view."""
-from django.test import TestCase
-from django.urls import reverse
+from bookclub.helpers import generate_token
 from bookclub.models import User
 from bookclub.tests.helpers import LogInTester, MessageTester
-from django.utils.http import urlsafe_base64_encode
+from django.test import TestCase
+from django.urls import reverse
 from django.utils.encoding import force_bytes
-from bookclub.helpers import generate_token
+from django.utils.http import urlsafe_base64_encode
+
 
 class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
     """Tests of the verfication view."""

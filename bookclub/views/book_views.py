@@ -1,18 +1,18 @@
-from urllib import request
-from bookclub.forms import BookForm, RatingForm , EditRatingForm, BooksSortForm
-from bookclub.helpers import NotificationHelper, SortHelper, get_recommender_books, rec_helper
-from bookclub.models import User, Book, Rating, Club
+
+from bookclub.forms import BookForm, BooksSortForm, EditRatingForm, RatingForm
+from bookclub.helpers import NotificationHelper, SortHelper,get_recommender_books, rec_helper
+from bookclub.models import Book, Club, Rating, User
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, FormView, ListView, UpdateView
 from django.views.generic.edit import FormMixin
-from system import settings
-from django.urls import reverse_lazy, reverse
 from notifications.signals import notify
-from django.contrib.auth.decorators import login_required
+from system import settings
 
 class AddBookView(LoginRequiredMixin, FormView):
     """Handle add book."""

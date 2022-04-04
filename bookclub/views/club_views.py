@@ -1,10 +1,11 @@
-from bookclub.forms import ClubsSortForm, CreateClubForm, TransferOwnershipForm, UsersSortForm
+from bookclub.forms import ClubsSortForm, CreateClubForm,TransferOwnershipForm, UsersSortForm
 from bookclub.helpers import NotificationHelper, SortHelper
 from bookclub.models import Club, User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mass_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -13,7 +14,6 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from notifications.signals import notify
 from system import settings
-from django.core.mail import send_mass_mail
 
 
 class CreateClubView(LoginRequiredMixin, CreateView):

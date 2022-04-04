@@ -1,5 +1,6 @@
-from collections import ChainMap, defaultdict
 import math
+from collections import ChainMap, defaultdict
+
 from bookclub.models import Book, User
 
 

@@ -1,8 +1,9 @@
 """Tests of the delete meeting view."""
+from bookclub.models import Club, Meeting, User
+from bookclub.tests.helpers import LoginRedirectTester, MessageTester
 from django.test import TestCase
 from django.urls import reverse
-from bookclub.models import User, Club, Meeting
-from bookclub.tests.helpers import LoginRedirectTester, MessageTester 
+
 
 class CancelMeetingViewTestCase(TestCase, LoginRedirectTester, MessageTester):
     """Tests of the delete meeting view."""
