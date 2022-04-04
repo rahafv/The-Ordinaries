@@ -84,27 +84,29 @@ def get_list_of_objects(searched, label):
     category = ''
     filtered_list = ""
 
-    if(label=="user-name"):
+    if label=="user-name":
         filtered_list = User.objects.filter(username__contains=searched)
         category= "Users"
-    elif(label=="user-location"):
+    elif label=="user-location":
         filtered_list = User.objects.filter(country__contains=searched)
         category= "Users"
-    elif(label=="club-name"):
+    elif label=="club-name":
         filtered_list = Club.objects.filter(name__contains=searched)
         category= "Clubs"
-    elif(label=="club-location"):
+    elif label=="club-location":
         filtered_list = Club.objects.filter(country__contains=searched)
         category= "Clubs"
-    elif(label=="book-title"):
+    elif label=="book-title":
         filtered_list = Book.objects.filter(title__contains=searched)
         category= "Books"
-    elif(label=="book-genre"):
+    elif label=="book-genre":
         filtered_list = Book.objects.filter(genre__contains=searched)
         category= "Books"
-    else:
+    elif label=="book-author":
         filtered_list = Book.objects.filter(author__contains=searched)
         category= "Books"
+    else:
+        return {"category": None, "filtered_list": []}
     
     return {"category" : category, "filtered_list" : filtered_list}
 
@@ -178,7 +180,7 @@ def get_recommender_books(request, is_item_based, numOfRecs, user_id=None, book_
     user_count = User.objects.count()
     limit = user_count/10
     if user_count < 10:
-        limit = 5
+        limit = 7
     if rec_helper.counter >= limit:
         rec_helper.reset_counter()
 
