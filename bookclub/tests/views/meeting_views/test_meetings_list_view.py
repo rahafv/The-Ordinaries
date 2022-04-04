@@ -38,7 +38,8 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
     def test_get_upcoming_meetings_list(self):
         self.client.login(username=self.user.username, password='Password123')
         self._create_test_meetings(12)
-        response = self.client.get(self.url)
+        form_input = {'filter': 'Upcoming meetings'}
+        response = self.client.get(self.url, form_input)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'meeting_templates/meetings_list.html')
         self.assertEqual(len(response.context['meetings_list']), 14)
@@ -103,6 +104,14 @@ class MeetingsListTest(TestCase, LoginRedirectTester ,MenuTestMixin, MessageTest
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "club_templates/club_page.html")
         self.assert_error_message(response)
+        self.assert_menu(response)
+
+    def test_get_meeting_list_with_wrong_input(self):
+        self.client.login(username=self.user.username, password='Password123')
+        form_input = {'filter': 'all meetings'}
+        response = self.client.get(self.url, form_input)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
         self.assert_menu(response)
 
     def _create_test_meetings(self, meetings_count=10):

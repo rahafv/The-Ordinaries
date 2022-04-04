@@ -10,11 +10,16 @@
         <div class="col-12">
             <h1 class="mb-3 mt-3">Meetings of {{club.name}} </h1> 
             <form action="{% url 'meetings_list' club.id %}" method=GET>
-                <div class='tabs-alt justify-content-center d-flex'>
-                    <input type="submit" name='filter' value="Upcoming meetings" class="btn btn-outline-dark">
-                    &emsp;
-                    <input type="submit" name='filter' value="Previous meetings" class="btn btn-outline-dark">
-                    &emsp;
+                <div class='tabs-alt d-flex mt-5 mb-3'>
+                    {% if is_previous %}
+                        <input type="submit" name='filter' value="Upcoming meetings" class="btn btn-outline-dark">
+                        <input type="submit" name='filter' value="Previous meetings" class="btn btn-outline-dark disabled" role="button" aria-disabled="true">
+                        &emsp;
+                    {% else %}
+                        <input type="submit" name='filter' value="Upcoming meetings" class="btn btn-outline-dark disabled" role="button" aria-disabled="true">
+                        <input type="submit" name='filter' value="Previous meetings" class="btn btn-outline-dark">
+                        &emsp;
+                    {% endif %}
                 </div>
             </form>
             {%if meetings_list %}

@@ -142,12 +142,15 @@ class MeetingsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Return club's meetings."""
-        self.is_previous = False
         if self.request.GET.get('filter') == 'Previous meetings': 
             self.is_previous = True
             return self.club.get_previous_meetings()
 
-        return self.club.get_upcoming_meetings()
+        if not self.request.GET.get('filter') or self.request.GET.get('filter') == 'Upcoming meetings':
+            self.is_previous = False
+            return self.club.get_upcoming_meetings()
+
+        raise Http404
 
     def get_template_names(self):
         """Return a different template name if the user does not have access rights."""
