@@ -49,6 +49,22 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
+Run the application: 
+
+```
+$ python3 manage.py runserver 
+``` 
+
+If you encountered this error message when running the server or migrating the database: 
+“ValueError: numpy.ndarray size changed, may indicate binary incompatibility. Expected 
+96 from C header, got 88 from PyObject” 
+
+write in the command line: 
+
+```
+$ pip install --upgrade numpy
+```
+
 ## Sources
 The packages used by this application are specified in `requirements.txt`
 
