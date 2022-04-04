@@ -10,6 +10,7 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
     fixtures = [
         'bookclub/tests/fixtures/default_club.json',
         'bookclub/tests/fixtures/other_club.json',
+        'bookclub/tests/fixtures/default_user.json',
         'bookclub/tests/fixtures/other_users.json'
     ]
 
@@ -17,6 +18,8 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.club = Club.objects.get(id=1)
         self.url = reverse("edit_club", kwargs={"club_id": self.club.id})
         self.owner = User.objects.get(username="janedoe")
+        self.user = User.objects.get(id=1)
+
         self.form_input = {
             'name': 'club2.0',
             'theme':'Drama',
@@ -29,7 +32,6 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
     def test_edit_club_page_url(self):
         self.assertEqual(self.url, f"/club/{self.club.id}/edit_club/")
 
-
     def test_get_edit_club(self):
         self.client.login(username=self.owner.username, password='Password123')
         response = self.client.get(self.url)
@@ -37,11 +39,18 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assertTemplateUsed(response, 'club_templates/edit_club_info.html')
         club_id = response.context['club_id']
         form= response.context['form']
-        #self.assertTrue(isinstance(form, ClubForm)) 
         self.assertEqual(form.instance, self.club)
         self.assertEqual(club_id, self.club.id)
         self.assert_menu(response)
-
+    
+    def test_only_owner_can_edit_club_details(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        response_url = reverse("club_page", kwargs={"club_id": self.club.id})
+        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        self.assertTemplateUsed(response, 'club_templates/club_page.html')
+        self.assert_error_message(response)
+        self.assert_menu(response)
 
     def test_unsuccessful_club_info_update(self):
         self.client.login(username=self.owner.username, password='Password123')
@@ -53,7 +62,6 @@ class ClubUpdateViewTest(TestCase, LoginRedirectTester, MessageTester,MenuTestMi
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/edit_club_info.html')
         form = response.context['form']
-        #self.assertTrue(isinstance(form, ClubForm))
         self.assertTrue(form.instance, self.club)
         self.assertTrue(form.is_bound)
         self.club.refresh_from_db()

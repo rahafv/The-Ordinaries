@@ -22,7 +22,7 @@ class PostProgressTest(TestCase, LoginRedirectTester ,MessageTester, MenuTestMix
         }
         
     def test_book_progress_url(self):
-        self.assertEqual(self.url,f'/book/{self.target_book.id}/post_progress')
+        self.assertEqual(self.url,f'/book/{self.target_book.id}/post_progress/')
     
     def test_get_book_with_valid_id(self):
         self.client.login(username=self.user.username, password='Password123')

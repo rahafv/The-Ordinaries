@@ -17,6 +17,8 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
     def setUp(self):
         self.target_book = Book.objects.get(ISBN='0195153448')
         self.user = User.objects.get(id=1)
+        self.sec_user = User.objects.get(id=2)
+
         self.club = Club.objects.get(id=1)
         self.url = reverse('books_list')
         self.BOOKS_PER_PAGE = 15
@@ -27,8 +29,15 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
     def test_books_list_url(self):
         self.assertEqual(self.url,f'/books/')
 
-    def test_get_club_books_list(self):
+    def test_get_non_members_cannot_access_club_books_list(self):
         self.client.login(username=self.user.username, password='Password123')
+        self.url = reverse('books_list', kwargs={'club_id': self.club.id})
+        response = self.client.get(self.url, self.form_input)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
+
+    def test_get_club_books_list(self):
+        self.client.login(username=self.sec_user.username, password='Password123')
         self.url = reverse('books_list', kwargs={'club_id': self.club.id})
         response = self.client.get(self.url, self.form_input)
         self.assertEqual(response.status_code, 200)
@@ -38,7 +47,6 @@ class BooksListTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data.get('sort'), 'name_desc')  
         self.assert_menu(response)
-
 
     def test_get_books_list(self):
         self.client.login(username=self.user.username, password='Password123')

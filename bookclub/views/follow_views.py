@@ -48,7 +48,9 @@ def follow_toggle(request, user_id):
     current_user = request.user
     followee = get_object_or_404(User.objects, id=user_id)
     notificationHelper = NotificationHelper()
-
+    if current_user == followee:
+        raise Http404
+        
     if(not current_user.is_following(followee)):
         notificationHelper.delete_notifications(current_user, [followee], notificationHelper.NotificationMessages.FOLLOW )
         notify.send(current_user, recipient=followee, verb=notificationHelper.NotificationMessages.FOLLOW,  description='notification' )

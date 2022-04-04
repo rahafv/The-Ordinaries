@@ -183,7 +183,7 @@ def join_club(request, club_id):
                                  "You have successfully applied!")
             return redirect('club_page', club_id)
         else:
-            messages.add_message(request, messages.ERROR,
+            messages.add_message(request, messages.INFO,
                                  "Already applied, awaiting approval!")
             return redirect('club_page', club_id)
 
@@ -379,6 +379,16 @@ class EditClubInformationView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['club_id'] = self.object.id
         return context
+
+    def get(self, *args, **kwargs):
+        """Get method with additonal checks for permissions."""
+        club = get_object_or_404(Club, id = self.kwargs['club_id'])
+
+        if self.request.user !=  club.owner:
+            messages.add_message(self.request, messages.ERROR, "You are not permitted to access this page!")
+            return redirect('club_page', club_id = club.id)
+
+        return super().get(*args, **kwargs)
 
     def get_success_url(self):
         """Return URL to redirect the user to after valid form handling."""

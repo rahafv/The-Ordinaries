@@ -1,3 +1,4 @@
+from django.http import Http404
 from bookclub.forms import LogInForm, SignUpForm
 from bookclub.helpers import generate_token
 from bookclub.models import User
@@ -98,8 +99,6 @@ class LogInView(LoginProhibitedMixin, FormView):
         form = LogInForm()
         return render(self.request, 'authentication_templates/log_in.html', {'form': form, 'next': self.next})
 
-
-
 """Handle log out attempt."""
 @login_required
 def log_out(request):
@@ -111,6 +110,11 @@ def log_out(request):
 def send_activiation_email(request, user_id):
 
     user = get_object_or_404(User, id=user_id)
+
+    if request.user.id:
+
+        if user != request.user:
+            raise Http404
 
     if not user.email_verified:
         current_site = get_current_site(request)

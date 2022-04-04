@@ -26,7 +26,7 @@ class ChooseBookViewTest(TestCase, LoginRedirectTester, MessageTester):
 
 
     def test_choose_book_url(self):
-        self.assertEqual(self.url, f'/meeting/{self.meeting.id}/choose/{self.book.id}')
+        self.assertEqual(self.url, f'/meeting/{self.meeting.id}/choose/{self.book.id}/')
 
     def test_cant_access_when_book(self):
         self.client.login(username=self.sec_user.username, password='Password123')
