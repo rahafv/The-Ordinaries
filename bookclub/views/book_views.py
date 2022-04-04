@@ -130,6 +130,11 @@ class AddReviewView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         """Generate context data to be shown in the template."""
         context = super().get_context_data(**kwargs)
+        
+        user = self.request.user
+        if Rating.objects.filter(user_id=user.id, book_id=self.kwargs['book_id']).exists():
+            raise Http404
+
         context['book'] = get_object_or_404(Book.objects, id=self.kwargs['book_id'])
         return context
 

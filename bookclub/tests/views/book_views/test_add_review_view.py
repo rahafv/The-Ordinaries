@@ -70,6 +70,17 @@ class AddReviewViewTestCase(TestCase, LoginRedirectTester):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "book_templates/book_details.html")
 
+    def test_get_rating_with_previous_rating(self):
+        self.client.login(username=self.user.username, password="Password123")
+        Rating.objects.create(
+            user=self.user,
+            book=self.book,
+            rating=5
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
+
     def test_get_add_book_redirects_when_not_logged_in(self):
         self.assert_redirects_when_not_logged_in()
 
