@@ -62,7 +62,7 @@ If you encountered this error message when running the server or migrating the d
 write in the command line: 
 
 ```
-$ pip install --upgrade numpy
+$ pip3 install --upgrade numpy
 ```
 
 ## Sources
