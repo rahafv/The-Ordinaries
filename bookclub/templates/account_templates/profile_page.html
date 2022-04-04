@@ -46,20 +46,23 @@
                 {% endif %}
             </div>
 
-            <div class="text-center pt-2 pb-1.7">
-                <a href="{% url 'following_list' user_id=user.id %}"  class = "d-inline-block text-white"> {{ user.followee_count }}  <span class= "opacity-80">following</span></a>
-                &emsp;
-                <a href="{% url 'followers_list' user_id=user.id %}" class = "d-inline-block text-white" > {{ user.follower_count }} <span class="opacity-80">followers</span></a>
-                &emsp;
-                <div class="float d-inline-flex">
-                    {% if followable %}
-                        {% if following %}
-                            <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-secondary text-white"> Unfollow </a> 
-                        {% else %}
-                            <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn opacity-100 text-white" style="background-color: #18708B;"> Follow </a> 
-                        {% endif %}
+            <div class="text-center pt-2 pb-1.7 d-inline-flex">
+                <form action="{% url 'follow_list' user.id %}" method=GET>
+                    <div class='tabs-alt justify-content-center d-flex'>
+                        {{ user.followee_count }} <input type="submit" name='filter' value="following" class="follow text-white">
+                        &emsp;
+                        {{ user.follower_count }} <input type="submit" name='filter' value="followers" class="follow text-white">
+                        &emsp;
+                    </div>
+                </form>
+
+                {% if followable %}
+                    {% if following %}
+                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn btn-secondary text-white"> Unfollow </a> 
+                    {% else %}
+                        <a href="{% url 'follow_toggle' user_id=user.id  %}" class=" profile-statistics btn opacity-100 text-white" style="background-color: #18708B;"> Follow </a> 
                     {% endif %}
-                </div> 
+                {% endif %}
             </div> 
         </div> 
             

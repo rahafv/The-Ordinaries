@@ -13,11 +13,6 @@ class User(AbstractUser):
 
     email_verified = models.BooleanField(default=False)
 
-    # training_counter = models.PositiveSmallIntegerField(
-    #     null=False,
-    #     blank=False
-    # )
-
     username = models.CharField(
         max_length=30,
         unique=True,

@@ -50,8 +50,7 @@ urlpatterns = [
     path('book/<int:book_id>/add_to_list/', user_views.add_book_to_list, name ='add_book_to_list'),
 
     path('follow_toggle/<int:user_id>/', follow_views.follow_toggle, name='follow_toggle'),
-    path('<int:user_id>/followings/', follow_views.FollowingListView.as_view(), name='following_list'),
-    path('<int:user_id>/followers/', follow_views.FollowersListView.as_view(), name='followers_list'),
+    path('<int:user_id>/follow_list/', follow_views.FollowListView.as_view(), name='follow_list'),
     
     path('add_book/', book_views.AddBookView.as_view(), name ='add_book'),
     path('books/', book_views.BookListView.as_view(), name ='books_list'),
