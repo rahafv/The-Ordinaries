@@ -36,6 +36,12 @@ class ShowUserTest(TestCase):
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'account_templates/profile_page.html')
        
+    def test_get_user_cannot_follow_themselves(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.url = reverse('follow_toggle', kwargs={'user_id': self.user.id})
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
 
     def test_get_follow_toggle_for_non_followee(self):
         self.client.login(username=self.user.username, password='Password123')

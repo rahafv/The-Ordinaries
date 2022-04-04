@@ -14,6 +14,8 @@ class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
 
     def setUp(self):
         self.user = User.objects.get(id=5)
+        self.other_user = User.objects.get(id=2)
+
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.token = generate_token.make_token(self.user)
         self.url = reverse('activate', kwargs={'uidb64': self.uid, 'token': self.token})
@@ -24,6 +26,13 @@ class VerificationViewTestCase(TestCase, LogInTester, MessageTester):
     def test_send_activation_url(self):
         self.url = reverse('send_activation', kwargs={'user_id': 5})
         self.assertEqual(self.url,f'/send_activation/{self.user.id}/')
+
+    def test_only_request_user_can_send_activation_url(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.url = reverse('send_activation', kwargs={'user_id': self.other_user.id})
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
 
     def test_succesful_verification(self):
         response = self.client.get(self.url, follow=True)

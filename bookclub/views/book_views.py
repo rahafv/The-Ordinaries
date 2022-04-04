@@ -1,3 +1,4 @@
+from urllib import request
 from bookclub.forms import BookForm, RatingForm , EditRatingForm, BooksSortForm
 from bookclub.helpers import NotificationHelper, SortHelper, get_recommender_books, rec_helper
 from bookclub.models import User, Book, Rating, Club
@@ -88,10 +89,15 @@ class BookListView(ListView):
         context = super().get_context_data(*args, **kwargs)
         books_queryset = Book.objects.all()
         general = True
-
+ 
         if self.club_id:
-            books_queryset = Club.objects.get(id=self.club_id).books.all()
-            general = False
+            club = Club.objects.get(id=self.club_id)
+            if club.is_member(self.request.user):
+                books_queryset = club.books.all()
+                general = False
+            else:
+                raise Http404
+
         if self.user_id:
             books_queryset = User.objects.get(id=self.user_id).books.all()
             general = False

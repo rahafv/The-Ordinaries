@@ -96,7 +96,7 @@ class JoinClubViewTestCase(TestCase, LoginRedirectTester, MessageTester,MenuTest
         self.assertEqual(applicants_after_count, applicants_before_count)
         response_url = reverse('club_page', kwargs={'club_id': self.club.id})
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assert_error_message(response)
+        self.assert_info_message(response)
         self.assert_menu(response)
 
     def test_join_club_with_invalid_id(self):
