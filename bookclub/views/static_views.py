@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.views.generic.base import TemplateView
 from django.shortcuts import get_object_or_404, render
 from bookclub.forms import BooksSortForm, ClubsSortForm, UsersSortForm
@@ -105,18 +106,19 @@ class SearchPageView(LoginRequiredMixin, TemplateView):
         label = category
 
         # method in helpers to return a dictionary with a list of users, clubs or books searched
-        search_page_results = get_list_of_objects(
-            searched=searched, label=label)
+        search_page_results = get_list_of_objects(searched, label)
         category = search_page_results["category"]
         filtered_list = search_page_results["filtered_list"]
 
         sortForm = ""
-        if(category == "Clubs"):
+        if category == "Clubs":
             sortForm = ClubsSortForm(self.request.GET or None)
-        elif(category == "Books"):
+        elif category == "Books":
             sortForm = BooksSortForm(self.request.GET or None)
-        else:
+        elif category == "Users":
             sortForm = UsersSortForm(self.request.GET or None)
+        else:
+            raise Http404
 
         if (sortForm.is_valid()):
             sort = sortForm.cleaned_data.get('sort')

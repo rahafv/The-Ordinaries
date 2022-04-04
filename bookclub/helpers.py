@@ -84,27 +84,29 @@ def get_list_of_objects(searched, label):
     category = ''
     filtered_list = ""
 
-    if(label=="user-name"):
+    if label=="user-name":
         filtered_list = User.objects.filter(username__contains=searched)
         category= "Users"
-    elif(label=="user-location"):
+    elif label=="user-location":
         filtered_list = User.objects.filter(country__contains=searched)
         category= "Users"
-    elif(label=="club-name"):
+    elif label=="club-name":
         filtered_list = Club.objects.filter(name__contains=searched)
         category= "Clubs"
-    elif(label=="club-location"):
+    elif label=="club-location":
         filtered_list = Club.objects.filter(country__contains=searched)
         category= "Clubs"
-    elif(label=="book-title"):
+    elif label=="book-title":
         filtered_list = Book.objects.filter(title__contains=searched)
         category= "Books"
-    elif(label=="book-genre"):
+    elif label=="book-genre":
         filtered_list = Book.objects.filter(genre__contains=searched)
         category= "Books"
-    else:
+    elif label=="book-author":
         filtered_list = Book.objects.filter(author__contains=searched)
         category= "Books"
+    else:
+        return {"category": None, "filtered_list": []}
     
     return {"category" : category, "filtered_list" : filtered_list}
 

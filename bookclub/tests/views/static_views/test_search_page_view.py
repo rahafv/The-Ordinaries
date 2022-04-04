@@ -153,6 +153,12 @@ class SearchPageTest(TestCase, LoginRedirectTester,MenuTestMixin):
         self.assertFalse(form.is_valid())
         self.assert_menu(response)
 
+    def test_search_with_no_category(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+        self.assertTemplateUsed(response, 'static_templates/404_page.html')
+
 
     def _create_test_users(self, user_count=6):
         for user_id in range(user_count):
