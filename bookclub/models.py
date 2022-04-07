@@ -303,7 +303,7 @@ class Book(models.Model):
     )
 
     description = models.CharField(
-        max_length=500,
+        max_length=18000,
         unique=False,
         blank=True
     )
@@ -462,7 +462,7 @@ class Meeting(models.Model):
     )
 
     notes = models.CharField(
-        max_length=500,
+        max_length=150,
         blank=True
     )
 
