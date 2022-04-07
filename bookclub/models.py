@@ -280,6 +280,7 @@ class Book(models.Model):
     """Book model."""
 
     ISBN = ISBNField(
+        max_length=15,
         unique=True
     )
 
