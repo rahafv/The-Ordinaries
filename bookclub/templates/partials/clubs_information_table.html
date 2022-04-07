@@ -16,7 +16,7 @@
                             {% for club in Clubs %}
                                 <tr>
                                     <td  style="width: 30%;">
-                                        <img src="{% static '/images/3.png' %}" loading="lazy"  alt="Avatar" class="rounded-circle profile-image" >
+                                        <img src="{% static 'images/3.png' %}" loading="lazy"  alt="Avatar" class="rounded-circle profile-image" >
                                         <a href='{% url 'club_page' club.id %}' style="color: black; font-size: 18px;  text-decoration: none;" >{{club.name}}</a>
                                         <span style="width: 180px;  font-style: italic; font-size: 15px;"class="user-link">{{club.club_type}}</span>
                                     </td>
