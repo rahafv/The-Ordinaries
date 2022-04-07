@@ -168,6 +168,6 @@ EMAIL_HOST_PASSWORD = 'clmdfxslqbaalopk'
 
 
 # Activate django_heroku
-if '/app' in os.environ['USERPROFILE']:
+if '/app' in os.environ['HOME']:
     import django_heroku
     django_heroku.settings(locals())
