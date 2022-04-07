@@ -211,7 +211,7 @@ class Club(models.Model):
     )
 
     country = models.CharField(
-        max_length=50,
+        max_length=55,
         blank=True
     )
 
