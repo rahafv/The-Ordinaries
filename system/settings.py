@@ -26,11 +26,11 @@ SECRET_KEY = 'django-insecure-y#z@-9$x!xugmhek!htjp(ahb0q=4dbtj0#9nrbxrv3cew!bsz
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+# DEBUG = True
 ALLOWED_HOSTS = ['localhost', 'testserver']
 
 # ATTENTION!! this will be commented until the deployment. and the above segmented will be uncommented instead.
-# DEBUG = False
+DEBUG = False
 
 # Application definition
 
@@ -167,3 +167,7 @@ EMAIL_HOST_USER = 'Ordinariesbookclubs@gmail.com'
 EMAIL_HOST_PASSWORD = 'clmdfxslqbaalopk'
 
 
+# Activate django_heroku
+if '/app' in os.environ['HOME']:
+    import django_heroku
+    django_heroku.settings(locals())
