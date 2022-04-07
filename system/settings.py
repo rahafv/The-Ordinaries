@@ -26,11 +26,11 @@ SECRET_KEY = 'django-insecure-y#z@-9$x!xugmhek!htjp(ahb0q=4dbtj0#9nrbxrv3cew!bsz
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+# DEBUG = True
 ALLOWED_HOSTS = ['localhost', 'testserver','.herokuapp.com']
 
 # ATTENTION!! this will be commented until the deployment. and the above segmented will be uncommented instead.
-# DEBUG = False
+DEBUG = False
 
 # Application definition
 
@@ -171,3 +171,40 @@ EMAIL_HOST_PASSWORD = 'clmdfxslqbaalopk'
 if '/app' in os.environ['HOME']:
     import django_heroku
     django_heroku.settings(locals())
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': ('%(asctime)s [%(process)d] [%(levelname)s] ''pathname=%(pathname)s lineno=%(lineno)s ''funcname=%(funcName)s %(message)s'),
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    }
+}
