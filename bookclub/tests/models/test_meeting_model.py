@@ -43,12 +43,12 @@ class MeetingModelTestCase(TestCase):
         self.meeting.title = second_meeting.title
         self._assert_meeting_is_valid()
 
-    def test_notes_cannot_be_over_500_characters_long(self):
-        self.meeting.notes = 'x' * 501
+    def test_notes_cannot_be_over_150_characters_long(self):
+        self.meeting.notes = 'x' * 151
         self._assert_meeting_is_invalid()
     
-    def test_notes_can_be_500_characters_long(self):
-        self.meeting.notes = 'x' * 500
+    def test_notes_can_be_150_characters_long(self):
+        self.meeting.notes = 'x' * 150
         self._assert_meeting_is_valid()
 
     def test_time_must_not_be_blank(self):

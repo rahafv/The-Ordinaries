@@ -29,16 +29,16 @@ class BookModelTestCase(TestCase):
         self.book.title = 'x' * 200
         self._assert_book_is_valid()
 
-    def test_title_cannot_be_over_200_characters_long(self):
-        self.book.title = 'x' * 201
+    def test_title_cannot_be_over_260_characters_long(self):
+        self.book.title = 'x' * 261
         self._assert_book_is_invalid()
 
     def test_author_can_be_100_characters_long(self):
         self.book.author = 'x' * 100
         self._assert_book_is_valid()
 
-    def test_author_cannot_be_over_100_characters_long(self):
-        self.book.author = 'x' * 101
+    def test_author_cannot_be_over_1530_characters_long(self):
+        self.book.author = 'x' * 1531
         self._assert_book_is_invalid()
 
     def test_ISBN_must_be_unique(self):
