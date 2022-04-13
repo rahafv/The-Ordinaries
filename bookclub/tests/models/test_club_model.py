@@ -113,8 +113,8 @@ class ClubModelTestCase(TestCase):
         self.club.country = 'x' * 50
         self._assert_club_is_valid()
 
-    def test_country_must_not_contain_more_than_50_characters(self):
-        self.club.country = 'x' * 51
+    def test_country_must_not_contain_more_than_55_characters(self):
+        self.club.country = 'x' * 56
         self._assert_club_is_invalid()
 
     def test_location(self):

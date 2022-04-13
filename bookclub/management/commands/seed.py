@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
     def create_users(self):
 
-        MAX_USERS = 200
+        MAX_USERS = 150
         users_path = os.path.abspath("book-review-dataset/Users.csv")
         with open(users_path, "r", encoding='latin-1') as csv_file:
             users_data = csv.reader(csv_file, delimiter=",")
@@ -119,7 +119,7 @@ class Command(BaseCommand):
             pass
 
     def create_followers(self):
-        count = int((self.users.count()-1)/10)
+        count = int((self.users.count())/25)
         for user in self.users:
             rand_num = random.randint(0, count)
             sample = User.objects.order_by('?').exclude(id=user.id)[:rand_num]
@@ -127,7 +127,7 @@ class Command(BaseCommand):
 
 
     def create_clubs(self):
-        MAX_CLUBS = 100
+        MAX_CLUBS = 24
         clubs_path = os.path.abspath("book-review-dataset/Clubs.csv")
         with open(clubs_path, "r", encoding='latin-1') as csv_file:
             clubs_data = csv.reader(csv_file, delimiter=",")
@@ -163,13 +163,13 @@ class Command(BaseCommand):
                 Club.objects.bulk_create(clubs)
 
     def populate_clubs(self):
-        count = int((self.users.count()-1)/10)
+        count = int((self.users.count())/25)
         books = Book.objects.order_by('?')
-        MEETING_PROBABILITY = 0.6
+        MEETING_PROBABILITY = 0.5
         ctr = 0
 
         for club in self.clubs:
-            rand_num = random.randint(0, count)
+            rand_num = random.randint(1, count)
             sample = User.objects.order_by('?')[:rand_num]
             club.members.add(*sample)
 
@@ -194,7 +194,7 @@ class Command(BaseCommand):
         notify.send(club, recipient=club.members.all(), verb=self.notificationHelper.NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M')
 
     def create_books(self):
-        MAX_BOOKS = 800
+        MAX_BOOKS = 500
         books_path = os.path.abspath("book-review-dataset/books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = csv.reader(csv_file, delimiter=",")
@@ -228,7 +228,7 @@ class Command(BaseCommand):
                 
 
     def create_ratings(self):
-        MAX_RATINGS = 4000
+        MAX_RATINGS = 2000
 
         ratings_path = os.path.abspath("book-review-dataset/ratings.csv")
         with open(ratings_path, "r", encoding='latin-1') as csv_file:
@@ -245,8 +245,12 @@ class Command(BaseCommand):
                 else:
                     review = 'the book was okay'
 
-                user = User.objects.get(username=col[0])
-                book = Book.objects.get(ISBN=col[1])
+                try:
+                    user = User.objects.get(username=col[0])
+                    book = Book.objects.get(ISBN=col[1])
+                except:
+                    continue
+                
 
                 rating = Rating(
                     user = user, 
@@ -259,14 +263,13 @@ class Command(BaseCommand):
                 user.add_book_to_all_books(book)
 
                 if random.random() < REVIEW_PROBABILITY:
-                    rand = random.randint(0,1)
-                    if rand == 1:
+                    rand = random.randint(0,2)
+                    if rand == 0:
                         notify.send(user, recipient=user.followers.all(), verb=self.notificationHelper.NotificationMessages.ADD, action_object=book, description='user-event-B' )
-                    else:
+                    elif rand == 1:
                         notify.send(user, recipient=user.followers.all(), verb=self.notificationHelper.NotificationMessages.REVIEW, action_object=book, description='user-event-B' )       
-                    
-                else:
-                    review = 'the book was okay'
+                    else:
+                        pass
            
                 ratings.append(rating)
 

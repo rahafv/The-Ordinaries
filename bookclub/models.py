@@ -211,7 +211,7 @@ class Club(models.Model):
     )
 
     country = models.CharField(
-        max_length=50,
+        max_length=55,
         blank=True
     )
 
@@ -280,29 +280,30 @@ class Book(models.Model):
     """Book model."""
 
     ISBN = ISBNField(
+        max_length=15,
         unique=True
     )
 
     title = models.CharField(
-        max_length=200,
+        max_length=260,
         unique=False,
         blank=False
     )
 
     author = models.CharField(
-        max_length=100,
+        max_length=1530,
         unique=False,
         blank=False
     )
 
     genre = models.CharField(
-        max_length=100,
+        max_length=220,
         unique=False,
         blank=True
     )
 
     description = models.CharField(
-        max_length=500,
+        max_length=18000,
         unique=False,
         blank=True
     )
@@ -461,7 +462,7 @@ class Meeting(models.Model):
     )
 
     notes = models.CharField(
-        max_length=500,
+        max_length=150,
         blank=True
     )
 
