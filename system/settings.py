@@ -167,7 +167,7 @@ EMAIL_HOST_USER = 'Ordinariesbookclubs@gmail.com'
 EMAIL_HOST_PASSWORD = 'clmdfxslqbaalopk'
 
 
-# # Activate django_heroku
-# if '/app' in os.environ['HOME']:
-#     import django_heroku
-#     django_heroku.settings(locals())
+# Activate django_heroku
+if '/app' in os.environ['HOME']:
+    import django_heroku
+    django_heroku.settings(locals())
