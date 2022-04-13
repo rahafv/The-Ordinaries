@@ -1,2 +1,2 @@
-python3 manage.py migrate
+python manage.py migrate
 web: gunicorn system.wsgi
