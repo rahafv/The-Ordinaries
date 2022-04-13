@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
                 users.append(user)
 
-                if len(users) > MAX_USERS:
+                if len(users) >= MAX_USERS:
                     User.objects.bulk_create(users)
                     users = []
                     break
@@ -137,7 +137,7 @@ class Command(BaseCommand):
             for col in clubs_data:
                 rand_id = random.randint(0, self.users.count()-1)
 
-                TYPE_PROBABILITY = 0.1
+                TYPE_PROBABILITY = 0.2
                 if random.random() < TYPE_PROBABILITY:
                     club_type = 'Private'
                 else:
@@ -154,7 +154,7 @@ class Command(BaseCommand):
 
                 clubs.append(club)
 
-                if len(clubs) > MAX_CLUBS:
+                if len(clubs) >= MAX_CLUBS:
                     Club.objects.bulk_create(clubs)
                     clubs = []
                     break
@@ -176,7 +176,7 @@ class Command(BaseCommand):
             club.members.add(club.owner)
             notify.send(club.owner, recipient=club.owner.followers.all(), verb=self.notificationHelper.NotificationMessages.CREATE, action_object=club, description='user-event-C' ) 
             
-            if random.random() < MEETING_PROBABILITY:
+            if random.random() <= MEETING_PROBABILITY:
                 self.create_meeting(club, club.owner, books[ctr])
             ctr +=1
             
@@ -194,7 +194,7 @@ class Command(BaseCommand):
         notify.send(club, recipient=club.members.all(), verb=self.notificationHelper.NotificationMessages.SCHEDULE, action_object=meeting, description='club-event-M')
 
     def create_books(self):
-        MAX_BOOKS = 500
+        MAX_BOOKS = 450
         books_path = os.path.abspath("book-review-dataset/books.csv")
         with open(books_path, "r", encoding='latin-1') as csv_file:
             books_data = csv.reader(csv_file, delimiter=",")
@@ -218,7 +218,7 @@ class Command(BaseCommand):
 
                 books.append(book)
 
-                if len(books) > MAX_BOOKS:
+                if len(books) >= MAX_BOOKS:
                     Book.objects.bulk_create(books)
                     books = []
                     break
@@ -273,7 +273,7 @@ class Command(BaseCommand):
            
                 ratings.append(rating)
 
-                if len(ratings) > MAX_RATINGS:
+                if len(ratings) >= MAX_RATINGS:
                     Rating.objects.bulk_create(ratings)
                     ratings = []
                     break
