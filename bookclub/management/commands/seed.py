@@ -24,7 +24,7 @@ class Command(BaseCommand):
         self.notificationHelper = NotificationHelper()
 
     def handle(self, *args, **options):
-        # unseed.emptyDatabase()
+        unseed.emptyDatabase()
 
         initial_start = time.time()
 
